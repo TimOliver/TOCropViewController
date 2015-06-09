@@ -690,9 +690,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGFloat scale = MAX(cropBoxFrame.size.height/imageSize.height, cropBoxFrame.size.width/imageSize.width);
     self.scrollView.minimumZoomScale = scale;
     
-    //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
-    self.scrollView.zoomScale = self.scrollView.zoomScale;
-    
     //make sure content isn't smaller than the crop box
     CGSize size = self.scrollView.contentSize;
     size.width = floorf(size.width);
@@ -700,12 +697,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //self.backgroundContainerView.frame = (CGRect){CGPointZero, size};
     self.scrollView.contentSize = size;
     
-    //If we were stretching the crop box outwards, make sure the content image is scaled as well
-    CGRect imageFrame = self.backgroundImageView.frame;
-    BOOL redrawRequired = floorf(CGRectGetWidth(imageFrame)) < floorf(CGRectGetWidth(cropBoxFrame)) || floorf(CGRectGetHeight(imageFrame)) < floorf(CGRectGetHeight(cropBoxFrame));
-    if (redrawRequired) {
-        self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-    }
+    //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
+    self.scrollView.zoomScale = self.scrollView.zoomScale;
     
     [self matchForegroundToBackground]; //re-align the background content to match
 }
@@ -758,6 +751,30 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.translucencyView.hidden = _cropElementsHidden;
     self.foregroundContainerView.hidden = _cropElementsHidden;
     self.gridOverlayView.hidden = _cropElementsHidden;
+}
+
+- (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
+{
+    _gridOverlayHidden = gridOverlayHidden;
+    [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
+}
+
+- (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
+{
+    self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
+    
+    [UIView animateWithDuration:0.4f animations:^{
+        self.gridOverlayView.alpha = gridOverlayHidden ? 0.0f : 1.0f;
+    }];
+}
+
+- (CGRect)imageViewFrame
+{
+    CGRect frame = CGRectZero;
+    frame.origin.x = -self.scrollView.contentOffset.x;
+    frame.origin.y = -self.scrollView.contentOffset.y;
+    frame.size = self.scrollView.contentSize;
+    return frame;
 }
 
 #pragma mark - Editing Mode -

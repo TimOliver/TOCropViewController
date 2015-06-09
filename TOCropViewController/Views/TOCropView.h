@@ -54,6 +54,11 @@
 @property (nonatomic, readonly) CGRect cropBoxFrame;
 
 /**
+ The frame of the entire image in the backing scroll view
+ */
+@property (nonatomic, readonly) CGRect imageViewFrame;
+
+/**
  Inset the workable region of the crop view in case in order to make space for accessory views
  */
 @property (nonatomic, assign) UIEdgeInsets cropRegionInsets;
@@ -87,6 +92,11 @@
  In relation to the coordinate space of the image, the frame that the crop view is focussing on
  */
 @property (nonatomic, readonly) CGRect croppedImageFrame;
+
+/**
+ Set the grid overlay graphic to be hidden
+ */
+@property (nonatomic, assign) BOOL gridOverlayHidden;
 
 /**
  Create a new instance of the crop view with the supplied image
@@ -137,5 +147,10 @@
  @param animated Whether the transition is animated
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
+
+/**
+ Animate the grid overlay graphic to be visible
+ */
+- (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated;
 
 @end

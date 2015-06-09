@@ -82,7 +82,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
     self.cropView = [[TOCropView alloc] initWithImage:self.image];
-    self.cropView.frame = (CGRect){0,0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
+    self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
     self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.cropView.delegate = self;
     [self.view addSubview:self.cropView];
@@ -106,16 +106,20 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.inTransition = YES;
-    [self setNeedsStatusBarAppearanceUpdate];
+    
+    if ([UIApplication sharedApplication].statusBarHidden == NO) {
+        self.inTransition = YES;
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     self.inTransition = NO;
-    if (animated) {
+    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+        [self.cropView setGridOverlayHidden:NO animated:YES];
     }
 }
 
@@ -326,54 +330,79 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 #pragma mark - Presentation Handling -
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController fromFrame:(CGRect)frame completion:(void (^)(void))completion
 {
-    __block typeof (self) blockSelf = self;
     self.transitionController.image = self.image;
     self.transitionController.fromFrame = frame;
-    self.transitionController.prepareForTransitionHandler = ^{
-        blockSelf.transitionController.toFrame = blockSelf.cropView.cropBoxFrame;
-        
-        if (!CGRectIsEmpty(frame))
-            blockSelf.cropView.cropElementsHidden = YES;
-    };
 
-    
+    __block typeof (self) blockSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
         if (completion) {
             completion();
         }
         
         blockSelf.cropView.cropElementsHidden = NO;
-        [self.transitionController reset];
+        if (!CGRectIsEmpty(frame)) {
+            [blockSelf.cropView setGridOverlayHidden:NO animated:YES];
+        }
     }];
 }
 
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController withImage:(UIImage *)image toFrame:(CGRect)frame completion:(void (^)(void))completion
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController withCroppedImage:(UIImage *)image toFrame:(CGRect)frame completion:(void (^)(void))completion
 {
-    __block typeof (self) blockSelf = self;
     self.transitionController.image = image;
     self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
     self.transitionController.toFrame = frame;
-    self.transitionController.prepareForTransitionHandler = ^{
-        blockSelf.cropView.cropElementsHidden = YES;
-    };
+
+    [viewController dismissViewControllerAnimated:YES completion:^ {
+        if (completion) {
+            completion();
+        }
+    }];
+}
+
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController toFrame:(CGRect)frame completion:(void (^)(void))completion
+{
+    self.transitionController.image = self.image;
+    self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.imageViewFrame toView:self.view];
+    self.transitionController.toFrame = frame;
     
     [viewController dismissViewControllerAnimated:YES completion:^ {
         if (completion) {
             completion();
         }
-        
-        [self.transitionController reset];
     }];
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source
 {
+    __block typeof (self) blockSelf = self;
+    self.transitionController.prepareForTransitionHandler = ^{
+        blockSelf.transitionController.toFrame = [blockSelf.cropView convertRect:blockSelf.cropView.cropBoxFrame toView:blockSelf.view];
+        if (!CGRectIsEmpty(blockSelf.transitionController.fromFrame))
+            blockSelf.cropView.cropElementsHidden = YES;
+        
+        if (blockSelf.prepareForTransitionHandler)
+            blockSelf.prepareForTransitionHandler();
+        
+        blockSelf.prepareForTransitionHandler = nil;
+    };
+    
     self.transitionController.isDismissing = NO;
     return self.transitionController;
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
+    __block typeof (self) blockSelf = self;
+    self.transitionController.prepareForTransitionHandler = ^{
+        if (!CGRectIsEmpty(blockSelf.transitionController.toFrame))
+            blockSelf.cropView.cropElementsHidden = YES;
+        else
+            blockSelf.cropView.simpleMode = YES;
+        
+        if (blockSelf.prepareForTransitionHandler)
+            blockSelf.prepareForTransitionHandler();
+    };
+    
     self.transitionController.isDismissing = YES;
     return self.transitionController;
 }
@@ -381,6 +410,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 #pragma mark - Button Feedback -
 - (void)cancelButtonTapped
 {
+    if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
+        [self.delegate cropViewController:self didFinishCancelled:YES];
+        return;
+    }
+    
     self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
@@ -399,6 +433,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
             [activityItems addObjectsFromArray:self.activityItems];
         
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:self.applicationActivities];
+        activityController.excludedActivityTypes = self.excludedActivityTypes;
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
             [self presentViewController:activityController animated:YES completion:nil];
@@ -414,8 +449,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
             if (!completed)
                 return;
             
-            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-            blockController.completionHandler = nil;
+            if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
+                [self.delegate cropViewController:self didFinishCancelled:NO];
+            }
+            else {
+                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                blockController.completionHandler = nil;
+            }
         };
         
         return;
