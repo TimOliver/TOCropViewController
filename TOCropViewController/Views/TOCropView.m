@@ -904,7 +904,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = self.cropBoxFrame;
     CGPoint offset = self.scrollView.contentOffset;
     
-    BOOL cropBoxIsPortrait = aspectRatio.width <= aspectRatio.height;
+    BOOL cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
@@ -945,12 +945,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
             
         [self moveCroppedContentToCenterAnimated:NO];
+        [self checkForCanReset];
         return;
     }
     
     [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
+        [self checkForCanReset];
         
         if (zoomOut)
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;

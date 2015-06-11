@@ -26,6 +26,7 @@
 #import "TOCropViewControllerTransitioning.h"
 #import "TOActivityCroppedImageProvider.h"
 #import "UIImage+CropRotate.h"
+#import "TOCroppedImageAttributes.h"
 
 typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatioOriginal,
@@ -427,8 +428,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
         TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle];
+        TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
         
-        NSMutableArray *activityItems = [@[imageItem] mutableCopy];
+        NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
         if (self.activityItems)
             [activityItems addObjectsFromArray:self.activityItems];
         

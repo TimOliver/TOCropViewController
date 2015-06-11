@@ -1,5 +1,5 @@
 //
-//  TOActivityCroppedImageProvider.h
+//  TOCroppedImageAttributes.h
 //
 //  Copyright 2015 Timothy Oliver. All rights reserved.
 //
@@ -20,14 +20,14 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface TOActivityCroppedImageProvider : UIActivityItemProvider
+@interface TOCroppedImageAttributes : NSObject
 
-@property (nonatomic, readonly) UIImage *image;
-@property (nonatomic, readonly) CGRect cropFrame;
 @property (nonatomic, readonly) NSInteger angle;
+@property (nonatomic, readonly) CGRect croppedFrame;
+@property (nonatomic, readonly) CGSize originalImageSize;
 
-- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle;
+- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle originalImageSize:(CGSize)originalSize;
 
 @end
