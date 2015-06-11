@@ -315,6 +315,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         case TOCropViewOverlayEdgeLeft:
             if (self.aspectLockEnabled) {
                 aspectHorizontal = YES;
+                xDelta = MAX(xDelta, 0);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMaxX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
                 frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5f);
@@ -329,9 +330,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMinX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
                 frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5f);
+                frame.size.width = originFrame.size.width + xDelta;
+                frame.size.width = MIN(frame.size.width, contentFrame.size.height * aspectRatio);
+            }
+            else {
+                frame.size.width = originFrame.size.width + xDelta;
             }
             
-            frame.size.width = originFrame.size.width + xDelta;
             break;
         case TOCropViewOverlayEdgeBottom:
             if (self.aspectLockEnabled) {
@@ -339,23 +344,33 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMinY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
                 frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5f);
+                frame.size.height = originFrame.size.height + yDelta;
+                frame.size.height = MIN(frame.size.height, contentFrame.size.width / aspectRatio);
             }
-            
-            frame.size.height = originFrame.size.height + yDelta;
+            else {
+                frame.size.height = originFrame.size.height + yDelta;
+            }
             break;
         case TOCropViewOverlayEdgeTop:
             if (self.aspectLockEnabled) {
                 aspectVertical = YES;
+                yDelta = MAX(0,yDelta);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMaxY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
                 frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5f);
+                frame.origin.y    = originFrame.origin.y + yDelta;
+                frame.size.height = originFrame.size.height - yDelta;
             }
-            
-            frame.origin.y    = originFrame.origin.y + yDelta;
-            frame.size.height = originFrame.size.height - yDelta;
+            else {
+                frame.origin.y    = originFrame.origin.y + yDelta;
+                frame.size.height = originFrame.size.height - yDelta;
+            }
             break;
         case TOCropViewOverlayEdgeTopLeft:
             if (self.aspectLockEnabled) {
+                xDelta = MAX(xDelta, 0);
+                yDelta = MAX(yDelta, 0);
+                
                 CGPoint distance;
                 distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - (yDelta / CGRectGetHeight(originFrame));
@@ -379,11 +394,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             break;
         case TOCropViewOverlayEdgeTopRight:
             if (self.aspectLockEnabled) {
+                xDelta = MAX(xDelta, 0);
+                yDelta = MAX(yDelta, 0);
+                
                 CGPoint distance;
                 distance.x = 1.0f - ((-xDelta) / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - ((yDelta) / CGRectGetHeight(originFrame));
                 
                 CGFloat scale = (distance.x + distance.y) * 0.5f;
+                scale = MIN(1.0f, scale);
                 
                 frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
                 frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
@@ -421,6 +440,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             break;
         case TOCropViewOverlayEdgeBottomRight:
             if (self.aspectLockEnabled) {
+                
                 CGPoint distance;
                 distance.x = 1.0f - ((-1 * xDelta) / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - ((-1 * yDelta) / CGRectGetHeight(originFrame));
@@ -695,7 +715,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     size.width = floorf(size.width);
     size.height = floorf(size.height);
     //self.backgroundContainerView.frame = (CGRect){CGPointZero, size};
-    self.scrollView.contentSize = size;
+    self.scrollView.contentSize = size;\
     
     //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
     self.scrollView.zoomScale = self.scrollView.zoomScale;

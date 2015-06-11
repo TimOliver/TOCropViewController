@@ -109,7 +109,7 @@
     
     CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
     self.imageView.hidden = YES;
-    [cropViewController dismissAnimatedFromParentViewController:self withImage:image toFrame:viewFrame completion:^{
+    [cropViewController dismissAnimatedFromParentViewController:self withCroppedImage:image toFrame:viewFrame completion:^{
         self.imageView.hidden = NO;
     }];
 }

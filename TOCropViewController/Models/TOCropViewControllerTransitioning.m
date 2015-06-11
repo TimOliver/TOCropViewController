@@ -1,10 +1,24 @@
 //
 //  TOCropViewControllerTransitioning.m
-//  TOCropViewControllerExample
 //
-//  Created by Tim Oliver on 6/1/15.
-//  Copyright (c) 2015 Tim Oliver. All rights reserved.
+//  Copyright 2015 Timothy Oliver. All rights reserved.
 //
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to
+//  deal in the Software without restriction, including without limitation the
+//  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+//  sell copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+//  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+//  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOCropViewControllerTransitioning.h"
 #import <QuartzCore/QuartzCore.h>
@@ -13,7 +27,7 @@
 
 - (NSTimeInterval)transitionDuration:(id <UIViewControllerContextTransitioning>)transitionContext
 {
-    return 0.4f;
+    return 0.45f;
 }
 
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext
@@ -45,22 +59,20 @@
         self.prepareForTransitionHandler();
     
     cropViewController.view.alpha = (self.isDismissing ? 1.0f : 0.0f);
+    if (imageView) {
+        [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+            imageView.frame = self.toFrame;
+        } completion:^(BOOL complete) {
+            [imageView removeFromSuperview];
+        }];
+    }
     
-    id animationBlock = ^{
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
         cropViewController.view.alpha = (self.isDismissing ? 0.0f : 1.0f);
-        imageView.frame = self.toFrame;
-    };
-    
-    id animationCompleteBlock = ^(BOOL completed) {
-        [imageView removeFromSuperview];
+    } completion:^(BOOL complete) {
         [self reset];
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-    };
-    
-    if (imageView == nil)
-        [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:animationBlock completion:animationCompleteBlock];
-    else
-        [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:animationBlock completion:animationCompleteBlock];
+    }];
 }
 
 - (void)reset

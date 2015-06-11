@@ -1,5 +1,5 @@
 //
-//  TOCropViewControllerTransitioning
+//  TOCropViewControllerTransitioning.h
 //
 //  Copyright 2015 Timothy Oliver. All rights reserved.
 //
