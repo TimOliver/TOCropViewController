@@ -212,6 +212,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)layoutInitialImage
 {
+    if (!self.image)
+        return;
+    
     CGSize imageSize = self.imageSize;
     self.scrollView.contentSize = imageSize;
     

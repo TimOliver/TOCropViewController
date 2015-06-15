@@ -4,19 +4,29 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>TOCropViewControllerExample - JA.xcscheme</key>
+		<key>TOCropViewControllerExample - JA.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>TOCropViewControllerExample.xcscheme</key>
+		<key>TOCropViewControllerExample.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>TOCropViewControllerTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>220611961B2E6777001A467B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>223424691ABBC0CD00BBC2B1</key>
 		<dict>
 			<key>primary</key>

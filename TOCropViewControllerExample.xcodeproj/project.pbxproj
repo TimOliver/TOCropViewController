@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2206119C1B2E6777001A467B /* TOCropViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */; };
 		223424701ABBC0CD00BBC2B1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2234246F1ABBC0CD00BBC2B1 /* main.m */; };
 		223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424721ABBC0CD00BBC2B1 /* AppDelegate.m */; };
 		223424761ABBC0CD00BBC2B1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
@@ -25,7 +26,20 @@
 		22DB4D9E1B234D4F008B8466 /* TOActivityCroppedImageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D9D1B234D4F008B8466 /* TOActivityCroppedImageProvider.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		2206119D1B2E6777001A467B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 223424621ABBC0CC00BBC2B1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 223424691ABBC0CD00BBC2B1;
+			remoteInfo = TOCropViewControllerExample;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOCropViewControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2206119A1B2E6777001A467B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOCropViewControllerTests.m; sourceTree = "<group>"; };
 		2234246A1ABBC0CD00BBC2B1 /* TOCropViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOCropViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2234246E1ABBC0CD00BBC2B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2234246F1ABBC0CD00BBC2B1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -70,6 +84,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		220611941B2E6777001A467B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		223424671ABBC0CD00BBC2B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -80,11 +101,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		220611981B2E6777001A467B /* TOCropViewControllerTests */ = {
+			isa = PBXGroup;
+			children = (
+				2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */,
+				220611991B2E6777001A467B /* Supporting Files */,
+			);
+			path = TOCropViewControllerTests;
+			sourceTree = "<group>";
+		};
+		220611991B2E6777001A467B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				2206119A1B2E6777001A467B /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		223424611ABBC0CC00BBC2B1 = {
 			isa = PBXGroup;
 			children = (
 				223424931ABBC4E900BBC2B1 /* TOCropViewController */,
 				2234246C1ABBC0CD00BBC2B1 /* TOCropViewControllerExample */,
+				220611981B2E6777001A467B /* TOCropViewControllerTests */,
 				2234246B1ABBC0CD00BBC2B1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				2234246A1ABBC0CD00BBC2B1 /* TOCropViewControllerExample.app */,
+				220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,6 +208,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		220611961B2E6777001A467B /* TOCropViewControllerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 220611A11B2E6777001A467B /* Build configuration list for PBXNativeTarget "TOCropViewControllerTests" */;
+			buildPhases = (
+				220611931B2E6777001A467B /* Sources */,
+				220611941B2E6777001A467B /* Frameworks */,
+				220611951B2E6777001A467B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2206119E1B2E6777001A467B /* PBXTargetDependency */,
+			);
+			name = TOCropViewControllerTests;
+			productName = TOCropViewControllerTests;
+			productReference = 220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		223424691ABBC0CD00BBC2B1 /* TOCropViewControllerExample */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2234248D1ABBC0CD00BBC2B1 /* Build configuration list for PBXNativeTarget "TOCropViewControllerExample" */;
@@ -194,6 +252,10 @@
 				LastUpgradeCheck = 0620;
 				ORGANIZATIONNAME = "Tim Oliver";
 				TargetAttributes = {
+					220611961B2E6777001A467B = {
+						CreatedOnToolsVersion = 6.3.2;
+						TestTargetID = 223424691ABBC0CD00BBC2B1;
+					};
 					223424691ABBC0CD00BBC2B1 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = 6LF3GMKZAB;
@@ -226,11 +288,19 @@
 			projectRoot = "";
 			targets = (
 				223424691ABBC0CD00BBC2B1 /* TOCropViewControllerExample */,
+				220611961B2E6777001A467B /* TOCropViewControllerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		220611951B2E6777001A467B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		223424681ABBC0CD00BBC2B1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -245,6 +315,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		220611931B2E6777001A467B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2206119C1B2E6777001A467B /* TOCropViewControllerTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		223424661ABBC0CD00BBC2B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -265,6 +343,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2206119E1B2E6777001A467B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 223424691ABBC0CD00BBC2B1 /* TOCropViewControllerExample */;
+			targetProxy = 2206119D1B2E6777001A467B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		223424771ABBC0CD00BBC2B1 /* Main.storyboard */ = {
@@ -307,6 +393,46 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		2206119F1B2E6777001A467B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TOCropViewControllerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOCropViewControllerExample.app/TOCropViewControllerExample";
+			};
+			name = Debug;
+		};
+		220611A01B2E6777001A467B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = TOCropViewControllerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOCropViewControllerExample.app/TOCropViewControllerExample";
+			};
+			name = Release;
+		};
 		2234248B1ABBC0CD00BBC2B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -426,6 +552,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		220611A11B2E6777001A467B /* Build configuration list for PBXNativeTarget "TOCropViewControllerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2206119F1B2E6777001A467B /* Debug */,
+				220611A01B2E6777001A467B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		223424651ABBC0CC00BBC2B1 /* Build configuration list for PBXProject "TOCropViewControllerExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
