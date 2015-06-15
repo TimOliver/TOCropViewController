@@ -778,12 +778,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
+    if (_gridOverlayHidden == gridOverlayHidden)
+        return;
+    
     _gridOverlayHidden = gridOverlayHidden;
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
 {
+    if (_gridOverlayHidden == gridOverlayHidden)
+        return;
+    
     self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     
     [UIView animateWithDuration:0.4f animations:^{

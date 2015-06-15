@@ -189,10 +189,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         self.cropView.frame = frame;
     }
     
-    [UIView setAnimationsEnabled:NO];
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
     [self.toolbar setNeedsLayout];
-    [UIView setAnimationsEnabled:YES];
 }
 
 #pragma mark - Rotation Handling -
@@ -219,11 +217,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
-    
     [UIView animateWithDuration:duration animations:^{
         self.snapshotView.alpha = 0.0f;
         self.toolbar.alpha = 1.0f;
+        
+        self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     }];
     [self.cropView performRelayoutForRotation];
 }
@@ -235,15 +233,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     
     [self.cropView setSimpleMode:NO animated:YES];
 }
-
-/*- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(nonnull id<UIViewControllerTransitionCoordinator>)coordinator
-{
-    [coordinator animateAlongsideTransition:^(id context) {
-        
-    }completion:^(id context) {
-        
-    }];
-}*/
 
 #pragma mark - Reset -
 - (void)resetCropViewLayout
