@@ -2,6 +2,11 @@
 
 ![TOCropViewController](screenshot.jpg)
 
+[![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
+[![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+[![License](https://img.shields.io/cocoapods/l/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+[![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+
 TOCropViewController is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on UIImage objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
 
 ## Features
