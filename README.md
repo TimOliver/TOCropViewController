@@ -18,6 +18,14 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 * The choice of having the controller return the cropped image to a delegate, or immediately pass it to a `UIActivityViewController`.
 * A custom animation and layout when the device is rotated to landscape mode.
 * Custom 'opening' and 'dismissal' animations.
+* Localized in 14 languages.
+
+## How does it work?
+While traditional cropping UI implementations will usually just have a dimming view with a square hole cut out of the middle, `TOCropViewController` goes about its implementation a little differently.
+
+![TOCropViewController](breakdown.jpg)
+
+Since there are two views that are overlaid over the image (A dimming view and a translucency view), trying to cut a hole open in both of them would be rather complex. Instead, an image view is placed in a scroll view in the background, and a copy of the image view is placed on top, inside a container view that is clipped to the designated cropping size. The size and position of the foreground image is then made to match the background view, creating the illusion that there is a hole in the dimming views, and minimising the number of views onscreen.
 
 ## Technical Requirements
 iOS 7.0 or above.
