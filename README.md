@@ -25,14 +25,12 @@ iOS 7.0 or above.
 
 ## Installation
 
-### [Cocoapods](https://cocoapods.org/)
-
+#### [Cocoapods](https://cocoapods.org/)
 ``` ruby
 pod 'TOCropViewController'
 ```
 
-### Manual
-
+#### Manual
 Add the files in the TOCropViewController subfolder to your Xcode project.
 
 ## How does it work?
