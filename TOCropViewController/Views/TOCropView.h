@@ -86,7 +86,7 @@
 /**
  Hide all of the crop elements for transition animations 
  */
-@property (nonatomic, assign) BOOL cropElementsHidden;
+@property (nonatomic, assign) BOOL croppingViewsHidden;
 
 /**
  In relation to the coordinate space of the image, the frame that the crop view is focussing on
@@ -152,5 +152,11 @@
  Animate the grid overlay graphic to be visible
  */
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated;
+
+/**
+ Animate the cropping component views to become visible
+ */
+- (void)setCroppingViewsHidden:(BOOL)hidden animated:(BOOL)animated;
+
 
 @end

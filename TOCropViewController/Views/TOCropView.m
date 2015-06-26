@@ -150,7 +150,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Background Image View
     self.backgroundImageView = [[UIImageView alloc] initWithImage:self.image];
-    
+    //self.backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
     //Background container view
     self.backgroundContainerView = [[UIView alloc] initWithFrame:self.backgroundImageView.frame];
     [self.backgroundContainerView addSubview:self.backgroundImageView];
@@ -211,9 +212,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)layoutInitialImage
 {
-    if (!self.image)
-        return;
-    
     CGSize imageSize = self.imageSize;
     self.scrollView.contentSize = imageSize;
     
@@ -224,7 +222,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
 
     self.scrollView.minimumZoomScale = scale;
-    self.scrollView.maximumZoomScale = 4.0f;
+    self.scrollView.maximumZoomScale = 15.0f;
     //set the fully zoomed out state initially
     self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
     self.scrollView.contentSize = scaledSize;
@@ -765,30 +763,46 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     return frame;
 }
 
-- (void)setCropElementsHidden:(BOOL)cropElementsHidden
+- (void)setCroppingViewsHidden:(BOOL)hidden
 {
-    _cropElementsHidden = cropElementsHidden;
+    [self setCroppingViewsHidden:hidden animated:NO];
+}
+
+- (void)setCroppingViewsHidden:(BOOL)hidden animated:(BOOL)animated
+{
+    if (_croppingViewsHidden == hidden)
+        return;
+        
+    _croppingViewsHidden = hidden;
     
-    self.backgroundImageView.hidden = _cropElementsHidden;
-    self.translucencyView.hidden = _cropElementsHidden;
-    self.foregroundContainerView.hidden = _cropElementsHidden;
-    self.gridOverlayView.hidden = _cropElementsHidden;
+    CGFloat alpha = hidden ? 0.0f : 1.0f;
+    
+    if (animated == NO) {
+        self.backgroundImageView.alpha = alpha;
+        self.translucencyView.alpha = alpha;
+        self.foregroundContainerView.alpha = alpha;
+        self.gridOverlayView.alpha = alpha;
+
+        return;
+    }
+    
+    self.foregroundContainerView.alpha = alpha;
+    self.backgroundImageView.alpha = alpha;
+    
+    [UIView animateWithDuration:0.5f animations:^{
+        self.translucencyView.alpha = alpha;
+        self.gridOverlayView.alpha = alpha;
+    }];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
-    if (_gridOverlayHidden == gridOverlayHidden)
-        return;
-    
     _gridOverlayHidden = gridOverlayHidden;
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
 {
-    if (_gridOverlayHidden == gridOverlayHidden)
-        return;
-    
     self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     
     [UIView animateWithDuration:0.4f animations:^{
@@ -862,25 +876,30 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     contentTargetPoint.y = ((focusPoint.y + self.scrollView.contentOffset.y) * scale);
     
     //Work out where the crop box is focusing, so we can re-align to center that point
-    CGPoint offset = CGPointZero;
-    offset.x = ceilf(-midPoint.x + contentTargetPoint.x);
-    offset.y = ceilf(-midPoint.y + contentTargetPoint.y);
+    __block CGPoint offset = CGPointZero;
+    offset.x = -midPoint.x + contentTargetPoint.x;
+    offset.y = -midPoint.y + contentTargetPoint.y;
     
     //clamp the content so it doesn't create any seams around the grid
+    offset.x = MAX(-cropFrame.origin.x, offset.x);
+    offset.y = MAX(-cropFrame.origin.y, offset.y);
+    
+    void (^translateBlock)() = ^{
+        self.scrollView.zoomScale *= scale;
+        
+        offset.x = MIN(-CGRectGetMaxX(cropFrame)+self.scrollView.contentSize.width, offset.x);
+        offset.y = MIN(-CGRectGetMaxY(cropFrame)+self.scrollView.contentSize.height, offset.y);
+        self.scrollView.contentOffset = offset;
+        
+        self.cropBoxFrame = cropFrame;
+    };
     
     if (!animated) {
-        self.scrollView.zoomScale *= scale;
-        self.scrollView.contentOffset = offset;
-        self.cropBoxFrame = cropFrame;
-        
+        translateBlock();
         return;
     }
     
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:^{
-        self.scrollView.zoomScale *= scale;
-        self.scrollView.contentOffset = offset;
-        self.cropBoxFrame = cropFrame;
-    } completion:nil];
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
 }
 
 - (void)setSimpleMode:(BOOL)simpleMode animated:(BOOL)animated

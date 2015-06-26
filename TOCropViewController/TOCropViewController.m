@@ -171,6 +171,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (void)viewDidLayoutSubviews
 {
+    [super viewDidLayoutSubviews];
+    
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) > CGRectGetHeight(self.view.bounds);
     if (verticalLayout ) {
         CGRect frame = self.cropView.frame;
@@ -187,8 +189,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         self.cropView.frame = frame;
     }
     
+    [UIView setAnimationsEnabled:NO];
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
     [self.toolbar setNeedsLayout];
+    [UIView setAnimationsEnabled:YES];
 }
 
 #pragma mark - Rotation Handling -
@@ -215,11 +219,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+    self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+    
     [UIView animateWithDuration:duration animations:^{
         self.snapshotView.alpha = 0.0f;
         self.toolbar.alpha = 1.0f;
-        
-        self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     }];
     [self.cropView performRelayoutForRotation];
 }
@@ -340,7 +344,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
             completion();
         }
         
-        blockSelf.cropView.cropElementsHidden = NO;
+        [blockSelf.cropView setCroppingViewsHidden:NO animated:YES];
         if (!CGRectIsEmpty(frame)) {
             [blockSelf.cropView setGridOverlayHidden:NO animated:YES];
         }
@@ -379,7 +383,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitionController.prepareForTransitionHandler = ^{
         blockSelf.transitionController.toFrame = [blockSelf.cropView convertRect:blockSelf.cropView.cropBoxFrame toView:blockSelf.view];
         if (!CGRectIsEmpty(blockSelf.transitionController.fromFrame))
-            blockSelf.cropView.cropElementsHidden = YES;
+            blockSelf.cropView.croppingViewsHidden = YES;
         
         if (blockSelf.prepareForTransitionHandler)
             blockSelf.prepareForTransitionHandler();
@@ -396,7 +400,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     __block typeof (self) blockSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
         if (!CGRectIsEmpty(blockSelf.transitionController.toFrame))
-            blockSelf.cropView.cropElementsHidden = YES;
+            blockSelf.cropView.croppingViewsHidden = YES;
         else
             blockSelf.cropView.simpleMode = YES;
         
