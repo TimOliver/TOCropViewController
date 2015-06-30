@@ -340,7 +340,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
-        __weak typeof (self) strongSelf = weakSelf;
+        typeof (self) strongSelf = weakSelf;
         if (completion) {
             completion();
         }
