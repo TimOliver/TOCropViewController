@@ -92,12 +92,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
-    __block typeof(self) blockSelf = self;
-    self.toolbar.doneButtonTapped =     ^{ [blockSelf doneButtonTapped]; };
-    self.toolbar.cancelButtonTapped =   ^{ [blockSelf cancelButtonTapped]; };
-    self.toolbar.resetButtonTapped =    ^{ [blockSelf resetCropViewLayout]; };
-    self.toolbar.clampButtonTapped =    ^{ [blockSelf showAspectRatioDialog]; };
-    self.toolbar.rotateButtonTapped =   ^{ [blockSelf rotateCropView]; };
+    __weak typeof(self) weakSelf = self;
+    self.toolbar.doneButtonTapped =     ^{ [weakSelf doneButtonTapped]; };
+    self.toolbar.cancelButtonTapped =   ^{ [weakSelf cancelButtonTapped]; };
+    self.toolbar.resetButtonTapped =    ^{ [weakSelf resetCropViewLayout]; };
+    self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
+    self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
     
     self.transitioningDelegate = self;
     
@@ -338,15 +338,16 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitionController.image = self.image;
     self.transitionController.fromFrame = frame;
 
-    __block typeof (self) blockSelf = self;
+    __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
+        typeof (self) strongSelf = weakSelf;
         if (completion) {
             completion();
         }
         
-        [blockSelf.cropView setCroppingViewsHidden:NO animated:YES];
+        [strongSelf.cropView setCroppingViewsHidden:NO animated:YES];
         if (!CGRectIsEmpty(frame)) {
-            [blockSelf.cropView setGridOverlayHidden:NO animated:YES];
+            [strongSelf.cropView setGridOverlayHidden:NO animated:YES];
         }
     }];
 }
@@ -379,16 +380,17 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source
 {
-    __block typeof (self) blockSelf = self;
+    __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
-        blockSelf.transitionController.toFrame = [blockSelf.cropView convertRect:blockSelf.cropView.cropBoxFrame toView:blockSelf.view];
-        if (!CGRectIsEmpty(blockSelf.transitionController.fromFrame))
-            blockSelf.cropView.croppingViewsHidden = YES;
+        typeof (self) strongSelf = weakSelf;
+        strongSelf.transitionController.toFrame = [strongSelf.cropView convertRect:strongSelf.cropView.cropBoxFrame toView:strongSelf.view];
+        if (!CGRectIsEmpty(strongSelf.transitionController.fromFrame))
+            strongSelf.cropView.croppingViewsHidden = YES;
         
-        if (blockSelf.prepareForTransitionHandler)
-            blockSelf.prepareForTransitionHandler();
+        if (strongSelf.prepareForTransitionHandler)
+            strongSelf.prepareForTransitionHandler();
         
-        blockSelf.prepareForTransitionHandler = nil;
+        strongSelf.prepareForTransitionHandler = nil;
     };
     
     self.transitionController.isDismissing = NO;
@@ -397,15 +399,16 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
-    __block typeof (self) blockSelf = self;
+    __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
-        if (!CGRectIsEmpty(blockSelf.transitionController.toFrame))
-            blockSelf.cropView.croppingViewsHidden = YES;
+        typeof (self) strongSelf = weakSelf;
+        if (!CGRectIsEmpty(strongSelf.transitionController.toFrame))
+            strongSelf.cropView.croppingViewsHidden = YES;
         else
-            blockSelf.cropView.simpleMode = YES;
+            strongSelf.cropView.simpleMode = YES;
         
-        if (blockSelf.prepareForTransitionHandler)
-            blockSelf.prepareForTransitionHandler();
+        if (strongSelf.prepareForTransitionHandler)
+            strongSelf.prepareForTransitionHandler();
     };
     
     self.transitionController.isDismissing = YES;
@@ -450,7 +453,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
             [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         }
         
-        __block typeof(activityController) blockController = activityController;
+        __weak typeof(activityController) blockController = activityController;
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
             if (!completed)
                 return;

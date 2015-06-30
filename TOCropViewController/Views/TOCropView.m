@@ -128,7 +128,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setup
 {
-    __block typeof(self) blockSelf = self;
+    __weak typeof(self) weakSelf = self;
     
     //View properties
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
@@ -145,8 +145,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
     
-    self.scrollView.touchesBegan = ^{ [blockSelf startEditing]; };
-    self.scrollView.touchesEnded = ^{ [blockSelf startResetTimer]; };
+    self.scrollView.touchesBegan = ^{ [weakSelf startEditing]; };
+    self.scrollView.touchesEnded = ^{ [weakSelf startResetTimer]; };
     
     //Background Image View
     self.backgroundImageView = [[UIImageView alloc] initWithImage:self.image];
@@ -884,14 +884,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     offset.x = MAX(-cropFrame.origin.x, offset.x);
     offset.y = MAX(-cropFrame.origin.y, offset.y);
     
+    __weak typeof(self) weakSelf = self;
     void (^translateBlock)() = ^{
-        self.scrollView.zoomScale *= scale;
+        typeof(self) strongSelf = weakSelf;
         
-        offset.x = MIN(-CGRectGetMaxX(cropFrame)+self.scrollView.contentSize.width, offset.x);
-        offset.y = MIN(-CGRectGetMaxY(cropFrame)+self.scrollView.contentSize.height, offset.y);
-        self.scrollView.contentOffset = offset;
+        strongSelf.scrollView.zoomScale *= scale;
         
-        self.cropBoxFrame = cropFrame;
+        offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
+        offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
+        strongSelf.scrollView.contentOffset = offset;
+        
+        strongSelf.cropBoxFrame = cropFrame;
     };
     
     if (!animated) {
