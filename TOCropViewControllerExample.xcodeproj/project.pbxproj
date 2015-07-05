@@ -37,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		15E30F151B47A2660099A975 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOCropViewControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2206119A1B2E6777001A467B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOCropViewControllerTests.m; sourceTree = "<group>"; };
@@ -281,6 +282,7 @@
 				ru,
 				pl,
 				id,
+				pt,
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -385,6 +387,7 @@
 				22C3C5541AC8CA4200E86280 /* ru */,
 				22C3C5551AC8CA4900E86280 /* pl */,
 				22C3C5561AC8CA5000E86280 /* id */,
+				15E30F151B47A2660099A975 /* pt */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			path = TOCropViewController;
@@ -559,6 +562,7 @@
 				220611A01B2E6777001A467B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		223424651ABBC0CC00BBC2B1 /* Build configuration list for PBXProject "TOCropViewControllerExample" */ = {
 			isa = XCConfigurationList;
