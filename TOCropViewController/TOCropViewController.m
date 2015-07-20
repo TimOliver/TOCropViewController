@@ -454,6 +454,20 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         }
         
         __weak typeof(activityController) blockController = activityController;
+        #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
+        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+            if (!completed)
+                return;
+            
+            if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
+                [self.delegate cropViewController:self didFinishCancelled:NO];
+            }
+            else {
+                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                blockController.completionWithItemsHandler = nil;
+            }
+        };
+        #else
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
             if (!completed)
                 return;
@@ -466,6 +480,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                 blockController.completionHandler = nil;
             }
         };
+        #endif
         
         return;
     }
