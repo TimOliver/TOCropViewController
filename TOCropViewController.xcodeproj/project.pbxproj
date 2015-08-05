@@ -25,7 +25,6 @@
 		83411A0A1B72A8BF00357AEB /* TOCropToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 83411A021B72A8BF00357AEB /* TOCropToolbar.m */; };
 		83411A0B1B72A8BF00357AEB /* TOCropView.h in Headers */ = {isa = PBXBuildFile; fileRef = 83411A031B72A8BF00357AEB /* TOCropView.h */; };
 		83411A0C1B72A8BF00357AEB /* TOCropView.m in Sources */ = {isa = PBXBuildFile; fileRef = 83411A041B72A8BF00357AEB /* TOCropView.m */; };
-		83411A0E1B72A8EC00357AEB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83411A0D1B72A8EC00357AEB /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -180,7 +179,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83411A0E1B72A8EC00357AEB /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +301,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = TOCropViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.apprience.TOCropViewController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -319,6 +318,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = TOCropViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.apprience.TOCropViewController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
