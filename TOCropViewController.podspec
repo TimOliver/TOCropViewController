@@ -9,6 +9,8 @@ Pod::Spec.new do |s|
   s.platform = :ios, '7.0'
 
   s.source_files = 'TOCropViewController/**/*.{h,m}'
-  s.resources = 'TOCropViewController/*.lproj'
+  s.resource_bundles = {
+    'TOCropViewControllerBundle' => ['TOCropViewController/*.lproj']
+  }
   s.requires_arc = true
 end
