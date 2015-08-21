@@ -256,10 +256,19 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                              delegate:self
-                                                    cancelButtonTitle:NSLocalizedStringFromTable(@"Cancel", @"TOCropViewControllerLocalizable", nil)
+                                                    cancelButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel",
+                                                                                                         @"TOCropViewControllerLocalizable",
+                                                                                                         [NSBundle bundleForClass:[self class]],
+                                                                                                         nil)
                                                destructiveButtonTitle:nil
-                                                    otherButtonTitles:NSLocalizedStringFromTable(@"Original", @"TOCropViewControllerLocalizable", nil),
-                                                                      NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil),
+                                                    otherButtonTitles:NSLocalizedStringFromTableInBundle(@"Original",
+                                                                                                         @"TOCropViewControllerLocalizable",
+                                                                                                         [NSBundle bundleForClass:[self class]],
+                                                                                                         nil),
+                                                                      NSLocalizedStringFromTableInBundle(@"Square",
+                                                                                                         @"TOCropViewControllerLocalizable",
+                                                                                                         [NSBundle bundleForClass:[self class]],
+                                                                                                         nil),
                                                                       verticalCropBox ? @"2:3" : @"3:2",
                                                                       verticalCropBox ? @"3:5" : @"5:3",
                                                                       verticalCropBox ? @"3:4" : @"4:3",
