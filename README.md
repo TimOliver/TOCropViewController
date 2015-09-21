@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/cocoapods/l/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 [![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 
-TOCropViewController is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on UIImage objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
+TOCropViewController is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on `UIImage` objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
 
 ## Features
 * Crop images by dragging the edges of a grid overlay.
@@ -32,6 +32,21 @@ pod 'TOCropViewController'
 
 #### Manual
 Add the files in the TOCropViewController subfolder to your Xcode project.
+
+## How do I use it?
+`TOCropViewController` operates around a very textbook modal setup. As such, it cannot be pushed to a `UINavigationController` stack, and instead must be presented as a modal dialog on an existing view controller.
+
+```
+UIImage *image = ...; //Load an image
+
+TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
+cropViewController.delegate = self;
+[self presentViewController:cropViewController animated:YES completion:nil];
+
+```
+
+Optionally, `TOCropViewController` also supports a custom presentation animation, providing more visual context to the user. Please see the sample app for a demonstration on how to implement this.
+
 
 ## How does it work?
 While traditional cropping UI implementations will usually just have a dimming view with a square hole cut out of the middle, `TOCropViewController` goes about its implementation a little differently.
