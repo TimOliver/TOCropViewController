@@ -29,12 +29,12 @@
     UIImage *croppedImage = nil;
     CGPoint drawPoint = CGPointZero;
     
-    UIGraphicsBeginImageContextWithOptions(frame.size, NO, 0.0f);
+    UIGraphicsBeginImageContextWithOptions(frame.size, YES, self.scale);
     {
         CGContextRef context = UIGraphicsGetCurrentContext();
         
         //To conserve memory in not needing to completely re-render the image re-rotated,
-        //map the image to a view and then use Core Animation to manipulated its rotation
+        //map the image to a view and then use Core Animation to manipulate its rotation
         if (angle != 0) {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self];
             imageView.layer.minificationFilter = @"nearest";

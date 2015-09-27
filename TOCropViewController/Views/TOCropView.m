@@ -797,12 +797,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
-    _gridOverlayHidden = gridOverlayHidden;
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
 {
+    _gridOverlayHidden = gridOverlayHidden;
     self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     
     [UIView animateWithDuration:0.4f animations:^{
@@ -934,7 +934,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = self.cropBoxFrame;
     CGPoint offset = self.scrollView.contentOffset;
     
-    BOOL cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
+    BOOL cropBoxIsPortrait = NO;
+    if ((NSInteger)aspectRatio.width == 1 && (NSInteger)aspectRatio.height == 1)
+        cropBoxIsPortrait = self.image.size.width > self.image.size.height;
+    else
+        cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
+    
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
