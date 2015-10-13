@@ -121,6 +121,7 @@
         self.image = image;
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
+        cropController.fixedAspectRatio = CGSizeMake(320, 120);
         [self presentViewController:cropController animated:YES completion:nil];
     }];
 }
@@ -135,6 +136,7 @@
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
     cropController.delegate = self;
+    cropController.fixedAspectRatio = CGSizeMake(320, 120);
     [self presentViewController:cropController animated:YES completion:nil];
 }
 

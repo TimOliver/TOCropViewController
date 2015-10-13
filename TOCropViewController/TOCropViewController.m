@@ -69,7 +69,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
-        
+        _fixedAspectRatio = CGSizeZero;
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
     }
@@ -111,6 +111,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     if ([UIApplication sharedApplication].statusBarHidden == NO) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
+    }
+    
+    if (! CGSizeEqualToSize(CGSizeZero,self.fixedAspectRatio)) {
+        self.toolbar.rotateButtonHidden = YES;
+        self.toolbar.clampButtonHidden = YES;
+        [self.cropView setAspectLockEnabledWithAspectRatio:self.fixedAspectRatio animated:YES];
     }
 }
 
@@ -242,8 +248,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)resetCropViewLayout
 {
     [self.cropView resetLayoutToDefaultAnimated:YES];
-    self.cropView.aspectLockEnabled = NO;
-    self.toolbar.clampButtonGlowing = NO;
+    if (CGSizeEqualToSize(self.fixedAspectRatio, CGSizeZero)) {
+        self.cropView.aspectLockEnabled = NO;
+        self.toolbar.clampButtonGlowing = NO;
+    }
 }
 
 #pragma mark - Aspect Ratio Handling -
@@ -341,6 +349,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)cropViewDidBecomeNonResettable:(TOCropView *)cropView
 {
     self.toolbar.resetButtonEnabled = NO;
+}
+
+- (CGSize)cropViewFixedAspectRatio {
+    return self.fixedAspectRatio;
 }
 
 #pragma mark - Presentation Handling -

@@ -95,6 +95,12 @@
  */
 @property (nonatomic, strong) NSArray *excludedActivityTypes;
 
+/**
+ If fixedAspectRatio is set (to non-CGSizeZero) it will automatically hide the clamp aspect control and rotation control. Reset stays.
+ */
+@property (nonatomic, assign) CGSize fixedAspectRatio;
+
+
 ///------------------------------------------------
 /// @name Object Creation
 ///------------------------------------------------
