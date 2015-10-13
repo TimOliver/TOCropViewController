@@ -248,8 +248,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)resetCropViewLayout
 {
     [self.cropView resetLayoutToDefaultAnimated:YES];
-    self.cropView.aspectLockEnabled = NO;
-    self.toolbar.clampButtonGlowing = NO;
+    if (CGSizeEqualToSize(self.fixedAspectRatio, CGSizeZero)) {
+        self.cropView.aspectLockEnabled = NO;
+        self.toolbar.clampButtonGlowing = NO;
+    }
 }
 
 #pragma mark - Aspect Ratio Handling -
@@ -347,6 +349,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)cropViewDidBecomeNonResettable:(TOCropView *)cropView
 {
     self.toolbar.resetButtonEnabled = NO;
+}
+
+- (CGSize)cropViewFixedAspectRatio {
+    return self.fixedAspectRatio;
 }
 
 #pragma mark - Presentation Handling -

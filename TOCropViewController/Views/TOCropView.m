@@ -503,6 +503,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)resetLayoutToDefaultAnimated:(BOOL)animated
 {
+    CGSize lockedToAspectRatio = CGSizeZero;
+    BOOL wasLocked = self.aspectLockEnabled && ! CGSizeEqualToSize(self.delegate.cropViewFixedAspectRatio, CGSizeZero);
+    if (wasLocked) {
+        lockedToAspectRatio = self.delegate.cropViewFixedAspectRatio;
+    }
     if (animated == NO || self.angle < 0) {
         self.angle = 0;
         self.foregroundImageView.transform = CGAffineTransformIdentity;
@@ -515,13 +520,19 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         [self layoutInitialImage];
         [self checkForCanReset];
+        if (wasLocked) {
+            [self setAspectLockEnabledWithAspectRatio:lockedToAspectRatio animated:YES];
+        }
         return;
+    } else {
+        [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+            [self layoutInitialImage];
+            [self checkForCanReset];
+            if (wasLocked) {
+                [self setAspectLockEnabledWithAspectRatio:lockedToAspectRatio animated:YES];
+            }
+        } completion:nil];
     }
-    
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
-        [self layoutInitialImage];
-        [self checkForCanReset];
-    } completion:nil];
 }
 
 #pragma mark - Gesture Recognizer -

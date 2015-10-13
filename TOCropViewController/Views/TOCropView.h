@@ -28,6 +28,7 @@
 
 - (void)cropViewDidBecomeResettable:(TOCropView *)cropView;
 - (void)cropViewDidBecomeNonResettable:(TOCropView *)cropView;
+- (CGSize)cropViewFixedAspectRatio;
 
 @end
 
