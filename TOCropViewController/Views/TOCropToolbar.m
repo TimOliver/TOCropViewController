@@ -146,11 +146,13 @@
         
         CGRect buttonFrame = (CGRect){0,0,44.0f,44.0f};
         
-        if (self.rotateButtonHidden) {
+        if (self.rotateButtonHidden && self.clampButtonHidden) {
+            buttonFrame.origin.x = CGRectGetMidX(containerRect) - 22.0f;
+            self.resetButton.frame = buttonFrame;
+        } else if (self.rotateButtonHidden && !self.clampButtonHidden) {
             buttonFrame.origin.x = CGRectGetMinX(containerRect);
             self.resetButton.frame = buttonFrame;
-        }
-        else {
+        } else {
             buttonFrame.origin.x = CGRectGetMinX(containerRect);
             self.rotateButton.frame = buttonFrame;
             
