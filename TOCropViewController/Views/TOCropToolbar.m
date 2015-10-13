@@ -129,6 +129,7 @@
     self.doneTextButton.hidden   = (verticalLayout);
     
     self.rotateButton.hidden = self.rotateButtonHidden;
+    self.clampButton.hidden = self.clampButtonHidden;
     
     if (verticalLayout == NO) {
         CGRect frame = CGRectZero;

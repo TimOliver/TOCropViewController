@@ -53,6 +53,8 @@
  */
 @property (nonatomic, readonly) CGRect cropBoxFrame;
 
+@property (nonatomic, assign) CGSize originalCropBoxSize; /* Save the original crop box size so we can tell when the content has been edited */
+
 /**
  The frame of the entire image in the backing scroll view
  */

@@ -69,7 +69,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
-        
+        _fixedAspectRatio = CGSizeZero;
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
     }
@@ -111,6 +111,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     if ([UIApplication sharedApplication].statusBarHidden == NO) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
+    }
+    
+    if (! CGSizeEqualToSize(CGSizeZero,self.fixedAspectRatio)) {
+        self.toolbar.rotateButtonHidden = YES;
+        self.toolbar.clampButtonHidden = YES;
+        [self.cropView setAspectLockEnabledWithAspectRatio:self.fixedAspectRatio animated:YES];
     }
 }
 

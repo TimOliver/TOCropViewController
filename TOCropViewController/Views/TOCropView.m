@@ -82,7 +82,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;   /* Disallow any input while the rotation animation is playing */
 
 /* Reset state data */
-@property (nonatomic, assign) CGSize originalCropBoxSize; /* Save the original crop box size so we can tell when the content has been edited */
+// Made public:
+// @property (nonatomic, assign) CGSize originalCropBoxSize; /* Save the original crop box size so we can tell when the content has been edited */
 @property (nonatomic, assign, readwrite) BOOL canReset;
 
 - (void)setup;
@@ -993,6 +994,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
         [self moveCroppedContentToCenterAnimated:NO];
     } completion:nil];
+    self.originalCropBoxSize = self.cropBoxFrame.size;
 }
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
