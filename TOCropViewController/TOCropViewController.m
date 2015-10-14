@@ -46,8 +46,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, strong) TOCropView *cropView;
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
-@property (nonatomic, strong) UIPopoverController *activityPopoverController;
 @property (nonatomic, assign) BOOL inTransition;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+@property (nonatomic, strong) UIPopoverController *activityPopoverController;
+#pragma clang diagnostic pop
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -255,6 +259,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         return;
     }
     
+    //TODO: Completely overhaul this once iOS 7 support is dropped
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                              delegate:self
@@ -264,9 +271,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                                                                                                          nil)
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:NSLocalizedStringFromTableInBundle(@"Original",
-                                                                                                         @"TOCropViewControllerLocalizable",
-                                                                                                         [NSBundle bundleForClass:[self class]],
-                                                                                                         nil),
+                                                                                                          @"TOCropViewControllerLocalizable",
+                                                                                                          [NSBundle bundleForClass:[self class]],
+                                                                                                          nil),
                                                                       NSLocalizedStringFromTableInBundle(@"Square",
                                                                                                          @"TOCropViewControllerLocalizable",
                                                                                                          [NSBundle bundleForClass:[self class]],
@@ -282,6 +289,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
     else
         [actionSheet showInView:self.view];
+#pragma clang diagnostic pop
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -455,15 +463,25 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:self.applicationActivities];
         activityController.excludedActivityTypes = self.excludedActivityTypes;
         
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        if (NSClassFromString(@"UIPopoverPresentationController")) {
+            activityController.modalPresentationStyle = UIModalPresentationPopover;
+            activityController.popoverPresentationController.sourceView = self.toolbar;
+            activityController.popoverPresentationController.sourceRect = self.toolbar.doneButtonFrame;
             [self presentViewController:activityController animated:YES completion:nil];
         }
         else {
-            [self.activityPopoverController dismissPopoverAnimated:NO];
-            self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
-            [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                [self presentViewController:activityController animated:YES completion:nil];
+            }
+            else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self.activityPopoverController dismissPopoverAnimated:NO];
+                self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
+                [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+#pragma clang diagnostic pop
+            }
         }
-        
         __weak typeof(activityController) blockController = activityController;
         #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
         activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
