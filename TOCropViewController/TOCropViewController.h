@@ -90,6 +90,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, assign) TOCropViewControllerAspectRatio defaultAspectRatio;
 
 /**
+ If true, the aspect ratio will be locked to the defaultAspectRatio. And, the aspect ratio button won't appear on the toolbar.
+ */
+@property (nonatomic, assign) BOOL lockedAspectRatio;
+
+/**
  If performing a transition animation, this block can be used to set up any view states just before the animation begins
  */
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);

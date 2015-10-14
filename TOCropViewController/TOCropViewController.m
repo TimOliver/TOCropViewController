@@ -65,7 +65,9 @@
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
+        
         _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
+        _lockedAspectRatio = NO;
     }
     
     return self;
@@ -83,6 +85,7 @@
     [self.view addSubview:self.cropView];
     
     self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+    self.toolbar.clampButtonHidden = self.lockedAspectRatio;
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
@@ -240,8 +243,13 @@
 - (void)resetCropViewLayout
 {
     [self.cropView resetLayoutToDefaultAnimated:YES];
-    self.cropView.aspectLockEnabled = NO;
-    self.toolbar.clampButtonGlowing = NO;
+    
+    if (self.lockedAspectRatio) {
+        [self setAspectRatio:self.defaultAspectRatio animated:NO];
+    } else {
+        self.cropView.aspectLockEnabled = NO;
+        self.toolbar.clampButtonGlowing = NO;
+    }
 }
 
 #pragma mark - Aspect Ratio Handling -
@@ -335,6 +343,9 @@
 - (void)rotateCropView
 {
     [self.cropView rotateImageNinetyDegreesAnimated:YES];
+    if (self.lockedAspectRatio) {
+        [self setAspectRatio:self.defaultAspectRatio animated:NO];
+    }
 }
 
 #pragma mark - Crop View Delegates -
