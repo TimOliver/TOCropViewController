@@ -29,7 +29,7 @@
     UIImage *croppedImage = nil;
     CGPoint drawPoint = CGPointZero;
     
-    UIGraphicsBeginImageContextWithOptions(frame.size, YES, self.scale);
+    UIGraphicsBeginImageContextWithOptions(frame.size, NO, self.scale);
     {
         CGContextRef context = UIGraphicsGetCurrentContext();
         
