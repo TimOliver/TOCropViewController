@@ -100,6 +100,16 @@
 ///------------------------------------------------
 
 /**
+ Creates a new instance of a crop view controller with the supplied image and maximum crop size
+ 
+ @param image The image that will be used to crop.
+ @param maxCropImageSize The maximum size to which the user can zoom in the photo to be cropped
+ 
+ @discussion The aspect ratio is inferred from maxCropImageSize
+ */
+- (instancetype)initWithImage:(UIImage *)image maxCropImageSize:(CGSize)size;
+
+/**
  Creates a new instance of a crop view controller with the supplied image
  
  @param image The image that will be used to crop.

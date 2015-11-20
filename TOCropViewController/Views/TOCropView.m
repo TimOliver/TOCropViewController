@@ -972,6 +972,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.aspectLockEnabled = YES;
     
+    CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height , cropBoxFrame.size.width / aspectRatio.width);
+    self.scrollView.maximumZoomScale = maxZoomScale;
+    
     if (animated == NO) {
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;

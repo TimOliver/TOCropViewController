@@ -119,7 +119,8 @@
 {
     [self dismissViewControllerAnimated:YES completion:^{
         self.image = image;
-        TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
+        CGSize maxSize = CGSizeMake(285, 285);
+        TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image maxCropImageSize:maxSize];
         cropController.delegate = self;
         [self presentViewController:cropController animated:YES completion:nil];
     }];

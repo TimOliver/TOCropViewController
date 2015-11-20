@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
+@property (nonatomic, assign) CGSize maxCropImageSize;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -66,6 +67,14 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @end
 
 @implementation TOCropViewController
+
+- (instancetype)initWithImage:(UIImage *)image maxCropImageSize:(CGSize)size {
+    self = [self initWithImage:image];
+    if (self) {
+        self.maxCropImageSize = size;
+    }
+    return self;
+}
 
 - (instancetype)initWithImage:(UIImage *)image
 {
@@ -90,6 +99,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
     self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.cropView.delegate = self;
+    [self.cropView setAspectLockEnabledWithAspectRatio:self.maxCropImageSize animated:NO];
     [self.view addSubview:self.cropView];
     
     self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
