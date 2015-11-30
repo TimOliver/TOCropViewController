@@ -64,6 +64,18 @@
 @property (nonatomic, readonly) UIImage *image;
 
 /**
+ If true, the user cannot resize the crop box frame using a pan gesture from a corner
+ Default is NO
+ */
+@property (nonatomic, assign) BOOL panResizeDisabled;
+
+/**
+ If true, the grid overlay is not displayed over the cropped image
+ Default is NO
+ */
+@property (nonatomic, assign) BOOL gridOverlayHidden;
+
+/**
  The view controller's delegate that will return the resulting cropped image, as well as crop information
  */
 @property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
