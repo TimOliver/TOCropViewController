@@ -121,8 +121,6 @@
         self.image = image;
         CGSize maxSize = CGSizeMake(285, 285);
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image maxCropImageSize:maxSize];
-        cropController.panResizeDisabled = YES;
-        cropController.gridOverlayHidden = YES;
         cropController.delegate = self;
         [self presentViewController:cropController animated:YES completion:nil];
     }];

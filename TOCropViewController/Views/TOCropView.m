@@ -199,7 +199,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridPanGestureRecognizer.delegate = self;
     [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
-
     
     self.editing = NO;
 }
@@ -661,12 +660,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - Accessors -
-
-- (void)setPanResizeDisabled:(BOOL)panResizeDisabled {
-    _panResizeDisabled = panResizeDisabled;
-    self.gridPanGestureRecognizer.enabled = !_panResizeDisabled;
-}
-
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
 {
     if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame))
@@ -840,7 +833,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _editing = editing;
     
-    [self.gridOverlayView setGridHidden:!self.gridOverlayHidden animated:animated];
+    [self.gridOverlayView setGridHidden:!editing animated:animated];
     
     if (editing == NO) {
         [self moveCroppedContentToCenterAnimated:animated];
