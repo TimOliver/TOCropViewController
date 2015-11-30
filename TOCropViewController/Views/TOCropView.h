@@ -39,6 +39,12 @@
 @property (nonatomic, strong, readonly) UIImage *image;
 
 /**
+ If true, the user cannot resize the crop box frame using a pan gesture from a corner
+ Default is NO
+ */
+@property (nonatomic, assign) BOOL panResizeDisabled;
+
+/**
  A delegate object that receives notifications from the crop view
  */
 @property (nonatomic, weak) id<TOCropViewDelegate> delegate;
@@ -101,7 +107,7 @@
 /**
  Create a new instance of the crop view with the supplied image
  */
-- (instancetype)initWithImage:(UIImage *)image;
+- (instancetype)initWithImage:(UIImage *)image panResizeDisabled:(BOOL)panResizeDisabled gridOverlayHidden:(BOOL)gridOverlayHidden;
 
 /**
  When performing large size transitions (eg, orientation rotation),

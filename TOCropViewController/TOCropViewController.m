@@ -95,7 +95,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     [super viewDidLoad];
 
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
-    self.cropView = [[TOCropView alloc] initWithImage:self.image];
+    self.cropView = [[TOCropView alloc] initWithImage:self.image panResizeDisabled:self.panResizeDisabled gridOverlayHidden:self.gridOverlayHidden];
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
     self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.cropView.delegate = self;

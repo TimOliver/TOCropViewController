@@ -116,10 +116,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 @implementation TOCropView
 
-- (instancetype)initWithImage:(UIImage *)image
+- (instancetype)initWithImage:(UIImage *)image panResizeDisabled:(BOOL)panResizeDisabled gridOverlayHidden:(BOOL)gridOverlayHidden
 {
     if (self = [super init]) {
         _image = image;
+        _panResizeDisabled = panResizeDisabled;
+        _gridOverlayHidden = gridOverlayHidden;
         [self setup];
     }
     
@@ -187,18 +189,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
-    self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
-    self.gridOverlayView.userInteractionEnabled = NO;
-    self.gridOverlayView.gridHidden = YES;
-    [self addSubview:self.gridOverlayView];
+    if (!self.gridOverlayHidden) {
+        self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
+        self.gridOverlayView.userInteractionEnabled = NO;
+        self.gridOverlayView.gridHidden = YES;
+        [self addSubview:self.gridOverlayView];
+    }
     
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
-    self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
-    self.gridPanGestureRecognizer.delegate = self;
-    [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
-    [self addGestureRecognizer:self.gridPanGestureRecognizer];
+    if (!self.panResizeDisabled) {
+        self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
+        self.gridPanGestureRecognizer.delegate = self;
+        [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
+        [self addGestureRecognizer:self.gridPanGestureRecognizer];
+    }
     
     self.editing = NO;
 }
@@ -660,6 +666,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - Accessors -
+
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
 {
     if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame))
