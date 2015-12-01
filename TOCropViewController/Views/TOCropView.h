@@ -39,10 +39,10 @@
 @property (nonatomic, strong, readonly) UIImage *image;
 
 /**
- If true, the user cannot resize the crop box frame using a pan gesture from a corner
- Default is NO
+ If false, the user cannot resize the crop box frame using a pan gesture from a corner.
+ Default vaue is true.
  */
-@property (nonatomic, assign) BOOL panResizeDisabled;
+@property (nonatomic, assign) BOOL cropBoxResizeEnabled;
 
 /**
  A delegate object that receives notifications from the crop view

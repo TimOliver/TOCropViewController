@@ -201,6 +201,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
     
     self.editing = NO;
+    self.cropBoxResizeEnabled = YES;
 }
 
 #pragma mark - View Layout -
@@ -661,9 +662,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 #pragma mark - Accessors -
 
-- (void)setPanResizeDisabled:(BOOL)panResizeDisabled {
-    _panResizeDisabled = panResizeDisabled;
-    self.gridPanGestureRecognizer.enabled = !_panResizeDisabled;
+- (void)setCropBoxResizeEnabled:(BOOL)panResizeEnabled {
+    _cropBoxResizeEnabled = panResizeEnabled;
+    self.gridPanGestureRecognizer.enabled = _cropBoxResizeEnabled;
 }
 
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
