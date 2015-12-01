@@ -23,6 +23,7 @@
 #import <UIKit/UIKit.h>
 
 @class TOCropViewController;
+@class TOCropView;
 
 ///------------------------------------------------
 /// @name Delegate
@@ -64,16 +65,9 @@
 @property (nonatomic, readonly) UIImage *image;
 
 /**
- If true, the user cannot resize the crop box frame using a pan gesture from a corner
- Default is NO
+ Contained crop view.
  */
-@property (nonatomic, assign) BOOL panResizeDisabled;
-
-/**
- If true, the grid overlay is not displayed over the cropped image
- Default is NO
- */
-@property (nonatomic, assign) BOOL gridOverlayHidden;
+@property (nonatomic, strong, readonly) TOCropView *cropView;
 
 /**
  The view controller's delegate that will return the resulting cropped image, as well as crop information
@@ -110,16 +104,6 @@
 ///------------------------------------------------
 /// @name Object Creation
 ///------------------------------------------------
-
-/**
- Creates a new instance of a crop view controller with the supplied image and maximum crop size
- 
- @param image The image that will be used to crop.
- @param maxCropImageSize The maximum size to which the user can zoom in the photo to be cropped
- 
- @discussion The aspect ratio is inferred from maxCropImageSize
- */
-- (instancetype)initWithImage:(UIImage *)image maxCropImageSize:(CGSize)size;
 
 /**
  Creates a new instance of a crop view controller with the supplied image

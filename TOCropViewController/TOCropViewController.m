@@ -43,11 +43,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 @property (nonatomic, readwrite) UIImage *image;
 @property (nonatomic, strong) TOCropToolbar *toolbar;
-@property (nonatomic, strong) TOCropView *cropView;
+@property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
-@property (nonatomic, assign) CGSize maxCropImageSize;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -68,14 +67,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 @implementation TOCropViewController
 
-- (instancetype)initWithImage:(UIImage *)image maxCropImageSize:(CGSize)size {
-    self = [self initWithImage:image];
-    if (self) {
-        self.maxCropImageSize = size;
-    }
-    return self;
-}
-
 - (instancetype)initWithImage:(UIImage *)image
 {
     self = [super init];
@@ -95,14 +86,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     [super viewDidLoad];
 
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
-    self.cropView = [[TOCropView alloc] initWithImage:self.image];
-    self.cropView.panResizeDisabled = YES;
-    self.cropView.gridOverlayHidden = YES;
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
-    self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.cropView.delegate = self;
     [self.view addSubview:self.cropView];
-    [self.cropView setAspectLockEnabledWithAspectRatio:self.maxCropImageSize animated:NO];
     
     self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
@@ -548,6 +533,17 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     else {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
+}
+
+#pragma mark - Property methods
+
+- (TOCropView *)cropView {
+    if (!_cropView) {
+        _cropView = [[TOCropView alloc] initWithImage:self.image];
+        _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _cropView.delegate = self;
+    }
+    return _cropView;
 }
 
 @end

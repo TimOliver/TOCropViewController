@@ -839,7 +839,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _editing = editing;
     
-    [self.gridOverlayView setGridHidden:!self.gridOverlayHidden animated:animated];
+    [self.gridOverlayView setGridHidden:!editing animated:animated];
     
     if (editing == NO) {
         [self moveCroppedContentToCenterAnimated:animated];
