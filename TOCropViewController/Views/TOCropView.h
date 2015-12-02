@@ -23,6 +23,7 @@
 #import <UIKit/UIKit.h>
 
 @class TOCropView;
+@class TOCropOverlayView;
 
 @protocol TOCropViewDelegate <NSObject>
 
@@ -37,6 +38,11 @@
  The image that the crop view is displaying. This cannot be changed once the crop view is instantiated.
  */
 @property (nonatomic, strong, readonly) UIImage *image;
+
+/**
+ A grid view overlaid on top of the foreground image view's container.
+ */
+@property (nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
 
 /**
  If false, the user cannot resize the crop box frame using a pan gesture from a corner.
