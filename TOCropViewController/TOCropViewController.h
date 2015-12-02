@@ -24,6 +24,7 @@
 
 @class TOCropViewController;
 @class TOCropView;
+@class TOCropToolbar;
 
 ///------------------------------------------------
 /// @name Delegate
@@ -68,6 +69,11 @@
  Contained crop view.
  */
 @property (nonatomic, strong, readonly) TOCropView *cropView;
+
+/**
+ Contained toolbar.
+ */
+@property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
  The view controller's delegate that will return the resulting cropped image, as well as crop information

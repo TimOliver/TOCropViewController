@@ -88,8 +88,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
     [self.view addSubview:self.cropView];
-    
-    self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
@@ -542,8 +541,21 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         _cropView = [[TOCropView alloc] initWithImage:self.image];
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _cropView.delegate = self;
+        _cropView.frame = [UIScreen mainScreen].bounds;
     }
     return _cropView;
+}
+
+- (TOCropToolbar *)toolbar {
+    if (!_toolbar) {
+        static CGFloat height = 44.f;
+        CGRect frame = CGRectMake(.0f,
+                                  CGRectGetHeight([UIScreen mainScreen].bounds) - height,
+                                  CGRectGetWidth([UIScreen mainScreen].bounds),
+                                  height);
+        _toolbar = [[TOCropToolbar alloc] initWithFrame:frame];
+    }
+    return _toolbar;
 }
 
 @end
