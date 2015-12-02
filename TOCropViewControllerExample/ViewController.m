@@ -119,10 +119,7 @@
 {
     [self dismissViewControllerAnimated:YES completion:^{
         self.image = image;
-        CGSize maxSize = CGSizeMake(285, 285);
-        TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image maxCropImageSize:maxSize];
-        cropController.panResizeDisabled = YES;
-        cropController.gridOverlayHidden = YES;
+        TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
         [self presentViewController:cropController animated:YES completion:nil];
     }];
@@ -136,7 +133,7 @@
 #pragma mark - Gesture Recognizer -
 - (void)didTapImageView
 {
-    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image maxCropImageSize:CGSizeMake(300, 300)];
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
     cropController.delegate = self;
     [self presentViewController:cropController animated:YES completion:nil];
 }

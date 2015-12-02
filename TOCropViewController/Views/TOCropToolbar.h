@@ -24,6 +24,17 @@
 
 @interface TOCropToolbar : UIView
 
+/* Contained buttons */
+@property (nonatomic, strong, readonly) UIButton *doneTextButton;
+@property (nonatomic, strong, readonly) UIButton *doneIconButton;
+
+@property (nonatomic, strong, readonly) UIButton *cancelTextButton;
+@property (nonatomic, strong, readonly) UIButton *cancelIconButton;
+
+@property (nonatomic, strong, readonly) UIButton *rotateButton;
+@property (nonatomic, strong, readonly) UIButton *resetButton;
+@property (nonatomic, strong, readonly) UIButton *clampButton;
+
 /* Button feedback handler blocks */
 @property (nonatomic, copy) void (^cancelButtonTapped)(void);
 @property (nonatomic, copy) void (^doneButtonTapped)(void);

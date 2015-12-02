@@ -56,7 +56,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
-@property (nonatomic, strong) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
+@property (nonatomic, strong, readwrite) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
 
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
 
@@ -201,6 +201,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
     
     self.editing = NO;
+    self.cropBoxResizeEnabled = YES;
 }
 
 #pragma mark - View Layout -
@@ -661,9 +662,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 #pragma mark - Accessors -
 
-- (void)setPanResizeDisabled:(BOOL)panResizeDisabled {
-    _panResizeDisabled = panResizeDisabled;
-    self.gridPanGestureRecognizer.enabled = !_panResizeDisabled;
+- (void)setCropBoxResizeEnabled:(BOOL)panResizeEnabled {
+    _cropBoxResizeEnabled = panResizeEnabled;
+    self.gridPanGestureRecognizer.enabled = _cropBoxResizeEnabled;
 }
 
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
@@ -839,7 +840,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _editing = editing;
     
-    [self.gridOverlayView setGridHidden:!self.gridOverlayHidden animated:animated];
+    [self.gridOverlayView setGridHidden:!editing animated:animated];
     
     if (editing == NO) {
         [self moveCroppedContentToCenterAnimated:animated];
