@@ -22,9 +22,13 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TOCropOverlayView.h"
+#import "TOCropScrollView.h"
+#import "TOCropToolbar.h"
+#import "TOCropView.h"
+
 @class TOCropViewController;
-@class TOCropView;
-@class TOCropToolbar;
+
 
 ///------------------------------------------------
 /// @name Delegate
