@@ -202,6 +202,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 }
 
 #pragma mark - Rotation Handling -
+
+//TODO: Deprecate iOS 7 properly at the right time
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.snapshotView = [self.toolbar snapshotViewAfterScreenUpdates:NO];
@@ -241,6 +245,24 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     
     [self.cropView setSimpleMode:NO animated:YES];
 }
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
+    CGSize currentSize = self.view.bounds.size;
+    if (currentSize.width < size.width)
+        orientation = UIInterfaceOrientationLandscapeLeft;
+    
+    [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        [self willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        [self didRotateFromInterfaceOrientation:orientation];
+    }];
+}
+#pragma clang diagnostic pop
 
 #pragma mark - Reset -
 - (void)resetCropViewLayout
