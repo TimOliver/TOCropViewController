@@ -256,9 +256,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     
     [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self didRotateFromInterfaceOrientation:orientation];
     }];
 }
