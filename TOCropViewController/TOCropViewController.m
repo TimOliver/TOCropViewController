@@ -28,17 +28,6 @@
 #import "UIImage+CropRotate.h"
 #import "TOCroppedImageAttributes.h"
 
-typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
-    TOCropViewControllerAspectRatioOriginal,
-    TOCropViewControllerAspectRatioSquare,
-    TOCropViewControllerAspectRatio3x2,
-    TOCropViewControllerAspectRatio5x3,
-    TOCropViewControllerAspectRatio4x3,
-    TOCropViewControllerAspectRatio5x4,
-    TOCropViewControllerAspectRatio7x5,
-    TOCropViewControllerAspectRatio16x9
-};
-
 @interface TOCropViewController () <UIActionSheetDelegate, UIViewControllerTransitioningDelegate, TOCropViewDelegate>
 
 @property (nonatomic, readwrite) UIImage *image;
@@ -76,6 +65,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
+        
+        _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
+        _lockedAspectRatio = NO;
     }
     
     return self;
@@ -102,6 +94,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitioningDelegate = self;
     
     self.view.backgroundColor = self.cropView.backgroundColor;
+
+    if (self.defaultAspectRatio != TOCropViewControllerAspectRatioOriginal) {
+        [self setAspectRatio:self.defaultAspectRatio animated:NO];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -252,9 +248,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     
     [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self didRotateFromInterfaceOrientation:orientation];
     }];
 }
@@ -264,8 +260,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)resetCropViewLayout
 {
     [self.cropView resetLayoutToDefaultAnimated:YES];
-    self.cropView.aspectLockEnabled = NO;
-    self.toolbar.clampButtonGlowing = NO;
+    
+    if (self.lockedAspectRatio) {
+        [self setAspectRatio:self.defaultAspectRatio animated:NO];
+    } else {
+        self.cropView.aspectLockEnabled = NO;
+        self.toolbar.clampButtonGlowing = NO;
+    }
 }
 
 #pragma mark - Aspect Ratio Handling -
@@ -312,9 +313,14 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
+    [self setAspectRatio:(TOCropViewControllerAspectRatio)buttonIndex animated:YES];
+}
+
+- (void)setAspectRatio:(TOCropViewControllerAspectRatio)aspectRatioSize animated:(BOOL)animated
+{
     CGSize aspectRatio = CGSizeZero;
     
-    switch (buttonIndex) {
+    switch (aspectRatioSize) {
         case TOCropViewControllerAspectRatioOriginal:
             aspectRatio = CGSizeZero;
             break;
@@ -339,8 +345,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         case TOCropViewControllerAspectRatio16x9:
             aspectRatio = CGSizeMake(16.0f, 9.0f);
             break;
-        default:
-            return;
     }
     
     if (self.cropView.cropBoxAspectRatioIsPortrait) {
@@ -349,13 +353,16 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         aspectRatio.height = width;
     }
     
-    [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:YES];
+    [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:animated];
     self.toolbar.clampButtonGlowing = YES;
 }
 
 - (void)rotateCropView
 {
     [self.cropView rotateImageNinetyDegreesAnimated:YES];
+    if (self.lockedAspectRatio) {
+        [self setAspectRatio:self.defaultAspectRatio animated:NO];
+    }
 }
 
 #pragma mark - Crop View Delegates -

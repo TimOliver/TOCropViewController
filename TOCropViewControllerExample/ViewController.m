@@ -134,7 +134,6 @@
 - (void)didTapImageView
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
-    cropController.delegate = self;
     [self presentViewController:cropController animated:YES completion:nil];
 }
 

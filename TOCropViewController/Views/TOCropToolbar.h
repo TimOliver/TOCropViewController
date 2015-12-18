@@ -43,6 +43,7 @@
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 
 /* Aspect ratio button settings */
+@property (nonatomic, assign) BOOL clampButtonHidden;
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;
 
