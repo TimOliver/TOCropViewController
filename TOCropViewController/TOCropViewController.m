@@ -43,7 +43,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 @property (nonatomic, readwrite) UIImage *image;
 @property (nonatomic, strong) TOCropToolbar *toolbar;
-@property (nonatomic, strong) TOCropView *cropView;
+@property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
@@ -86,13 +86,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     [super viewDidLoad];
 
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
-    self.cropView = [[TOCropView alloc] initWithImage:self.image];
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
-    self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.cropView.delegate = self;
     [self.view addSubview:self.cropView];
-    
-    self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
@@ -558,6 +554,30 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     else {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
+}
+
+#pragma mark - Property methods
+
+- (TOCropView *)cropView {
+    if (!_cropView) {
+        _cropView = [[TOCropView alloc] initWithImage:self.image];
+        _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _cropView.delegate = self;
+        _cropView.frame = [UIScreen mainScreen].bounds;
+    }
+    return _cropView;
+}
+
+- (TOCropToolbar *)toolbar {
+    if (!_toolbar) {
+        static CGFloat height = 44.f;
+        CGRect frame = CGRectMake(.0f,
+                                  CGRectGetHeight([UIScreen mainScreen].bounds) - height,
+                                  CGRectGetWidth([UIScreen mainScreen].bounds),
+                                  height);
+        _toolbar = [[TOCropToolbar alloc] initWithFrame:frame];
+    }
+    return _toolbar;
 }
 
 @end

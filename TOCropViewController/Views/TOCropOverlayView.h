@@ -27,6 +27,16 @@
 @property (nonatomic, assign) BOOL gridHidden;
 
 /**
+ Add/Remove the interior horizontal grid lines.
+ */
+@property (nonatomic, assign) BOOL displayHorizontalGridLines;
+
+/**
+ Add/Remove the interior vertical grid lines.
+ */
+@property (nonatomic, assign) BOOL displayVerticalGridLines;
+
+/**
  Shows and hides the interior grid lines
  */
 - (void)setGridHidden:(BOOL)hidden animated:(BOOL)animated;

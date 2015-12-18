@@ -22,7 +22,13 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TOCropOverlayView.h"
+#import "TOCropScrollView.h"
+#import "TOCropToolbar.h"
+#import "TOCropView.h"
+
 @class TOCropViewController;
+
 
 ///------------------------------------------------
 /// @name Delegate
@@ -62,6 +68,16 @@
  The original, uncropped image that was passed to this controller.
  */
 @property (nonatomic, readonly) UIImage *image;
+
+/**
+ Contained crop view.
+ */
+@property (nonatomic, strong, readonly) TOCropView *cropView;
+
+/**
+ Contained toolbar.
+ */
+@property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
  The view controller's delegate that will return the resulting cropped image, as well as crop information
