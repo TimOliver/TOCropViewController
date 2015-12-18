@@ -120,8 +120,6 @@
     [self dismissViewControllerAnimated:YES completion:^{
         self.image = image;
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
-        cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
-        cropController.lockedAspectRatio = YES;
         cropController.delegate = self;
         [self presentViewController:cropController animated:YES completion:nil];
     }];
@@ -136,8 +134,6 @@
 - (void)didTapImageView
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
-    cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
-    cropController.delegate = self;
     [self presentViewController:cropController animated:YES completion:nil];
 }
 
