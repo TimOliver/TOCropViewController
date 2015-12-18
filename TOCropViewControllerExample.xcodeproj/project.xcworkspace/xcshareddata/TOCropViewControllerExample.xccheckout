@@ -7,21 +7,21 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>2D90AB17-71D2-4E13-9F5B-7AFB673BBD9E</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>TOCropViewControllerExample</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>EBF9236F7ED7963EA21B6A80B0DA4EDCCFA2B7DF</key>
-		<string>https://github.com/TimOliver/TOCropViewController.git</string>
+		<string>github.com:hydyy/TOCropViewController.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>TOCropViewControllerExample.xcodeproj/project.xcworkspace</string>
+	<string>TOCropViewControllerExample.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>EBF9236F7ED7963EA21B6A80B0DA4EDCCFA2B7DF</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/TimOliver/TOCropViewController.git</string>
+	<string>github.com:hydyy/TOCropViewController.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
