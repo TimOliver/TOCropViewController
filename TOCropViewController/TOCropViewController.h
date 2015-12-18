@@ -22,6 +22,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TOCropView.h"
+#import "TOCropToolbar.h"
+
 typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatioOriginal,
     TOCropViewControllerAspectRatioSquare,
