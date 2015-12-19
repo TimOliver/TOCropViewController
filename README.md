@@ -20,40 +20,81 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 * Custom 'opening' and 'dismissal' animations.
 * Localized in 14 languages.
 
-## Technical Requirements
-iOS 7.0 or above.
+## System Requirements
+iOS 7.0 or above
 
 ## Installation
 
-#### [Cocoapods](https://cocoapods.org/)
+#### As a Cocoapods Dependency
+
+Add the following to your Podfile:
 ``` ruby
 pod 'TOCropViewController'
 ```
 
-#### Manual
-Add the files in the TOCropViewController subfolder to your Xcode project.
+#### Manual Installation
 
-## How do I use it?
-`TOCropViewController` operates around a very textbook modal setup. As such, it cannot be pushed to a `UINavigationController` stack, and instead must be presented as a modal dialog on an existing view controller.
+Download this project from GitHub, move the subfolder named 'TOWebViewController' over to your project folder, and drag it into your Xcode project.
 
+## Examples
+`TOCropViewController` operates around a very strict modal implemention. It cannot be pushed to a `UINavigationController` stack, and must be presented as a full-screen dialog on an existing view controller.
+
+### Basic Implementation
+```objc
+- (void)presentCropViewController
+{
+  UIImage *image = ...; //Load an image
+  
+  TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
+  cropViewController.delegate = self;
+  [self presentViewController:cropViewController animated:YES completion:nil];
+}
+
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+{
+  // 'image' is the newly cropped version of the original image
+}
 ```
-UIImage *image = ...; //Load an image
 
-TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
-cropViewController.delegate = self;
-[self presentViewController:cropViewController animated:YES completion:nil];
-
+### Sharing Cropped Images Via a Share Sheet
+```objc
+- (void)presentCropViewController
+{
+  UIImage *image = ...; //Load an image
+  
+  TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
+  cropViewController.showActivitySheetOnDone = YES;
+  [self presentViewController:cropViewController animated:YES completion:nil];
+}
 ```
 
-Optionally, `TOCropViewController` also supports a custom presentation animation, providing more visual context to the user. Please see the sample app for a demonstration on how to implement this.
+### Presenting With a Custom Animation
+Optionally, `TOCropViewController` also supports a custom presentation animation where an already-visible copy of the image will zoom in to fill the screen.
+```objc
+- (void)presentViewController
+{
+  UIImage *image = ...;
+  UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+  CGRect frame = [self.view convertRect:imageView.frame toView:self.view];
+  
+  TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
+  cropViewController.delegate = self;
+  [self presentViewController:cropViewController animated:YES completion:nil];
+  [cropViewController presentAnimatedFromParentViewController:self fromFrame:frame completion:nil];
+}
+```
 
-
-## How does it work?
+## Architecture of `TOCropViewController`
 While traditional cropping UI implementations will usually just have a dimming view with a square hole cut out of the middle, `TOCropViewController` goes about its implementation a little differently.
 
 ![TOCropViewController](breakdown.jpg)
 
 Since there are two views that are overlaid over the image (A dimming view and a translucency view), trying to cut a hole open in both of them would be rather complex. Instead, an image view is placed in a scroll view in the background, and a copy of the image view is placed on top, inside a container view that is clipped to the designated cropping size. The size and position of the foreground image is then made to match the background view, creating the illusion that there is a hole in the dimming views, and minimising the number of views onscreen.
 
+## Credits
+`TOCropViewController` was originally created by [Tim Oliver](http://twitter.com/TimOliverAU) as a component for [iComics](http://icomics.co), a comic reader app for iOS.
+
+Thanks also goes to `TOCropViewController`'s growing list of [contributors](https://github.com/TimOliver/TOCropViewController/graphs/contributors)!
+
 ## License
-TOCropViewController is licensed under the MIT License, please see the LICENSE file.
+TOCropViewController is licensed under the MIT License, please see the [LICENSE](LICENSE) file.
