@@ -971,6 +971,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
+        cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         offset.x += (delta * 0.5f);
         
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
@@ -985,6 +986,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat newHeight = cropBoxFrame.size.width * (aspectRatio.height/aspectRatio.width);
         CGFloat delta = cropBoxFrame.size.height - newHeight;
         cropBoxFrame.size.height = newHeight;
+        cropBoxFrame.origin.x = self.contentBounds.origin.y;
         offset.y += (delta * 0.5f);
         
         CGFloat boundsHeight = CGRectGetHeight(boundsFrame);
@@ -998,30 +1000,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.aspectLockEnabled = YES;
     
-    CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height , cropBoxFrame.size.width / aspectRatio.width);
+    CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height, cropBoxFrame.size.width / aspectRatio.width);
     self.scrollView.maximumZoomScale = maxZoomScale;
     
-    if (animated == NO) {
+    void (^translateBlock)() = ^{
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
         
         if (zoomOut)
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-            
+        
         [self moveCroppedContentToCenterAnimated:NO];
         [self checkForCanReset];
+    };
+    
+    if (animated == NO) {
+        translateBlock();
         return;
     }
     
-    [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
-        self.scrollView.contentOffset = offset;
-        self.cropBoxFrame = cropBoxFrame;
-        [self checkForCanReset];
-        
-        if (zoomOut)
-            self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-        [self moveCroppedContentToCenterAnimated:NO];
-    } completion:nil];
+    [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:translateBlock completion:nil];
 }
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
