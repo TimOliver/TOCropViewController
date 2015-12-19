@@ -969,10 +969,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
+        
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
-        cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         offset.x += (delta * 0.5f);
+        
+        if (delta < 0.0f)
+            cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
         if (newWidth > boundsWidth) {
@@ -986,8 +989,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat newHeight = cropBoxFrame.size.width * (aspectRatio.height/aspectRatio.width);
         CGFloat delta = cropBoxFrame.size.height - newHeight;
         cropBoxFrame.size.height = newHeight;
-        cropBoxFrame.origin.x = self.contentBounds.origin.y;
         offset.y += (delta * 0.5f);
+        
+        if (delta < 0.0f)
+            cropBoxFrame.origin.x = self.contentBounds.origin.y;
         
         CGFloat boundsHeight = CGRectGetHeight(boundsFrame);
         if (newHeight > boundsHeight) {
