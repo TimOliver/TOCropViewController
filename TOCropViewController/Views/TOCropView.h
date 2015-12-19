@@ -21,9 +21,9 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TOCropOverlayView.h"
 
 @class TOCropView;
-@class TOCropOverlayView;
 
 @protocol TOCropViewDelegate <NSObject>
 

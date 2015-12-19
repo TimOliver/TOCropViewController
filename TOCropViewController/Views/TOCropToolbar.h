@@ -24,13 +24,17 @@
 
 @interface TOCropToolbar : UIView
 
-/* Contained buttons */
+/* The 'Done' buttons to commit the crop. The text button is displayed
+ in portrait mode and the icon one, in landscape. */
 @property (nonatomic, strong, readonly) UIButton *doneTextButton;
 @property (nonatomic, strong, readonly) UIButton *doneIconButton;
 
+/* The 'Cancel' buttons to cancel the crop. The text button is displayed
+ in portrait mode and the icon one, in landscape. */
 @property (nonatomic, strong, readonly) UIButton *cancelTextButton;
 @property (nonatomic, strong, readonly) UIButton *cancelIconButton;
 
+/* The cropper control buttons */
 @property (nonatomic, strong, readonly) UIButton *rotateButton;
 @property (nonatomic, strong, readonly) UIButton *resetButton;
 @property (nonatomic, strong, readonly) UIButton *clampButton;

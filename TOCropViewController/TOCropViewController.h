@@ -79,12 +79,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, readonly) UIImage *image;
 
 /**
- Contained crop view.
+ The crop view managed by this view controller.
  */
 @property (nonatomic, strong, readonly) TOCropView *cropView;
 
 /**
- Contained toolbar.
+ The toolbar view managed by this view controller.
  */
 @property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
