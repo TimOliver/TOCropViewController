@@ -68,13 +68,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) NSTimer *resetTimer;  /* The timer used to reset the view after the user stops interacting with it */
 @property (nonatomic, assign) BOOL editing;         /* Used to denote the active state of the user manipulating the content */
 @property (nonatomic, assign, readwrite) NSInteger angle;
+@property (nonatomic, assign) BOOL disableForgroundMatching; /* At times during animation, disable matching the forground image view to the background */
 
 /* Pre-screen-rotation state information */
 @property (nonatomic, assign) CGPoint rotationContentOffset;
 @property (nonatomic, assign) CGSize rotationContentSize;
 
+/* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
-@property (nonatomic, readonly) CGSize imageSize; /* Given the current rotation of the image, the size of the image */
+@property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
 
 /* 90-degree rotation state data */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
@@ -290,6 +292,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)matchForegroundToBackground
 {
+    if (self.disableForgroundMatching)
+        return;
+    
     //We can't simply match the frames since if the images are rotated, the frame property becomes unusable
     self.foregroundImageView.frame = [self.backgroundContainerView.superview convertRect:self.backgroundContainerView.frame toView:self.foregroundContainerView];
 }
@@ -895,13 +900,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     void (^translateBlock)() = ^{
         typeof(self) strongSelf = weakSelf;
         
-        strongSelf.scrollView.zoomScale *= scale;
+        // Setting these scroll view properties will trigger
+        // the foreground matching method via their delegates,
+        // multiple times inside the same animation block, resulting
+        // in glitchy animations.
+        //
+        // Disable matching for now, and explicitly update at the end.
+        strongSelf.disableForgroundMatching = YES;
+        {
+            strongSelf.scrollView.zoomScale *= scale;
+            
+            offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
+            offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
+            strongSelf.scrollView.contentOffset = offset;
+            
+            strongSelf.cropBoxFrame = cropFrame;
+        }
+        strongSelf.disableForgroundMatching = NO;
         
-        offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
-        offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
-        strongSelf.scrollView.contentOffset = offset;
-        
-        strongSelf.cropBoxFrame = cropFrame;
+        //Explicitly update the matching at the end of the calculations
+        [strongSelf matchForegroundToBackground];
     };
     
     if (!animated) {
@@ -909,6 +927,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
+    [self matchForegroundToBackground];
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
 }
 
