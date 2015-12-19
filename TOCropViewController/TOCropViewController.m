@@ -387,6 +387,7 @@
     
     [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:animated];
     self.toolbar.clampButtonGlowing = YES;
+    self.toolbar.clampButtonHidden = YES;
 }
 
 - (void)rotateCropView
