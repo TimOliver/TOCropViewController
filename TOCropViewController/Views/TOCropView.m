@@ -858,9 +858,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:editing?0.2f:0.35f animations:^{
+    [UIView animateKeyframesWithDuration:editing?0.1f:0.35f delay:editing?0.0f:0.1f options:0 animations:^{
         self.translucencyView.alpha  = editing ? 0.0f : 1.0f;
-    }];
+    } completion:nil];
 }
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated
