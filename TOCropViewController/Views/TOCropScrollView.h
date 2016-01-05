@@ -22,6 +22,10 @@
 
 #import <UIKit/UIKit.h>
 
+/*
+ Subclassing UIScrollView was necessary in order to directly capture
+ touch events that weren't otherwise accessible via UIGestureRecognizer objects.
+ */
 @interface TOCropScrollView : UIScrollView
 
 @property (nonatomic, copy) void (^touchesBegan)(void);

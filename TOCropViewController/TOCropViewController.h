@@ -22,6 +22,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TOCropView.h"
+#import "TOCropToolbar.h"
+
 typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatioOriginal,
     TOCropViewControllerAspectRatioSquare,
@@ -34,6 +37,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 };
 
 @class TOCropViewController;
+
 
 ///------------------------------------------------
 /// @name Delegate
@@ -73,6 +77,16 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
  The original, uncropped image that was passed to this controller.
  */
 @property (nonatomic, readonly) UIImage *image;
+
+/**
+ The crop view managed by this view controller.
+ */
+@property (nonatomic, strong, readonly) TOCropView *cropView;
+
+/**
+ The toolbar view managed by this view controller.
+ */
+@property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
  The view controller's delegate that will return the resulting cropped image, as well as crop information

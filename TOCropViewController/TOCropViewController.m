@@ -21,8 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOCropViewController.h"
-#import "TOCropView.h"
-#import "TOCropToolbar.h"
 #import "TOCropViewControllerTransitioning.h"
 #import "TOActivityCroppedImageProvider.h"
 #import "UIImage+CropRotate.h"
@@ -32,7 +30,7 @@
 
 @property (nonatomic, readwrite) UIImage *image;
 @property (nonatomic, strong) TOCropToolbar *toolbar;
-@property (nonatomic, strong) TOCropView *cropView;
+@property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
@@ -78,14 +76,9 @@
     [super viewDidLoad];
 
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
-    self.cropView = [[TOCropView alloc] initWithImage:self.image];
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
-    self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.cropView.delegate = self;
     [self.view addSubview:self.cropView];
-    
-    self.toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
-    self.toolbar.clampButtonHidden = self.lockedAspectRatio;
+
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
@@ -199,6 +192,10 @@
 }
 
 #pragma mark - Rotation Handling -
+
+//TODO: Deprecate iOS 7 properly at the right time
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.snapshotView = [self.toolbar snapshotViewAfterScreenUpdates:NO];
@@ -239,6 +236,24 @@
     [self.cropView setSimpleMode:NO animated:YES];
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
+    CGSize currentSize = self.view.bounds.size;
+    if (currentSize.width < size.width)
+        orientation = UIInterfaceOrientationLandscapeLeft;
+    
+    [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self didRotateFromInterfaceOrientation:orientation];
+    }];
+}
+#pragma clang diagnostic pop
+
 #pragma mark - Reset -
 - (void)resetCropViewLayout
 {
@@ -261,43 +276,77 @@
         return;
     }
     
+    //Depending on the shape of the image, work out if horizontal, or vertical options are required
+    BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
+    
+    //Prepare the localized options
+    NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
+    NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
+    NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
+    
+    //Prepare the list that will be fed to the alert view/controller
+    NSMutableArray *items = [NSMutableArray array];
+    [items addObject:originalButtonTitle];
+    [items addObject:squareButtonTitle];
+    if (verticalCropBox) {
+        [items addObjectsFromArray:@[@"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"]];
+    }
+    else {
+        [items addObjectsFromArray:@[@"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"]];
+    }
+    
+    //Present via a UIAlertController if >= iOS 8
+    if (NSClassFromString(@"UIAlertController")) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
+        
+        //Add each item to the alert controller
+        NSInteger i = 0;
+        for (NSString *item in items) {
+            UIAlertAction *action = [UIAlertAction actionWithTitle:item style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self setAspectRatio:(TOCropViewControllerAspectRatio)i animated:YES];
+            }];
+            [alertController addAction:action];
+            
+            i++;
+        }
+        
+        alertController.modalPresentationStyle = UIModalPresentationPopover;
+        UIPopoverPresentationController *presentationController = [alertController popoverPresentationController];
+        presentationController.sourceView = self.toolbar;
+        presentationController.sourceRect = self.toolbar.clampButtonFrame;
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else {
     //TODO: Completely overhaul this once iOS 7 support is dropped
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                             delegate:self
-                                                    cancelButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel",
-                                                                                                         @"TOCropViewControllerLocalizable",
-                                                                                                         [NSBundle bundleForClass:[self class]],
-                                                                                                         nil)
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:NSLocalizedStringFromTableInBundle(@"Original",
-                                                                                                          @"TOCropViewControllerLocalizable",
-                                                                                                          [NSBundle bundleForClass:[self class]],
-                                                                                                          nil),
-                                                                      NSLocalizedStringFromTableInBundle(@"Square",
-                                                                                                         @"TOCropViewControllerLocalizable",
-                                                                                                         [NSBundle bundleForClass:[self class]],
-                                                                                                         nil),
-                                                                      verticalCropBox ? @"2:3" : @"3:2",
-                                                                      verticalCropBox ? @"3:5" : @"5:3",
-                                                                      verticalCropBox ? @"3:4" : @"4:3",
-                                                                      verticalCropBox ? @"4:5" : @"5:4",
-                                                                      verticalCropBox ? @"5:7" : @"7:5",
-                                                                      verticalCropBox ? @"9:16" : @"16:9",nil];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
-    else
-        [actionSheet showInView:self.view];
+        
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                                 delegate:self
+                                                        cancelButtonTitle:cancelButtonTitle
+                                                   destructiveButtonTitle:nil
+                                                        otherButtonTitles:nil];
+        
+        for (NSString *item in items) {
+            [actionSheet addButtonWithTitle:item];
+        }
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
+        else
+            [actionSheet showInView:self.view];
 #pragma clang diagnostic pop
+    }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     [self setAspectRatio:(TOCropViewControllerAspectRatio)buttonIndex animated:YES];
 }
+#pragma clang diagnostic pop
 
 - (void)setAspectRatio:(TOCropViewControllerAspectRatio)aspectRatioSize animated:(BOOL)animated
 {
@@ -544,6 +593,30 @@
     else {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
+}
+
+#pragma mark - Property methods
+
+- (TOCropView *)cropView {
+    if (!_cropView) {
+        _cropView = [[TOCropView alloc] initWithImage:self.image];
+        _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _cropView.delegate = self;
+        _cropView.frame = [UIScreen mainScreen].bounds;
+    }
+    return _cropView;
+}
+
+- (TOCropToolbar *)toolbar {
+    if (!_toolbar) {
+        static CGFloat height = 44.f;
+        CGRect frame = CGRectMake(.0f,
+                                  CGRectGetHeight([UIScreen mainScreen].bounds) - height,
+                                  CGRectGetWidth([UIScreen mainScreen].bounds),
+                                  height);
+        _toolbar = [[TOCropToolbar alloc] initWithFrame:frame];
+    }
+    return _toolbar;
 }
 
 @end

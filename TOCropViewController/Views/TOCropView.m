@@ -56,7 +56,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
-@property (nonatomic, strong) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
+@property (nonatomic, strong, readwrite) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
 
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
 
@@ -68,13 +68,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) NSTimer *resetTimer;  /* The timer used to reset the view after the user stops interacting with it */
 @property (nonatomic, assign) BOOL editing;         /* Used to denote the active state of the user manipulating the content */
 @property (nonatomic, assign, readwrite) NSInteger angle;
+@property (nonatomic, assign) BOOL disableForgroundMatching; /* At times during animation, disable matching the forground image view to the background */
 
 /* Pre-screen-rotation state information */
 @property (nonatomic, assign) CGPoint rotationContentOffset;
 @property (nonatomic, assign) CGSize rotationContentSize;
 
+/* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
-@property (nonatomic, readonly) CGSize imageSize; /* Given the current rotation of the image, the size of the image */
+@property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
 
 /* 90-degree rotation state data */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
@@ -201,6 +203,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
     
     self.editing = NO;
+    self.cropBoxResizeEnabled = YES;
 }
 
 #pragma mark - View Layout -
@@ -289,6 +292,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)matchForegroundToBackground
 {
+    if (self.disableForgroundMatching)
+        return;
+    
     //We can't simply match the frames since if the images are rotated, the frame property becomes unusable
     self.foregroundImageView.frame = [self.backgroundContainerView.superview convertRect:self.backgroundContainerView.frame toView:self.foregroundContainerView];
 }
@@ -660,6 +666,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - Accessors -
+
+- (void)setCropBoxResizeEnabled:(BOOL)panResizeEnabled {
+    _cropBoxResizeEnabled = panResizeEnabled;
+    self.gridPanGestureRecognizer.enabled = _cropBoxResizeEnabled;
+}
+
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
 {
     if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame))
@@ -846,9 +858,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:editing?0.2f:0.35f animations:^{
+    [UIView animateKeyframesWithDuration:editing?0.1f:0.35f delay:editing?0.0f:0.1f options:0 animations:^{
         self.translucencyView.alpha  = editing ? 0.0f : 1.0f;
-    }];
+    } completion:nil];
 }
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated
@@ -888,13 +900,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     void (^translateBlock)() = ^{
         typeof(self) strongSelf = weakSelf;
         
-        strongSelf.scrollView.zoomScale *= scale;
+        // Setting these scroll view properties will trigger
+        // the foreground matching method via their delegates,
+        // multiple times inside the same animation block, resulting
+        // in glitchy animations.
+        //
+        // Disable matching for now, and explicitly update at the end.
+        strongSelf.disableForgroundMatching = YES;
+        {
+            strongSelf.scrollView.zoomScale *= scale;
+            
+            offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
+            offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
+            strongSelf.scrollView.contentOffset = offset;
+            
+            strongSelf.cropBoxFrame = cropFrame;
+        }
+        strongSelf.disableForgroundMatching = NO;
         
-        offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
-        offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
-        strongSelf.scrollView.contentOffset = offset;
-        
-        strongSelf.cropBoxFrame = cropFrame;
+        //Explicitly update the matching at the end of the calculations
+        [strongSelf matchForegroundToBackground];
     };
     
     if (!animated) {
@@ -902,6 +927,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
+    [self matchForegroundToBackground];
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
 }
 
@@ -943,9 +969,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
+        
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
         offset.x += (delta * 0.5f);
+        
+        if (delta < 0.0f)
+            cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
         if (newWidth > boundsWidth) {
@@ -961,6 +991,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         cropBoxFrame.size.height = newHeight;
         offset.y += (delta * 0.5f);
         
+        if (delta < 0.0f)
+            cropBoxFrame.origin.x = self.contentBounds.origin.y;
+        
         CGFloat boundsHeight = CGRectGetHeight(boundsFrame);
         if (newHeight > boundsHeight) {
             CGFloat scale = boundsHeight / newHeight;
@@ -972,27 +1005,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.aspectLockEnabled = YES;
     
-    if (animated == NO) {
+    CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height, cropBoxFrame.size.width / aspectRatio.width);
+    self.scrollView.maximumZoomScale = maxZoomScale;
+    
+    void (^translateBlock)() = ^{
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
         
         if (zoomOut)
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-            
+        
         [self moveCroppedContentToCenterAnimated:NO];
         [self checkForCanReset];
+    };
+    
+    if (animated == NO) {
+        translateBlock();
         return;
     }
     
-    [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
-        self.scrollView.contentOffset = offset;
-        self.cropBoxFrame = cropBoxFrame;
-        [self checkForCanReset];
-        
-        if (zoomOut)
-            self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-        [self moveCroppedContentToCenterAnimated:NO];
-    } completion:nil];
+    [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:translateBlock completion:nil];
 }
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
