@@ -36,6 +36,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatio16x9
 };
 
+typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
+    TOCropViewControllerToolbarPositionTop,
+    TOCropViewControllerToolbarPositionBottom
+};
+
 @class TOCropViewController;
 
 
@@ -102,6 +107,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
  The default aspect ratio for the crop view, the default value is TOCropViewControllerAspectRatioOriginal.
  */
 @property (nonatomic, assign) TOCropViewControllerAspectRatio defaultAspectRatio;
+
+/**
+ The position of the Toolbar the default value is TOCropViewControllerToolbarPositionBottom.
+ */
+@property (nonatomic, assign) TOCropViewControllerToolbarPosition toolbarPosition;
 
 /**
  If true, the aspect ratio will be locked to the defaultAspectRatio. And, the aspect ratio button won't appear on the toolbar.
