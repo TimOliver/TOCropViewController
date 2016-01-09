@@ -2,7 +2,7 @@
 
 Thanks so much for your interest in `TOCropViewController`! It makes me incredibly happy to hear that others have not just found it useful, but are eager to help contribute to it.
 
-That being said, I feel I need to make it very clear that as something I developed in my spare time, and made freely available online, I cannot make any guarantees or warranties towards providing support for it. As such, I would very much appreciate your understanding and help in maintaining this project.
+That being said, I feel I need to make it very clear that as this is something I built in my free time and am freely offering online, I hope you can appreciate that I cannot make any guarantees to its support or continued development. To this end, I would very much appreciate your understanding and help in maintaining this project.
 
 ## Submitting a Pull Request
 I absolutely love and welcome all pull requests! I don't have any strict guidelines or requirements for the formatting of pull requests, just that you properly describe what the pull request fixes/adds in its description field.
