@@ -715,7 +715,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     size.width = floorf(size.width);
     size.height = floorf(size.height);
     //self.backgroundContainerView.frame = (CGRect){CGPointZero, size};
-    self.scrollView.contentSize = size;\
+    self.scrollView.contentSize = size;
     
     //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
     self.scrollView.zoomScale = self.scrollView.zoomScale;
@@ -864,7 +864,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //The scale we need to scale up the crop box to fit full screen
     CGFloat scale = MIN(CGRectGetWidth(contentRect)/CGRectGetWidth(cropFrame), CGRectGetHeight(contentRect)/CGRectGetHeight(cropFrame));
-
+    
     cropFrame.size.width = floorf(cropFrame.size.width * scale);
     cropFrame.size.height = floorf(cropFrame.size.height * scale);
     cropFrame.origin.x = contentRect.origin.x + floorf((contentRect.size.width - cropFrame.size.width) * 0.5f);
@@ -998,7 +998,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
 {
     // Important: If rotate clockwise, You must use a different icon for rotation button.
-    [self rotateImageNinetyDegreesAnimated:animated clockwise:YES];
+    [self rotateImageNinetyDegreesAnimated:animated clockwise:NO];
 }
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise
