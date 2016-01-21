@@ -37,6 +37,8 @@
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
+@property (nonatomic, strong) UIButton *rotateButton;   // compatible with original rotateButton
+
 - (void)setup;
 - (void)buttonTapped:(id)button;
 
@@ -167,20 +169,14 @@
         containerView.frame = containerRect;
 #endif
         
-        CGRect buttonFrame = (CGRect){0,0,44.0f,44.0f};
+        CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         if (self.rotateButtonHidden) {
-            self.resetButton.frame = buttonFrame;
-            self.clampButton.frame = buttonFrame;
-            [self layoutFixedSizeButtons:@[self.resetButton, self.clampButton] inContainerRect:containerRect horizontally:YES];
+            [self layoutToolbarButtons:@[self.resetButton, self.clampButton] withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
         }
         else {
-            self.rotateCWButton.frame = buttonFrame;
-            self.rotateCCWButton.frame = buttonFrame;
-            self.resetButton.frame = buttonFrame;
-            self.clampButton.frame = buttonFrame;
             NSArray *buttonsInOrderHorizontally = @[self.rotateCWButton, self.rotateCCWButton, self.resetButton, self.clampButton];
-            [self layoutFixedSizeButtons:buttonsInOrderHorizontally inContainerRect:containerRect horizontally:YES];
+            [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
         }
     }
     else {
@@ -201,45 +197,37 @@
         containerView.frame = containerRect;
 #endif
         
-        CGRect buttonFrame = (CGRect){0,0,44.0f,44.0f};
+        CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         if (self.rotateButtonHidden) {
-            self.resetButton.frame = buttonFrame;
-            self.clampButton.frame = buttonFrame;
-            [self layoutFixedSizeButtons:@[self.resetButton, self.clampButton] inContainerRect:containerRect horizontally:NO];
+            [self layoutToolbarButtons:@[self.resetButton, self.clampButton] withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
         }
         else {
-            self.rotateCWButton.frame = buttonFrame;
-            self.rotateCCWButton.frame = buttonFrame;
-            self.resetButton.frame = buttonFrame;
-            self.clampButton.frame = buttonFrame;
             NSArray *buttonsInOrderVertically = @[self.rotateCWButton, self.rotateCCWButton, self.resetButton, self.clampButton];
-            [self layoutFixedSizeButtons:buttonsInOrderVertically inContainerRect:containerRect horizontally:NO];
+            [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
         }
     }
 }
 
-// The convenience method for calculating button's offset inside of
-// the container rect, better pass in buttons with same fixed size
-- (void)layoutFixedSizeButtons:(NSArray *)buttons inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
+// The convenience method for calculating button's frame inside of the container rect
+- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
 {
     NSInteger count = buttons.count;
-    UIView *firstButton = buttons.firstObject;
-    CGFloat fixedSize = horizontally ? CGRectGetWidth(firstButton.bounds) : CGRectGetHeight(firstButton.bounds);
+    CGFloat fixedSize = horizontally ? size.width : size.height;
     CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
     CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
     
     for (NSInteger i = 0; i < count; i++) {
         UIView *button = buttons[i];
-        CGFloat staticOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
-        CGFloat dynamicOffset = padding + i * (fixedSize + padding);
-        CGPoint origin = horizontally ? CGPointMake(dynamicOffset, staticOffset) : CGPointMake(staticOffset, dynamicOffset);
+        CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
+        CGFloat diffOffset = padding + i * (fixedSize + padding);
+        CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
         if (horizontally) {
             origin.x += CGRectGetMinX(containerRect);
         } else {
             origin.y += CGRectGetMinY(containerRect);
         }
-        button.frame = (CGRect){origin, button.frame.size};
+        button.frame = (CGRect){origin, size};
     }
 }
 
@@ -501,6 +489,18 @@
     UIGraphicsEndImageContext();
     
     return clampImage;
+}
+
+#pragma mark - Rotate Button Compatibility
+
+- (void)setRotateButton:(UIButton *)rotateButton
+{
+    self.rotateCCWButton = rotateButton;
+}
+
+- (UIButton *)rotateButton
+{
+    return self.rotateCCWButton;
 }
 
 @end
