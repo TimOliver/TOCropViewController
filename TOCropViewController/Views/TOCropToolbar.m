@@ -47,6 +47,8 @@
 
 @implementation TOCropToolbar
 
+BOOL isArabic;
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
@@ -59,8 +61,18 @@
 - (void)setup {
     self.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
     
+    isArabic = [[[NSLocale preferredLanguages] objectAtIndex:0] containsString:@"ar"];
+    
+    UIControlContentHorizontalAlignment doneButtonAlignment = UIControlContentHorizontalAlignmentLeft;
+    UIControlContentHorizontalAlignment cancelButtonAlignment = UIControlContentHorizontalAlignmentRight;
+    if (isArabic){
+        doneButtonAlignment = UIControlContentHorizontalAlignmentRight;
+        cancelButtonAlignment = UIControlContentHorizontalAlignmentLeft;
+    }
+    
+    
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _doneTextButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    _doneTextButton.contentHorizontalAlignment = doneButtonAlignment;
     [_doneTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Done",
                                                                  @"TOCropViewControllerLocalizable",
                                                                  [NSBundle bundleForClass:[self class]],
@@ -78,7 +90,7 @@
     [self addSubview:_doneIconButton];
     
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _cancelTextButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+    _cancelTextButton.contentHorizontalAlignment = cancelButtonAlignment;
     [_cancelTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel",
                                                                    @"TOCropViewControllerLocalizable",
                                                                    [NSBundle bundleForClass:[self class]],
@@ -144,13 +156,25 @@
     CGRect containerRect;
     CGRectEdge rectEdge;
     if (verticalLayout == NO) {
+        
+        // Cancel frame
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;
         frame.size.width = [self.cancelTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
+        
+        CGFloat doneX = boundsSize.width - CGRectGetWidth(frame);
+        CGFloat cancelX = 0;
+        if (isArabic) {
+            doneX = 0;
+            cancelX = boundsSize.width - CGRectGetWidth(frame);
+        }
+        
+        frame.origin.x = cancelX;
         self.cancelTextButton.frame = frame;
         
+        // Done frame
         frame.size.width = [self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
-        frame.origin.x = boundsSize.width - CGRectGetWidth(frame);
+        frame.origin.x = doneX;
         self.doneTextButton.frame = frame;
         
         containerRect = (CGRect){0,0,containerRectWidth,44.0f};
