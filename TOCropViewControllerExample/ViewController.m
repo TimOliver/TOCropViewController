@@ -128,6 +128,10 @@
         self.image = image;
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
+        
+        // uncomment to change the position of the Toolbar
+//        cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        
         [self presentViewController:cropController animated:YES completion:nil];
     }];
 }
@@ -142,6 +146,10 @@
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
     cropController.delegate = self;
+    
+    // uncomment to change the position of the Toolbar
+//    cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+    
     [self presentViewController:cropController animated:YES completion:nil];
 }
 

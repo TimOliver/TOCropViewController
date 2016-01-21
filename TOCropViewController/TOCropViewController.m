@@ -49,6 +49,7 @@
 
 /* View layout */
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout;
+- (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout;
 
 @end
 
@@ -65,6 +66,7 @@
         _image = image;
         
         _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
+        _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
         _lockedAspectRatio = NO;
     }
     
@@ -75,8 +77,7 @@
 {
     [super viewDidLoad];
 
-    BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
-    self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
+    self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.cropView];
 
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
@@ -157,9 +158,40 @@
     }
     else {
         frame.origin.x = 0.0f;
-        frame.origin.y = CGRectGetHeight(self.view.bounds) - 44.0f;
+        
+        if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
+            frame.origin.y = CGRectGetHeight(self.view.bounds) - 44.0f;
+        } else {
+            frame.origin.y = 0;
+        }
+        
         frame.size.width = CGRectGetWidth(self.view.bounds);
         frame.size.height = 44.0f;
+    }
+    
+    return frame;
+}
+
+- (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout
+{
+    CGRect frame = self.cropView.frame;
+    if (verticalLayout ) {
+        frame.origin.x = 44.0f;
+        frame.origin.y = 0.0f;
+        frame.size.width = CGRectGetWidth(self.view.bounds) - 44.0f;
+        frame.size.height = CGRectGetHeight(self.view.frame);
+    }
+    else {
+        frame.origin.x = 0.0f;
+        
+        if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
+            frame.origin.y = 0.0f;
+        } else {
+            frame.origin.y = 44.0f;
+        }
+
+        frame.size.width = CGRectGetWidth(self.view.bounds);
+        frame.size.height = CGRectGetHeight(self.view.frame) - 44.0f;
     }
     
     return frame;
@@ -170,20 +202,10 @@
     [super viewDidLayoutSubviews];
     
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) > CGRectGetHeight(self.view.bounds);
-    if (verticalLayout ) {
-        CGRect frame = self.cropView.frame;
-        frame.origin.x = 44.0f;
-        frame.size.width = CGRectGetWidth(self.view.bounds) - 44.0f;
-        frame.size.height = CGRectGetHeight(self.view.bounds);
-        self.cropView.frame = frame;
-    }
-    else {
-        CGRect frame = self.cropView.frame;
-        frame.origin.x = 0.0f;
-        frame.size.width = CGRectGetWidth(self.view.bounds);
-        frame.size.height = CGRectGetHeight(self.view.bounds) - 44.0f;
-        self.cropView.frame = frame;
-    }
+    self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
+    
+    [self.cropView prepareforRotation];
+    [self.cropView performRelayoutForRotation];
     
     [UIView setAnimationsEnabled:NO];
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
@@ -209,6 +231,7 @@
     [self.view addSubview:self.snapshotView];
 
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+    self.cropView.frame = [self frameForCropViewWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     [self.toolbar layoutIfNeeded];
     
     self.toolbar.alpha = 0.0f;
@@ -220,6 +243,7 @@
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+    self.cropView.frame = [self frameForCropViewWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     
     [UIView animateWithDuration:duration animations:^{
         self.snapshotView.alpha = 0.0f;
