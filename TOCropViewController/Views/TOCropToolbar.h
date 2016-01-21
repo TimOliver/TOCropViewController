@@ -27,7 +27,8 @@
 /* Button feedback handler blocks */
 @property (nonatomic, copy) void (^cancelButtonTapped)(void);
 @property (nonatomic, copy) void (^doneButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateCCWButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateCWButtonTapped)(void);
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 

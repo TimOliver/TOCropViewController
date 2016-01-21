@@ -22,6 +22,8 @@
 
 #import "TOCropToolbar.h"
 
+#define kTOCropToolbarShowButtonsContainerRectForDebugging     0   // convenience debug toggle
+
 @interface TOCropToolbar()
 
 @property (nonatomic, strong) UIButton *doneTextButton;
@@ -30,7 +32,8 @@
 @property (nonatomic, strong) UIButton *cancelTextButton;
 @property (nonatomic, strong) UIButton *cancelIconButton;
 
-@property (nonatomic, strong) UIButton *rotateButton;
+@property (nonatomic, strong) UIButton *rotateCCWButton; // counterclockwise rotation
+@property (nonatomic, strong) UIButton *rotateCWButton;  // clockwise rotation
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
@@ -40,7 +43,8 @@
 + (UIImage *)doneImage;
 + (UIImage *)cancelImage;
 + (UIImage *)resetImage;
-+ (UIImage *)rotateImage;
++ (UIImage *)rotateCCWImage;
++ (UIImage *)rotateCWImage;
 + (UIImage *)clampImage;
 
 @end
@@ -100,12 +104,19 @@
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_clampButton];
     
-    _rotateButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _rotateButton.contentMode = UIViewContentModeCenter;
-    _rotateButton.tintColor = [UIColor whiteColor];
-    [_rotateButton setImage:[TOCropToolbar rotateImage] forState:UIControlStateNormal];
-    [_rotateButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateButton];
+    _rotateCWButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _rotateCWButton.contentMode = UIViewContentModeCenter;
+    _rotateCWButton.tintColor = [UIColor whiteColor];
+    [_rotateCWButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
+    [_rotateCWButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_rotateCWButton];
+    
+    _rotateCCWButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _rotateCCWButton.contentMode = UIViewContentModeCenter;
+    _rotateCCWButton.tintColor = [UIColor whiteColor];
+    [_rotateCCWButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
+    [_rotateCCWButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_rotateCCWButton];
     
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
@@ -128,7 +139,17 @@
     self.doneIconButton.hidden   = (!verticalLayout);
     self.doneTextButton.hidden   = (verticalLayout);
     
-    self.rotateButton.hidden = self.rotateButtonHidden;
+    self.rotateCCWButton.hidden = self.rotateButtonHidden;
+    
+#if kTOCropToolbarShowButtonsContainerRectForDebugging
+    static UIView *containerView = nil;
+    if (!containerView) {
+        containerView = [[UIView alloc] initWithFrame:CGRectZero];
+        containerView.backgroundColor = [UIColor redColor];
+        containerView.alpha = 0.1;
+        [self addSubview:containerView];
+    }
+#endif
     
     if (verticalLayout == NO) {
         CGRect frame = CGRectZero;
@@ -140,25 +161,27 @@
         frame.origin.x = boundsSize.width - CGRectGetWidth(frame);
         self.doneTextButton.frame = frame;
         
-        CGRect containerRect = (CGRect){0,0,165.0f,44.0f};
-        containerRect.origin.x = (CGRectGetWidth(self.bounds) - (CGRectGetWidth(containerRect))) * 0.5f;
+        CGRect containerRect = (CGRect){CGRectGetMaxX(self.cancelTextButton.frame),0,CGRectGetMinX(self.doneTextButton.frame)-CGRectGetMaxX(self.cancelTextButton.frame),44.0f};
+
+#if kTOCropToolbarShowButtonsContainerRectForDebugging
+        containerView.frame = containerRect;
+#endif
         
         CGRect buttonFrame = (CGRect){0,0,44.0f,44.0f};
         
         if (self.rotateButtonHidden) {
-            buttonFrame.origin.x = CGRectGetMinX(containerRect);
             self.resetButton.frame = buttonFrame;
+            self.clampButton.frame = buttonFrame;
+            [self layoutFixedSizeButtons:@[self.resetButton, self.clampButton] inContainerRect:containerRect horizontally:YES];
         }
         else {
-            buttonFrame.origin.x = CGRectGetMinX(containerRect);
-            self.rotateButton.frame = buttonFrame;
-            
-            buttonFrame.origin.x = CGRectGetMidX(containerRect) -  22.0f;
+            self.rotateCWButton.frame = buttonFrame;
+            self.rotateCCWButton.frame = buttonFrame;
             self.resetButton.frame = buttonFrame;
+            self.clampButton.frame = buttonFrame;
+            NSArray *buttonsInOrderHorizontally = @[self.rotateCWButton, self.rotateCCWButton, self.resetButton, self.clampButton];
+            [self layoutFixedSizeButtons:buttonsInOrderHorizontally inContainerRect:containerRect horizontally:YES];
         }
-        
-        buttonFrame.origin.x = CGRectGetMaxX(containerRect) - 44.0f;
-        self.clampButton.frame = buttonFrame;
     }
     else {
         CGRect frame = CGRectZero;
@@ -172,25 +195,51 @@
         frame.size.height = 44.0f;
         self.doneIconButton.frame = frame;
         
-        CGRect containerRect = (CGRect){0,0,44.0f,165.0f};
-        containerRect.origin.y = (CGRectGetHeight(self.bounds) - (CGRectGetHeight(containerRect))) * 0.5f;
+        CGRect containerRect = (CGRect){0,CGRectGetMaxY(self.doneIconButton.frame),44.0f,CGRectGetMinY(self.cancelIconButton.frame)-CGRectGetMaxY(self.doneIconButton.frame)};
+        
+#if kTOCropToolbarShowButtonsContainerRectForDebugging
+        containerView.frame = containerRect;
+#endif
         
         CGRect buttonFrame = (CGRect){0,0,44.0f,44.0f};
         
         if (self.rotateButtonHidden) {
-            buttonFrame.origin.y = CGRectGetMinY(containerRect);
             self.resetButton.frame = buttonFrame;
+            self.clampButton.frame = buttonFrame;
+            [self layoutFixedSizeButtons:@[self.resetButton, self.clampButton] inContainerRect:containerRect horizontally:NO];
         }
         else {
-            buttonFrame.origin.y = CGRectGetMinY(containerRect);
-            self.rotateButton.frame = buttonFrame;
-            
-            buttonFrame.origin.y = CGRectGetMidY(containerRect) -  22.0f;
+            self.rotateCWButton.frame = buttonFrame;
+            self.rotateCCWButton.frame = buttonFrame;
             self.resetButton.frame = buttonFrame;
+            self.clampButton.frame = buttonFrame;
+            NSArray *buttonsInOrderVertically = @[self.rotateCWButton, self.rotateCCWButton, self.resetButton, self.clampButton];
+            [self layoutFixedSizeButtons:buttonsInOrderVertically inContainerRect:containerRect horizontally:NO];
         }
+    }
+}
 
-        buttonFrame.origin.y = CGRectGetMaxY(containerRect) - 44.0f;
-        self.clampButton.frame = buttonFrame;
+// The convenience method for calculating button's offset inside of
+// the container rect, better pass in buttons with same fixed size
+- (void)layoutFixedSizeButtons:(NSArray *)buttons inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
+{
+    NSInteger count = buttons.count;
+    UIView *firstButton = buttons.firstObject;
+    CGFloat fixedSize = horizontally ? CGRectGetWidth(firstButton.bounds) : CGRectGetHeight(firstButton.bounds);
+    CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
+    CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
+    
+    for (NSInteger i = 0; i < count; i++) {
+        UIView *button = buttons[i];
+        CGFloat staticOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
+        CGFloat dynamicOffset = padding + i * (fixedSize + padding);
+        CGPoint origin = horizontally ? CGPointMake(dynamicOffset, staticOffset) : CGPointMake(staticOffset, dynamicOffset);
+        if (horizontally) {
+            origin.x += CGRectGetMinX(containerRect);
+        } else {
+            origin.y += CGRectGetMinY(containerRect);
+        }
+        button.frame = (CGRect){origin, button.frame.size};
     }
 }
 
@@ -207,8 +256,11 @@
     else if (button == self.resetButton && self.resetButtonTapped) {
         self.resetButtonTapped();
     }
-    else if (button == self.rotateButton && self.rotateButtonTapped) {
-        self.rotateButtonTapped();
+    else if (button == self.rotateCCWButton && self.rotateCCWButtonTapped) {
+        self.rotateCCWButtonTapped();
+    }
+    else if (button == self.rotateCWButton && self.rotateCWButtonTapped) {
+        self.rotateCWButtonTapped();
     }
     else if (button == self.clampButton && self.clampButtonTapped) {
         self.clampButtonTapped();
@@ -314,7 +366,7 @@
     return cancelImage;
 }
 
-+ (UIImage *)rotateImage
++ (UIImage *)rotateCCWImage
 {
     UIImage *rotateImage = nil;
     
@@ -349,6 +401,19 @@
     UIGraphicsEndImageContext();
     
     return rotateImage;
+}
+
++ (UIImage *)rotateCWImage
+{
+    UIImage *rotateCCWImage = [self.class rotateCCWImage];
+    UIGraphicsBeginImageContextWithOptions(rotateCCWImage.size, NO, rotateCCWImage.scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextTranslateCTM(context, rotateCCWImage.size.width, rotateCCWImage.size.height);
+    CGContextRotateCTM(context, M_PI);
+    CGContextDrawImage(context,CGRectMake(0,0,rotateCCWImage.size.width,rotateCCWImage.size.height),rotateCCWImage.CGImage);
+    UIImage *rotateCWImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return rotateCWImage;
 }
 
 + (UIImage *)resetImage

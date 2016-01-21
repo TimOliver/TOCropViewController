@@ -58,7 +58,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)doneButtonTapped;
 - (void)showAspectRatioDialog;
 - (void)resetCropViewLayout;
-- (void)rotateCropView;
+- (void)rotateCropViewClockwise;
+- (void)rotateCropViewCounterclockwise;
 
 /* View layout */
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout;
@@ -101,7 +102,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.cancelButtonTapped =   ^{ [weakSelf cancelButtonTapped]; };
     self.toolbar.resetButtonTapped =    ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
-    self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
+    self.toolbar.rotateCCWButtonTapped =   ^{ [weakSelf rotateCropViewCounterclockwise]; };
+    self.toolbar.rotateCWButtonTapped =   ^{ [weakSelf rotateCropViewClockwise]; };
     
     self.transitioningDelegate = self;
     
@@ -335,9 +337,14 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.clampButtonGlowing = YES;
 }
 
-- (void)rotateCropView
+- (void)rotateCropViewClockwise
 {
-    [self.cropView rotateImageNinetyDegreesAnimated:YES];
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES];
+}
+
+- (void)rotateCropViewCounterclockwise
+{
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
 }
 
 #pragma mark - Crop View Delegates -

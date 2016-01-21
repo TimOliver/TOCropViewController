@@ -997,7 +997,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
 {
-    // Important: If rotate clockwise, You must use a different icon for rotation button.
     [self rotateImageNinetyDegreesAnimated:animated clockwise:NO];
 }
 
@@ -1028,12 +1027,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Convert the new angle to radians
     CGFloat angleInRadians = 0.0f;
     switch (newAngle) {
-        case 90: case -90: angleInRadians = M_PI_2; break;
-        case 180: case -180: angleInRadians = M_PI; break;
-        case 270: case -270: angleInRadians = (M_PI + M_PI_2); break;
-        default: break;
+        case 90:    angleInRadians = M_PI_2;            break;
+        case -90:   angleInRadians = -M_PI_2;           break;
+        case 180:   angleInRadians = M_PI;              break;
+        case -180:  angleInRadians = -M_PI;             break;
+        case 270:   angleInRadians = (M_PI + M_PI_2);   break;
+        case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
+        default:                                        break;
     }
-    angleInRadians = clockwise ? angleInRadians : -angleInRadians;
     
     // Set up the transformation matrix for the rotation
     CGAffineTransform rotation = CGAffineTransformRotate(CGAffineTransformIdentity, angleInRadians);
@@ -1048,16 +1049,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.scrollView.contentOffset.x, cropMidPoint.y + self.scrollView.contentOffset.y};
     
     //Work out the dimensions of the crop box when rotated
+    // (Important: MUST calculate the new fliped size everytime and avoid using stored size for rotating back.)
     CGRect newCropFrame = CGRectZero;
-    NSInteger flipedLastEditedAngle = clockwise ? self.cropBoxLastEditedAngle + 180 : self.cropBoxLastEditedAngle - 180;;
-    if (self.angle == self.cropBoxLastEditedAngle || self.angle == flipedLastEditedAngle % 360) {
-        newCropFrame.size = self.cropBoxLastEditedSize;
-    }
-    else {
-        newCropFrame.size = (CGSize){floorf(self.cropBoxLastEditedSize.height * scale), floorf(self.cropBoxLastEditedSize.width * scale)};
-        //update last edited size
-        self.cropBoxLastEditedSize = cropBoxFrame.size;
-    }
+    newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
+    self.cropBoxLastEditedSize = cropBoxFrame.size;
     
     newCropFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - newCropFrame.size.width) * 0.5f);
     newCropFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - newCropFrame.size.height) * 0.5f);
