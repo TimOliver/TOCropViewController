@@ -161,6 +161,14 @@
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
 
 /**
+ Rotates the entire canvas to a 90-degree angle
+ 
+ @param animated Whether the transition is animated
+ @param clockwise Whether the rotation is clockwise, no means counterclockwise
+ */
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
+
+/**
  Animate the grid overlay graphic to be visible
  */
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated;
