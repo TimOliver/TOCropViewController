@@ -45,7 +45,8 @@
 - (void)doneButtonTapped;
 - (void)showAspectRatioDialog;
 - (void)resetCropViewLayout;
-- (void)rotateCropView;
+- (void)rotateCropViewClockwise;
+- (void)rotateCropViewCounterclockwise;
 
 /* View layout */
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout;
@@ -57,6 +58,10 @@
 
 - (instancetype)initWithImage:(UIImage *)image
 {
+    if (image == nil) {
+        return nil;
+    }
+    
     self = [super init];
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
@@ -86,9 +91,12 @@
     __weak typeof(self) weakSelf = self;
     self.toolbar.doneButtonTapped =     ^{ [weakSelf doneButtonTapped]; };
     self.toolbar.cancelButtonTapped =   ^{ [weakSelf cancelButtonTapped]; };
+    
     self.toolbar.resetButtonTapped =    ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
-    self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
+    
+    self.toolbar.rotateCounterclockwiseButtonTapped =   ^{ [weakSelf rotateCropViewCounterclockwise]; };
+    self.toolbar.rotateClockwiseButtonTapped =   ^{ [weakSelf rotateCropViewClockwise]; };
     
     self.transitioningDelegate = self;
     
@@ -413,12 +421,14 @@
     self.toolbar.clampButtonGlowing = YES;
 }
 
-- (void)rotateCropView
+- (void)rotateCropViewClockwise
 {
-    [self.cropView rotateImageNinetyDegreesAnimated:YES];
-    if (self.lockedAspectRatio) {
-        [self setAspectRatio:self.defaultAspectRatio animated:NO];
-    }
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES];
+}
+
+- (void)rotateCropViewCounterclockwise
+{
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
 }
 
 #pragma mark - Crop View Delegates -
@@ -619,7 +629,7 @@
     }
 }
 
-#pragma mark - Property methods
+#pragma mark - Property Methods -
 
 - (TOCropView *)cropView {
     if (!_cropView) {
@@ -641,6 +651,16 @@
         _toolbar = [[TOCropToolbar alloc] initWithFrame:frame];
     }
     return _toolbar;
+}
+
+- (void)setShowClockwiseRotationButton:(BOOL)showClockwiseRotationButton
+{
+    self.toolbar.showClockwiseRotationButton = showClockwiseRotationButton;
+}
+
+- (BOOL)showClockwiseRotationButton
+{
+    return self.toolbar.showClockwiseRotationButton;
 }
 
 @end

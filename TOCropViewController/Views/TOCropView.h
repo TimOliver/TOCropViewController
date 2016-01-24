@@ -153,12 +153,20 @@
 - (void)setAspectLockEnabledWithAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated;
 
 /**
- Rotates the entire canvas to a 90-degree angle
+ Rotates the entire canvas to a 90-degree angle. The default rotation is counterclockwise.
  
  @param angle The angle in which to rotate (May be 0, 90, 180, 270)
  @param animated Whether the transition is animated
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
+
+/**
+ Rotates the entire canvas to a 90-degree angle
+ 
+ @param animated Whether the transition is animated
+ @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
+ */
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
 
 /**
  Animate the grid overlay graphic to be visible

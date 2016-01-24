@@ -129,8 +129,11 @@
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
         
-        // uncomment to change the position of the Toolbar
-//        cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        // Uncomment this to place the toolbar at the top of the view controller
+        // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        
+        // Uncomment this to add an additional clockwise rotation button
+        // cropController.showClockwiseRotationButton = YES;
         
         [self presentViewController:cropController animated:YES completion:nil];
     }];

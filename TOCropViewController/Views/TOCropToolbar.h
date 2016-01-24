@@ -42,7 +42,8 @@
 /* Button feedback handler blocks */
 @property (nonatomic, copy) void (^cancelButtonTapped)(void);
 @property (nonatomic, copy) void (^doneButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateCounterclockwiseButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 
@@ -59,5 +60,8 @@
 
 /* Done button frame for popover controllers */
 @property (nonatomic, readonly) CGRect doneButtonFrame;
+
+/* Show the clockwise rotation button */
+@property (nonatomic, assign) BOOL showClockwiseRotationButton;
 
 @end

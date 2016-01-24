@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) BOOL showActivitySheetOnDone;
 
 /**
- The default aspect ratio for the crop view, the default value is TOCropViewControllerAspectRatioOriginal.
+ The default aspect ratio for the crop view, the default value is `TOCropViewControllerAspectRatioOriginal`.
  */
 @property (nonatomic, assign) TOCropViewControllerAspectRatio defaultAspectRatio;
 
@@ -112,6 +112,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  The position of the Toolbar the default value is TOCropViewControllerToolbarPositionBottom.
  */
 @property (nonatomic, assign) TOCropViewControllerToolbarPosition toolbarPosition;
+
+/**
+ Optionally show an additional button that will rotate the image clockwise, as opposed to counterclockwise.
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL showClockwiseRotationButton;
 
 /**
  If true, the aspect ratio will be locked to the defaultAspectRatio. And, the aspect ratio button won't appear on the toolbar.
@@ -139,6 +145,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  If `showActivitySheetOnDone` is true, then you may expliclty set activities that won't appear in the share sheet here.
  */
 @property (nonatomic, strong) NSArray *excludedActivityTypes;
+
+
 
 ///------------------------------------------------
 /// @name Object Creation

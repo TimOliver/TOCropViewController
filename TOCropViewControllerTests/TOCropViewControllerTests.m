@@ -18,9 +18,22 @@
 @implementation TOCropViewControllerTests
 
 - (void)testViewControllerInstance {
-    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:nil];
+    //Create a basic image
+    UIGraphicsBeginImageContextWithOptions((CGSize){10, 10}, NO, 1.0f);
+    CGContextFillRect(UIGraphicsGetCurrentContext(), (CGRect){0,0,10,10});
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    //Perform test
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:image];
     UIView *view = controller.view;
-    XCTAssert(view!=nil, @"Pass");
+    XCTAssertNotNil(view);
+}
+
+- (void)testViewControllerInvalidInput
+{
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:nil];
+    XCTAssertNil(controller);
 }
 
 @end
