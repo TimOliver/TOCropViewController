@@ -1,7 +1,7 @@
 //
 //  TOCropToolbar.h
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -42,8 +42,8 @@
 /* Button feedback handler blocks */
 @property (nonatomic, copy) void (^cancelButtonTapped)(void);
 @property (nonatomic, copy) void (^doneButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateCCWButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateCWButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateCounterclockwiseButtonTapped)(void);
+@property (nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 

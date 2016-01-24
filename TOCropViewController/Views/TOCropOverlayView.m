@@ -1,7 +1,7 @@
 //
 //  TOCropOverlayView.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -110,7 +110,7 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     for (NSInteger i = 0; i < 4; i++) {
         NSArray *cornerLine = cornerLines[i];
         
-        CGRect verticalFrame, horizontalFrame;
+        CGRect verticalFrame = CGRectZero, horizontalFrame = CGRectZero;
         switch (i) {
             case 0: //top left
                 verticalFrame = (CGRect){-3.0f,-3.0f,3.0f,kTOCropOverLayerCornerWidth+3.0f};
