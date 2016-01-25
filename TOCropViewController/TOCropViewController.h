@@ -114,12 +114,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) TOCropViewControllerToolbarPosition toolbarPosition;
 
 /**
- Optionally show an additional button that will rotate the image clockwise, as opposed to counterclockwise.
- Default is NO.
- */
-@property (nonatomic, assign) BOOL showClockwiseRotationButton;
-
-/**
  If true, the aspect ratio will be locked to the defaultAspectRatio. And, the aspect ratio button won't appear on the toolbar.
  */
 @property (nonatomic, assign) BOOL lockedAspectRatio;

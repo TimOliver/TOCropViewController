@@ -653,14 +653,4 @@
     return _toolbar;
 }
 
-- (void)setShowClockwiseRotationButton:(BOOL)showClockwiseRotationButton
-{
-    self.toolbar.showClockwiseRotationButton = showClockwiseRotationButton;
-}
-
-- (BOOL)showClockwiseRotationButton
-{
-    return self.toolbar.showClockwiseRotationButton;
-}
-
 @end
