@@ -132,8 +132,9 @@
         // Uncomment this to place the toolbar at the top of the view controller
         // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
         
-        // Uncomment this to add an additional clockwise rotation button
-        // cropController.showClockwiseRotationButton = YES;
+        // Uncomment to hide rotation buttons
+//        cropController.toolbar.rotateClockwiseButtonHidden = true;
+//        cropController.toolbar.rotateCounterClockwiseButtonHidden = true;
         
         [self presentViewController:cropController animated:YES completion:nil];
     }];

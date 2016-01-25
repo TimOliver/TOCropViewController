@@ -52,8 +52,9 @@
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;
 
-/* Disable the rotate button */
-@property (nonatomic, assign) BOOL rotateButtonHidden;
+/* Rotate button settings */
+@property (nonatomic, assign) BOOL rotateCounterClockwiseButtonHidden;
+@property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 
 /* Enable the reset button */
 @property (nonatomic, assign) BOOL resetButtonEnabled;
@@ -61,7 +62,5 @@
 /* Done button frame for popover controllers */
 @property (nonatomic, readonly) CGRect doneButtonFrame;
 
-/* Show the clockwise rotation button */
-@property (nonatomic, assign) BOOL showClockwiseRotationButton;
 
 @end
