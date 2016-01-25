@@ -129,6 +129,9 @@
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
         
+        // Uncomment this to remove ratio button from toolbar
+//        cropController.lockedAspectRatio = true;
+        
         // Uncomment this to place the toolbar at the top of the view controller
         // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
         
