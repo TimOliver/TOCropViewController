@@ -13,7 +13,11 @@
 
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) UIImageView *imageView;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
+#pragma clang diagnostic pop
 
 - (void)showCropViewController;
 - (void)sharePhoto;
@@ -93,9 +97,12 @@
         [self presentViewController:activityController animated:YES completion:nil];
     }
     else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [self.activityPopoverController dismissPopoverAnimated:NO];
         self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
         [self.activityPopoverController presentPopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+#pragma clang diagnostic pop
     }
 }
 
@@ -121,6 +128,14 @@
         self.image = image;
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
+        
+        // Uncomment this to place the toolbar at the top of the view controller
+        // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        
+        // Uncomment to hide rotation buttons
+//        cropController.toolbar.rotateClockwiseButtonHidden = true;
+//        cropController.toolbar.rotateCounterClockwiseButtonHidden = true;
+        
         [self presentViewController:cropController animated:YES completion:nil];
     }];
 }
@@ -135,6 +150,10 @@
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:self.image];
     cropController.delegate = self;
+    
+    // uncomment to change the position of the Toolbar
+//    cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+    
     [self presentViewController:cropController animated:YES completion:nil];
 }
 

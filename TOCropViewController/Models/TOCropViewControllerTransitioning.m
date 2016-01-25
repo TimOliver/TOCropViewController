@@ -1,7 +1,7 @@
 //
 //  TOCropViewControllerTransitioning.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -41,7 +41,9 @@
     UIViewController *previousController = (self.isDismissing == NO) ? fromViewController : toViewController;
     
     cropViewController.view.frame = containerView.bounds;
-    previousController.view.frame = containerView.bounds;
+    
+    if (self.isDismissing)
+        previousController.view.frame = containerView.bounds;
     
     UIImageView *imageView = nil;
     if ((self.isDismissing && !CGRectIsEmpty(self.toFrame)) || (!self.isDismissing && !CGRectIsEmpty(self.fromFrame))) {

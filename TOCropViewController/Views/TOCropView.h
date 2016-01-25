@@ -1,7 +1,7 @@
 //
 //  TOCropView.h
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TOCropOverlayView.h"
 
 @class TOCropView;
 
@@ -37,6 +38,17 @@
  The image that the crop view is displaying. This cannot be changed once the crop view is instantiated.
  */
 @property (nonatomic, strong, readonly) UIImage *image;
+
+/**
+ A grid view overlaid on top of the foreground image view's container.
+ */
+@property (nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
+
+/**
+ If false, the user cannot resize the crop box frame using a pan gesture from a corner.
+ Default vaue is true.
+ */
+@property (nonatomic, assign) BOOL cropBoxResizeEnabled;
 
 /**
  A delegate object that receives notifications from the crop view
@@ -141,12 +153,20 @@
 - (void)setAspectLockEnabledWithAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated;
 
 /**
- Rotates the entire canvas to a 90-degree angle
+ Rotates the entire canvas to a 90-degree angle. The default rotation is counterclockwise.
  
  @param angle The angle in which to rotate (May be 0, 90, 180, 270)
  @param animated Whether the transition is animated
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
+
+/**
+ Rotates the entire canvas to a 90-degree angle
+ 
+ @param animated Whether the transition is animated
+ @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
+ */
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
 
 /**
  Animate the grid overlay graphic to be visible

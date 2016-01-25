@@ -1,7 +1,7 @@
 //
 //  TOCropScrollView
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -22,6 +22,10 @@
 
 #import <UIKit/UIKit.h>
 
+/*
+ Subclassing UIScrollView was necessary in order to directly capture
+ touch events that weren't otherwise accessible via UIGestureRecognizer objects.
+ */
 @interface TOCropScrollView : UIScrollView
 
 @property (nonatomic, copy) void (^touchesBegan)(void);

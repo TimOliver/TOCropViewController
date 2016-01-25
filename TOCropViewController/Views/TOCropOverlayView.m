@@ -1,7 +1,7 @@
 //
 //  TOCropOverlayView.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -56,12 +56,9 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
 - (void)setup
 {
     UIView *(^newLineView)(void) = ^UIView *(void){
-        UIView *newLine = [[UIView alloc] initWithFrame:CGRectZero];
-        newLine.backgroundColor = [UIColor whiteColor];
-        [self addSubview:newLine];
-        return newLine;
+        return [self createNewLineView];
     };
-    
+
     _outerLineViews     = @[newLineView(), newLineView(), newLineView(), newLineView()];
     
     _topLeftLineViews   = @[newLineView(), newLineView()];
@@ -69,8 +66,8 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     _topRightLineViews  = @[newLineView(), newLineView()];
     _bottomRightLineViews = @[newLineView(), newLineView()];
     
-    _horizontalGridLines = @[newLineView(), newLineView()];
-    _verticalGridLines = @[newLineView(), newLineView()];
+    self.displayHorizontalGridLines = YES;
+    self.displayVerticalGridLines = YES;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -113,7 +110,7 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     for (NSInteger i = 0; i < 4; i++) {
         NSArray *cornerLine = cornerLines[i];
         
-        CGRect verticalFrame, horizontalFrame;
+        CGRect verticalFrame = CGRectZero, horizontalFrame = CGRectZero;
         switch (i) {
             case 0: //top left
                 verticalFrame = (CGRect){-3.0f,-3.0f,3.0f,kTOCropOverLayerCornerWidth+3.0f};
@@ -188,9 +185,50 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     }];
 }
 
+#pragma mark - Property methods
+
+- (void)setDisplayHorizontalGridLines:(BOOL)displayHorizontalGridLines {
+    _displayHorizontalGridLines = displayHorizontalGridLines;
+    
+    [self.horizontalGridLines enumerateObjectsUsingBlock:^(UIView *__nonnull lineView, NSUInteger idx, BOOL * __nonnull stop) {
+        [lineView removeFromSuperview];
+    }];
+    
+    if (_displayHorizontalGridLines) {
+        self.horizontalGridLines = @[[self createNewLineView], [self createNewLineView]];
+    } else {
+        self.horizontalGridLines = @[];
+    }
+    [self setNeedsDisplay];
+}
+
+- (void)setDisplayVerticalGridLines:(BOOL)displayVerticalGridLines {
+    _displayVerticalGridLines = displayVerticalGridLines;
+    
+    [self.verticalGridLines enumerateObjectsUsingBlock:^(UIView *__nonnull lineView, NSUInteger idx, BOOL * __nonnull stop) {
+        [lineView removeFromSuperview];
+    }];
+    
+    if (_displayVerticalGridLines) {
+        self.verticalGridLines = @[[self createNewLineView], [self createNewLineView]];
+    } else {
+        self.verticalGridLines = @[];
+    }
+    [self setNeedsDisplay];
+}
+
 - (void)setGridHidden:(BOOL)gridHidden
 {
     [self setGridHidden:gridHidden animated:NO];
+}
+
+#pragma mark - Private methods
+
+- (nonnull UIView *)createNewLineView {
+    UIView *newLine = [[UIView alloc] initWithFrame:CGRectZero];
+    newLine.backgroundColor = [UIColor whiteColor];
+    [self addSubview:newLine];
+    return newLine;
 }
 
 @end

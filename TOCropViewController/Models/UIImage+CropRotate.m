@@ -1,7 +1,7 @@
 //
 //  UIImage+CropRotate.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -24,12 +24,17 @@
 
 @implementation UIImage (CropRotate)
 
+- (BOOL)hasAlpha
+{
+    CGImageAlphaInfo alphaInfo = CGImageGetAlphaInfo(self.CGImage);
+    return (alphaInfo == kCGImageAlphaFirst || alphaInfo == kCGImageAlphaLast ||
+            alphaInfo == kCGImageAlphaPremultipliedFirst || alphaInfo == kCGImageAlphaPremultipliedLast);
+}
+
 - (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle
 {
     UIImage *croppedImage = nil;
-    CGPoint drawPoint = CGPointZero;
-    
-    UIGraphicsBeginImageContextWithOptions(frame.size, YES, self.scale);
+    UIGraphicsBeginImageContextWithOptions(frame.size, ![self hasAlpha], self.scale);
     {
         CGContextRef context = UIGraphicsGetCurrentContext();
         
@@ -49,7 +54,7 @@
         }
         else {
             CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
-            [self drawAtPoint:drawPoint];
+            [self drawAtPoint:CGPointZero];
         }
         
         croppedImage = UIGraphicsGetImageFromCurrentImageContext();
