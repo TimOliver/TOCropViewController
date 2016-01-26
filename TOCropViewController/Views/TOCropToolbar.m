@@ -32,8 +32,6 @@
 @property (nonatomic, strong, readwrite) UIButton *cancelTextButton;
 @property (nonatomic, strong, readwrite) UIButton *cancelIconButton;
 
-@property (nonatomic, strong) UIButton *rotateCounterclockwiseButton;
-@property (nonatomic, strong) UIButton *rotateClockwiseButton;
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
@@ -66,6 +64,8 @@
 
 - (void)setup {
     self.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    
+    _rotateClockwiseButtonHidden = YES;
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     if ([UIView resolveClassMethod:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) {
@@ -114,13 +114,6 @@
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_clampButton];
     
-    _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
-    _rotateClockwiseButton.tintColor = [UIColor whiteColor];
-    [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
-    [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateClockwiseButton];
-    
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateCounterclockwiseButton.tintColor = [UIColor whiteColor];
@@ -148,9 +141,6 @@
     self.cancelTextButton.hidden = (verticalLayout);
     self.doneIconButton.hidden   = (!verticalLayout);
     self.doneTextButton.hidden   = (verticalLayout);
-    
-//    self.rotateCounterclockwiseButton.hidden = self.rotateButtonHidden;
-    
     
 #if kTOCropToolbarShowButtonsContainerRectForDebugging
     static UIView *containerView = nil;
@@ -553,19 +543,28 @@
 
 #pragma mark - Accessors -
 
-- (void)setRotateClockwiseButtonHidden:(BOOL)showClockwiseRotationButton
+- (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
 {
-    if (_rotateClockwiseButtonHidden == showClockwiseRotationButton) {
+    if (_rotateClockwiseButtonHidden == rotateClockwiseButtonHidden) {
         return;
     }
     
-    _rotateClockwiseButtonHidden = showClockwiseRotationButton;
+    _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
+    
+    if (_rotateClockwiseButton == NO) {
+        _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
+        _rotateClockwiseButton.tintColor = [UIColor whiteColor];
+        [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
+        [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_rotateClockwiseButton];
+    }
+    else {
+        [_rotateClockwiseButton removeFromSuperview];
+        _rotateClockwiseButton = nil;
+    }
+    
     [self setNeedsLayout];
-}
-
-- (void)setRotateButton:(UIButton *)rotateButton
-{
-    self.rotateCounterclockwiseButton = rotateButton;
 }
 
 - (UIButton *)rotateButton

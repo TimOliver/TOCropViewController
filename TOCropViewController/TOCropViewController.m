@@ -72,7 +72,6 @@
         
         _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
-        _lockedAspectRatio = NO;
     }
     
     return self;
@@ -98,10 +97,9 @@
     self.toolbar.rotateCounterclockwiseButtonTapped =   ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped =   ^{ [weakSelf rotateCropViewClockwise]; };
     
-    self.toolbar.clampButtonHidden = self.lockedAspectRatio;
+    self.toolbar.clampButtonHidden = self.aspectRatioLocked;
     
     self.transitioningDelegate = self;
-    
     self.view.backgroundColor = self.cropView.backgroundColor;
 
     if (self.defaultAspectRatio != TOCropViewControllerAspectRatioOriginal) {
@@ -291,12 +289,14 @@
 #pragma mark - Reset -
 - (void)resetCropViewLayout
 {
-    [self.cropView resetLayoutToDefaultAnimated:YES];
+    BOOL animated = (self.cropView.angle == 0);
+    [self.cropView resetLayoutToDefaultAnimated:animated];
     
-    if (self.lockedAspectRatio) {
-        [self setAspectRatio:self.defaultAspectRatio animated:NO];
-    } else {
-        self.cropView.aspectLockEnabled = NO;
+    if (self.aspectRatioLocked) {
+        [self setAspectRatio:self.defaultAspectRatio animated:animated];
+    }
+    else {
+        self.cropView.aspectRatioLocked = NO;
         self.toolbar.clampButtonGlowing = NO;
     }
 }
@@ -304,8 +304,8 @@
 #pragma mark - Aspect Ratio Handling -
 - (void)showAspectRatioDialog
 {
-    if (self.cropView.aspectLockEnabled) {
-        self.cropView.aspectLockEnabled = NO;
+    if (self.cropView.aspectRatioLocked) {
+        self.cropView.aspectRatioLocked = NO;
         self.toolbar.clampButtonGlowing = NO;
         return;
     }
@@ -653,6 +653,39 @@
         _toolbar = [[TOCropToolbar alloc] initWithFrame:frame];
     }
     return _toolbar;
+}
+
+- (void)setAspectRatioLocked:(BOOL)aspectRatioLocked
+{
+    self.cropView.aspectRatioLocked = aspectRatioLocked;
+    self.toolbar.clampButtonHidden = aspectRatioLocked;
+}
+
+- (BOOL)aspectRatioLocked
+{
+    return self.cropView.aspectRatioLocked;
+}
+
+- (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
+{
+    self.toolbar.rotateCounterClockwiseButtonHidden = rotateButtonsHidden;
+    
+    if (self.rotateClockwiseButtonHidden == NO) {
+        self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
+    }
+}
+
+- (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
+{
+    if (_rotateClockwiseButtonHidden == rotateClockwiseButtonHidden) {
+        return;
+    }
+    
+    _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
+    
+    if (self.rotateButtonsHidden == NO) {
+        self.toolbar.rotateClockwiseButtonHidden = _rotateClockwiseButtonHidden;
+    }
 }
 
 @end

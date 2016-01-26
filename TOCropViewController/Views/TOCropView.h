@@ -83,7 +83,7 @@
 /**
  When the cropping box is locked to its current size
  */
-@property (nonatomic, assign) BOOL aspectLockEnabled;
+@property (nonatomic, assign) BOOL aspectRatioLocked;
 
 /**
  True when the height of the crop box is bigger than the width
