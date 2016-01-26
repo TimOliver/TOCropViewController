@@ -98,6 +98,8 @@
     self.toolbar.rotateCounterclockwiseButtonTapped =   ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped =   ^{ [weakSelf rotateCropViewClockwise]; };
     
+    self.toolbar.clampButtonHidden = self.lockedAspectRatio;
+    
     self.transitioningDelegate = self;
     
     self.view.backgroundColor = self.cropView.backgroundColor;
