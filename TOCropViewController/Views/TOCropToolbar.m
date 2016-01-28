@@ -493,6 +493,7 @@
 
         resetImage = UIGraphicsGetImageFromCurrentImageContext();
     }
+    UIGraphicsEndImageContext();
     
     return resetImage;
 }
