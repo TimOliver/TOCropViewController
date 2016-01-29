@@ -35,9 +35,12 @@
 @property (nonatomic, strong, readonly) UIButton *cancelIconButton;
 
 /* The cropper control buttons */
-@property (nonatomic, strong, readonly) UIButton *rotateButton;
+@property (nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
 @property (nonatomic, strong, readonly) UIButton *resetButton;
 @property (nonatomic, strong, readonly) UIButton *clampButton;
+@property (nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
+
+@property (nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
 @property (nonatomic, copy) void (^cancelButtonTapped)(void);
@@ -52,7 +55,6 @@
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;
 
-/* Rotate button settings */
 @property (nonatomic, assign) BOOL rotateCounterClockwiseButtonHidden;
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 

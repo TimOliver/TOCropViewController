@@ -319,7 +319,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     switch (self.tappedEdge) {
         case TOCropViewOverlayEdgeLeft:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 aspectHorizontal = YES;
                 xDelta = MAX(xDelta, 0);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMaxX(originFrame), CGRectGetMidY(originFrame)};
@@ -331,7 +331,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             frame.size.width = originFrame.size.width - xDelta;
             break;
         case TOCropViewOverlayEdgeRight:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 aspectHorizontal = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMinX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
@@ -345,7 +345,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeBottom:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 aspectVertical = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMinY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
@@ -358,7 +358,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeTop:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 aspectVertical = YES;
                 yDelta = MAX(0,yDelta);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMaxY(originFrame)};
@@ -373,7 +373,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeTopLeft:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 xDelta = MAX(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -399,7 +399,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeTopRight:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 xDelta = MAX(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -424,7 +424,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeBottomLeft:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 CGPoint distance;
                 distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - (-yDelta / CGRectGetHeight(originFrame));
@@ -445,7 +445,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeBottomRight:
-            if (self.aspectLockEnabled) {
+            if (self.aspectRatioLocked) {
                 
                 CGPoint distance;
                 distance.x = 1.0f - ((-1 * xDelta) / CGRectGetWidth(originFrame));
@@ -477,12 +477,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     maxSize.height = CGRectGetHeight(contentFrame);
     
     //clamp the box to ensure it doesn't go beyond the bounds we've set
-    if (self.aspectLockEnabled && aspectHorizontal) {
+    if (self.aspectRatioLocked && aspectHorizontal) {
         maxSize.height = contentFrame.size.width / aspectRatio;
         minSize.width = kTOCropViewMinimumBoxSize * aspectRatio;
     }
         
-    if (self.aspectLockEnabled && aspectVertical) {
+    if (self.aspectRatioLocked && aspectVertical) {
         maxSize.width = contentFrame.size.height * aspectRatio;
         minSize.height = kTOCropViewMinimumBoxSize / aspectRatio;
     }
@@ -1003,7 +1003,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         }
     }
     
-    self.aspectLockEnabled = YES;
+    self.aspectRatioLocked = YES;
     
     CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height, cropBoxFrame.size.width / aspectRatio.width);
     self.scrollView.maximumZoomScale = maxZoomScale;
