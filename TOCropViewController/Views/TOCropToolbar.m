@@ -237,17 +237,22 @@
         
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
-        if (self.rotateCounterClockwiseButtonHidden) {
-            [self layoutToolbarButtons:@[self.resetButton, self.clampButton] withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
+        NSMutableArray *buttonsInOrderVertically = [NSMutableArray new];
+        if (!self.rotateCounterClockwiseButtonHidden) {
+            [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
         }
-        else {
-            NSMutableArray *buttonsInOrderVertically = [@[self.rotateCounterclockwiseButton, self.resetButton, self.clampButton] mutableCopy];
-            if (self.rotateClockwiseButton) {
-                [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
-            }
-            
-            [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
+        
+        [buttonsInOrderVertically addObject:self.resetButton];
+        
+        if (!self.clampButtonHidden) {
+            [buttonsInOrderVertically addObject:self.clampButton];
         }
+        
+        if (!self.rotateClockwiseButtonHidden) {
+            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
+        }
+        
+        [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
 }
 
