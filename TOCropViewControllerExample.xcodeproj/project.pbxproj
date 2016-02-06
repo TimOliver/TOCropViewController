@@ -84,6 +84,8 @@
 		22DB4D9D1B234D4F008B8466 /* TOActivityCroppedImageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOActivityCroppedImageProvider.m; sourceTree = "<group>"; };
 		6AE313501C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
+		CDC8C5771C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -286,6 +288,7 @@
 				id,
 				pt,
 				ar,
+				tr,
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -362,6 +365,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				223424781ABBC0CD00BBC2B1 /* Base */,
+				CDC8C5751C667B9100BB86A4 /* tr */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -393,6 +397,7 @@
 				22C3C5561AC8CA5000E86280 /* id */,
 				15E30F151B47A2660099A975 /* pt */,
 				6AE313511C47DAA200894C5B /* ar */,
+				CDC8C5771C667B9100BB86A4 /* tr */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			path = TOCropViewController;
