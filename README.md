@@ -18,7 +18,7 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 * The choice of having the controller return the cropped image to a delegate, or immediately pass it to a `UIActivityViewController`.
 * A custom animation and layout when the device is rotated to landscape mode.
 * Custom 'opening' and 'dismissal' animations.
-* Localized in 15 languages.
+* Localized in 17 languages.
 
 ## System Requirements
 iOS 7.0 or above
