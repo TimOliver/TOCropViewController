@@ -413,7 +413,7 @@
             break;
     }
     
-    if (self.cropView.cropBoxAspectRatioIsPortrait) {
+    if (self.cropView.cropBoxAspectRatioIsPortrait && !self.aspectRatioLocked) {
         CGFloat width = aspectRatio.width;
         aspectRatio.width = aspectRatio.height;
         aspectRatio.height = width;
