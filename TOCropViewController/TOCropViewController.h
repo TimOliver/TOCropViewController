@@ -181,6 +181,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  */
 - (instancetype)initWithImage:(UIImage *)image;
 
+
+/**
+ Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
+ */
+- (void)resetCropViewLayout;
+
 /**
  Play a custom animation of the target image zooming to its position in 
  the crop controller while the background fades in.
