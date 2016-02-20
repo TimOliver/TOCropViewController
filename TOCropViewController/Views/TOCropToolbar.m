@@ -75,9 +75,8 @@
         self.reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
     }
     
-    NSBundle* classBundle = [NSBundle bundleForClass:[self class]];
-    NSURL* resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-    NSBundle* resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
+    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *resourceBundle = [[NSBundle alloc] initWithURL:[classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"]];
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Done",

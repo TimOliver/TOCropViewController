@@ -314,9 +314,8 @@
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     
     //Prepare the localized options
-    NSBundle* classBundle = [NSBundle bundleForClass:[self class]];
-    NSURL* resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-    NSBundle* resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
+    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *resourceBundle = [[NSBundle alloc] initWithURL:[classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"]];
     
     NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
     NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil);
