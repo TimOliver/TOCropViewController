@@ -111,7 +111,7 @@
 {
     [super viewWillAppear:animated];
     
-    if ([UIApplication sharedApplication].statusBarHidden == NO) {
+    if (animated) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
     }
@@ -151,7 +151,7 @@
 
 - (BOOL)prefersStatusBarHidden
 {
-    return !self.inTransition;
+    return !(self.inTransition) && !(self.view.superview == nil);
 }
 
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout
@@ -668,13 +668,14 @@
 
 - (void)setAspectRatioLocked:(BOOL)aspectRatioLocked
 {
+    if (aspectRatioLocked == _aspectRatioLocked) {
+        return;
+    }
+    
+    _aspectRatioLocked = aspectRatioLocked;
+    
     self.cropView.aspectRatioLocked = aspectRatioLocked;
     self.toolbar.clampButtonHidden = aspectRatioLocked;
-}
-
-- (BOOL)aspectRatioLocked
-{
-    return self.cropView.aspectRatioLocked;
 }
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
