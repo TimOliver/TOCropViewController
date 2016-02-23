@@ -72,13 +72,24 @@
         self.reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
     }
     else {
-        self.reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] containsString:@"ar"];
+        self.reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
+    }
+    
+    // In CocoaPods, strings are stored in a separate bundle from the main one
+    NSBundle *resourceBundle = nil;
+    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    if (resourceBundleURL) {
+        resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
+    }
+    else {
+        resourceBundle = classBundle;
     }
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Done",
                                                                  @"TOCropViewControllerLocalizable",
-                                                                 [NSBundle bundleForClass:[self class]],
+                                                                 resourceBundle,
                                                                  nil)
                      forState:UIControlStateNormal];
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
@@ -95,7 +106,7 @@
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel",
                                                                    @"TOCropViewControllerLocalizable",
-                                                                   [NSBundle bundleForClass:[self class]],
+                                                                   resourceBundle,
                                                                    nil)
                        forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
@@ -237,17 +248,22 @@
         
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
-        if (self.rotateCounterClockwiseButtonHidden) {
-            [self layoutToolbarButtons:@[self.resetButton, self.clampButton] withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
+        NSMutableArray *buttonsInOrderVertically = [NSMutableArray new];
+        if (!self.rotateCounterClockwiseButtonHidden) {
+            [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
         }
-        else {
-            NSMutableArray *buttonsInOrderVertically = [@[self.rotateCounterclockwiseButton, self.resetButton, self.clampButton] mutableCopy];
-            if (self.rotateClockwiseButton) {
-                [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
-            }
-            
-            [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
+        
+        [buttonsInOrderVertically addObject:self.resetButton];
+        
+        if (!self.clampButtonHidden) {
+            [buttonsInOrderVertically addObject:self.clampButton];
         }
+        
+        if (!self.rotateClockwiseButtonHidden) {
+            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
+        }
+        
+        [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
 }
 

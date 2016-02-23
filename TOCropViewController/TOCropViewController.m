@@ -111,7 +111,7 @@
 {
     [super viewWillAppear:animated];
     
-    if ([UIApplication sharedApplication].statusBarHidden == NO) {
+    if (animated) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
     }
@@ -151,7 +151,7 @@
 
 - (BOOL)prefersStatusBarHidden
 {
-    return !self.inTransition;
+    return !(self.inTransition) && !(self.view.superview == nil);
 }
 
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout
@@ -313,10 +313,21 @@
     //Depending on the shape of the image, work out if horizontal, or vertical options are required
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     
+    // In CocoaPods, strings are stored in a separate bundle from the main one
+    NSBundle *resourceBundle = nil;
+    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    if (resourceBundleURL) {
+        resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
+    }
+    else {
+        resourceBundle = classBundle;
+    }
+    
     //Prepare the localized options
-    NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
-    NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
-    NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", [NSBundle bundleForClass:[self class]], nil);
+    NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil);
     
     //Prepare the list that will be fed to the alert view/controller
     NSMutableArray *items = [NSMutableArray array];
@@ -413,7 +424,7 @@
             break;
     }
     
-    if (self.cropView.cropBoxAspectRatioIsPortrait) {
+    if (self.cropView.cropBoxAspectRatioIsPortrait && !self.aspectRatioLocked) {
         CGFloat width = aspectRatio.width;
         aspectRatio.width = aspectRatio.height;
         aspectRatio.height = width;
@@ -657,13 +668,14 @@
 
 - (void)setAspectRatioLocked:(BOOL)aspectRatioLocked
 {
+    if (aspectRatioLocked == _aspectRatioLocked) {
+        return;
+    }
+    
+    _aspectRatioLocked = aspectRatioLocked;
+    
     self.cropView.aspectRatioLocked = aspectRatioLocked;
     self.toolbar.clampButtonHidden = aspectRatioLocked;
-}
-
-- (BOOL)aspectRatioLocked
-{
-    return self.cropView.aspectRatioLocked;
 }
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
