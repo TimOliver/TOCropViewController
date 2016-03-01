@@ -501,6 +501,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = MAX(frame.origin.y, CGRectGetMinY(contentFrame));
     frame.origin.y = MIN(frame.origin.y, CGRectGetMaxY(contentFrame) - minSize.height);
     
+    //Make crop box stay in place if it's size scaled down
+    //to limits from top left corner (Not perfect solution)
+    if (frame.size.width == minSize.width)
+        frame.origin.x = self.cropBoxFrame.origin.x;
+    if (frame.size.height == minSize.height)
+        frame.origin.y = self.cropBoxFrame.origin.y;
+    
     self.cropBoxFrame = frame;
     
     [self checkForCanReset];
@@ -570,6 +577,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (CGRectContainsPoint(innerFrame, tapPoint) || !CGRectContainsPoint(outerFrame, tapPoint))
         return NO;
     
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    if (self.gridPanGestureRecognizer.state == UIGestureRecognizerStateChanged) {
+        return NO;
+    }
     return YES;
 }
 
