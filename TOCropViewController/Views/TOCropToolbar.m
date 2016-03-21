@@ -22,7 +22,7 @@
 
 #import "TOCropToolbar.h"
 
-#define kTOCropToolbarShowButtonsContainerRectForDebugging     0   // convenience debug toggle
+#define TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT     0   // convenience debug toggle
 
 @interface TOCropToolbar()
 
@@ -153,7 +153,7 @@
     self.doneIconButton.hidden   = (!verticalLayout);
     self.doneTextButton.hidden   = (verticalLayout);
     
-#if kTOCropToolbarShowButtonsContainerRectForDebugging
+#if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
     static UIView *containerView = nil;
     if (!containerView) {
         containerView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -204,7 +204,7 @@
         
         CGRect containerRect = (CGRect){x,0,width,44.0f};
 
-#if kTOCropToolbarShowButtonsContainerRectForDebugging
+#if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
 #endif
         
@@ -242,7 +242,7 @@
         
         CGRect containerRect = (CGRect){0,CGRectGetMaxY(self.doneIconButton.frame),44.0f,CGRectGetMinY(self.cancelIconButton.frame)-CGRectGetMaxY(self.doneIconButton.frame)};
         
-#if kTOCropToolbarShowButtonsContainerRectForDebugging
+#if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
 #endif
         
