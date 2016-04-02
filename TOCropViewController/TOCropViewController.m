@@ -156,9 +156,8 @@
 
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout
 {
-    CGRect frame = self.toolbar.frame;
-    if (verticalLayout ) {
-        frame = self.toolbar.frame;
+    CGRect frame = CGRectZero;
+    if (!verticalLayout) {
         frame.origin.x = 0.0f;
         frame.origin.y = 0.0f;
         frame.size.width = 44.0f;
@@ -182,8 +181,8 @@
 
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout
 {
-    CGRect frame = self.cropView.frame;
-    if (verticalLayout ) {
+    CGRect frame = CGRectZero;
+    if (!verticalLayout) {
         frame.origin.x = 44.0f;
         frame.origin.y = 0.0f;
         frame.size.width = CGRectGetWidth(self.view.bounds) - 44.0f;
@@ -209,7 +208,7 @@
 {
     [super viewDidLayoutSubviews];
     
-    BOOL verticalLayout = CGRectGetWidth(self.view.bounds) > CGRectGetHeight(self.view.bounds);
+    BOOL verticalLayout = CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
     
     [self.cropView prepareforRotation];
@@ -228,6 +227,8 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+    [super willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    
     self.snapshotView = [self.toolbar snapshotViewAfterScreenUpdates:NO];
     self.snapshotView.frame = self.toolbar.frame;
     
@@ -250,14 +251,12 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
-    self.cropView.frame = [self frameForCropViewWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
-    
     [UIView animateWithDuration:duration animations:^{
         self.snapshotView.alpha = 0.0f;
         self.toolbar.alpha = 1.0f;
+        
+        [self.cropView performRelayoutForRotation];
     }];
-    [self.cropView performRelayoutForRotation];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -647,7 +646,6 @@
 - (TOCropView *)cropView {
     if (!_cropView) {
         _cropView = [[TOCropView alloc] initWithImage:self.image];
-        _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _cropView.delegate = self;
         _cropView.frame = [UIScreen mainScreen].bounds;
     }
