@@ -72,7 +72,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 /* Pre-screen-rotation state information */
 @property (nonatomic, assign) CGPoint rotationContentOffset;
-@property (nonatomic, assign) CGSize rotationContentSize;
+@property (nonatomic, assign) CGSize  rotationContentSize;
+@property (nonatomic, assign) CGSize  rotationBoundSize;
 
 /* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
@@ -251,16 +252,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     self.rotationContentOffset = self.scrollView.contentOffset;
     self.rotationContentSize   = self.scrollView.contentSize;
+    self.rotationBoundSize     = self.scrollView.bounds.size;
 }
 
 - (void)performRelayoutForRotation
 {
     CGRect cropFrame = self.cropBoxFrame;
     CGRect contentFrame = self.contentBounds;
-    
-    //Work out the portion of the image we were focused on
-    CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
-    CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.rotationContentOffset.x, cropMidPoint.y + self.rotationContentOffset.y};
  
     CGFloat scale = MIN(contentFrame.size.width / cropFrame.size.width, contentFrame.size.height / cropFrame.size.height);
     self.scrollView.minimumZoomScale *= scale;
@@ -274,19 +272,41 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.cropBoxFrame = cropFrame;
     
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
+
+    //Work out the center point of the content before we rotated
+    CGPoint oldMidPoint = (CGPoint){self.rotationBoundSize.width * 0.5f, self.rotationBoundSize.height * 0.5f};
+    CGPoint contentCenter = (CGPoint){self.rotationContentOffset.x + oldMidPoint.x, self.rotationContentOffset.y + oldMidPoint.y};
     
-    //work out how to line up out point of interest into the middle of the crop box
-    cropTargetPoint.x *= scale;
-    cropTargetPoint.y *= scale;
+    //Normalize it to a percentage we can apply to different sizes
+    CGPoint normalizedCenter = CGPointZero;
+    normalizedCenter.x = contentCenter.x / self.rotationContentSize.width;
+    normalizedCenter.y = contentCenter.y / self.rotationContentSize.height;
     
-    CGPoint midPoint = {floorf(CGRectGetMidX(cropFrame)), floorf(CGRectGetMidY(cropFrame))};
+    //Work out the new content offset by applying the normalized values to the new layout
+    CGPoint newMidPoint = (CGPoint){self.scrollView.bounds.size.width * 0.5f,
+                                    self.scrollView.bounds.size.height * 0.5f};
+    
+    CGPoint translatedContentOffset = CGPointZero;
+    translatedContentOffset.x = self.scrollView.contentSize.width * normalizedCenter.x;
+    translatedContentOffset.y = self.scrollView.contentSize.height * normalizedCenter.y;
+    
     CGPoint offset = CGPointZero;
-    offset.x = floorf(-midPoint.x + cropTargetPoint.x);
-    offset.y = floorf(-midPoint.y + cropTargetPoint.y);
+    offset.x = floorf(translatedContentOffset.x - newMidPoint.x);
+    offset.y = floorf(translatedContentOffset.y - newMidPoint.y);
+    
+    //Make sure it doesn't overshoot the top left corner of the crop box
     offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
     offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
+
+    //Nor undershoot the bottom right corner
+    CGPoint maximumOffset = CGPointZero;
+    maximumOffset.x = (self.bounds.size.width - self.scrollView.contentInset.right) + self.scrollView.contentSize.width;
+    maximumOffset.y = (self.bounds.size.height - self.scrollView.contentInset.bottom) + self.scrollView.contentSize.height;
+    offset.x = MIN(offset.x, maximumOffset.x);
+    offset.y = MIN(offset.y, maximumOffset.y);
     self.scrollView.contentOffset = offset;
     
+    //Line up the background instance of the image
     [self matchForegroundToBackground];
 }
 

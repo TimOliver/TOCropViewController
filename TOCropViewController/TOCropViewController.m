@@ -210,14 +210,8 @@
     
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
-    
-    [self.cropView prepareforRotation];
-    [self.cropView performRelayoutForRotation];
-    
-    //[UIView setAnimationsEnabled:NO];
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
     [self.toolbar setNeedsLayout];
-    //[UIView setAnimationsEnabled:YES];
 }
 
 #pragma mark - Rotation Handling -
