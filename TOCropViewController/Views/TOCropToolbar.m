@@ -141,6 +141,11 @@
     [self addSubview:_resetButton];
 }
 
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
