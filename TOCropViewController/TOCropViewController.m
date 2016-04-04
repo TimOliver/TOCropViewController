@@ -210,8 +210,12 @@
     
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
-    self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
-    [self.toolbar setNeedsLayout];
+    [self.cropView moveCroppedContentToCenterAnimated:NO];
+    
+    [UIView performWithoutAnimation:^{
+        self.toolbar.frame = [self frameForToolBarWithVerticalLayout:verticalLayout];
+        [self.toolbar setNeedsLayout];
+    }];
 }
 
 #pragma mark - Rotation Handling -
@@ -231,9 +235,11 @@
     
     [self.view addSubview:self.snapshotView];
     
-    self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
-    [self.toolbar layoutIfNeeded];
-    self.toolbar.alpha = 0.0f;
+    [UIView performWithoutAnimation:^{
+        self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
+        [self.toolbar layoutIfNeeded];
+        self.toolbar.alpha = 0.0f;
+    }];
     
     [self.cropView prepareforRotation];
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
@@ -242,7 +248,13 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+    //Remove all animations in the toolbar
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+    [self.toolbar.layer removeAllAnimations];
+    for (CALayer *sublayer in self.toolbar.layer.sublayers) {
+        [sublayer removeAllAnimations];
+    }
+    
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     [self.cropView performRelayoutForRotation];
     

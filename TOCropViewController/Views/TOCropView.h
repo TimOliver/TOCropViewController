@@ -178,5 +178,10 @@
  */
 - (void)setCroppingViewsHidden:(BOOL)hidden animated:(BOOL)animated;
 
+/**
+ When triggered, the crop view will perform a relayout to ensure the crop box
+ fills the entire crop view region
+ */
+- (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
 @end

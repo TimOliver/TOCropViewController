@@ -100,7 +100,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 /* Editing state */
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated;
-- (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 - (void)startEditing;
 
 /* Timer handling */
