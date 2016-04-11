@@ -152,7 +152,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Background Image View
     self.backgroundImageView = [[UIImageView alloc] initWithImage:self.image];
-    //self.backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
     //Background container view
     self.backgroundContainerView = [[UIView alloc] initWithFrame:self.backgroundImageView.frame];
@@ -535,20 +534,34 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)resetLayoutToDefaultAnimated:(BOOL)animated
 {
     if (animated == NO || self.angle != 0) {
+        //Reset all of the rotation transforms
         self.angle = 0;
-        self.foregroundImageView.transform = CGAffineTransformIdentity;
-        self.backgroundImageView.transform = CGAffineTransformIdentity;
-        
+
+        //Set the scroll to 1.0f to reset the transform scale
         self.scrollView.zoomScale = 1.0f;
-        self.backgroundContainerView.frame = (CGRect){CGPointZero, self.backgroundImageView.frame.size};
-        self.backgroundImageView.frame = self.backgroundContainerView.frame;
-        self.foregroundImageView.frame = self.backgroundContainerView.frame;
         
+        CGRect imageRect = (CGRect){CGPointZero, self.image.size};
+        
+        //Reset everything about the background container and image views
+        self.backgroundImageView.transform = CGAffineTransformIdentity;
+        self.backgroundContainerView.transform = CGAffineTransformIdentity;
+        self.backgroundImageView.frame = imageRect;
+        self.backgroundContainerView.frame = imageRect;
+        
+        //Reset the transform ans size of just the foreground image
+        self.foregroundImageView.transform = CGAffineTransformIdentity;
+        self.foregroundImageView.frame = imageRect;
+        
+        //Reset the layout
         [self layoutInitialImage];
+        
+        //Enable / Disable the reset button
         [self checkForCanReset];
+        
         return;
     }
     
+    //Perform an animation of the image zooming back out to its original size
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
         [self layoutInitialImage];
         [self checkForCanReset];
