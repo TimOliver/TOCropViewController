@@ -1061,6 +1061,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.aspectRatioLocked = YES;
     
+    self.cropBoxLastEditedSize = cropBoxFrame.size;
+    self.cropBoxLastEditedAngle = self.angle;
+    
     CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height, cropBoxFrame.size.width / aspectRatio.width);
     self.scrollView.maximumZoomScale = maxZoomScale;
     
@@ -1138,7 +1141,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Work out the dimensions of the crop box when rotated
     CGRect newCropFrame = CGRectZero;
-    newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
     if (labs(self.angle) == labs(self.cropBoxLastEditedAngle) || (labs(self.angle)*-1) == ((labs(self.cropBoxLastEditedAngle) - 180) % 360)) {
         newCropFrame.size = self.cropBoxLastEditedSize;
         
@@ -1146,7 +1148,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.zoomScale = self.cropBoxLastEditedZoomScale;
     }
     else {
-        newCropFrame.size = (CGSize){floorf(self.cropBoxLastEditedSize.height * scale), floorf(self.cropBoxLastEditedSize.width * scale)};
+        newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
         
         //Re-adjust the scrolling dimensions of the scroll view to match the new size
         self.scrollView.minimumZoomScale *= scale;
