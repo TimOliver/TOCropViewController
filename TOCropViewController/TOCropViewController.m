@@ -72,6 +72,7 @@
         
         _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
+        _rotateClockwiseButtonHidden = YES;
     }
     
     return self;

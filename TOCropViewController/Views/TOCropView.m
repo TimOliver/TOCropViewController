@@ -82,6 +82,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* 90-degree rotation state data */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
 @property (nonatomic, assign) NSInteger cropBoxLastEditedAngle; /* Remember which angle we were at when we saved the editing size */
+@property (nonatomic, assign) CGFloat cropBoxLastEditedZoomScale; /* Remember the zoom size when we last edited */
+@property (nonatomic, assign) CGFloat cropBoxLastEditedMinZoomScale; /* Remember the minimum size when we last edited. */
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;   /* Disallow any input while the rotation animation is playing */
 
 /* Reset state data */
@@ -239,6 +241,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
     self.cropBoxLastEditedAngle = 0;
+    self.cropBoxLastEditedZoomScale = self.scrollView.zoomScale;
+    self.cropBoxLastEditedMinZoomScale = self.scrollView.minimumZoomScale;
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
@@ -702,6 +706,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView
 {
+    if (scrollView.isTracking) {
+        self.cropBoxLastEditedZoomScale = scrollView.zoomScale;
+        self.cropBoxLastEditedMinZoomScale = scrollView.minimumZoomScale;
+    }
+    
     [self checkForCanReset];
     [self matchForegroundToBackground];
 }
@@ -1128,10 +1137,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.scrollView.contentOffset.x, cropMidPoint.y + self.scrollView.contentOffset.y};
     
     //Work out the dimensions of the crop box when rotated
-    // (Important: MUST calculate the new fliped size everytime and avoid using stored size for rotating back.)
     CGRect newCropFrame = CGRectZero;
     newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
-    self.cropBoxLastEditedSize = cropBoxFrame.size;
+    if (labs(self.angle) == labs(self.cropBoxLastEditedAngle) || (labs(self.angle)*-1) == ((labs(self.cropBoxLastEditedAngle) - 180) % 360)) {
+        newCropFrame.size = self.cropBoxLastEditedSize;
+        
+        self.scrollView.minimumZoomScale = self.cropBoxLastEditedMinZoomScale;
+        self.scrollView.zoomScale = self.cropBoxLastEditedZoomScale;
+    }
+    else {
+        newCropFrame.size = (CGSize){floorf(self.cropBoxLastEditedSize.height * scale), floorf(self.cropBoxLastEditedSize.width * scale)};
+        
+        //Re-adjust the scrolling dimensions of the scroll view to match the new size
+        self.scrollView.minimumZoomScale *= scale;
+        self.scrollView.zoomScale *= scale;
+    }
     
     newCropFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - newCropFrame.size.width) * 0.5f);
     newCropFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - newCropFrame.size.height) * 0.5f);
@@ -1142,10 +1162,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         snapshotView = [self.foregroundContainerView snapshotViewAfterScreenUpdates:NO];
         self.rotateAnimationInProgress = YES;
     }
-    
-    //Re-adjust the scrolling dimensions of the scroll view to match the new size
-    self.scrollView.minimumZoomScale *= scale;
-    self.scrollView.zoomScale *= scale;
     
     //Rotate the background image view, inside its container view
     self.backgroundImageView.transform = rotation;
