@@ -336,8 +336,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Current aspect ratio of the crop box in case we need to clamp it
     CGFloat aspectRatio = (originFrame.size.width / originFrame.size.height);
-    
+
+    //Note whether we're being aspect transformed horizontally or vertically
     BOOL aspectHorizontal = NO, aspectVertical = NO;
+    
+    //Depending on which corner we drag from, set the appropriate min flag to
+    //ensure we can properly clamp the XY value of the box if it overruns the minimum size
+    //(Otherwise the image itself will slide with the drag gesture)
+    BOOL clampMinFromTop = NO, clampMinFromLeft = NO;
     
     switch (self.tappedEdge) {
         case TOCropViewOverlayEdgeLeft:
@@ -351,6 +357,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             frame.origin.x   = originFrame.origin.x + xDelta;
             frame.size.width = originFrame.size.width - xDelta;
+            
+            clampMinFromLeft = YES;
+            
             break;
         case TOCropViewOverlayEdgeRight:
             if (self.aspectRatioLocked) {
@@ -393,6 +402,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.origin.y    = originFrame.origin.y + yDelta;
                 frame.size.height = originFrame.size.height - yDelta;
             }
+            
+            clampMinFromTop = YES;
+            
             break;
         case TOCropViewOverlayEdgeTopLeft:
             if (self.aspectRatioLocked) {
@@ -419,6 +431,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.origin.y   = originFrame.origin.y + yDelta;
                 frame.size.height = originFrame.size.height - yDelta;
             }
+            
+            clampMinFromTop = YES;
+            clampMinFromLeft = YES;
+            
             break;
         case TOCropViewOverlayEdgeTopRight:
             if (self.aspectRatioLocked) {
@@ -444,6 +460,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.origin.y    = originFrame.origin.y + yDelta;
                 frame.size.height = originFrame.size.height - yDelta;
             }
+            
+            clampMinFromTop = YES;
+            
             break;
         case TOCropViewOverlayEdgeBottomLeft:
             if (self.aspectRatioLocked) {
@@ -465,6 +484,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.origin.x    = originFrame.origin.x + xDelta;
                 frame.size.width  = originFrame.size.width - xDelta;
             }
+            
+            clampMinFromLeft = YES;
+            
             break;
         case TOCropViewOverlayEdgeBottomRight:
             if (self.aspectRatioLocked) {
@@ -489,14 +511,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         case TOCropViewOverlayEdgeNone: break;
     }
     
-    //Work out the limits the box may be scaled before it starts to overlap itself
-    CGSize minSize = CGSizeZero;
-    minSize.width = kTOCropViewMinimumBoxSize;
-    minSize.height = kTOCropViewMinimumBoxSize;
-    
-    CGSize maxSize = CGSizeZero;
-    maxSize.width = CGRectGetWidth(contentFrame);
-    maxSize.height = CGRectGetHeight(contentFrame);
+    //The absolute max/min size the box may be in the bounds of the crop view
+    CGSize minSize = (CGSize){kTOCropViewMinimumBoxSize, kTOCropViewMinimumBoxSize};
+    CGSize maxSize = (CGSize){CGRectGetWidth(contentFrame), CGRectGetHeight(contentFrame)};
     
     //clamp the box to ensure it doesn't go beyond the bounds we've set
     if (self.aspectRatioLocked && aspectHorizontal) {
@@ -517,18 +534,23 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.size.width  = MIN(frame.size.width, maxSize.width);
     frame.size.height = MIN(frame.size.height, maxSize.height);
     
+    //Clamp the X position of the box to the interior of the cropping bounds
     frame.origin.x = MAX(frame.origin.x, CGRectGetMinX(contentFrame));
     frame.origin.x = MIN(frame.origin.x, CGRectGetMaxX(contentFrame) - minSize.width);
 
+    //Clamp the Y postion of the box to the interior of the cropping bounds
     frame.origin.y = MAX(frame.origin.y, CGRectGetMinY(contentFrame));
     frame.origin.y = MIN(frame.origin.y, CGRectGetMaxY(contentFrame) - minSize.height);
     
-    //Make crop box stay in place if it's size scaled down
-    //to limits from top left corner (Not perfect solution)
-    if (frame.size.width == minSize.width)
-        frame.origin.x = self.cropBoxFrame.origin.x;
-    if (frame.size.height == minSize.height)
-        frame.origin.y = self.cropBoxFrame.origin.y;
+    //Once the box is completely shrunk, clamp its ability to move
+    if (clampMinFromLeft && frame.size.width <= minSize.width + FLT_EPSILON) {
+        frame.origin.x = CGRectGetMaxX(originFrame) - minSize.width;
+    }
+    
+    //Once the box is completely shrunk, clamp its ability to move
+    if (clampMinFromTop && frame.size.height <= minSize.height + FLT_EPSILON) {
+        frame.origin.y = CGRectGetMaxY(originFrame) - minSize.height;
+    }
     
     self.cropBoxFrame = frame;
     
@@ -1063,9 +1085,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.cropBoxLastEditedSize = cropBoxFrame.size;
     self.cropBoxLastEditedAngle = self.angle;
-    
-    CGFloat maxZoomScale = MAX(cropBoxFrame.size.height / aspectRatio.height, cropBoxFrame.size.width / aspectRatio.width);
-    self.scrollView.maximumZoomScale = maxZoomScale;
     
     void (^translateBlock)() = ^{
         self.scrollView.contentOffset = offset;
