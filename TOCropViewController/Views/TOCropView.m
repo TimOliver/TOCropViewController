@@ -438,7 +438,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             break;
         case TOCropViewOverlayEdgeTopRight:
             if (self.aspectRatioLocked) {
-                xDelta = MAX(xDelta, 0);
+                xDelta = MIN(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
                 CGPoint distance;
@@ -446,11 +446,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 distance.y = 1.0f - ((yDelta) / CGRectGetHeight(originFrame));
                 
                 CGFloat scale = (distance.x + distance.y) * 0.5f;
-                scale = MIN(1.0f, scale);
                 
                 frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
                 frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
-                frame.origin.y = CGRectGetMaxY(originFrame) - frame.size.height;
+                frame.origin.y = originFrame.origin.y + (CGRectGetHeight(originFrame) - frame.size.height);
                 
                 aspectVertical = YES;
                 aspectHorizontal = YES;
@@ -673,20 +672,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = self.cropBoxFrame;
     
     //account for padding around the box
-    frame = CGRectInset(frame, -22.0f, -22.0f);
+    frame = CGRectInset(frame, -32.0f, -32.0f);
     
     //Make sure the corners take priority
-    CGRect topLeftRect = (CGRect){frame.origin, {44,44}};
+    CGRect topLeftRect = (CGRect){frame.origin, {64,64}};
     if (CGRectContainsPoint(topLeftRect, point))
         return TOCropViewOverlayEdgeTopLeft;
     
     CGRect topRightRect = topLeftRect;
-    topRightRect.origin.x = CGRectGetMaxX(frame) - 44.0f;
+    topRightRect.origin.x = CGRectGetMaxX(frame) - 64.0f;
     if (CGRectContainsPoint(topRightRect, point))
         return TOCropViewOverlayEdgeTopRight;
     
     CGRect bottomLeftRect = topLeftRect;
-    bottomLeftRect.origin.y = CGRectGetMaxY(frame) - 44.0f;
+    bottomLeftRect.origin.y = CGRectGetMaxY(frame) - 64.0f;
     if (CGRectContainsPoint(bottomLeftRect, point))
         return TOCropViewOverlayEdgeBottomLeft;
     
@@ -696,21 +695,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return TOCropViewOverlayEdgeBottomRight;
     
     //Check for edges
-    CGRect topRect = (CGRect){frame.origin, {CGRectGetWidth(frame), 44.0f}};
+    CGRect topRect = (CGRect){frame.origin, {CGRectGetWidth(frame), 64.0f}};
     if (CGRectContainsPoint(topRect, point))
         return TOCropViewOverlayEdgeTop;
     
     CGRect bottomRect = topRect;
-    bottomRect.origin.y = CGRectGetMaxY(frame) - 44.0f;
+    bottomRect.origin.y = CGRectGetMaxY(frame) - 64.0f;
     if (CGRectContainsPoint(bottomRect, point))
         return TOCropViewOverlayEdgeBottom;
     
-    CGRect leftRect = (CGRect){frame.origin, {44.0f, CGRectGetHeight(frame)}};
+    CGRect leftRect = (CGRect){frame.origin, {64.0f, CGRectGetHeight(frame)}};
     if (CGRectContainsPoint(leftRect, point))
         return TOCropViewOverlayEdgeLeft;
     
     CGRect rightRect = leftRect;
-    rightRect.origin.x = CGRectGetMaxX(frame) - 44.0f;
+    rightRect.origin.x = CGRectGetMaxX(frame) - 64.0f;
     if (CGRectContainsPoint(rightRect, point))
         return TOCropViewOverlayEdgeRight;
     
