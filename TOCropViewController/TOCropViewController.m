@@ -91,7 +91,6 @@
     self.toolbar.doneButtonTapped =     ^{ [weakSelf doneButtonTapped]; };
     self.toolbar.cancelButtonTapped =   ^{ [weakSelf cancelButtonTapped]; };
     
-    self.toolbar.resetButtonTapped =    ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped =    ^{ [weakSelf showAspectRatioDialog]; };
     
     self.toolbar.rotateCounterclockwiseButtonTapped =   ^{ [weakSelf rotateCropViewCounterclockwise]; };
@@ -290,21 +289,6 @@
 }
 #pragma clang diagnostic pop
 
-#pragma mark - Reset -
-- (void)resetCropViewLayout
-{
-    BOOL animated = (self.cropView.angle == 0);
-    [self.cropView resetLayoutToDefaultAnimated:animated];
-    
-    if (self.aspectRatioLocked) {
-        [self setAspectRatio:self.defaultAspectRatio animated:animated];
-    }
-    else {
-        self.cropView.aspectRatioLocked = NO;
-        self.toolbar.clampButtonGlowing = NO;
-    }
-}
-
 #pragma mark - Aspect Ratio Handling -
 - (void)showAspectRatioDialog
 {
@@ -446,17 +430,6 @@
 - (void)rotateCropViewCounterclockwise
 {
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
-}
-
-#pragma mark - Crop View Delegates -
-- (void)cropViewDidBecomeResettable:(TOCropView *)cropView
-{
-    self.toolbar.resetButtonEnabled = YES;
-}
-
-- (void)cropViewDidBecomeNonResettable:(TOCropView *)cropView
-{
-    self.toolbar.resetButtonEnabled = NO;
 }
 
 #pragma mark - Presentation Handling -

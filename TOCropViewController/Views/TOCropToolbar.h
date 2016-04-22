@@ -36,7 +36,6 @@
 
 /* The cropper control buttons */
 @property (nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
-@property (nonatomic, strong, readonly) UIButton *resetButton;
 @property (nonatomic, strong, readonly) UIButton *clampButton;
 @property (nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
@@ -48,7 +47,6 @@
 @property (nonatomic, copy) void (^rotateCounterclockwiseButtonTapped)(void);
 @property (nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
-@property (nonatomic, copy) void (^resetButtonTapped)(void);
 
 /* Aspect ratio button settings */
 @property (nonatomic, assign) BOOL clampButtonHidden;
