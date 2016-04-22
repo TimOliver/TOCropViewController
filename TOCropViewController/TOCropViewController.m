@@ -28,6 +28,7 @@
 
 @interface TOCropViewController () <UIActionSheetDelegate, UIViewControllerTransitioningDelegate, TOCropViewDelegate>
 
+@property (nonatomic, strong) UIActivityIndicatorView *activityView;
 @property (nonatomic, readwrite) UIImage *image;
 @property (nonatomic, strong) TOCropToolbar *toolbar;
 @property (nonatomic, strong, readwrite) TOCropView *cropView;
@@ -69,8 +70,8 @@
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
-        
-        _defaultAspectRatio = TOCropViewControllerAspectRatioOriginal;
+        _aspectRatioLocked = YES;
+        _defaultAspectRatio = TOCropViewControllerAspectRatio4x3;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
     }
     
@@ -80,6 +81,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    self.activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [self.view addSubview:self.activityView];
+    self.activityView.center = self.view.center;
+    [self.activityView startAnimating];
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.cropView];
@@ -417,7 +423,7 @@
         aspectRatio.width = aspectRatio.height;
         aspectRatio.height = width;
     }
-    
+
     [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:animated];
     self.toolbar.clampButtonGlowing = YES;
 }
@@ -676,5 +682,21 @@
         self.toolbar.rotateClockwiseButtonHidden = _rotateClockwiseButtonHidden;
     }
 }
+
+- (void)didFinishLoadingImage:(UIImage *)image {
+  [self.activityView removeFromSuperview];
+  _image = image;
+  BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
+  self.cropView = [[TOCropView alloc] initWithImage:self.image];
+  self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
+  self.cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+  self.cropView.delegate = self;
+  [self.view addSubview:self.cropView];
+
+  if (self.defaultAspectRatio != TOCropViewControllerAspectRatioOriginal) {
+    [self setAspectRatio:self.defaultAspectRatio animated:NO];
+  }
+}
+
 
 @end
