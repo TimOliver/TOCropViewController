@@ -181,47 +181,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  */
 - (instancetype)initWithImage:(UIImage *)image;
 
+- (void)didFinishLoadingImage:(UIImage *)image;
 
-/**
- Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
- */
-- (void)resetCropViewLayout;
-
-/**
- Play a custom animation of the target image zooming to its position in 
- the crop controller while the background fades in.
- If any view configurations need to be done before the animation 
- starts, please do them in `prepareForTransitionHandler`
- 
- @param viewController The parent controller that this view controller would be presenting from.
- @param frame In the screen's coordinate space, the frame from which the image should animate from.
- @param completion A block that is called once the transition animation is completed.
- */
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController fromFrame:(CGRect)frame completion:(void (^)(void))completion;
-
-/**
- Play a custom animation of the supplied cropped image zooming out from 
- the cropped frame to the specified frame as the rest of the content fades out.
- If any view configurations need to be done before the animation starts, 
- please do them in `prepareForTransitionHandler`
- 
- @param viewController The parent controller that this view controller would be presenting from.
- @param frame The target frame that the image will animate to
- @param completion A block that is called once the transition animation is completed.
- */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController withCroppedImage:(UIImage *)image toFrame:(CGRect)frame completion:(void (^)(void))completion;
-
-/**
- Play a custom animation of the supplied cropped image zooming out from 
- the cropped frame to the specified frame as the rest of the content fades out.
- If any view configurations need to be done before the animation starts, 
- please do them in `prepareForTransitionHandler`
- 
- @param viewController The parent controller that this view controller would be presenting from.
- @param frame The target frame that the image will animate to
- @param completion A block that is called once the transition animation is completed.
- */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController toFrame:(CGRect)frame completion:(void (^)(void))completion;
+@property (nonatomic, strong) void (^cancelDownload) (void);
 
 @end
 
