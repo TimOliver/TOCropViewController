@@ -125,10 +125,15 @@
         self.image = image;
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
+        cropController.aspectRatioLocked = YES;
 
         // Uncomment this to place the toolbar at the top of the view controller
         // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
-        
+
+        // Delay execution of my block for 10 seconds.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+          [cropController didFinishLoadingImage:image];
+        });
         [self presentViewController:cropController animated:YES completion:nil];
     }];
 }
