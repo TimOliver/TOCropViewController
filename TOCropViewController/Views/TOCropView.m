@@ -25,6 +25,7 @@
 #import "TOCropScrollView.h"
 
 #define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.12f alpha:1.0f]
+#define TOCROPVIEW_DYNAMIC_BLUR(x) [x respondsToSelector:@selector(setEffect:)]
 
 static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
@@ -56,6 +57,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
+@property (nonatomic, strong) id translucencyEffect;                /* The dark blur visual effect applied to the visual effect view. */
 @property (nonatomic, strong, readwrite) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
 
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
@@ -99,6 +101,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Crop box handling */
 - (TOCropViewOverlayEdge)cropEdgeForPoint:(CGPoint)point;
 - (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point;
+- (void)toggleTranslucencyViewVisible:(BOOL)visible;
 
 /* Editing state */
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated;
@@ -170,7 +173,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Translucency View
     if (NSClassFromString(@"UIVisualEffectView")) {
-        self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
+        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
         self.translucencyView.frame = self.bounds;
     }
     else {
@@ -593,6 +597,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     } completion:nil];
 }
 
+- (void)toggleTranslucencyViewVisible:(BOOL)visible
+{
+    if (TOCROPVIEW_DYNAMIC_BLUR(self.translucencyView) == NO) {
+        self.translucencyView.alpha = visible ? 1.0f : 0.0f;
+    }
+    else {
+        [(UIVisualEffectView *)self.translucencyView setEffect:visible ? self.translucencyEffect : nil];
+    }
+}
+
 #pragma mark - Gesture Recognizer -
 - (void)gridPanGestureRecognized:(UIPanGestureRecognizer *)recognizer
 {
@@ -868,18 +882,19 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     if (animated == NO) {
         self.backgroundImageView.alpha = alpha;
-        self.translucencyView.alpha = alpha;
         self.foregroundContainerView.alpha = alpha;
         self.gridOverlayView.alpha = alpha;
 
+        [self toggleTranslucencyViewVisible:!hidden];
+        
         return;
     }
     
     self.foregroundContainerView.alpha = alpha;
     self.backgroundImageView.alpha = alpha;
     
-    [UIView animateWithDuration:0.5f animations:^{
-        self.translucencyView.alpha = alpha;
+    [UIView animateWithDuration:0.4f animations:^{
+        [self toggleTranslucencyViewVisible:!hidden];
         self.gridOverlayView.alpha = alpha;
     }];
 }
@@ -931,12 +946,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     if (animated == NO) {
-        self.translucencyView.alpha  = editing ? 0.0f : 1.0f;
+        [self toggleTranslucencyViewVisible:!editing];
         return;
     }
     
     [UIView animateKeyframesWithDuration:editing?0.1f:0.35f delay:editing?0.0f:0.2f options:0 animations:^{
-        self.translucencyView.alpha  = editing ? 0.0f : 1.0f;
+        [self toggleTranslucencyViewVisible:!editing];
     } completion:nil];
 }
 
@@ -1018,13 +1033,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.editing = NO;
     
     if (animated == NO) {
-        self.translucencyView.alpha  = simpleMode ? 0.0f : 1.0f;
+        [self toggleTranslucencyViewVisible:!simpleMode];
         
         return;
     }
     
-    [UIView animateWithDuration:0.35f animations:^{
-        self.translucencyView.alpha  = simpleMode ? 0.0f : 1.0f;
+    [UIView animateWithDuration:0.3f animations:^{
+        [self toggleTranslucencyViewVisible:!simpleMode];
     }];
 }
 
