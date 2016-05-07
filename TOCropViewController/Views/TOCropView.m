@@ -121,6 +121,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Reset state */
 - (void)checkForCanReset;
 
+/* Capture rotation state (for 90-degree rotation) */
+- (void)captureStateForImageRotation;
+
 @end
 
 @implementation TOCropView
@@ -249,10 +252,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.cropBoxFrame = frame;
     
     //save the current state for use with 90-degree rotations
-    self.cropBoxLastEditedSize = self.cropBoxFrame.size;
     self.cropBoxLastEditedAngle = 0;
-    self.cropBoxLastEditedZoomScale = self.scrollView.zoomScale;
-    self.cropBoxLastEditedMinZoomScale = self.scrollView.minimumZoomScale;
+    [self captureStateForImageRotation];
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
@@ -283,8 +284,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     cropFrame.origin.y    = floorf(contentFrame.origin.y + ((contentFrame.size.height - cropFrame.size.height) * 0.5f));
     self.cropBoxFrame = cropFrame;
     
-    self.cropBoxLastEditedSize = self.cropBoxFrame.size;
-
+    [self captureStateForImageRotation];
+    
     //Work out the center point of the content before we rotated
     CGPoint oldMidPoint = (CGPoint){self.rotationBoundSize.width * 0.5f, self.rotationBoundSize.height * 0.5f};
     CGPoint contentCenter = (CGPoint){self.rotationContentOffset.x + oldMidPoint.x, self.rotationContentOffset.y + oldMidPoint.y};
@@ -947,7 +948,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     if (editing == NO) {
         [self moveCroppedContentToCenterAnimated:animated];
-        self.cropBoxLastEditedSize = self.cropBoxFrame.size;
+        [self captureStateForImageRotation];
         self.cropBoxLastEditedAngle = self.angle;
     }
     
@@ -1139,11 +1140,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Cancel any pending resizing timers
     if (self.resetTimer) {
         [self cancelResetTimer];
-        [self.gridOverlayView setGridHidden:YES];
-        [self moveCroppedContentToCenterAnimated:NO];
+        [self setEditing:NO animated:NO];
         
         self.cropBoxLastEditedAngle = self.angle;
-        self.cropBoxLastEditedSize = self.cropBoxFrame.size;
+        [self captureStateForImageRotation];
     }
     
     //Work out the new angle, and wrap around once we exceed 360s
@@ -1291,6 +1291,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     [self checkForCanReset];
+}
+
+- (void)captureStateForImageRotation
+{
+    self.cropBoxLastEditedSize = self.cropBoxFrame.size;
+    self.cropBoxLastEditedZoomScale = self.scrollView.zoomScale;
+    self.cropBoxLastEditedMinZoomScale = self.scrollView.minimumZoomScale;
 }
 
 #pragma mark - Resettable State -
