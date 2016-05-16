@@ -101,7 +101,12 @@
 @property (nonatomic, assign) BOOL croppingViewsHidden;
 
 /**
- In relation to the coordinate space of the image, the frame that the crop view is focussing on
+ In relation to the coordinate space of the image, initial value of the frame that the crop view is focusing on
+ */
+@property (nonatomic, assign) CGRect initialCroppedImageFrame; /* This is the initial croppedImageFrame, if not provided it's assumed to be the whole image */
+
+/**
+ In relation to the coordinate space of the image, the frame that the crop view is focusing on
  */
 @property (nonatomic, readonly) CGRect croppedImageFrame;
 

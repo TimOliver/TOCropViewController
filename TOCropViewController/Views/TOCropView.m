@@ -62,6 +62,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
 
 /* Crop box handling */
+@property (nonatomic, assign) BOOL applyInitialCroppedImageFrame; /* No by default, when setting initialCroppedImageFrame this will be set to YES, and set back to NO after first application - so it's only done once */
 @property (nonatomic, assign) TOCropViewOverlayEdge tappedEdge; /* The edge region that the user tapped on, to resize the cropping region */
 @property (nonatomic, assign) CGRect cropOriginFrame;     /* When resizing, this is the original frame of the crop box. */
 @property (nonatomic, assign) CGPoint panOriginPoint;     /* The initial touch point of the pan gesture recognizer */
@@ -146,7 +147,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.backgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
     self.cropBoxFrame = CGRectZero;
-    
+
+    self.applyInitialCroppedImageFrame = NO;
+
     //Scroll View properties
     self.scrollView = [[TOCropScrollView alloc] initWithFrame:self.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -243,21 +246,39 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //set the fully zoomed out state initially
     self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
     self.scrollView.contentSize = scaledSize;
-    
+
     //Relayout the image in the scroll view
     CGRect frame = CGRectZero;
     frame.size = scaledSize;
     frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f);
     frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
     self.cropBoxFrame = frame;
-    
+
+    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
+        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
+        
+        // layout image and crop
+        [self moveCroppedContentToCenterAnimated:NO];
+
+        // preselect the initialCroppedImageFrame
+        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
+        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
+        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
+        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
+        self.cropBoxFrame = frame;
+        
+        // zoom
+        [self moveCroppedContentToCenterAnimated:NO];
+    }
+
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
-    
+
+    [self checkForCanReset];
     [self matchForegroundToBackground];
 }
 
@@ -583,7 +604,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.backgroundContainerView.transform = CGAffineTransformIdentity;
         self.backgroundImageView.frame = imageRect;
         self.backgroundContainerView.frame = imageRect;
-        
+
         //Reset the transform ans size of just the foreground image
         self.foregroundImageView.transform = CGAffineTransformIdentity;
         self.foregroundImageView.frame = imageRect;
@@ -596,7 +617,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         return;
     }
-    
+
     //Perform an animation of the image zooming back out to its original size
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
         [self layoutInitialImage];
@@ -873,6 +894,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     return frame;
 }
 
+- (void)setInitialCroppedImageFrame:(CGRect)initialCroppedImageFrame
+{
+    _initialCroppedImageFrame = initialCroppedImageFrame;
+    self.applyInitialCroppedImageFrame = YES;
+}
+
 - (void)setCroppingViewsHidden:(BOOL)hidden
 {
     [self setCroppingViewsHidden:hidden animated:NO];
@@ -1025,7 +1052,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         translateBlock();
         return;
     }
-    
+
     [self matchForegroundToBackground];
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
 }
@@ -1314,7 +1341,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     else if ((NSInteger)floorf(self.cropBoxFrame.size.width) != (NSInteger)floorf(self.originalCropBoxSize.width) || (NSInteger)floorf(self.cropBoxFrame.size.height) != (NSInteger)floorf(self.originalCropBoxSize.height)) { //crop box has been changed
         canReset = YES;
     }
-    
+
     if (canReset && self.canReset == NO) {
         self.canReset = YES;
         
