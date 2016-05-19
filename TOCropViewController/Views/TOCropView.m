@@ -82,6 +82,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
 
 /* 90-degree rotation state data */
+@property (nonatomic, assign) BOOL applyInitialRotatedAngle; /* No by default, when setting initialRotatedAngle this will be set to YES, and set back to NO after first application - so it's only done once */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
 @property (nonatomic, assign) NSInteger cropBoxLastEditedAngle; /* Remember which angle we were at when we saved the editing size */
 @property (nonatomic, assign) CGFloat cropBoxLastEditedZoomScale; /* Remember the zoom size when we last edited */
@@ -253,6 +254,36 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f);
     frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
     self.cropBoxFrame = frame;
+    
+    if (self.applyInitialRotatedAngle) {
+        // Get croppedFrame before rotate.
+        // After getting croppedFrame before rotate, rotate.
+        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
+        switch (self.initialRotatedAngle) {
+            case 90:
+            case -270:
+                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+                break;
+            case 180:
+            case -180:
+                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
+                break;
+            case 270:
+            case -90:
+                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+                break;
+            default:
+                break;
+        }
+        self.initialCroppedImageFrame = beforeRotatedFrame;
+    }
+
 
     if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
         self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
@@ -274,6 +305,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
+    
+    if (self.applyInitialRotatedAngle) {
+        self.applyInitialRotatedAngle = NO;
+        int rotateCount = self.initialRotatedAngle / 90.0f;
+        for (int i = 0; i < abs(rotateCount); i++) {
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
+        }
+    }
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
@@ -898,6 +937,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     _initialCroppedImageFrame = initialCroppedImageFrame;
     self.applyInitialCroppedImageFrame = YES;
+}
+
+- (void)setInitialRotatedAngle:(NSInteger)initialRotatedAngle
+{
+    _initialRotatedAngle = initialRotatedAngle;
+    self.applyInitialRotatedAngle = YES;
 }
 
 - (void)setCroppingViewsHidden:(BOOL)hidden
