@@ -129,6 +129,9 @@
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
         cropController.delegate = self;
         
+        cropController.defaultAspectRatio = TOCropViewControllerAspectRatioCircular;
+        cropController.aspectRatioLocked = YES;
+
         // Uncomment this to test out locked aspect ratio sizes
         // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
         // cropController.aspectRatioLocked = YES;

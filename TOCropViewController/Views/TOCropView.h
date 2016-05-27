@@ -116,6 +116,11 @@
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
 /**
+ If circularModeEnabled is true the overlay image got a circular mask
+ */
+@property (nonatomic, assign) BOOL circularModeEnabled;
+
+/**
  Create a new instance of the crop view with the supplied image
  */
 - (instancetype)initWithImage:(UIImage *)image;
