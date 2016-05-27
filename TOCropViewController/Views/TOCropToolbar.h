@@ -24,6 +24,9 @@
 
 @interface TOCropToolbar : UIView
 
+/* In horizontal mode, offsets all of the buttons vertically by 20 points. */
+@property (nonatomic, assign) BOOL statusBarVisible;
+
 /* The 'Done' buttons to commit the crop. The text button is displayed
  in portrait mode and the icon one, in landscape. */
 @property (nonatomic, strong, readonly) UIButton *doneTextButton;
