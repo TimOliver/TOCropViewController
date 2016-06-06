@@ -390,6 +390,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //We can't simply match the frames since if the images are rotated, the frame property becomes unusable
     self.foregroundImageView.frame = [self.backgroundContainerView.superview convertRect:self.backgroundContainerView.frame toView:self.foregroundContainerView];
+    
+    if (_circularModeEnabled) {
+        self.foregroundContainerView.layer.cornerRadius = self.foregroundContainerView.frame.size.width/2;
+        self.foregroundContainerView.layer.masksToBounds = YES;
+    }
 }
 
 - (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point

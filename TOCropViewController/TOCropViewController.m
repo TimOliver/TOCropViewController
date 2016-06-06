@@ -113,6 +113,8 @@
     self.view.backgroundColor = self.cropView.backgroundColor;
 
     if (self.defaultAspectRatio != TOCropViewControllerAspectRatioOriginal) {
+        _cropView.circularModeEnabled = self.defaultAspectRatio == TOCropViewControllerAspectRatioCircular ? YES : NO;
+        
         [self setAspectRatio:self.defaultAspectRatio animated:NO];
     }
 }
@@ -453,6 +455,7 @@
         case TOCropViewControllerAspectRatioOriginal:
             aspectRatio = CGSizeZero;
             break;
+        case TOCropViewControllerAspectRatioCircular:
         case TOCropViewControllerAspectRatioSquare:
             aspectRatio = CGSizeMake(1.0f, 1.0f);
             break;
