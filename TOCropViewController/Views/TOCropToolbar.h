@@ -53,11 +53,12 @@
 @property (nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nonatomic, copy) void (^resetButtonTapped)(void);
 
-/* Aspect ratio button settings */
-@property (nonatomic, assign) BOOL clampButtonHidden;
+/* State management for the 'clamp' button */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;
 
+/* Aspect ratio button visibility settings */
+@property (nonatomic, assign) BOOL clampButtonHidden;
 @property (nonatomic, assign) BOOL rotateCounterClockwiseButtonHidden;
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 

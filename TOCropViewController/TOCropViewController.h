@@ -28,7 +28,6 @@
 typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatioOriginal,
     TOCropViewControllerAspectRatioSquare,
-    TOCropViewControllerAspectRatioCircular,
     TOCropViewControllerAspectRatio3x2,
     TOCropViewControllerAspectRatio5x3,
     TOCropViewControllerAspectRatio4x3,
@@ -86,6 +85,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  The original, uncropped image that was passed to this controller.
  */
 @property (nonatomic, readonly) UIImage *image;
+
+/**
+ The cropping style of this particular crop view controller
+ */
+@property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
 
 /**
  The crop view managed by this view controller.
@@ -182,6 +186,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  */
 - (instancetype)initWithImage:(UIImage *)image;
 
+/** 
+ Creates a new instance of a crop view controller with the supplied image and cropping style
+ 
+ @param style The cropping style that will be used with this view controller (eg, rectangular, or circular)
+ @param image The image that will be cropped
+ */
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image;
 
 /**
  Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself

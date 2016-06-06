@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @interface TOCropView () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong, readwrite) UIImage *image;
+@property (nonatomic, assign, readwrite) TOCropViewCroppingStyle croppingStyle;
 
 /* Views */
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
@@ -130,27 +131,43 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 @implementation TOCropView
 
-- (instancetype)initWithImage:(UIImage *)image
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
     if (self = [super init]) {
         _image = image;
+        _croppingStyle = style;
         [self setup];
     }
     
     return self;
 }
 
+- (instancetype)initWithImage:(UIImage *)image
+{
+    return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
+}
+
 - (void)setup
 {
     __weak typeof(self) weakSelf = self;
+    
+    BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
     
     //View properties
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.backgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
     self.cropBoxFrame = CGRectZero;
-
+    self.resetAspectRatioLockEnabled = (self.croppingStyle != TOCropViewCroppingStyleCircular);
     self.applyInitialCroppedImageFrame = NO;
-
+    self.editing = NO;
+    self.cropBoxResizeEnabled = !circularMode;
+    self.lockedAspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
+    self.resetAspectRatioLockEnabled = !circularMode;
+    
+    /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
+     we'll need to manually check the system version to ensure that it's available. */
+    self.dynamicBlurEffect = ([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] != NSOrderedAscending);
+    
     //Scroll View properties
     self.scrollView = [[TOCropScrollView alloc] initWithFrame:self.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -192,36 +209,40 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.translucencyView = toolbar;
         self.translucencyView.frame = CGRectInset(self.bounds, -1.0f, -1.0f);
     }
-    
     self.translucencyView.hidden = NO;
     self.translucencyView.userInteractionEnabled = NO;
     self.translucencyView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.translucencyView];
     
+    // The forground container that holds the foreground image view
     self.foregroundContainerView = [[UIView alloc] initWithFrame:(CGRect){0,0,200,200}];
     self.foregroundContainerView.clipsToBounds = YES;
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
+    if (self.croppingStyle != TOCropViewCroppingStyleCircular) {
+
+    }
+    
+    self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
+    [self.foregroundContainerView addSubview:self.foregroundImageView];
+    
+    // The following setup isn't needed during circular cropping
+    if (circularMode) {
+        return;
+    }
+    
+    // The white grid overlay view
     self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
     self.gridOverlayView.userInteractionEnabled = NO;
     self.gridOverlayView.gridHidden = YES;
     [self addSubview:self.gridOverlayView];
     
-    self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
-    [self.foregroundContainerView addSubview:self.foregroundImageView];
-    
+    // The pan controller to recognize gestures meant to resize the grid view
     self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
     self.gridPanGestureRecognizer.delegate = self;
     [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
-    
-    self.editing = NO;
-    self.cropBoxResizeEnabled = YES;
-    
-    /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
-     we'll need to manually check the system version to ensure that it's available. */
-    self.dynamicBlurEffect = ([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] != NSOrderedAscending);
 }
 
 #pragma mark - View Layout -
@@ -229,6 +250,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     [super didMoveToSuperview];
     [self layoutInitialImage];
+    [self setLockedAspectRatio:self.lockedAspectRatio animated:NO];
 }
 
 - (void)layoutInitialImage
@@ -319,6 +341,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     [self checkForCanReset];
     [self matchForegroundToBackground];
+    
+    if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
+        self.foregroundContainerView.layer.cornerRadius = self.foregroundContainerView.frame.size.width * 0.5f;
+        self.foregroundContainerView.layer.masksToBounds = YES;
+    }
 }
 
 - (void)prepareforRotation
@@ -390,11 +417,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //We can't simply match the frames since if the images are rotated, the frame property becomes unusable
     self.foregroundImageView.frame = [self.backgroundContainerView.superview convertRect:self.backgroundContainerView.frame toView:self.foregroundContainerView];
-    
-    if (_circularModeEnabled) {
-        self.foregroundContainerView.layer.cornerRadius = self.foregroundContainerView.frame.size.width/2;
-        self.foregroundContainerView.layer.masksToBounds = YES;
-    }
 }
 
 - (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point
@@ -423,7 +445,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     switch (self.tappedEdge) {
         case TOCropViewOverlayEdgeLeft:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 aspectHorizontal = YES;
                 xDelta = MAX(xDelta, 0);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMaxX(originFrame), CGRectGetMidY(originFrame)};
@@ -438,7 +460,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeRight:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 aspectHorizontal = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMinX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
@@ -452,7 +474,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeBottom:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 aspectVertical = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMinY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
@@ -465,7 +487,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             }
             break;
         case TOCropViewOverlayEdgeTop:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 aspectVertical = YES;
                 yDelta = MAX(0,yDelta);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMaxY(originFrame)};
@@ -483,7 +505,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeTopLeft:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 xDelta = MAX(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -513,7 +535,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeTopRight:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 xDelta = MIN(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -540,7 +562,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeBottomLeft:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 CGPoint distance;
                 distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - (-yDelta / CGRectGetHeight(originFrame));
@@ -564,7 +586,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             break;
         case TOCropViewOverlayEdgeBottomRight:
-            if (self.aspectRatioLocked) {
+            if (self.aspectRatioLockEnabled) {
                 
                 CGPoint distance;
                 distance.x = 1.0f - ((-1 * xDelta) / CGRectGetWidth(originFrame));
@@ -591,12 +613,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGSize maxSize = (CGSize){CGRectGetWidth(contentFrame), CGRectGetHeight(contentFrame)};
     
     //clamp the box to ensure it doesn't go beyond the bounds we've set
-    if (self.aspectRatioLocked && aspectHorizontal) {
+    if (self.aspectRatioLockEnabled && aspectHorizontal) {
         maxSize.height = contentFrame.size.width / aspectRatio;
         minSize.width = kTOCropViewMinimumBoxSize * aspectRatio;
     }
         
-    if (self.aspectRatioLocked && aspectVertical) {
+    if (self.aspectRatioLockEnabled && aspectVertical) {
         maxSize.width = contentFrame.size.height * aspectRatio;
         minSize.height = kTOCropViewMinimumBoxSize / aspectRatio;
     }
@@ -903,9 +925,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self setEditing:editing animated:NO];
 }
 
-- (void)setSimpleMode:(BOOL)simpleMode
+- (void)setSimpleRenderMode:(BOOL)simpleMode
 {
-    [self setSimpleMode:simpleMode animated:NO];
+    [self setSimpleRenderMode:simpleMode animated:NO];
 }
 
 - (BOOL)cropBoxAspectRatioIsPortrait
@@ -1041,7 +1063,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated
 {
-    if (self.simpleMode)
+    if (self.simpleRenderMode)
         return;
     
     CGRect contentRect = self.contentBounds;
@@ -1107,12 +1129,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
 }
 
-- (void)setSimpleMode:(BOOL)simpleMode animated:(BOOL)animated
+- (void)setSimpleRenderMode:(BOOL)simpleMode animated:(BOOL)animated
 {
-    if (simpleMode == _simpleMode)
+    if (simpleMode == _simpleRenderMode)
         return;
     
-    _simpleMode = simpleMode;
+    _simpleRenderMode = simpleMode;
     
     self.editing = NO;
     
@@ -1127,11 +1149,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
-- (void)setAspectLockEnabledWithAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated
+- (void)setLockedAspectRatio:(CGSize)lockedAspectRatio
 {
-    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON)
-        aspectRatio = (CGSize){self.imageSize.width, self.imageSize.height};
+    [self setLockedAspectRatio:lockedAspectRatio animated:NO];
+}
+
+- (void)setLockedAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated
+{
+    _lockedAspectRatio = aspectRatio;
     
+    // Passing in an empty size will disable it
+    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON) {
+        self.aspectRatioLockEnabled = NO;
+        return;
+    }
+    
+    // Will be executed automatically when added to a super view
+    if (self.superview == nil) {
+        return;
+    }
+
     CGRect boundsFrame = self.contentBounds;
     CGRect cropBoxFrame = self.cropBoxFrame;
     CGPoint offset = self.scrollView.contentOffset;
@@ -1179,7 +1216,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         }
     }
     
-    self.aspectRatioLocked = YES;
+    self.aspectRatioLockEnabled = YES;
     
     self.cropBoxLastEditedSize = cropBoxFrame.size;
     self.cropBoxLastEditedAngle = self.angle;

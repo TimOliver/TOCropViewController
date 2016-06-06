@@ -126,11 +126,8 @@
 {
     [self dismissViewControllerAnimated:YES completion:^{
         self.image = image;
-        TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:image];
+        TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:image];
         cropController.delegate = self;
-        
-        cropController.defaultAspectRatio = TOCropViewControllerAspectRatioCircular;
-        cropController.aspectRatioLocked = YES;
 
         // Uncomment this to test out locked aspect ratio sizes
         // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
