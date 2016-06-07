@@ -488,8 +488,9 @@
         aspectRatio.height = width;
     }
     
-    [self.cropView setLockedAspectRatio:aspectRatio animated:animated];
+    [self.cropView setAspectRatio:aspectRatio animated:animated];
     self.toolbar.clampButtonGlowing = YES;
+    self.cropView.aspectRatioLockEnabled = YES;
 }
 
 - (void)rotateCropViewClockwise

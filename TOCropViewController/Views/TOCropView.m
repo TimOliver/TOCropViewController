@@ -60,6 +60,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) id translucencyEffect;                /* The dark blur visual effect applied to the visual effect view. */
 @property (nonatomic, strong, readwrite) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
 
+/* Gesture Recognizers */
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
 
 /* Crop box handling */
@@ -81,6 +82,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
 @property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
+@property (nonatomic, readonly) BOOL hasAspectRatio;  /* True if an aspect ratio was explicitly applied to this crop view */
 
 /* 90-degree rotation state data */
 @property (nonatomic, assign) BOOL applyInitialRotatedAngle; /* No by default, when setting initialRotatedAngle this will be set to YES, and set back to NO after first application - so it's only done once */
@@ -161,7 +163,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.applyInitialCroppedImageFrame = NO;
     self.editing = NO;
     self.cropBoxResizeEnabled = !circularMode;
-    self.lockedAspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
+    self.aspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
     self.resetAspectRatioLockEnabled = !circularMode;
     
     /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
@@ -250,7 +252,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     [super didMoveToSuperview];
     [self layoutInitialImage];
-    [self setLockedAspectRatio:self.lockedAspectRatio animated:NO];
 }
 
 - (void)layoutInitialImage
@@ -259,9 +260,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.contentSize = imageSize;
     
     CGRect bounds = self.contentBounds;
+    CGSize boundsSize = bounds.size;
 
     //work out the max and min scale of the image
-    CGFloat scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
+    CGFloat scale = 0;
+    if (self.hasAspectRatio) {
+        CGFloat ratioScale = (self.aspectRatio.width / self.aspectRatio.height); //Work out the size of the width in relation to height
+        BOOL portraitRatio = ratioScale <= 1.0f - FLT_EPSILON;
+        CGSize scaledSize = portraitRatio ? (CGSize){boundsSize.height * ratioScale, boundsSize.height} :
+                                            (CGSize){boundsSize.width, boundsSize.width / ratioScale};
+        
+        scale = MAX(scaledSize.width/imageSize.width, scaledSize.height/imageSize.height);
+    }
+    else {
+        scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
+    }
     CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
 
     self.scrollView.minimumZoomScale = scale;
@@ -277,64 +290,64 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
     self.cropBoxFrame = frame;
     
-    if (self.applyInitialRotatedAngle) {
-        // Get croppedFrame before rotate.
-        // After getting croppedFrame before rotate, rotate.
-        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
-        switch (self.initialRotatedAngle) {
-            case 90:
-            case -270:
-                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-                break;
-            case 180:
-            case -180:
-                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
-                break;
-            case 270:
-            case -90:
-                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-                break;
-            default:
-                break;
-        }
-        self.initialCroppedImageFrame = beforeRotatedFrame;
-    }
-
-
-    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
-        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
-        
-        // layout image and crop
-        [self moveCroppedContentToCenterAnimated:NO];
-
-        // preselect the initialCroppedImageFrame
-        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
-        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
-        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
-        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
-        self.cropBoxFrame = frame;
-        
-        // zoom
-        [self moveCroppedContentToCenterAnimated:NO];
-    }
+//    if (self.applyInitialRotatedAngle) {
+//        // Get croppedFrame before rotate.
+//        // After getting croppedFrame before rotate, rotate.
+//        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
+//        switch (self.initialRotatedAngle) {
+//            case 90:
+//            case -270:
+//                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+//                break;
+//            case 180:
+//            case -180:
+//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
+//                break;
+//            case 270:
+//            case -90:
+//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+//                break;
+//            default:
+//                break;
+//        }
+//        self.initialCroppedImageFrame = beforeRotatedFrame;
+//    }
+//
+//
+//    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
+//        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
+//        
+//        // layout image and crop
+//        [self moveCroppedContentToCenterAnimated:NO];
+//
+//        // preselect the initialCroppedImageFrame
+//        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
+//        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
+//        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
+//        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
+//        self.cropBoxFrame = frame;
+//        
+//        // zoom
+//        [self moveCroppedContentToCenterAnimated:NO];
+//    }
 
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
     
-    if (self.applyInitialRotatedAngle) {
-        self.applyInitialRotatedAngle = NO;
-        int rotateCount = self.initialRotatedAngle / 90.0f;
-        for (int i = 0; i < abs(rotateCount); i++) {
-            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
-        }
-    }
+//    if (self.applyInitialRotatedAngle) {
+//        self.applyInitialRotatedAngle = NO;
+//        int rotateCount = self.initialRotatedAngle / 90.0f;
+//        for (int i = 0; i < abs(rotateCount); i++) {
+//            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
+//        }
+//    }
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
@@ -343,7 +356,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self matchForegroundToBackground];
     
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
-        self.foregroundContainerView.layer.cornerRadius = self.foregroundContainerView.frame.size.width * 0.5f;
+        self.foregroundContainerView.layer.cornerRadius = floorf(self.foregroundContainerView.frame.size.width * 0.5f);
         self.foregroundContainerView.layer.masksToBounds = YES;
     }
 }
@@ -678,6 +691,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         //Reset the layout
         [self layoutInitialImage];
         
+        //Re-apply the aspect ratio
+        if (self.resetAspectRatioLockEnabled == NO) {
+            [self setAspectRatio:self.aspectRatio animated:NO];
+        }
+        
         //Enable / Disable the reset button
         [self checkForCanReset];
         
@@ -685,7 +703,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     //Perform an animation of the image zooming back out to its original size
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+    [UIView animateWithDuration:10.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
         [self layoutInitialImage];
         [self checkForCanReset];
     } completion:nil];
@@ -1149,24 +1167,23 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
-- (void)setLockedAspectRatio:(CGSize)lockedAspectRatio
+- (void)setAspectRatio:(CGSize)aspectRatio
 {
-    [self setLockedAspectRatio:lockedAspectRatio animated:NO];
+    [self setAspectRatio:aspectRatio animated:NO];
 }
 
-- (void)setLockedAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated
+- (void)setAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated
 {
-    _lockedAspectRatio = aspectRatio;
-    
-    // Passing in an empty size will disable it
-    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON) {
-        self.aspectRatioLockEnabled = NO;
-        return;
-    }
+    _aspectRatio = aspectRatio;
     
     // Will be executed automatically when added to a super view
     if (self.superview == nil) {
         return;
+    }
+    
+    // Passing in an empty size will revert back to the image aspect ratio
+    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON) {
+        aspectRatio = (CGSize){self.imageSize.width, self.imageSize.height};
     }
 
     CGRect boundsFrame = self.contentBounds;
@@ -1215,8 +1232,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             zoomOut = YES;
         }
     }
-    
-    self.aspectRatioLockEnabled = YES;
     
     self.cropBoxLastEditedSize = cropBoxFrame.size;
     self.cropBoxLastEditedAngle = self.angle;
@@ -1460,6 +1475,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return (CGSize){self.image.size.height, self.image.size.width};
 
     return (CGSize){self.image.size.width, self.image.size.height};
+}
+
+- (BOOL)hasAspectRatio
+{
+    return (self.aspectRatio.width > FLT_EPSILON && self.aspectRatio.height > FLT_EPSILON);
 }
 
 @end

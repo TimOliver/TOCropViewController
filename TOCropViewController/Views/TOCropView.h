@@ -91,9 +91,9 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL simpleRenderMode;
 
 /**
- A width x height ratio that the crop box will be clamped to (eg 4:3 is {4.0f, 3.0f})
+ A width x height ratio that the crop box will be rescaled to (eg 4:3 is {4.0f, 3.0f})
  */
-@property (nonatomic, assign) CGSize lockedAspectRatio;
+@property (nonatomic, assign) CGSize aspectRatio;
 
 /**
  When the cropping box is locked to its current aspect ratio (But can still be resized)
@@ -181,12 +181,12 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 - (void)resetLayoutToDefaultAnimated:(BOOL)animated;
 
 /**
- Enables an aspect ratio lock where the crop box will always scale at a specific ratio.
+ Changes the aspect ratio of the crop box to match the one specified
  
- @param aspectRatio The aspect ratio (For example 16:9 is 16.0f/9.0f). Specify 0.0f to lock to the image's original aspect ratio
+ @param aspectRatio The aspect ratio (For example 16:9 is 16.0f/9.0f). 'CGSizeZero' will reset it to the image's own ratio
  @param animated Whether the locking effect is animated
  */
-- (void)setLockedAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated;
+- (void)setAspectRatio:(CGSize)aspectRatio animated:(BOOL)animated;
 
 /**
  Rotates the entire canvas to a 90-degree angle. The default rotation is counterclockwise.
