@@ -94,6 +94,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 /* Reset state data */
 @property (nonatomic, assign) CGSize originalCropBoxSize; /* Save the original crop box size so we can tell when the content has been edited */
+@property (nonatomic, assign) CGPoint originalContentOffset; /* Save the original content offset so we can tell if it's been scrolled. */
 @property (nonatomic, assign, readwrite) BOOL canReset;
 
 /* In iOS 9, a new dynamic blur effect became available. */
@@ -251,6 +252,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)didMoveToSuperview
 {
     [super didMoveToSuperview];
+    
+    if (self.superview == nil) {
+        return;
+    }
+    
     [self layoutInitialImage];
 }
 
@@ -262,96 +268,114 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect bounds = self.contentBounds;
     CGSize boundsSize = bounds.size;
 
-    //work out the max and min scale of the image
-    CGFloat scale = 0;
+    //work out the minimum scale of the object
+    CGFloat scale = 0.0f;
+    CGSize cropBoxSize = CGSizeZero;
+    
+    // If an aspect ratio was pre-applied to the crop view, use that to work out the minimum scale
     if (self.hasAspectRatio) {
         CGFloat ratioScale = (self.aspectRatio.width / self.aspectRatio.height); //Work out the size of the width in relation to height
-        BOOL portraitRatio = ratioScale <= 1.0f - FLT_EPSILON;
-        CGSize scaledSize = portraitRatio ? (CGSize){boundsSize.height * ratioScale, boundsSize.height} :
-                                            (CGSize){boundsSize.width, boundsSize.width / ratioScale};
-        
-        scale = MAX(scaledSize.width/imageSize.width, scaledSize.height/imageSize.height);
+        // If the image is portait shaped, scale down by the height
+        if (ratioScale <= 1.0f - FLT_EPSILON) {
+            cropBoxSize = (CGSize){boundsSize.height * ratioScale, boundsSize.height};
+        }
+        else {
+            cropBoxSize = (CGSize){boundsSize.width, boundsSize.width / ratioScale};
+        }
+        scale = MAX(cropBoxSize.width/imageSize.width, cropBoxSize.height/imageSize.height);
     }
-    else {
+    else { // By default, calculate the minimum size for the image to fit inside the bounds
         scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
     }
+    
+    // The final size, in points the image needs to be to fit our bounds
     CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
 
+    // Configure the scroll view
     self.scrollView.minimumZoomScale = scale;
     self.scrollView.maximumZoomScale = 15.0f;
     //set the fully zoomed out state initially
     self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
     self.scrollView.contentSize = scaledSize;
 
-    //Relayout the image in the scroll view
+    //Set the crop box to the size we calculated and align in the middle of the screen
     CGRect frame = CGRectZero;
-    frame.size = scaledSize;
+    frame.size = self.hasAspectRatio ? cropBoxSize : scaledSize;
     frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f);
     frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
     self.cropBoxFrame = frame;
     
-//    if (self.applyInitialRotatedAngle) {
-//        // Get croppedFrame before rotate.
-//        // After getting croppedFrame before rotate, rotate.
-//        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
-//        switch (self.initialRotatedAngle) {
-//            case 90:
-//            case -270:
-//                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
-//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-//                break;
-//            case 180:
-//            case -180:
-//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-//                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
-//                break;
-//            case 270:
-//            case -90:
-//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-//                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
-//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-//                break;
-//            default:
-//                break;
-//        }
-//        self.initialCroppedImageFrame = beforeRotatedFrame;
-//    }
-//
-//
-//    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
-//        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
-//        
-//        // layout image and crop
-//        [self moveCroppedContentToCenterAnimated:NO];
-//
-//        // preselect the initialCroppedImageFrame
-//        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
-//        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
-//        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
-//        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
-//        self.cropBoxFrame = frame;
-//        
-//        // zoom
-//        [self moveCroppedContentToCenterAnimated:NO];
-//    }
+    // If we ended up with a smaller crop box than the content, offset it in the middle
+    if (frame.size.width < scaledSize.width - FLT_EPSILON || frame.size.height < scaledSize.height - FLT_EPSILON) {
+        CGPoint offset = CGPointZero;
+        offset.x = -floorf((CGRectGetWidth(self.scrollView.frame) - scaledSize.width) * 0.5f);
+        offset.y = -floorf((CGRectGetHeight(self.scrollView.frame) - scaledSize.height) * 0.5f);
+        self.scrollView.contentOffset = offset;
+    }
+    
+    if (self.applyInitialRotatedAngle) {
+        // Get croppedFrame before rotate.
+        // After getting croppedFrame before rotate, rotate.
+        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
+        switch (self.initialRotatedAngle) {
+            case 90:
+            case -270:
+                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+                break;
+            case 180:
+            case -180:
+                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
+                break;
+            case 270:
+            case -90:
+                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
+                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+                break;
+            default:
+                break;
+        }
+        self.initialCroppedImageFrame = beforeRotatedFrame;
+    }
+
+
+    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
+        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
+        
+        // layout image and crop
+        [self moveCroppedContentToCenterAnimated:NO];
+
+        // preselect the initialCroppedImageFrame
+        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
+        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
+        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
+        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
+        self.cropBoxFrame = frame;
+        
+        // zoom
+        [self moveCroppedContentToCenterAnimated:NO];
+    }
 
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
     
-//    if (self.applyInitialRotatedAngle) {
-//        self.applyInitialRotatedAngle = NO;
-//        int rotateCount = self.initialRotatedAngle / 90.0f;
-//        for (int i = 0; i < abs(rotateCount); i++) {
-//            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
-//        }
-//    }
+    if (self.applyInitialRotatedAngle) {
+        self.applyInitialRotatedAngle = NO;
+        int rotateCount = self.initialRotatedAngle / 90.0f;
+        for (int i = 0; i < abs(rotateCount); i++) {
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
+        }
+    }
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
-
+    self.originalContentOffset = self.scrollView.contentOffset;
+    
     [self checkForCanReset];
     [self matchForegroundToBackground];
     
@@ -703,7 +727,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     //Perform an animation of the image zooming back out to its original size
-    [UIView animateWithDuration:10.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
         [self layoutInitialImage];
         [self checkForCanReset];
     } completion:nil];
@@ -846,10 +870,29 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView { return self.backgroundContainerView; }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView            { [self matchForegroundToBackground]; }
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView    { [self startEditing]; }
-- (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view { [self startEditing]; }
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView   { [self startResetTimer]; }
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale { [self startResetTimer]; }
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self startEditing];
+    self.canReset = YES;
+}
+
+- (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view
+{
+    [self startEditing];
+    self.canReset = YES;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    [self startResetTimer];
+    [self checkForCanReset];
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale {
+    [self startResetTimer];
+    [self checkForCanReset];
+}
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView
 {
@@ -858,7 +901,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.cropBoxLastEditedMinZoomScale = scrollView.minimumZoomScale;
     }
     
-    [self checkForCanReset];
     [self matchForegroundToBackground];
 }
 
@@ -1045,6 +1087,24 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = -self.scrollView.contentOffset.y;
     frame.size = self.scrollView.contentSize;
     return frame;
+}
+
+- (void)setCanReset:(BOOL)canReset
+{
+    if (canReset == _canReset) {
+        return;
+    }
+    
+    _canReset = canReset;
+    
+    if (canReset) {
+        if ([self.delegate respondsToSelector:@selector(cropViewDidBecomeResettable:)])
+            [self.delegate cropViewDidBecomeResettable:self];
+    }
+    else  {
+        if ([self.delegate respondsToSelector:@selector(cropViewDidBecomeNonResettable:)])
+            [self.delegate cropViewDidBecomeNonResettable:self];
+    }
 }
 
 #pragma mark - Editing Mode -
@@ -1440,22 +1500,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     else if (self.scrollView.zoomScale > self.scrollView.minimumZoomScale + FLT_EPSILON) { //image has been zoomed in
         canReset = YES;
     }
-    else if ((NSInteger)floorf(self.cropBoxFrame.size.width) != (NSInteger)floorf(self.originalCropBoxSize.width) || (NSInteger)floorf(self.cropBoxFrame.size.height) != (NSInteger)floorf(self.originalCropBoxSize.height)) { //crop box has been changed
+    else if ((NSInteger)floorf(self.cropBoxFrame.size.width) != (NSInteger)floorf(self.originalCropBoxSize.width) ||
+             (NSInteger)floorf(self.cropBoxFrame.size.height) != (NSInteger)floorf(self.originalCropBoxSize.height))
+    { //crop box has been changed
+        canReset = YES;
+    }
+    else if ((NSInteger)floorf(self.scrollView.contentOffset.x) != (NSInteger)floorf(self.originalContentOffset.x) ||
+             (NSInteger)floorf(self.scrollView.contentOffset.y) != (NSInteger)floorf(self.originalContentOffset.y))
+    {
         canReset = YES;
     }
 
-    if (canReset && self.canReset == NO) {
-        self.canReset = YES;
-        
-        if ([self.delegate respondsToSelector:@selector(cropViewDidBecomeResettable:)])
-            [self.delegate cropViewDidBecomeResettable:self];
-    }
-    else if (!canReset && self.canReset) {
-        self.canReset = NO;
-        
-        if ([self.delegate respondsToSelector:@selector(cropViewDidBecomeNonResettable:)])
-            [self.delegate cropViewDidBecomeNonResettable:self];
-    }
+    self.canReset = canReset;
 }
 
 #pragma mark - Convienience Methods -
