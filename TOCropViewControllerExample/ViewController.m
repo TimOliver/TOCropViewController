@@ -14,6 +14,9 @@
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) UIImageView *imageView;
 
+@property (nonatomic, strong) UIImagePickerController *standardPicker;
+@property (nonatomic, strong) UIImagePickerController *profilePicker;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
@@ -90,11 +93,35 @@
 #pragma mark - Bar Button Items -
 - (void)showCropViewController
 {
-    UIImagePickerController *photoPickerController = [[UIImagePickerController alloc] init];
-    photoPickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-    photoPickerController.allowsEditing = NO;
-    photoPickerController.delegate = self;
-    [self presentViewController:photoPickerController animated:YES completion:nil];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Crop Image"
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction *action) {
+                                               self.standardPicker = [[UIImagePickerController alloc] init];
+                                               self.standardPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                                               self.standardPicker.allowsEditing = NO;
+                                               self.standardPicker.delegate = self;
+                                               [self presentViewController:self.standardPicker animated:YES completion:nil];
+                                           }];
+    
+    UIAlertAction *profileAction = [UIAlertAction actionWithTitle:@"Make Profile Picture"
+                                           style:UIAlertActionStyleDefault
+                                         handler:^(UIAlertAction *action) {
+                                             self.profilePicker = [[UIImagePickerController alloc] init];
+                                             self.profilePicker.modalPresentationStyle = UIModalPresentationFormSheet;
+                                             self.profilePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                                             self.profilePicker.allowsEditing = NO;
+                                             self.profilePicker.delegate = self;
+                                             [self presentViewController:self.profilePicker animated:YES completion:nil];
+                                         }];
+    
+    [alertController addAction:defaultAction];
+    [alertController addAction:profileAction];
+    [alertController setModalPresentationStyle:UIModalPresentationPopover];
+    
+    UIPopoverPresentationController *popPresenter = [alertController popoverPresentationController];
+    popPresenter.barButtonItem = self.navigationItem.leftBarButtonItem;
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)sharePhoto
@@ -134,30 +161,43 @@
     
     self.navigationItem.rightBarButtonItem.enabled = YES;
     
-    CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
-    self.imageView.hidden = YES;
-    [cropViewController dismissAnimatedFromParentViewController:self withCroppedImage:image toFrame:viewFrame completion:^{
-        self.imageView.hidden = NO;
-    }];
+    if (cropViewController.croppingStyle != TOCropViewCroppingStyleCircular) {
+        CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
+        self.imageView.hidden = YES;
+        [cropViewController dismissAnimatedFromParentViewController:self withCroppedImage:image toFrame:viewFrame completion:^{
+            self.imageView.hidden = NO;
+        }];
+    }
+    else {
+        [cropViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 #pragma mark - Image Picker Delegate -
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary *)editingInfo
 {
-    [self dismissViewControllerAnimated:YES completion:^{
-        self.image = image;
+    if (picker == self.profilePicker) {
         TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:image];
         cropController.delegate = self;
-
-        // Uncomment this to test out locked aspect ratio sizes
-        // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
-        // cropController.aspectRatioLocked = YES;
-        
-        // Uncomment this to place the toolbar at the top of the view controller
-        // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
-        
-        [self presentViewController:cropController animated:YES completion:nil];
-    }];
+        self.image = image;
+        [picker pushViewController:cropController animated:YES];
+    }
+    else {
+        [self dismissViewControllerAnimated:YES completion:^{
+            self.image = image;
+            TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
+            cropController.delegate = self;
+            
+            // Uncomment this to test out locked aspect ratio sizes
+            // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
+            // cropController.aspectRatioLocked = YES;
+            
+            // Uncomment this to place the toolbar at the top of the view controller
+            // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+            
+            [self presentViewController:cropController animated:YES completion:nil];
+        }];
+    }
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker

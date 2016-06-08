@@ -102,9 +102,6 @@
     [super viewDidLoad];
 
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
-    
-    self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
-    [self.view addSubview:self.cropView];
 
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
@@ -141,6 +138,8 @@
         
         [self.navigationController setNavigationBarHidden:YES animated:animated];
         [self.navigationController setToolbarHidden:YES animated:animated];
+        
+        self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     }
 }
 
@@ -263,6 +262,13 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
+    
+    //Dumb hack for UINavigationController views returning the incorrect size at creation time
+    //Add the crop view at this point since the sizes should be set by now.
+    if (self.cropView.superview == nil) {
+        self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
+        [self.view addSubview:self.cropView];
+    }
     
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
@@ -565,6 +571,10 @@
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source
 {
+    if (self.navigationController) {
+        return nil;
+    }
+    
     __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
         typeof (self) strongSelf = weakSelf;
@@ -584,6 +594,10 @@
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
+    if (self.navigationController) {
+        return nil;
+    }
+    
     __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
         typeof (self) strongSelf = weakSelf;
