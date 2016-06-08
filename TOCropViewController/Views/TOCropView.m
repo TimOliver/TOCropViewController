@@ -315,64 +315,64 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.contentOffset = offset;
     }
     
-    if (self.applyInitialRotatedAngle) {
-        // Get croppedFrame before rotate.
-        // After getting croppedFrame before rotate, rotate.
-        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
-        switch (self.initialRotatedAngle) {
-            case 90:
-            case -270:
-                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-                break;
-            case 180:
-            case -180:
-                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
-                break;
-            case 270:
-            case -90:
-                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
-                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
-                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
-                break;
-            default:
-                break;
-        }
-        self.initialCroppedImageFrame = beforeRotatedFrame;
-    }
+//    if (self.applyInitialRotatedAngle) {
+//        // Get croppedFrame before rotate.
+//        // After getting croppedFrame before rotate, rotate.
+//        CGRect beforeRotatedFrame = self.initialCroppedImageFrame;
+//        switch (self.initialRotatedAngle) {
+//            case 90:
+//            case -270:
+//                beforeRotatedFrame.origin.x = self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+//                break;
+//            case 180:
+//            case -180:
+//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.width - self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.origin.y = self.imageSize.height - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.size = self.initialCroppedImageFrame.size;
+//                break;
+//            case 270:
+//            case -90:
+//                beforeRotatedFrame.origin.x = self.imageSize.width - self.initialCroppedImageFrame.size.height - self.initialCroppedImageFrame.origin.y;
+//                beforeRotatedFrame.origin.y = self.initialCroppedImageFrame.origin.x;
+//                beforeRotatedFrame.size = CGSizeMake(self.initialCroppedImageFrame.size.height, self.initialCroppedImageFrame.size.width);
+//                break;
+//            default:
+//                break;
+//        }
+//        self.initialCroppedImageFrame = beforeRotatedFrame;
+//    }
 
 
-    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
-        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
-        
-        // layout image and crop
-        [self moveCroppedContentToCenterAnimated:NO];
-
-        // preselect the initialCroppedImageFrame
-        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
-        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
-        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
-        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
-        self.cropBoxFrame = frame;
-        
-        // zoom
-        [self moveCroppedContentToCenterAnimated:NO];
-    }
+//    if (self.applyInitialCroppedImageFrame) { // apply initialCroppedImageFrame
+//        self.applyInitialCroppedImageFrame = NO; // reset to NO, so we don't apply it again (it means it'll reset to full frame)
+//        
+//        // layout image and crop
+//        [self moveCroppedContentToCenterAnimated:NO];
+//
+//        // preselect the initialCroppedImageFrame
+//        frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - scaledSize.width) * 0.5f) + CGRectGetMinX(_initialCroppedImageFrame) * scale;
+//        frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - scaledSize.height) * 0.5f) + CGRectGetMinY(_initialCroppedImageFrame) * scale;
+//        frame.size.width = CGRectGetWidth(_initialCroppedImageFrame) * scale;
+//        frame.size.height = CGRectGetHeight(_initialCroppedImageFrame) * scale;
+//        self.cropBoxFrame = frame;
+//        
+//        // zoom
+//        [self moveCroppedContentToCenterAnimated:NO];
+//    }
 
     //save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
     
-    if (self.applyInitialRotatedAngle) {
-        self.applyInitialRotatedAngle = NO;
-        int rotateCount = self.initialRotatedAngle / 90.0f;
-        for (int i = 0; i < abs(rotateCount); i++) {
-            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
-        }
-    }
+//    if (self.applyInitialRotatedAngle) {
+//        self.applyInitialRotatedAngle = NO;
+//        int rotateCount = self.initialRotatedAngle / 90.0f;
+//        for (int i = 0; i < abs(rotateCount); i++) {
+//            [self rotateImageNinetyDegreesAnimated:NO clockwise:rotateCount > 0];
+//        }
+//    }
     
     //save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.cropBoxFrame.size;
@@ -725,11 +725,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
 
+    //If we were in the middle of a reset timer, cancel it as we'll
+    //manually perform a restoration animation here
+    if (self.resetTimer) {
+        [self cancelResetTimer];
+        [self setEditing:NO animated:NO];
+    }
+   
+     [self setSimpleRenderMode:YES animated:NO];
+    
     //Perform an animation of the image zooming back out to its original size
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
         [self layoutInitialImage];
         [self checkForCanReset];
-    } completion:nil];
+    } completion:^(BOOL complete) {
+        [self setSimpleRenderMode:NO animated:YES];
+    }];
 }
 
 - (void)toggleTranslucencyViewVisible:(BOOL)visible
@@ -1214,7 +1225,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     [self matchForegroundToBackground];
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:0 animations:translateBlock completion:nil];
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionBeginFromCurrentState animations:translateBlock completion:nil];
 }
 
 - (void)setSimpleRenderMode:(BOOL)simpleMode animated:(BOOL)animated
@@ -1232,7 +1243,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:0.3f animations:^{
+    [UIView animateWithDuration:0.25f animations:^{
         [self toggleTranslucencyViewVisible:!simpleMode];
     }];
 }
@@ -1322,7 +1333,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:0.5f delay:0.0 usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:translateBlock completion:nil];
+    [UIView animateWithDuration:0.5f
+                          delay:0.0
+         usingSpringWithDamping:1.0f
+          initialSpringVelocity:0.7f
+                        options:UIViewAnimationOptionBeginFromCurrentState
+                     animations:translateBlock
+                     completion:nil];
 }
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
@@ -1463,7 +1480,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.translucencyView.hidden = YES;
         self.gridOverlayView.hidden = YES;
         
-        [UIView animateWithDuration:0.45f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.8f options:0 animations:^{
+        [UIView animateWithDuration:0.45f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.8f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             CGAffineTransform transform = CGAffineTransformRotate(CGAffineTransformIdentity, clockwise ? M_PI_2 : -M_PI_2);
             transform = CGAffineTransformScale(transform, scale, scale);
             snapshotView.transform = transform;

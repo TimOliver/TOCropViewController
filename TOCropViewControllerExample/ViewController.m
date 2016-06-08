@@ -25,6 +25,8 @@
 - (void)layoutImageView;
 - (void)didTapImageView;
 
+- (void)updateImageViewWithImage:(UIImage *)image fromCropViewController:(TOCropViewController *)cropViewController;
+
 @end
 
 @implementation ViewController
@@ -42,6 +44,7 @@
     
     self.imageView = [[UIImageView alloc] init];
     self.imageView.userInteractionEnabled = YES;
+    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.view addSubview:self.imageView];
     
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapImageView)];
@@ -68,13 +71,20 @@
     CGRect imageFrame = CGRectZero;
     imageFrame.size = self.imageView.image.size;
     
-    CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
-    imageFrame.size.width *= scale;
-    imageFrame.size.height *= scale;
-    imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5f;
-    imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5f;
-    self.imageView.frame = imageFrame;
-    
+    if (self.imageView.image.size.width > viewFrame.size.width &&
+        self.imageView.image.size.height > viewFrame.size.height)
+    {
+        CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
+        imageFrame.size.width *= scale;
+        imageFrame.size.height *= scale;
+        imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5f;
+        imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5f;
+        self.imageView.frame = imageFrame;
+    }
+    else {
+        self.imageView.frame = imageFrame;
+        self.imageView.center = self.view.center;
+    }
 }
 
 #pragma mark - Bar Button Items -
@@ -108,6 +118,16 @@
 
 #pragma mark - Cropper Delegate -
 - (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+{
+    [self updateImageViewWithImage:image fromCropViewController:cropViewController];
+}
+
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+{
+    [self updateImageViewWithImage:image fromCropViewController:cropViewController];
+}
+
+- (void)updateImageViewWithImage:(UIImage *)image fromCropViewController:(TOCropViewController *)cropViewController
 {
     self.imageView.image = image;
     [self layoutImageView];

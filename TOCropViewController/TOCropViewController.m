@@ -624,7 +624,7 @@
 
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
-        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle];
+        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular)];
         TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
         
         NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
@@ -689,6 +689,14 @@
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
         [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
     }
+    else if (self.croppingStyle == TOCropViewCroppingStyleCircular && [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)]) {
+        UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
+        
+        //dispatch on the next run-loop so the animation isn't interuppted by the crop operation
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
+        });
+    }
     //If the delegate that requires the specific cropped image is provided, call it
     else if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)]) {
         UIImage *image = nil;
@@ -696,7 +704,7 @@
             image = self.image;
         }
         else {
-            image = [self.image croppedImageWithFrame:cropFrame angle:angle];
+            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO];
         }
         
         //dispatch on the next run-loop so the animation isn't interuppted by the crop operation

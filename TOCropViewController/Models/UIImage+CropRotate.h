@@ -24,6 +24,6 @@
 
 @interface UIImage (CropRotate)
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle;
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular;
 
 @end
