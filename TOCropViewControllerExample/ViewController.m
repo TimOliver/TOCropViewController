@@ -74,7 +74,7 @@
     CGRect imageFrame = CGRectZero;
     imageFrame.size = self.imageView.image.size;
     
-    if (self.imageView.image.size.width > viewFrame.size.width &&
+    if (self.imageView.image.size.width > viewFrame.size.width ||
         self.imageView.image.size.height > viewFrame.size.height)
     {
         CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
@@ -86,7 +86,7 @@
     }
     else {
         self.imageView.frame = imageFrame;
-        self.imageView.center = self.view.center;
+        self.imageView.center = (CGPoint){CGRectGetMidX(self.view.bounds),  CGRectGetMidY(self.view.bounds)};
     }
 }
 
@@ -108,10 +108,12 @@
                                            style:UIAlertActionStyleDefault
                                          handler:^(UIAlertAction *action) {
                                              self.profilePicker = [[UIImagePickerController alloc] init];
-                                             self.profilePicker.modalPresentationStyle = UIModalPresentationFormSheet;
+                                             self.profilePicker.modalPresentationStyle = UIModalPresentationPopover;
                                              self.profilePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
                                              self.profilePicker.allowsEditing = NO;
                                              self.profilePicker.delegate = self;
+                                             self.profilePicker.preferredContentSize = CGSizeMake(512,512);
+                                             self.profilePicker.popoverPresentationController.barButtonItem = self.navigationItem.leftBarButtonItem;
                                              [self presentViewController:self.profilePicker animated:YES completion:nil];
                                          }];
     
