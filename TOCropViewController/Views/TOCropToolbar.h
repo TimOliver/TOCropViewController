@@ -59,7 +59,7 @@
 
 /* Aspect ratio button visibility settings */
 @property (nonatomic, assign) BOOL clampButtonHidden;
-@property (nonatomic, assign) BOOL rotateCounterClockwiseButtonHidden;
+@property (nonatomic, assign) BOOL rotateCounterclockwiseButtonHidden;
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 
 /* Enable the reset button */

@@ -212,7 +212,7 @@
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         NSMutableArray *buttonsInOrderHorizontally = [NSMutableArray new];
-        if (!self.rotateCounterClockwiseButtonHidden) {
+        if (!self.rotateCounterclockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
         }
         
@@ -250,7 +250,7 @@
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         NSMutableArray *buttonsInOrderVertically = [NSMutableArray new];
-        if (!self.rotateCounterClockwiseButtonHidden) {
+        if (!self.rotateCounterclockwiseButtonHidden) {
             [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
         }
         
@@ -344,10 +344,10 @@
 
 - (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden
 {
-    if (_rotateCounterClockwiseButtonHidden == rotateButtonHidden)
+    if (_rotateCounterclockwiseButtonHidden == rotateButtonHidden)
         return;
     
-    _rotateCounterClockwiseButtonHidden = rotateButtonHidden;
+    _rotateCounterclockwiseButtonHidden = rotateButtonHidden;
     [self setNeedsLayout];
 }
 

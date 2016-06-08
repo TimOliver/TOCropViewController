@@ -29,6 +29,7 @@
 static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
+static const CGFloat kTOCropViewCircularPathRadius = 300.0f;
 
 /* When the user taps down to resize the box, this state is used
  to determine where they tapped and how to manipulate the box */
@@ -99,6 +100,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 /* In iOS 9, a new dynamic blur effect became available. */
 @property (nonatomic, assign) BOOL dynamicBlurEffect;
+
+/* Managing the clipping of the foreground container into a circle */
+@property (nonatomic, strong) CAShapeLayer *circularMaskLayer;
 
 - (void)setup;
 
@@ -223,15 +227,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
-    if (self.croppingStyle != TOCropViewCroppingStyleCircular) {
-
-    }
-    
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
     // The following setup isn't needed during circular cropping
     if (circularMode) {
+        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:(CGRect){0,0,kTOCropViewCircularPathRadius, kTOCropViewCircularPathRadius}];
+        self.circularMaskLayer = [[CAShapeLayer alloc] init];
+        self.circularMaskLayer.path = circlePath.CGPath;
+        self.foregroundContainerView.layer.mask = self.circularMaskLayer;
+        
         return;
     }
     
@@ -275,13 +280,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // If an aspect ratio was pre-applied to the crop view, use that to work out the minimum scale
     if (self.hasAspectRatio) {
         CGFloat ratioScale = (self.aspectRatio.width / self.aspectRatio.height); //Work out the size of the width in relation to height
-        // If the image is portait shaped, scale down by the height
-        if (ratioScale <= 1.0f - FLT_EPSILON) {
-            cropBoxSize = (CGSize){boundsSize.height * ratioScale, boundsSize.height};
-        }
-        else {
-            cropBoxSize = (CGSize){boundsSize.width, boundsSize.width / ratioScale};
-        }
+        CGSize fullSizeRatio = (CGSize){boundsSize.height * ratioScale, boundsSize.height};
+        CGFloat fitScale = MIN(boundsSize.width/fullSizeRatio.width, boundsSize.height/fullSizeRatio.height);
+        cropBoxSize = (CGSize){fullSizeRatio.width * fitScale, fullSizeRatio.height * fitScale};
+        
         scale = MAX(cropBoxSize.width/imageSize.width, cropBoxSize.height/imageSize.height);
     }
     else { // By default, calculate the minimum size for the image to fit inside the bounds
@@ -378,11 +380,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     [self checkForCanReset];
     [self matchForegroundToBackground];
-    
-    if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
-        self.foregroundContainerView.layer.cornerRadius = floorf(self.foregroundContainerView.frame.size.width * 0.5f);
-        self.foregroundContainerView.layer.masksToBounds = YES;
-    }
 }
 
 - (void)prepareforRotation
@@ -693,6 +690,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)resetLayoutToDefaultAnimated:(BOOL)animated
 {
+    // If resetting the crop view includes resetting the aspect ratio,
+    // reset it to zero here. But set the ivar directly since there's no point
+    // in performing the relayout calculations right before a reset.
+    if (self.hasAspectRatio && self.resetAspectRatioLockEnabled) {
+        _aspectRatio = CGSizeZero;
+    }
+    
     if (animated == NO || self.angle != 0) {
         //Reset all of the rotation transforms
         self.angle = 0;
@@ -714,11 +718,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         //Reset the layout
         [self layoutInitialImage];
-        
-        //Re-apply the aspect ratio
-        if (self.resetAspectRatioLockEnabled == NO) {
-            [self setAspectRatio:self.aspectRatio animated:NO];
-        }
         
         //Enable / Disable the reset button
         [self checkForCanReset];
@@ -956,6 +955,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.frame = _cropBoxFrame; //set the clipping view to match the new rect
     self.gridOverlayView.frame = _cropBoxFrame; //set the new overlay view to match the same region
     
+    // If the mask layer is present, adjust its transform to fit the new container view size
+    if (self.circularMaskLayer) {
+        CGFloat scale = _cropBoxFrame.size.width / kTOCropViewCircularPathRadius;
+        self.circularMaskLayer.transform = CATransform3DScale(CATransform3DIdentity, scale, scale, 1.0f);
+    }
+    
     //reset the scroll view insets to match the region of the new crop rect
     self.scrollView.contentInset = (UIEdgeInsets){CGRectGetMinY(_cropBoxFrame),
                                                     CGRectGetMinX(_cropBoxFrame),
@@ -1146,6 +1151,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     CGRect contentRect = self.contentBounds;
     CGRect cropFrame = self.cropBoxFrame;
+    
+    // Ensure we only proceed after the crop frame has been setup for the first time
+    if (cropFrame.size.width < FLT_EPSILON || cropFrame.size.height < FLT_EPSILON) {
+        return;
+    }
     
     CGPoint focusPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
     CGPoint midPoint = (CGPoint){CGRectGetMidX(contentRect), CGRectGetMidY(contentRect)};

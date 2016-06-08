@@ -101,6 +101,8 @@
 {
     [super viewDidLoad];
 
+    BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
+    
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.cropView];
 
@@ -117,7 +119,8 @@
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped        = ^{ [weakSelf rotateCropViewClockwise]; };
     
-    self.toolbar.clampButtonHidden = self.aspectRatioLocked || (self.croppingStyle == TOCropViewCroppingStyleCircular);
+    self.toolbar.clampButtonHidden = self.aspectRatioLocked || circularMode;
+    self.toolbar.rotateClockwiseButtonHidden = !circularMode;
     
     self.transitioningDelegate = self;
     self.view.backgroundColor = self.cropView.backgroundColor;
@@ -739,7 +742,7 @@
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
 {
-    self.toolbar.rotateCounterClockwiseButtonHidden = rotateButtonsHidden;
+    self.toolbar.rotateCounterclockwiseButtonHidden = rotateButtonsHidden;
     
     if (self.rotateClockwiseButtonHidden == NO) {
         self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
