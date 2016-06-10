@@ -489,6 +489,9 @@
         case TOCropViewControllerAspectRatio16x9:
             aspectRatio = CGSizeMake(16.0f, 9.0f);
             break;
+        case TOCropViewControllerAspectRatioCustom:
+            aspectRatio = self.customAspectRatio;
+            break;
     }
     
     if (self.cropView.cropBoxAspectRatioIsPortrait && !self.aspectRatioLocked) {
