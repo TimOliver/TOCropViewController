@@ -25,16 +25,16 @@
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
 
-typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
-    TOCropViewControllerAspectRatioOriginal,
-    TOCropViewControllerAspectRatioSquare,
-    TOCropViewControllerAspectRatio3x2,
-    TOCropViewControllerAspectRatio5x3,
-    TOCropViewControllerAspectRatio4x3,
-    TOCropViewControllerAspectRatio5x4,
-    TOCropViewControllerAspectRatio7x5,
-    TOCropViewControllerAspectRatio16x9,
-    TOCropViewControllerAspectRatioCustom
+typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
+    TOCropViewControllerAspectRatioPresetOriginal,
+    TOCropViewControllerAspectRatioPresetSquare,
+    TOCropViewControllerAspectRatioPreset3x2,
+    TOCropViewControllerAspectRatioPreset5x3,
+    TOCropViewControllerAspectRatioPreset4x3,
+    TOCropViewControllerAspectRatioPreset5x4,
+    TOCropViewControllerAspectRatioPreset7x5,
+    TOCropViewControllerAspectRatioPreset16x9,
+    TOCropViewControllerAspectRatioPresetCustom
 };
 
 typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
@@ -126,10 +126,31 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) BOOL showActivitySheetOnDone;
 
 /**
- The default aspect ratio for the crop view, the default value is 
- `TOCropViewControllerAspectRatioOriginal`.
+ A choice from one of the pre-defined aspect ratio presets
  */
-@property (nonatomic, assign) TOCropViewControllerAspectRatio defaultAspectRatio;
+@property (nonatomic, assign) TOCropViewControllerAspectRatioPreset aspectRatioPreset;
+
+/**
+ A CGSize value representing a custom aspect ratio, not listed in the presets.
+ E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
+ 
+ NOTE: You will need to set the
+ */
+@property (nonatomic, assign) CGSize customAspectRatio;
+
+/**
+ If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
+ 
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL aspectRatioLockEnabled;
+
+/** 
+ If true, tapping the reset button will reset the aspect ratio back to the 'original' as part of the reset
+ 
+ Default is YES
+ */
+@property (nonatomic, assign) BOOL resetAspectRatioEnabled;
 
 /**
  The position of the Toolbar the default value is `TOCropViewControllerToolbarPositionBottom`.
@@ -153,17 +174,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) BOOL rotateButtonsHidden;
 
 /**
- If true, the aspect ratio will be locked to the defaultAspectRatio. 
- And, the aspect ratio button won't appear on the toolbar.
+ When enabled, hides the 'Aspect Ratio Picker' button on the toolbar.
+ 
+ Default is NO.
  */
-@property (nonatomic, assign) BOOL aspectRatioLocked;
-
-/**
- The CGSize representing a custom aspect ratio.
-
- NOTE: This property is ignored unless you set defaultAspectRatio to TOCropViewControllerAspectRatioCustom.
- */
-@property (nonatomic, assign) CGSize customAspectRatio;
+@property (nonatomic, assign) BOOL aspectRatioPickerButtonHidden;
 
 /**
  If performing a transition animation, this block can be used to set up any 
@@ -217,6 +232,15 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
  */
 - (void)resetCropViewLayout;
+
+/** 
+ Set the aspect ratio to be one of the available preset options. These presets have specific behaviour
+ such as swapping their dimensions depending on portrait or landscape sized images.
+ 
+ @param aspectRatioPreset The aspect ratio preset
+ @param animated Whether the transition to the aspect ratio is animated
+ */
+- (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated;
 
 /**
  Play a custom animation of the target image zooming to its position in 

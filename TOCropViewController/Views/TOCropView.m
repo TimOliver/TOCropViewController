@@ -96,7 +96,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Reset state data */
 @property (nonatomic, assign) CGSize originalCropBoxSize; /* Save the original crop box size so we can tell when the content has been edited */
 @property (nonatomic, assign) CGPoint originalContentOffset; /* Save the original content offset so we can tell if it's been scrolled. */
-@property (nonatomic, assign, readwrite) BOOL canReset;
+@property (nonatomic, assign, readwrite) BOOL canBeReset;
 
 /* In iOS 9, a new dynamic blur effect became available. */
 @property (nonatomic, assign) BOOL dynamicBlurEffect;
@@ -164,7 +164,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.backgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
     self.cropBoxFrame = CGRectZero;
-    self.resetAspectRatioLockEnabled = (self.croppingStyle != TOCropViewCroppingStyleCircular);
     self.applyInitialCroppedImageFrame = NO;
     self.editing = NO;
     self.cropBoxResizeEnabled = !circularMode;
@@ -885,13 +884,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     [self startEditing];
-    self.canReset = YES;
+    self.canBeReset = YES;
 }
 
 - (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view
 {
     [self startEditing];
-    self.canReset = YES;
+    self.canBeReset = YES;
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
@@ -1106,13 +1105,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     return frame;
 }
 
-- (void)setCanReset:(BOOL)canReset
+- (void)setCanBeReset:(BOOL)canReset
 {
-    if (canReset == _canReset) {
+    if (canReset == _canBeReset) {
         return;
     }
     
-    _canReset = canReset;
+    _canBeReset = canReset;
     
     if (canReset) {
         if ([self.delegate respondsToSelector:@selector(cropViewDidBecomeResettable:)])
@@ -1555,7 +1554,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         canReset = YES;
     }
 
-    self.canReset = canReset;
+    self.canBeReset = canReset;
 }
 
 #pragma mark - Convienience Methods -

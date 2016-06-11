@@ -191,7 +191,7 @@
             cropController.delegate = self;
             
             // Uncomment this to test out locked aspect ratio sizes
-            // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
+             cropController.aspectRatioPreset = TOCropViewControllerAspectRatioPresetSquare;
             // cropController.aspectRatioLocked = YES;
             
             // Uncomment this to place the toolbar at the top of the view controller

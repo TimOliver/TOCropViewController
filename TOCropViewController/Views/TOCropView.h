@@ -68,10 +68,10 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 /**
  Whether the user has manipulated the crop view to the point where it can be reset
  */
-@property (nonatomic, readonly) BOOL canReset;
+@property (nonatomic, readonly) BOOL canBeReset;
 
 /** 
- The frame of the cropping box on the crop view
+ The frame of the cropping box in the coordinate space of the crop view
  */
 @property (nonatomic, readonly) CGRect cropBoxFrame;
 
@@ -92,6 +92,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 
 /**
  A width x height ratio that the crop box will be rescaled to (eg 4:3 is {4.0f, 3.0f})
+ Setting it to CGSizeZero will reset the aspect ratio to the image's own ratio.
  */
 @property (nonatomic, assign) CGSize aspectRatio;
 
