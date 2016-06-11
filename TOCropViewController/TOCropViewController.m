@@ -141,6 +141,8 @@
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     }
+
+    [self setAspectRatio:self.defaultAspectRatio animated:NO];
 }
 
 - (void)viewDidAppear:(BOOL)animated
