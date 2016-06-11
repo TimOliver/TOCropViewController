@@ -33,7 +33,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     TOCropViewControllerAspectRatio4x3,
     TOCropViewControllerAspectRatio5x4,
     TOCropViewControllerAspectRatio7x5,
-    TOCropViewControllerAspectRatio16x9
+    TOCropViewControllerAspectRatio16x9,
+    TOCropViewControllerAspectRatioCustom
 };
 
 typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
@@ -156,6 +157,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  And, the aspect ratio button won't appear on the toolbar.
  */
 @property (nonatomic, assign) BOOL aspectRatioLocked;
+
+/**
+ The CGSize representing a custom aspect ratio.
+
+ NOTE: This property is ignored unless you set defaultAspectRatio to TOCropViewControllerAspectRatioCustom.
+ */
+@property (nonatomic, assign) CGSize customAspectRatio;
 
 /**
  If performing a transition animation, this block can be used to set up any 
