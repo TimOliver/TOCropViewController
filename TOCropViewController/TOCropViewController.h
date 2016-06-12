@@ -141,12 +141,19 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
  
+ If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio
+ button will automatically be hidden from the toolbar.
+ 
  Default is NO.
  */
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /** 
- If true, tapping the reset button will reset the aspect ratio back to the 'original' as part of the reset
+ If true, tapping the reset button will also reset the aspect ratio back to the image
+ default ratio. Otherwise, the reset will just zoom out to the current aspect ratio.
+ 
+ If this is set to NO, and `aspectRatioLockEnabled` is set to YES, then the aspect ratio
+ button will automatically be hidden from the toolbar.
  
  Default is YES
  */

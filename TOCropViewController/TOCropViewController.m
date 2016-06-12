@@ -87,7 +87,6 @@
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
         _rotateClockwiseButtonHidden = YES;
-        _resetAspectRatioEnabled = YES;
     }
     
     return self;
@@ -365,13 +364,9 @@
     
     if (self.resetAspectRatioEnabled == NO) {
         [self.cropView resetLayoutToDefaultAnimated:animated];
-        [self setAspectRatioPreset:self.aspectRatioPreset animated:animated];
-        self.aspectRatioLockEnabled = NO;
     }
     else {
-        self.cropView.aspectRatioLockEnabled = NO;
-        self.toolbar.clampButtonGlowing = NO;
-        
+        self.aspectRatioLockEnabled = NO;
         [self setAspectRatioPreset:TOCropViewControllerAspectRatioPresetOriginal animated:animated];
         [self.cropView resetLayoutToDefaultAnimated:animated];
     }
@@ -764,14 +759,15 @@
 
 - (void)setAspectRatioLockEnabled:(BOOL)aspectRatioLockEnabled
 {
-    if (aspectRatioLockEnabled == _aspectRatioLockEnabled) {
-        return;
-    }
+    self.toolbar.clampButtonGlowing = aspectRatioLockEnabled;
+    self.cropView.aspectRatioLockEnabled = aspectRatioLockEnabled;
     
-    _aspectRatioLockEnabled = aspectRatioLockEnabled;
-    
-    self.toolbar.clampButtonGlowing = _aspectRatioLockEnabled;
-    self.cropView.aspectRatioLockEnabled = _aspectRatioLockEnabled;
+    self.aspectRatioPickerButtonHidden = (aspectRatioLockEnabled && self.resetAspectRatioEnabled == NO);
+}
+
+- (BOOL)aspectRatioLockEnabled
+{
+    return self.cropView.aspectRatioLockEnabled;
 }
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
@@ -804,6 +800,17 @@
 - (BOOL)aspectRatioPickerButtonHidden
 {
     return self.toolbar.clampButtonHidden;
+}
+
+- (void)setResetAspectRatioEnabled:(BOOL)resetAspectRatioEnabled
+{
+    self.cropView.resetAspectRatioEnabled = resetAspectRatioEnabled;
+    self.aspectRatioPickerButtonHidden = (resetAspectRatioEnabled == NO && self.aspectRatioLockEnabled);
+}
+
+- (BOOL)resetAspectRatioEnabled
+{
+    return self.cropView.resetAspectRatioEnabled;
 }
 
 @end
