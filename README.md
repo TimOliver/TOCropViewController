@@ -115,5 +115,7 @@ Since there are two views that are overlaid over the image (A dimming view and a
 
 Thanks also goes to `TOCropViewController`'s growing list of [contributors](https://github.com/TimOliver/TOCropViewController/graphs/contributors)!
 
+iOS Device mockups used in the screenshot created by [Robbie Pearce](http://robbiepearce.com/devices).
+
 ## License
 TOCropViewController is licensed under the MIT License, please see the [LICENSE](LICENSE) file.
