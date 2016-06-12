@@ -103,6 +103,9 @@
 
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
+    self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
+    [self.view addSubview:self.cropView];
+    
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
     
@@ -240,12 +243,24 @@
 
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout
 {
+    //On an iPad, if being presented in a modal view controller by a UINavigationController,
+    //at the time we need it, the size of our view will be incorrect.
+    //If this is the case, derive our view size from our parent view controller instead
+    
+    CGRect bounds = CGRectZero;
+    if (self.parentViewController == nil) {
+        bounds = self.view.bounds;
+    }
+    else {
+        bounds = self.parentViewController.view.bounds;
+    }
+    
     CGRect frame = CGRectZero;
     if (!verticalLayout) {
         frame.origin.x = 44.0f;
         frame.origin.y = 0.0f;
-        frame.size.width = CGRectGetWidth(self.view.bounds) - 44.0f;
-        frame.size.height = CGRectGetHeight(self.view.frame);
+        frame.size.width = CGRectGetWidth(bounds) - 44.0f;
+        frame.size.height = CGRectGetHeight(bounds);
     }
     else {
         frame.origin.x = 0.0f;
@@ -256,8 +271,8 @@
             frame.origin.y = 44.0f;
         }
 
-        frame.size.width = CGRectGetWidth(self.view.bounds);
-        frame.size.height = CGRectGetHeight(self.view.frame) - 44.0f;
+        frame.size.width = CGRectGetWidth(bounds);
+        frame.size.height = CGRectGetHeight(bounds) - 44.0f;
     }
     
     return frame;
@@ -266,13 +281,6 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    
-    //Dumb hack for UINavigationController views returning the incorrect size at creation time
-    //Add the crop view at this point since the sizes should be set by now.
-    if (self.cropView.superview == nil) {
-        self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
-        [self.view addSubview:self.cropView];
-    }
     
     BOOL verticalLayout = CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:verticalLayout];
