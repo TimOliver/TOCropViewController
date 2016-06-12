@@ -1,6 +1,8 @@
 # TOCropViewController
 
-![TOCropViewController](screenshot.jpg)
+<p align="center">
+<img src="https://raw.githubusercontent.com/TimOliver/TODocumentCropViewController/master/screenshot.jpg" width="890" style="margin:0 auto" />
+</p>
 
 [![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
 [![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
@@ -11,6 +13,7 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 
 ## Features
 * Crop images by dragging the edges of a grid overlay.
+* Optionally, crop circular copies of images.
 * Rotate images in 90-degree segments.
 * Clamp the crop box to a specific aspect ratio.
 * A reset button to completely undo all changes.
@@ -18,7 +21,7 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 * The choice of having the controller return the cropped image to a delegate, or immediately pass it to a `UIActivityViewController`.
 * A custom animation and layout when the device is rotated to landscape mode.
 * Custom 'opening' and 'dismissal' animations.
-* Localized in 17 languages.
+* Localized in 18 languages.
 
 ## System Requirements
 iOS 7.0 or above
@@ -55,6 +58,22 @@ Download this project from GitHub, move the subfolder named 'TOWebViewController
   // 'image' is the newly cropped version of the original image
 }
 ```
+
+### Making a Circular Cropped Image
+```objc
+- (void)presentCropViewController
+{
+UIImage *image = ...; //Load an image
+
+TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:image];
+cropViewController.delegate = self;
+[self presentViewController:cropViewController animated:YES completion:nil];
+}
+
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+{
+// 'image' is the newly cropped, circular version of the original image
+}
 
 ### Sharing Cropped Images Via a Share Sheet
 ```objc
