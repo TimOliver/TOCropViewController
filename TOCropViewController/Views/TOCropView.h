@@ -115,7 +115,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 /**
  The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
  */
-@property (nonatomic, assign, readonly) NSInteger angle;
+@property (nonatomic, assign) NSInteger angle;
 
 /**
  Hide all of the crop elements for transition animations 
@@ -123,19 +123,9 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL croppingViewsHidden;
 
 /**
- In relation to the coordinate space of the image, initial value of the frame that the crop view is focusing on
- */
-@property (nonatomic, assign) CGRect initialCroppedImageFrame; /* This is the initial croppedImageFrame, if not provided it's assumed to be the whole image */
-
-/**
- The initial rotation angle of the crop view
- */
-@property (nonatomic, assign) NSInteger initialRotatedAngle; /* This is the initial rotatedAngle such as 90, 180, 270, 360 (also negative). */
-
-/**
  In relation to the coordinate space of the image, the frame that the crop view is focusing on
  */
-@property (nonatomic, readonly) CGRect croppedImageFrame;
+@property (nonatomic, assign) CGRect imageCropFrame;
 
 /**
  Set the grid overlay graphic to be hidden

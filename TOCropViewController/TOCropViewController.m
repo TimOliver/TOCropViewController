@@ -508,7 +508,11 @@
             break;
     }
     
-    if (self.cropView.cropBoxAspectRatioIsPortrait && !self.aspectRatioLockEnabled) {
+    //If the image is a portrait shape, flip the aspect ratio to match
+    if (aspectRatioPreset != TOCropViewControllerAspectRatioPresetCustom &&
+        self.cropView.cropBoxAspectRatioIsPortrait &&
+        !self.aspectRatioLockEnabled)
+    {
         CGFloat width = aspectRatio.width;
         aspectRatio.width = aspectRatio.height;
         aspectRatio.height = width;
@@ -648,7 +652,7 @@
 
 - (void)doneButtonTapped
 {
-    CGRect cropFrame = self.cropView.croppedImageFrame;
+    CGRect cropFrame = self.cropView.imageCropFrame;
     NSInteger angle = self.cropView.angle;
 
     //If desired, when the user taps done, show an activity sheet
@@ -769,7 +773,6 @@
 {
     self.toolbar.clampButtonGlowing = aspectRatioLockEnabled;
     self.cropView.aspectRatioLockEnabled = aspectRatioLockEnabled;
-    
     self.aspectRatioPickerButtonHidden = (aspectRatioLockEnabled && self.resetAspectRatioEnabled == NO);
 }
 
@@ -785,6 +788,15 @@
     if (self.rotateClockwiseButtonHidden == NO) {
         self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
     }
+}
+
+- (BOOL)rotateButtonsHidden
+{
+    if (self.rotateClockwiseButtonHidden == NO) {
+        return self.toolbar.rotateCounterclockwiseButtonHidden && self.toolbar.rotateClockwiseButtonHidden;
+    }
+    
+    return self.toolbar.rotateCounterclockwiseButtonHidden;
 }
 
 - (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
@@ -819,6 +831,26 @@
 - (BOOL)resetAspectRatioEnabled
 {
     return self.cropView.resetAspectRatioEnabled;
+}
+
+- (void)setAngle:(NSInteger)angle
+{
+    self.cropView.angle = angle;
+}
+
+- (NSInteger)angle
+{
+    return self.cropView.angle;
+}
+
+- (void)setImageCropFrame:(CGRect)imageCropFrame
+{
+    self.cropView.imageCropFrame = imageCropFrame;
+}
+
+- (CGRect)imageCropFrame
+{
+    return self.cropView.imageCropFrame;
 }
 
 @end

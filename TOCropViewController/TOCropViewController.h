@@ -99,14 +99,39 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, readonly) UIImage *image;
 
 /**
- The cropping style of this particular crop view controller
+ The view controller's delegate that will return the resulting
+ cropped image, as well as crop information
  */
-@property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
+@property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
+
+/**
+ If true, when the user hits 'Done', a UIActivityController will appear
+ before the view controller ends.
+ */
+@property (nonatomic, assign) BOOL showActivitySheetOnDone;
 
 /**
  The crop view managed by this view controller.
  */
 @property (nonatomic, strong, readonly) TOCropView *cropView;
+
+/** 
+ In the coordinate space of the image itself, the region that is currently
+ being highlighted by the crop box.
+ 
+ This property can be set before the controller is presented to have
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) CGRect imageCropFrame;
+
+/**
+ The angle in which the image is rotated in the crop view.
+ This can only be in 90 degree increments (eg, 0, 90, 180, 270).
+ 
+ This property can be set before the controller is presented to have 
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) NSInteger angle;
 
 /**
  The toolbar view managed by this view controller.
@@ -114,16 +139,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
- The view controller's delegate that will return the resulting 
- cropped image, as well as crop information
+ The cropping style of this particular crop view controller
  */
-@property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
-
-/**
- If true, when the user hits 'Done', a UIActivityController will appear 
- before the view controller ends.
- */
-@property (nonatomic, assign) BOOL showActivitySheetOnDone;
+@property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
 
 /**
  A choice from one of the pre-defined aspect ratio presets
@@ -134,7 +152,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  A CGSize value representing a custom aspect ratio, not listed in the presets.
  E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
  
- NOTE: You will need to set the
+ NOTE: You will need to set `aspectRatioPreset` to 'Custom' for this to be applied
  */
 @property (nonatomic, assign) CGSize customAspectRatio;
 
