@@ -168,7 +168,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.editing = NO;
     self.cropBoxResizeEnabled = !circularMode;
     self.aspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
-    self.resetAspectRatioLockEnabled = !circularMode;
+    self.resetAspectRatioEnabled = !circularMode;
     
     /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
      we'll need to manually check the system version to ensure that it's available. */
@@ -274,9 +274,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     //work out the minimum scale of the object
     CGFloat scale = 0.0f;
-    CGSize cropBoxSize = CGSizeZero;
     
-    // If an aspect ratio was pre-applied to the crop view, use that to work out the minimum scale
+    // Work out the size of the image to fit into the content bounds
+    scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
+    CGSize scaledImageSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
+    
+    // If an aspect ratio was pre-applied to the crop view, use that to work out the minimum scale the image needs to be to fit
+    CGSize cropBoxSize = CGSizeZero;
     if (self.hasAspectRatio) {
         CGFloat ratioScale = (self.aspectRatio.width / self.aspectRatio.height); //Work out the size of the width in relation to height
         CGSize fullSizeRatio = (CGSize){boundsSize.height * ratioScale, boundsSize.height};
@@ -285,13 +289,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         scale = MAX(cropBoxSize.width/imageSize.width, cropBoxSize.height/imageSize.height);
     }
-    else { // By default, calculate the minimum size for the image to fit inside the bounds
-        scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
-    }
-    
-    // The final size, in points the image needs to be to fit our bounds
-    CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
 
+    //Whether aspect ratio, or original, the final image size we'll base the rest of the calculations off
+    CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
+    
     // Configure the scroll view
     self.scrollView.minimumZoomScale = scale;
     self.scrollView.maximumZoomScale = 15.0f;
@@ -374,7 +375,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     //save the size for checking if we're in a resettable state
-    self.originalCropBoxSize = self.cropBoxFrame.size;
+    self.originalCropBoxSize = self.resetAspectRatioEnabled ? scaledImageSize : cropBoxSize;
     self.originalContentOffset = self.scrollView.contentOffset;
     
     [self checkForCanReset];
@@ -692,7 +693,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // If resetting the crop view includes resetting the aspect ratio,
     // reset it to zero here. But set the ivar directly since there's no point
     // in performing the relayout calculations right before a reset.
-    if (self.hasAspectRatio && self.resetAspectRatioLockEnabled) {
+    if (self.hasAspectRatio && self.resetAspectRatioEnabled) {
         _aspectRatio = CGSizeZero;
     }
     

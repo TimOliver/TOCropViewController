@@ -105,7 +105,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  When the user taps 'reset', whether the aspect ratio will also be reset as well
  Default is YES
  */
-@property (nonatomic, assign) BOOL resetAspectRatioLockEnabled;
+@property (nonatomic, assign) BOOL resetAspectRatioEnabled;
 
 /**
  True when the height of the crop box is bigger than the width
