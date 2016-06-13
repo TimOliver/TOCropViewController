@@ -71,10 +71,8 @@
 
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
-    if (image == nil) {
-        return nil;
-    }
-    
+    NSParameterAssert(image);
+
     self = [super init];
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
