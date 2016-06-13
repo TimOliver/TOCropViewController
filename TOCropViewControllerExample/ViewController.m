@@ -190,11 +190,12 @@
             TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
             cropController.delegate = self;
             
-            // Uncomment this to test out locked aspect ratio sizes
-            // cropController.defaultAspectRatio = TOCropViewControllerAspectRatioSquare;
-            // cropController.aspectRatioLocked = YES;
+            // -- Uncomment the following lines of code to test out the aspect ratio features --
+            //cropController.aspectRatioPreset = TOCropViewControllerAspectRatioPresetSquare; //Set the initial aspect ratio as a square
+            //cropController.aspectRatioLockEnabled = YES; // The crop box is locked to the aspect ratio and can't be resized away from it
+            //cropController.resetAspectRatioEnabled = NO; // When tapping 'reset', the aspect ratio will NOT be reset back to default
             
-            // Uncomment this to place the toolbar at the top of the view controller
+            // -- Uncomment this line of code to place the toolbar at the top of the view controller --
             // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
             
             [self presentViewController:cropController animated:YES completion:nil];
