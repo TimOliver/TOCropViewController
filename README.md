@@ -74,6 +74,7 @@ cropViewController.delegate = self;
 {
 // 'image' is the newly cropped, circular version of the original image
 }
+```
 
 ### Sharing Cropped Images Via a Share Sheet
 ```objc
@@ -89,6 +90,7 @@ cropViewController.delegate = self;
 
 ### Presenting With a Custom Animation
 Optionally, `TOCropViewController` also supports a custom presentation animation where an already-visible copy of the image will zoom in to fill the screen.
+
 ```objc
 - (void)presentViewController
 {
