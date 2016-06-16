@@ -40,6 +40,7 @@
 @property (nonatomic, strong) UIView *toolbarSnapshotView;
 
 /* Transition animation controller */
+@property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
 
@@ -543,11 +544,37 @@
 }
 
 #pragma mark - Presentation Handling -
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController fromFrame:(CGRect)frame completion:(void (^)(void))completion
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
 {
-    self.transitionController.image = self.image;
-    self.transitionController.fromFrame = frame;
+    [self presentAnimatedFromParentViewController:viewController
+                                        fromFrame:frame
+                                        fromImage:nil
+                                            angle:0
+                                     toImageFrame:CGRectZero
+                                            setup:setup
+                                       completion:completion];
+}
 
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)fromFrame
+                                      fromImage:(UIImage *)image
+                                          angle:(NSInteger)angle
+                                   toImageFrame:(CGRect)toFrame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
+{
+    self.transitionController.image = image ? image : self.image;
+    self.transitionController.fromFrame = fromFrame;
+    self.prepareForTransitionHandler = setup;
+    
+    if (self.angle != 0 || !CGRectIsEmpty(toFrame)) {
+        self.angle = angle;
+        self.imageCropFrame = toFrame;
+    }
+    
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
         typeof (self) strongSelf = weakSelf;
@@ -556,7 +583,7 @@
         }
         
         [strongSelf.cropView setCroppingViewsHidden:NO animated:YES];
-        if (!CGRectIsEmpty(frame)) {
+        if (!CGRectIsEmpty(fromFrame)) {
             [strongSelf.cropView setGridOverlayHidden:NO animated:YES];
         }
     }];
