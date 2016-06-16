@@ -736,30 +736,29 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     CGRect frame = CGRectZero;
     CGRect bounds = self.contentBounds;
-    CGSize imageSize = self.imageSize;
     
     CGFloat minimumSize = self.scrollView.minimumZoomScale;
-    CGSize scaledCropSize = (CGSize){imageCropframe.size.width * minimumSize, imageCropframe.size.height * minimumSize};
+    CGSize scaledCropSize = (CGSize){floorf(imageCropframe.size.width * minimumSize), floorf(imageCropframe.size.height * minimumSize)};
     
     //Work out the scale needed to fit this crop frame into the bounds
-    CGFloat scale = MIN(scaledCropSize.width / bounds.size.width, imageSize.height / bounds.size.height);
+    CGFloat scale = MAX(scaledCropSize.width / bounds.size.width, scaledCropSize.height / bounds.size.height);
     frame.origin = (CGPoint){imageCropframe.origin.x * scale, imageCropframe.origin.y * scale};
-    frame.size   = (CGSize){floorf(imageCropframe.size.width * scale), floorf(imageCropframe.size.height * scale)};
+    frame.size   = scaledCropSize;
     
     // Work out the necessary scroll offset to center this content
     CGPoint offset = CGPointZero;
     offset.x = floorf(CGRectGetMidX(self.bounds) - frame.origin.x);
     offset.y = floorf(CGRectGetMidY(self.bounds) - frame.origin.y);
     
-    self.scrollView.zoomScale = self.scrollView.minimumZoomScale * scale;
-    self.scrollView.contentOffset = offset;
+    self.scrollView.zoomScale = self.scrollView.minimumZoomScale / scale;
+    //self.scrollView.contentOffset = offset;
     
     //set the crop box
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
     cropBoxFrame.origin.x = floorf((self.bounds.origin.x - frame.size.width) * 0.5f);
     cropBoxFrame.origin.y = floorf((self.bounds.origin.y - frame.size.height) * 0.5f);
-    self.cropBoxFrame = cropBoxFrame;
+    //self.cropBoxFrame = cropBoxFrame;
 }
 
 #pragma mark - Gesture Recognizer -
