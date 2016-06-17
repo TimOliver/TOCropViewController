@@ -47,8 +47,8 @@
         //map the image to a view and then use Core Animation to manipulate its rotation
         if (angle != 0) {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self];
-            imageView.layer.minificationFilter = @"nearest";
-            imageView.layer.magnificationFilter = @"neareset";
+            imageView.layer.minificationFilter = kCAFilterNearest;
+            imageView.layer.magnificationFilter = kCAFilterNearest;
             imageView.transform = CGAffineTransformRotate(CGAffineTransformIdentity, angle * (M_PI/180.0f));
             CGRect rotatedRect = CGRectApplyAffineTransform(imageView.bounds, imageView.transform);
             UIView *containerView = [[UIView alloc] initWithFrame:(CGRect){CGPointZero, rotatedRect.size}];
