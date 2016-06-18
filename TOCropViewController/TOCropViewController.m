@@ -43,6 +43,7 @@
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
+@property (nonatomic, assign) BOOL initialLayout;
 
 /* If pushed from a navigation controller, the visibility of that controller's bars. */
 @property (nonatomic, assign) BOOL navigationBarHidden;
@@ -154,6 +155,7 @@
 {
     [super viewDidAppear:animated];
     self.inTransition = NO;
+    self.cropView.simpleRenderMode = NO;
     if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
         
@@ -631,6 +633,8 @@
     if (self.navigationController) {
         return nil;
     }
+    
+    self.cropView.simpleRenderMode = YES;
     
     __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
