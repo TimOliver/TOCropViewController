@@ -733,32 +733,27 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)updateToImageCropFrame:(CGRect)imageCropframe
 {
-    
-    CGRect frame = CGRectZero;
-    CGRect bounds = self.contentBounds;
-    
+    //Convert the image crop frame's size from image space to the screen space
     CGFloat minimumSize = self.scrollView.minimumZoomScale;
     CGSize scaledCropSize = (CGSize){floorf(imageCropframe.size.width * minimumSize), floorf(imageCropframe.size.height * minimumSize)};
     
-    //Work out the scale needed to fit this crop frame into the bounds
-    CGFloat scale = MAX(scaledCropSize.width / bounds.size.width, scaledCropSize.height / bounds.size.height);
-    frame.origin = (CGPoint){imageCropframe.origin.x * scale, imageCropframe.origin.y * scale};
-    frame.size   = scaledCropSize;
+    // Work out the scale necessary to upscale the crop size to fit the content bounds of the crop bound
+    CGRect bounds = self.contentBounds;
+    CGFloat scale = MIN(bounds.size.width / scaledCropSize.width, bounds.size.height / scaledCropSize.height);
     
-    // Work out the necessary scroll offset to center this content
-    CGPoint offset = CGPointZero;
-    offset.x = floorf(CGRectGetMidX(self.bounds) - frame.origin.x);
-    offset.y = floorf(CGRectGetMidY(self.bounds) - frame.origin.y);
+    // Zoom into the scroll view to the appropriate size
+    self.scrollView.zoomScale = self.scrollView.minimumZoomScale * scale;
     
-    self.scrollView.zoomScale = self.scrollView.minimumZoomScale / scale;
-    //self.scrollView.contentOffset = offset;
+    // Work out the size and offset of the upscaed crop box
+    CGRect frame = CGRectZero;
+    frame.size = (CGSize){floorf(scaledCropSize.width * scale), floorf(scaledCropSize.height * scale)};
     
     //set the crop box
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
-    cropBoxFrame.origin.x = floorf((self.bounds.origin.x - frame.size.width) * 0.5f);
-    cropBoxFrame.origin.y = floorf((self.bounds.origin.y - frame.size.height) * 0.5f);
-    //self.cropBoxFrame = cropBoxFrame;
+    cropBoxFrame.origin.x = floorf((self.bounds.size.width - frame.size.width) * 0.5f);
+    cropBoxFrame.origin.y = floorf((self.bounds.size.height - frame.size.height) * 0.5f);
+    self.cropBoxFrame = cropBoxFrame;
 }
 
 #pragma mark - Gesture Recognizer -
