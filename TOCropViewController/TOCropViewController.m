@@ -550,6 +550,13 @@
 #pragma mark - Presentation Handling -
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
                                       fromFrame:(CGRect)frame
+                                     completion:(void (^)(void))completion
+{
+    [self presentAnimatedFromParentViewController:viewController fromFrame:frame setup:nil completion:completion];
+}
+
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)frame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion
 {
@@ -593,11 +600,16 @@
     }];
 }
 
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController withCroppedImage:(UIImage *)image toFrame:(CGRect)frame completion:(void (^)(void))completion
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                               withCroppedImage:(UIImage *)image
+                                        toFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
 {
-    self.transitionController.image = image;
+    self.transitionController.image = image ? image : self.image;
     self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
     self.transitionController.toFrame = frame;
+    self.prepareForTransitionHandler = setup;
 
     [viewController dismissViewControllerAnimated:YES completion:^ {
         if (completion) {
@@ -606,17 +618,12 @@
     }];
 }
 
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController toFrame:(CGRect)frame completion:(void (^)(void))completion
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                                        toFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
 {
-    self.transitionController.image = self.image;
-    self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.imageViewFrame toView:self.view];
-    self.transitionController.toFrame = frame;
-    
-    [viewController dismissViewControllerAnimated:YES completion:^ {
-        if (completion) {
-            completion();
-        }
-    }];
+    [self dismissAnimatedFromParentViewController:viewController withCroppedImage:nil toFrame:frame setup:setup completion:completion];
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source

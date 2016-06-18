@@ -262,6 +262,18 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 - (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated;
 
 /**
+ Play a custom animation of the target image zooming to its position in
+ the crop controller while the background fades in.
+ 
+ @param viewController The parent controller that this view controller would be presenting from.
+ @param frame In the screen's coordinate space, the frame from which the image should animate from.
+ @param completion A block that is called once the transition animation is completed.
+ */
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)frame
+                                     completion:(void (^)(void))completion;
+
+/**
  Play a custom animation of the target image zooming to its position in 
  the crop controller while the background fades in.
  
@@ -301,30 +313,31 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  Play a custom animation of the supplied cropped image zooming out from 
  the cropped frame to the specified frame as the rest of the content fades out.
- If any view configurations need to be done before the animation starts, 
- please do them in `prepareForTransitionHandler`
+ If any view configurations need to be done before the animation starts,
  
  @param viewController The parent controller that this view controller would be presenting from.
  @param frame The target frame that the image will animate to
+ @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
                                withCroppedImage:(UIImage *)image
                                         toFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;
-
 /**
- Play a custom animation of the supplied cropped image zooming out from 
+ Play a custom animation of the supplied cropped image zooming out from
  the cropped frame to the specified frame as the rest of the content fades out.
- If any view configurations need to be done before the animation starts, 
- please do them in `prepareForTransitionHandler`
+ If any view configurations need to be done before the animation starts,
  
  @param viewController The parent controller that this view controller would be presenting from.
  @param frame The target frame that the image will animate to
+ @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
                                         toFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;
 
 @end
