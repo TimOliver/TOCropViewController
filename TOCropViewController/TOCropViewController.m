@@ -80,6 +80,7 @@
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
+        self.automaticallyAdjustsScrollViewInsets = NO;
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
@@ -158,8 +159,13 @@
     if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
         
-        if (self.cropView.gridOverlayHidden)
+        if (self.cropView.gridOverlayHidden) {
             [self.cropView setGridOverlayHidden:NO animated:YES];
+        }
+        
+        if (self.navigationController == nil) {
+            [self.cropView setBackgroundImageViewHidden:NO animated:YES];
+        }
     }
 }
 

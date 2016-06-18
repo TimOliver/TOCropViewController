@@ -735,7 +735,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     //Convert the image crop frame's size from image space to the screen space
     CGFloat minimumSize = self.scrollView.minimumZoomScale;
-    CGSize scaledCropSize = (CGSize){floorf(imageCropframe.size.width * minimumSize), floorf(imageCropframe.size.height * minimumSize)};
+    CGPoint scaledOffset = (CGPoint){imageCropframe.origin.x * minimumSize, imageCropframe.origin.y * minimumSize};
+    CGSize scaledCropSize = (CGSize){imageCropframe.size.width * minimumSize, imageCropframe.size.height * minimumSize};
     
     // Work out the scale necessary to upscale the crop size to fit the content bounds of the crop bound
     CGRect bounds = self.contentBounds;
@@ -746,14 +747,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // Work out the size and offset of the upscaed crop box
     CGRect frame = CGRectZero;
-    frame.size = (CGSize){floorf(scaledCropSize.width * scale), floorf(scaledCropSize.height * scale)};
+    frame.size = (CGSize){scaledCropSize.width * scale, scaledCropSize.height * scale};
     
     //set the crop box
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
-    cropBoxFrame.origin.x = floorf((self.bounds.size.width - frame.size.width) * 0.5f);
-    cropBoxFrame.origin.y = floorf((self.bounds.size.height - frame.size.height) * 0.5f);
+    cropBoxFrame.origin.x = (self.bounds.size.width - frame.size.width) * 0.5f;
+    cropBoxFrame.origin.y = (self.bounds.size.height - frame.size.height) * 0.5f;
     self.cropBoxFrame = cropBoxFrame;
+    
+    frame.origin.x = (scaledOffset.x * scale) - self.scrollView.contentInset.left;
+    frame.origin.y = (scaledOffset.y * scale) - self.scrollView.contentInset.top;
+    self.scrollView.contentOffset = frame.origin;
 }
 
 #pragma mark - Gesture Recognizer -
@@ -1079,6 +1084,27 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [UIView animateWithDuration:0.4f animations:^{
         [self toggleTranslucencyViewVisible:!hidden];
         self.gridOverlayView.alpha = alpha;
+    }];
+}
+
+- (void)setBackgroundImageViewHidden:(BOOL)hidden animated:(BOOL)animated
+{
+    if (animated == NO) {
+        self.backgroundImageView.hidden = hidden;
+        return;
+    }
+    
+    CGFloat beforeAlpha = hidden ? 1.0f : 0.0f;
+    CGFloat toAlpha = hidden ? 0.0f : 1.0f;
+    
+    self.backgroundImageView.hidden = NO;
+    self.backgroundImageView.alpha = beforeAlpha;
+    [UIView animateWithDuration:0.5f animations:^{
+        self.backgroundImageView.alpha = toAlpha;
+    }completion:^(BOOL complete) {
+        if (hidden) {
+            self.backgroundImageView.hidden = YES;
+        }
     }];
 }
 

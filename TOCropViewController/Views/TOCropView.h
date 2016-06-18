@@ -206,6 +206,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 - (void)setCroppingViewsHidden:(BOOL)hidden animated:(BOOL)animated;
 
 /**
+ Animate the background image view to become visible
+ */
+- (void)setBackgroundImageViewHidden:(BOOL)hidden animated:(BOOL)animated;
+
+/**
  When triggered, the crop view will perform a relayout to ensure the crop box
  fills the entire crop view region
  */

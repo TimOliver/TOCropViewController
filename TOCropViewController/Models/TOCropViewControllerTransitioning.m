@@ -68,7 +68,11 @@
         [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
             imageView.frame = self.toFrame;
         } completion:^(BOOL complete) {
-            [imageView removeFromSuperview];
+            [UIView animateWithDuration:0.5f animations:^{
+                imageView.alpha = 0.0f;
+            }completion:^(BOOL complete) {
+                [imageView removeFromSuperview];
+            }];
         }];
     }
     
