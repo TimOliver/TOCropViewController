@@ -99,14 +99,39 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, readonly) UIImage *image;
 
 /**
- The cropping style of this particular crop view controller
+ The view controller's delegate that will return the resulting
+ cropped image, as well as crop information
  */
-@property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
+@property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
+
+/**
+ If true, when the user hits 'Done', a UIActivityController will appear
+ before the view controller ends.
+ */
+@property (nonatomic, assign) BOOL showActivitySheetOnDone;
 
 /**
  The crop view managed by this view controller.
  */
 @property (nonatomic, strong, readonly) TOCropView *cropView;
+
+/** 
+ In the coordinate space of the image itself, the region that is currently
+ being highlighted by the crop box.
+ 
+ This property can be set before the controller is presented to have
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) CGRect imageCropFrame;
+
+/**
+ The angle in which the image is rotated in the crop view.
+ This can only be in 90 degree increments (eg, 0, 90, 180, 270).
+ 
+ This property can be set before the controller is presented to have 
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) NSInteger angle;
 
 /**
  The toolbar view managed by this view controller.
@@ -114,16 +139,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
- The view controller's delegate that will return the resulting 
- cropped image, as well as crop information
+ The cropping style of this particular crop view controller
  */
-@property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
-
-/**
- If true, when the user hits 'Done', a UIActivityController will appear 
- before the view controller ends.
- */
-@property (nonatomic, assign) BOOL showActivitySheetOnDone;
+@property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
 
 /**
  A choice from one of the pre-defined aspect ratio presets
@@ -134,7 +152,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  A CGSize value representing a custom aspect ratio, not listed in the presets.
  E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
  
- NOTE: You will need to set the
+ NOTE: You will need to set `aspectRatioPreset` to 'Custom' for this to be applied
  */
 @property (nonatomic, assign) CGSize customAspectRatio;
 
@@ -186,12 +204,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  Default is NO.
  */
 @property (nonatomic, assign) BOOL aspectRatioPickerButtonHidden;
-
-/**
- If performing a transition animation, this block can be used to set up any 
- view states just before the animation begins.
- */
-@property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 
 /** 
  If `showActivitySheetOnDone` is true, then these activity items will 
@@ -252,14 +264,39 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  Play a custom animation of the target image zooming to its position in 
  the crop controller while the background fades in.
- If any view configurations need to be done before the animation 
- starts, please do them in `prepareForTransitionHandler`
  
  @param viewController The parent controller that this view controller would be presenting from.
  @param frame In the screen's coordinate space, the frame from which the image should animate from.
+ @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController fromFrame:(CGRect)frame completion:(void (^)(void))completion;
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion;
+
+/**
+ Play a custom animation of the target image zooming to its position in
+ the crop controller while the background fades in. Additionally, if you're 
+ 'restoring' to a previous crop setup, this method lets you provide a previously
+ cropped copy of the image, and the previous crop settings to transition back to
+ where the user would have left off.
+ 
+ @param viewController The parent controller that this view controller would be presenting from.
+ @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
+ @param fromImage The previously cropped image that can be used in the transition animation.
+ @param angle The rotation angle in which the image was rotated when it was originally cropped.
+ @param toImageFrame In the image's coordinate space, the previous crop frame that created the previous crop
+ @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
+ @param completion A block that is called once the transition animation is completed.
+ */
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)fromFrame
+                                      fromImage:(UIImage *)image
+                                          angle:(NSInteger)angle
+                                   toImageFrame:(CGRect)toFrame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion;
 
 /**
  Play a custom animation of the supplied cropped image zooming out from 
@@ -271,7 +308,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param frame The target frame that the image will animate to
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController withCroppedImage:(UIImage *)image toFrame:(CGRect)frame completion:(void (^)(void))completion;
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                               withCroppedImage:(UIImage *)image
+                                        toFrame:(CGRect)frame
+                                     completion:(void (^)(void))completion;
 
 /**
  Play a custom animation of the supplied cropped image zooming out from 
@@ -283,7 +323,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param frame The target frame that the image will animate to
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController toFrame:(CGRect)frame completion:(void (^)(void))completion;
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                                        toFrame:(CGRect)frame
+                                     completion:(void (^)(void))completion;
 
 @end
 

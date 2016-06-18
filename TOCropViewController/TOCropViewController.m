@@ -40,6 +40,7 @@
 @property (nonatomic, strong) UIView *toolbarSnapshotView;
 
 /* Transition animation controller */
+@property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
 
@@ -77,6 +78,7 @@
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
+        self.automaticallyAdjustsScrollViewInsets = NO;
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
@@ -155,8 +157,13 @@
     if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
         
-        if (self.cropView.gridOverlayHidden)
+        if (self.cropView.gridOverlayHidden) {
             [self.cropView setGridOverlayHidden:NO animated:YES];
+        }
+        
+        if (self.navigationController == nil) {
+            [self.cropView setBackgroundImageViewHidden:NO animated:YES];
+        }
     }
 }
 
@@ -506,7 +513,11 @@
             break;
     }
     
-    if (self.cropView.cropBoxAspectRatioIsPortrait && !self.aspectRatioLockEnabled) {
+    //If the image is a portrait shape, flip the aspect ratio to match
+    if (aspectRatioPreset != TOCropViewControllerAspectRatioPresetCustom &&
+        self.cropView.cropBoxAspectRatioIsPortrait &&
+        !self.aspectRatioLockEnabled)
+    {
         CGFloat width = aspectRatio.width;
         aspectRatio.width = aspectRatio.height;
         aspectRatio.height = width;
@@ -537,11 +548,37 @@
 }
 
 #pragma mark - Presentation Handling -
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController fromFrame:(CGRect)frame completion:(void (^)(void))completion
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
 {
-    self.transitionController.image = self.image;
-    self.transitionController.fromFrame = frame;
+    [self presentAnimatedFromParentViewController:viewController
+                                        fromFrame:frame
+                                        fromImage:nil
+                                            angle:0
+                                     toImageFrame:CGRectZero
+                                            setup:setup
+                                       completion:completion];
+}
 
+- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
+                                      fromFrame:(CGRect)fromFrame
+                                      fromImage:(UIImage *)image
+                                          angle:(NSInteger)angle
+                                   toImageFrame:(CGRect)toFrame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
+{
+    self.transitionController.image = image ? image : self.image;
+    self.transitionController.fromFrame = fromFrame;
+    self.prepareForTransitionHandler = setup;
+    
+    if (self.angle != 0 || !CGRectIsEmpty(toFrame)) {
+        self.angle = angle;
+        self.imageCropFrame = toFrame;
+    }
+    
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
         typeof (self) strongSelf = weakSelf;
@@ -550,7 +587,7 @@
         }
         
         [strongSelf.cropView setCroppingViewsHidden:NO animated:YES];
-        if (!CGRectIsEmpty(frame)) {
+        if (!CGRectIsEmpty(fromFrame)) {
             [strongSelf.cropView setGridOverlayHidden:NO animated:YES];
         }
     }];
@@ -646,7 +683,7 @@
 
 - (void)doneButtonTapped
 {
-    CGRect cropFrame = self.cropView.croppedImageFrame;
+    CGRect cropFrame = self.cropView.imageCropFrame;
     NSInteger angle = self.cropView.angle;
 
     //If desired, when the user taps done, show an activity sheet
@@ -767,7 +804,6 @@
 {
     self.toolbar.clampButtonGlowing = aspectRatioLockEnabled;
     self.cropView.aspectRatioLockEnabled = aspectRatioLockEnabled;
-    
     self.aspectRatioPickerButtonHidden = (aspectRatioLockEnabled && self.resetAspectRatioEnabled == NO);
 }
 
@@ -783,6 +819,15 @@
     if (self.rotateClockwiseButtonHidden == NO) {
         self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
     }
+}
+
+- (BOOL)rotateButtonsHidden
+{
+    if (self.rotateClockwiseButtonHidden == NO) {
+        return self.toolbar.rotateCounterclockwiseButtonHidden && self.toolbar.rotateClockwiseButtonHidden;
+    }
+    
+    return self.toolbar.rotateCounterclockwiseButtonHidden;
 }
 
 - (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
@@ -817,6 +862,26 @@
 - (BOOL)resetAspectRatioEnabled
 {
     return self.cropView.resetAspectRatioEnabled;
+}
+
+- (void)setAngle:(NSInteger)angle
+{
+    self.cropView.angle = angle;
+}
+
+- (NSInteger)angle
+{
+    return self.cropView.angle;
+}
+
+- (void)setImageCropFrame:(CGRect)imageCropFrame
+{
+    self.cropView.imageCropFrame = imageCropFrame;
+}
+
+- (CGRect)imageCropFrame
+{
+    return self.cropView.imageCropFrame;
 }
 
 @end
