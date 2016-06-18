@@ -200,7 +200,7 @@
 
 - (BOOL)prefersStatusBarHidden
 {
-    //If we belong to a UINavigationController, defer to its status bar style
+    //If we belong to a UINavigationController, defer to its own status bar style
     if (self.navigationController) {
         return self.navigationController.prefersStatusBarHidden;
     }
@@ -609,7 +609,7 @@
                                      completion:(void (^)(void))completion
 {
     self.transitionController.image = image ? image : self.image;
-    self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
+    self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.imageViewFrame toView:self.view];
     self.transitionController.toFrame = frame;
     self.prepareForTransitionHandler = setup;
 
