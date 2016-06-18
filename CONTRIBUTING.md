@@ -11,6 +11,8 @@ If you've added or changed a feature that directly involves any UI layout, pleas
 * Presenting the view controller, then enabling split-screen on an iPad.
 * Changing the split-screen window sizes on iPad.
 
+If possible, please file an issue before filing a PR to discuss the feature you'd like to add. To ensure the quality of this view controller library doesn't dip, I plan to be very strict about the level of reliability and thoroughness of any code submitted through a PR. :)
+
 ## Submitting an Issue
 I've included all of the essential tips for filing comprehensive issues directly in the [issues template](/TimOliver/TOCropViewController/blob/master/ISSUE_TEMPLATE.md). Please read that document and follow it as closely as you can when filing new issues.
 
