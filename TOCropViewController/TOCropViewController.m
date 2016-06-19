@@ -551,37 +551,28 @@
 
 #pragma mark - Presentation Handling -
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)frame
-                                     completion:(void (^)(void))completion
-{
-    [self presentAnimatedFromParentViewController:viewController fromFrame:frame setup:nil completion:completion];
-}
-
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)frame
+                                       fromView:(UIView *)fromView
+                                      fromFrame:(CGRect)fromFrame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion
 {
-    [self presentAnimatedFromParentViewController:viewController
-                                        fromFrame:frame
-                                        fromImage:nil
-                                            angle:0
-                                     toImageFrame:CGRectZero
-                                            setup:setup
-                                       completion:completion];
+    [self presentAnimatedFromParentViewController:viewController fromImage:nil fromView:fromView fromFrame:fromFrame
+                                            angle:0 toImageFrame:CGRectZero setup:setup completion:nil];
 }
 
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)fromFrame
                                       fromImage:(UIImage *)image
+                                       fromView:(UIView *)fromView
+                                      fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
                                    toImageFrame:(CGRect)toFrame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion
 {
-    self.transitionController.image = image ? image : self.image;
+    self.transitionController.image     = image ? image : self.image;
     self.transitionController.fromFrame = fromFrame;
-    self.prepareForTransitionHandler = setup;
+    self.transitionController.fromView  = fromView;
+    self.prepareForTransitionHandler    = setup;
     
     if (self.angle != 0 || !CGRectIsEmpty(toFrame)) {
         self.angle = angle;
@@ -603,29 +594,40 @@
 }
 
 - (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
-                               withCroppedImage:(UIImage *)image
+                                         toView:(UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion
 {
-    self.transitionController.image = image ? image : self.image;
-    self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.imageViewFrame toView:self.view];
-    self.transitionController.toFrame = frame;
-    self.prepareForTransitionHandler = setup;
+    [self dismissAnimatedFromParentViewController:viewController withCroppedImage:nil toView:toView toFrame:frame setup:setup completion:completion];
+}
+
+- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                               withCroppedImage:(UIImage *)image
+                                         toView:(UIView *)toView
+                                        toFrame:(CGRect)frame
+                                          setup:(void (^)(void))setup
+                                     completion:(void (^)(void))completion
+{
+    // If a cropped image was supplied, use that, and only zoom out from the crop box
+    if (image) {
+        self.transitionController.image     = image ? image : self.image;
+        self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
+    }
+    else { // else use the main image, and zoom out from its entirety
+        self.transitionController.image     = self.image;
+        self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.imageViewFrame toView:self.view];
+    }
+    
+    self.transitionController.toView    = toView;
+    self.transitionController.toFrame   = frame;
+    self.prepareForTransitionHandler    = setup;
 
     [viewController dismissViewControllerAnimated:YES completion:^ {
         if (completion) {
             completion();
         }
     }];
-}
-
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
-                                        toFrame:(CGRect)frame
-                                          setup:(void (^)(void))setup
-                                     completion:(void (^)(void))completion
-{
-    [self dismissAnimatedFromParentViewController:viewController withCroppedImage:nil toFrame:frame setup:setup completion:completion];
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source
@@ -639,10 +641,13 @@
     __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
         typeof (self) strongSelf = weakSelf;
-        strongSelf.transitionController.toFrame = [strongSelf.cropView convertRect:strongSelf.cropView.cropBoxFrame toView:strongSelf.view];
-        if (!CGRectIsEmpty(strongSelf.transitionController.fromFrame))
-            strongSelf.cropView.croppingViewsHidden = YES;
+        TOCropViewControllerTransitioning *transitioning = strongSelf.transitionController;
         
+        transitioning.toFrame = [strongSelf.cropView convertRect:strongSelf.cropView.cropBoxFrame toView:strongSelf.view];
+        if (!CGRectIsEmpty(transitioning.fromFrame) || transitioning.fromView) {
+            strongSelf.cropView.croppingViewsHidden = YES;
+        }
+
         if (strongSelf.prepareForTransitionHandler)
             strongSelf.prepareForTransitionHandler();
         
@@ -662,7 +667,9 @@
     __weak typeof (self) weakSelf = self;
     self.transitionController.prepareForTransitionHandler = ^{
         typeof (self) strongSelf = weakSelf;
-        if (!CGRectIsEmpty(strongSelf.transitionController.toFrame))
+        TOCropViewControllerTransitioning *transitioning = strongSelf.transitionController;
+        
+        if (!CGRectIsEmpty(transitioning.toFrame) || transitioning.toView)
             strongSelf.cropView.croppingViewsHidden = YES;
         else
             strongSelf.cropView.simpleRenderMode = YES;

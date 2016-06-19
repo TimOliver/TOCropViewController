@@ -263,27 +263,17 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 
 /**
  Play a custom animation of the target image zooming to its position in
- the crop controller while the background fades in.
+ the crop controller while the background fades in. 
  
  @param viewController The parent controller that this view controller would be presenting from.
- @param frame In the screen's coordinate space, the frame from which the image should animate from.
- @param completion A block that is called once the transition animation is completed.
- */
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)frame
-                                     completion:(void (^)(void))completion;
-
-/**
- Play a custom animation of the target image zooming to its position in 
- the crop controller while the background fades in.
- 
- @param viewController The parent controller that this view controller would be presenting from.
- @param frame In the screen's coordinate space, the frame from which the image should animate from.
+ @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
+ @param fromFrame In the screen's coordinate space, the frame from which the image should animate from. Optional if `fromView` has a value.
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)frame
+                                       fromView:(UIView *)fromView
+                                      fromFrame:(CGRect)fromFrame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;
 
@@ -295,47 +285,56 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  where the user would have left off.
  
  @param viewController The parent controller that this view controller would be presenting from.
- @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param fromImage The previously cropped image that can be used in the transition animation.
+ @param fromView A view that's frame will be used as the origin for this animation
+ @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
  @param toImageFrame In the image's coordinate space, the previous crop frame that created the previous crop
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromFrame:(CGRect)fromFrame
                                       fromImage:(UIImage *)image
+                                       fromView:(UIView *)fromView
+                                      fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
                                    toImageFrame:(CGRect)toFrame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;
 
 /**
- Play a custom animation of the supplied cropped image zooming out from 
+ Play a custom animation of the supplied cropped image zooming out from
  the cropped frame to the specified frame as the rest of the content fades out.
  If any view configurations need to be done before the animation starts,
  
  @param viewController The parent controller that this view controller would be presenting from.
+ @param image The image that will be played in the transition. If nil, the cropper's image will be used.
+ @param toView A view who's frame will be used to establish the destination frame
  @param frame The target frame that the image will animate to
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
-                               withCroppedImage:(UIImage *)image
+                                         toView:(UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;
+
 /**
  Play a custom animation of the supplied cropped image zooming out from
  the cropped frame to the specified frame as the rest of the content fades out.
  If any view configurations need to be done before the animation starts,
  
  @param viewController The parent controller that this view controller would be presenting from.
+ @param image The resulting 'cropped' image. If supplied, will animate out of the crop box zone. If nil, the default image will entirely zoom out
+ @param toView A view who's frame will be used to establish the destination frame
  @param frame The target frame that the image will animate to
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
 - (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
+                               withCroppedImage:(UIImage *)image
+                                         toView:(UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion;

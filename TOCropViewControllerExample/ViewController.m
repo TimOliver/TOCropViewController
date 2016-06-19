@@ -80,8 +80,9 @@
     cropController.delegate = self;
     CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
     [cropController presentAnimatedFromParentViewController:self
-                                                  fromFrame:viewFrame
                                                   fromImage:self.imageView.image
+                                                   fromView:nil
+                                                  fromFrame:viewFrame
                                                       angle:self.angle
                                                toImageFrame:self.croppedFrame
                                                       setup:^{ self.imageView.hidden = YES; }
@@ -111,9 +112,14 @@
     self.navigationItem.rightBarButtonItem.enabled = YES;
     
     if (cropViewController.croppingStyle != TOCropViewCroppingStyleCircular) {
-        CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
         self.imageView.hidden = YES;
-        [cropViewController dismissAnimatedFromParentViewController:self withCroppedImage:image toFrame:viewFrame setup:nil completion:^{
+        [cropViewController dismissAnimatedFromParentViewController:self
+                                                   withCroppedImage:image
+                                                             toView:self.imageView
+                                                            toFrame:CGRectZero
+                                                              setup:^{ [self layoutImageView]; }
+                                                         completion:
+         ^{
             self.imageView.hidden = NO;
         }];
     }
@@ -123,7 +129,6 @@
     }
 }
 
-
 #pragma mark - Image Layout -
 - (void)layoutImageView
 {
@@ -132,7 +137,7 @@
     
     CGFloat padding = 20.0f;
     
-    CGRect viewFrame = self.view.frame;
+    CGRect viewFrame = self.view.bounds;
     viewFrame.size.width -= (padding * 2.0f);
     viewFrame.size.height -= ((padding * 2.0f));
     
