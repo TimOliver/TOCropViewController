@@ -570,7 +570,7 @@
     
     _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
     
-    if (_rotateClockwiseButton == NO) {
+    if (_rotateClockwiseButtonHidden == NO) {
         _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
         _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
         _rotateClockwiseButton.tintColor = [UIColor whiteColor];
