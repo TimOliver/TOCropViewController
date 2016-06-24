@@ -49,6 +49,9 @@
 @property (nonatomic, assign) BOOL navigationBarHidden;
 @property (nonatomic, assign) BOOL toolbarHidden;
 
+/* Save status bar hidden before showing this view controller to restore after dismissing. */
+@property (nonatomic, assign) BOOL statusBarWasHidden;
+
 /* On iOS 7, the popover view controller that appears when tapping 'Done' */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -133,7 +136,13 @@
     
     if (animated) {
         self.inTransition = YES;
-        [self setNeedsStatusBarAppearanceUpdate];
+        if (self.forceHideStatusBar) {
+          self.statusBarWasHidden = [UIApplication sharedApplication].statusBarHidden;
+          [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                                  withAnimation:UIStatusBarAnimationSlide];
+        } else {
+          [self setNeedsStatusBarAppearanceUpdate];
+        }
     }
     
     if (self.navigationController) {
@@ -157,8 +166,10 @@
     self.inTransition = NO;
     self.cropView.simpleRenderMode = NO;
     if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
-        [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
-        
+        if (!self.forceHideStatusBar) {
+          [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+        }
+
         if (self.cropView.gridOverlayHidden) {
             [self.cropView setGridOverlayHidden:NO animated:YES];
         }
@@ -173,8 +184,13 @@
 {
     [super viewWillDisappear:animated];
     self.inTransition = YES;
-    [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
-    
+    if (self.forceHideStatusBar) {
+      [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarWasHidden
+                                              withAnimation:UIStatusBarAnimationSlide];
+    } else {
+      [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+    }
+
     if (self.navigationController) {
         [self.navigationController setNavigationBarHidden:self.navigationBarHidden animated:animated];
         [self.navigationController setToolbarHidden:self.toolbarHidden animated:animated];
@@ -185,7 +201,9 @@
 {
     [super viewDidDisappear:animated];
     self.inTransition = NO;
-    [self setNeedsStatusBarAppearanceUpdate];
+    if (!self.forceHideStatusBar) {
+      [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 #pragma mark - Status Bar -

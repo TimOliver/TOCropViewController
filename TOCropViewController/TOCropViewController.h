@@ -111,6 +111,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) BOOL showActivitySheetOnDone;
 
 /**
+  If true, controller force hides status bar.
+ Use this property when need hidden status bar when in info.plist
+ UIViewControllerBasedStatusBarAppearance = NO.
+ */
+@property (nonatomic, assign) BOOL forceHideStatusBar;
+
+/**
  The crop view managed by this view controller.
  */
 @property (nonatomic, strong, readonly) TOCropView *cropView;
