@@ -35,9 +35,16 @@ Add the following to your Podfile:
 pod 'TOCropViewController'
 ```
 
+#### As a Carthage Dependency
+
+Add the following to your Cartfile:
+``` 
+github "https://github.com/TimOliver/TOCropViewController"
+```
+
 #### Manual Installation
 
-Download this project from GitHub, move the subfolder named 'TOWebViewController' over to your project folder, and drag it into your Xcode project.
+Download this project from GitHub, move the subfolder named 'TOCropViewController' over to your project folder, and drag it into your Xcode project.
 
 ## Examples
 `TOCropViewController` operates around a very strict modal implemention. It cannot be pushed to a `UINavigationController` stack, and must be presented as a full-screen dialog on an existing view controller.
