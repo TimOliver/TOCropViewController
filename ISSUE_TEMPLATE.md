@@ -28,7 +28,7 @@ What is the outcome result you want to achieve with this library?
 
 ## Expected Results
 
-What did you expected to happen?
+What did you expect to happen?
 
 ## Actual Results
 

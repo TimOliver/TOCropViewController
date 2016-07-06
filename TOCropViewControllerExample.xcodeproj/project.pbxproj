@@ -25,6 +25,7 @@
 		144B8CE11D22CD730085D774 /* TOCropView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D951B234D07008B8466 /* TOCropView.m */; };
 		144B8CE21D22CD730085D774 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		144B8CE41D22CE0D0085D774 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 144B8CE31D22CE0D0085D774 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		146EFFB61D243822006CE3A0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 146EFFB51D243822006CE3A0 /* Info.plist */; };
 		2206119C1B2E6777001A467B /* TOCropViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */; };
 		223424701ABBC0CD00BBC2B1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2234246F1ABBC0CD00BBC2B1 /* main.m */; };
 		223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424721ABBC0CD00BBC2B1 /* AppDelegate.m */; };
@@ -57,6 +58,7 @@
 /* Begin PBXFileReference section */
 		144B8CC91D22CAFF0085D774 /* TOCropViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TOCropViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		144B8CE31D22CE0D0085D774 /* TOCropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCropViewController.h; sourceTree = "<group>"; };
+		146EFFB51D243822006CE3A0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		15E30F151B47A2660099A975 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOCropViewControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2206119A1B2E6777001A467B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				144B8CE31D22CE0D0085D774 /* TOCropViewController.h */,
 				22DB4D831B234CFA008B8466 /* TOCropViewController.m */,
 				22C3C5491AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings */,
+				146EFFB51D243822006CE3A0 /* Info.plist */,
 			);
 			path = TOCropViewController;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				146EFFB61D243822006CE3A0 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,7 +512,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = TOCropViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -531,7 +535,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = TOCropViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -706,6 +710,7 @@
 				144B8CCF1D22CAFF0085D774 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		220611A11B2E6777001A467B /* Build configuration list for PBXNativeTarget "TOCropViewControllerTests" */ = {
 			isa = XCConfigurationList;
