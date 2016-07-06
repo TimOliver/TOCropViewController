@@ -55,9 +55,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  Called when the user has committed the crop action, and provides 
  just the cropping rectangle.
- 
- @param image The newly cropped image.
+
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+ @param angle The angle of the image when it was cropped
  */
 - (void)cropViewController:(TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle;
 
@@ -285,11 +285,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  where the user would have left off.
  
  @param viewController The parent controller that this view controller would be presenting from.
- @param fromImage The previously cropped image that can be used in the transition animation.
+ @param image The previously cropped image that can be used in the transition animation.
  @param fromView A view that's frame will be used as the origin for this animation
  @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
- @param toImageFrame In the image's coordinate space, the previous crop frame that created the previous crop
+ @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
@@ -308,7 +308,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  If any view configurations need to be done before the animation starts,
  
  @param viewController The parent controller that this view controller would be presenting from.
- @param image The image that will be played in the transition. If nil, the cropper's image will be used.
  @param toView A view who's frame will be used to establish the destination frame
  @param frame The target frame that the image will animate to
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.

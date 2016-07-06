@@ -182,7 +182,6 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 /**
  Rotates the entire canvas to a 90-degree angle. The default rotation is counterclockwise.
  
- @param angle The angle in which to rotate (May be 0, 90, 180, 270)
  @param animated Whether the transition is animated
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
