@@ -151,8 +151,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  A CGSize value representing a custom aspect ratio, not listed in the presets.
  E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
- 
- NOTE: You will need to set `aspectRatioPreset` to 'Custom' for this to be applied
  */
 @property (nonatomic, assign) CGSize customAspectRatio;
 
@@ -286,7 +284,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  @param viewController The parent controller that this view controller would be presenting from.
  @param image The previously cropped image that can be used in the transition animation.
- @param fromView A view that's frame will be used as the origin for this animation
+ @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
  @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
  @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop

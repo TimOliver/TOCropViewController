@@ -145,6 +145,9 @@
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     }
+    else {
+        [self.cropView setBackgroundImageViewHidden:YES animated:NO];
+    }
 
     if (self.aspectRatioPreset != TOCropViewControllerAspectRatioPresetOriginal) {
         [self setAspectRatioPreset:self.aspectRatioPreset animated:NO];
@@ -377,14 +380,11 @@
 {
     BOOL animated = (self.cropView.angle == 0);
     
-    if (self.resetAspectRatioEnabled == NO) {
-        [self.cropView resetLayoutToDefaultAnimated:animated];
-    }
-    else {
+    if (self.resetAspectRatioEnabled) {
         self.aspectRatioLockEnabled = NO;
-        [self setAspectRatioPreset:TOCropViewControllerAspectRatioPresetOriginal animated:animated];
-        [self.cropView resetLayoutToDefaultAnimated:animated];
     }
+    
+    [self.cropView resetLayoutToDefaultAnimated:animated];
 }
 
 #pragma mark - Aspect Ratio Handling -
@@ -484,6 +484,8 @@
 - (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated
 {
     CGSize aspectRatio = CGSizeZero;
+    
+    _aspectRatioPreset = aspectRatioPreset;
     
     switch (aspectRatioPreset) {
         case TOCropViewControllerAspectRatioPresetOriginal:
@@ -875,6 +877,12 @@
 {
     self.cropView.resetAspectRatioEnabled = resetAspectRatioEnabled;
     self.aspectRatioPickerButtonHidden = (resetAspectRatioEnabled == NO && self.aspectRatioLockEnabled);
+}
+
+- (void)setCustomAspectRatio:(CGSize)customAspectRatio
+{
+    _customAspectRatio = customAspectRatio;
+    [self setAspectRatioPreset:TOCropViewControllerAspectRatioPresetCustom animated:NO];
 }
 
 - (BOOL)resetAspectRatioEnabled
