@@ -284,7 +284,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  @param viewController The parent controller that this view controller would be presenting from.
  @param image The previously cropped image that can be used in the transition animation.
- @param fromView A view that's frame will be used as the origin for this animation
+ @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
  @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
  @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop
