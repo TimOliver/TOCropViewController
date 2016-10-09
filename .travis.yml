@@ -2,4 +2,4 @@ language: objective-c
 osx_image: xcode8
 xcode_project: TOCropViewControllerExample.xcodeproj
 xcode_scheme: TOCropViewControllerTests
-script: xctool -project TOCropViewControllerExample.xcodeproj -scheme TOCropViewControllerTests -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+script: set -o pipefail && xcodebuild -project "TOCropViewControllerExample.xcodeproj" -scheme "TOCropViewControllerTests" clean test | xcpretty
