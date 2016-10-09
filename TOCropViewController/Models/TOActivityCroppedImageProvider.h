@@ -24,11 +24,11 @@
 
 @interface TOActivityCroppedImageProvider : UIActivityItemProvider
 
-@property (nonatomic, readonly) UIImage *image;
+@property (nonnull, nonatomic, readonly) UIImage *image;
 @property (nonatomic, readonly) CGRect cropFrame;
 @property (nonatomic, readonly) NSInteger angle;
 @property (nonatomic, readonly) BOOL circular;
 
-- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular;
+- (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular;
 
 @end

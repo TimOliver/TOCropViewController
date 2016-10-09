@@ -59,7 +59,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle;
 
 /**
  Called when the user has committed the crop action, and provides 
@@ -69,7 +69,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
 
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
@@ -79,7 +79,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
 
 /**
  If implemented, when the user hits cancel, or completes a 
@@ -87,7 +87,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  giving you a chance to manually dismiss the view controller
  
  */
-- (void)cropViewController:(TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled;
 
 @end
 
@@ -96,13 +96,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  The original, uncropped image that was passed to this controller.
  */
-@property (nonatomic, readonly) UIImage *image;
+@property (nonnull, nonatomic, readonly) UIImage *image;
 
 /**
  The view controller's delegate that will return the resulting
  cropped image, as well as crop information
  */
-@property (nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
+@property (nullable, nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
 
 /**
  If true, when the user hits 'Done', a UIActivityController will appear
@@ -113,7 +113,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  The crop view managed by this view controller.
  */
-@property (nonatomic, strong, readonly) TOCropView *cropView;
+@property (nonnull, nonatomic, strong, readonly) TOCropView *cropView;
 
 /** 
  In the coordinate space of the image itself, the region that is currently
@@ -136,7 +136,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  The toolbar view managed by this view controller.
  */
-@property (nonatomic, strong, readonly) TOCropToolbar *toolbar;
+@property (nonnull, nonatomic, strong, readonly) TOCropToolbar *toolbar;
 
 /**
  The cropping style of this particular crop view controller
@@ -208,7 +208,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  be supplied to that UIActivityViewController in addition to the 
  `TOActivityCroppedImageProvider` object.
  */
-@property (nonatomic, strong) NSArray *activityItems;
+@property (nullable, nonatomic, strong) NSArray *activityItems;
 
 /**
  If `showActivitySheetOnDone` is true, then you may specify any 
@@ -216,13 +216,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  access to the cropping information, it can be accessed in the supplied 
  `TOActivityCroppedImageProvider` object
  */
-@property (nonatomic, strong) NSArray *applicationActivities;
+@property (nullable, nonatomic, strong) NSArray *applicationActivities;
 
 /**
  If `showActivitySheetOnDone` is true, then you may expliclty 
  set activities that won't appear in the share sheet here.
  */
-@property (nonatomic, strong) NSArray *excludedActivityTypes;
+@property (nullable, nonatomic, strong) NSArray *excludedActivityTypes;
 
 
 
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  @param image The image that will be used to crop.
  */
-- (instancetype)initWithImage:(UIImage *)image;
+- (nonnull instancetype)initWithImage:(nonnull UIImage *)image;
 
 /** 
  Creates a new instance of a crop view controller with the supplied image and cropping style
@@ -243,7 +243,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param style The cropping style that will be used with this view controller (eg, rectangular, or circular)
  @param image The image that will be cropped
  */
-- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image;
+- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image;
 
 /**
  Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
@@ -269,11 +269,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                       fromView:(UIView *)fromView
+- (void)presentAnimatedFromParentViewController:(nonnull UIViewController *)viewController
+                                       fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
-                                          setup:(void (^)(void))setup
-                                     completion:(void (^)(void))completion;
+                                          setup:(nullable void (^)(void))setup
+                                     completion:(nullable void (^)(void))completion;
 
 /**
  Play a custom animation of the target image zooming to its position in
@@ -291,14 +291,14 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
-                                      fromImage:(UIImage *)image
-                                       fromView:(UIView *)fromView
+- (void)presentAnimatedFromParentViewController:(nonnull UIViewController *)viewController
+                                      fromImage:(nullable UIImage *)image
+                                       fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
                                    toImageFrame:(CGRect)toFrame
-                                          setup:(void (^)(void))setup
-                                     completion:(void (^)(void))completion;
+                                          setup:(nullable void (^)(void))setup
+                                     completion:(nullable void (^)(void))completion;
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -311,11 +311,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
-                                         toView:(UIView *)toView
+- (void)dismissAnimatedFromParentViewController:(nonnull UIViewController *)viewController
+                                         toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
-                                          setup:(void (^)(void))setup
-                                     completion:(void (^)(void))completion;
+                                          setup:(nullable void (^)(void))setup
+                                     completion:(nullable void (^)(void))completion;
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -329,12 +329,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
  */
-- (void)dismissAnimatedFromParentViewController:(UIViewController *)viewController
-                               withCroppedImage:(UIImage *)image
-                                         toView:(UIView *)toView
+- (void)dismissAnimatedFromParentViewController:(nonnull UIViewController *)viewController
+                               withCroppedImage:(nullable UIImage *)image
+                                         toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
-                                          setup:(void (^)(void))setup
-                                     completion:(void (^)(void))completion;
+                                          setup:(nullable void (^)(void))setup
+                                     completion:(nullable void (^)(void))completion;
 
 @end
 

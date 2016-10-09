@@ -28,8 +28,8 @@
  */
 @interface TOCropScrollView : UIScrollView
 
-@property (nonatomic, copy) void (^touchesBegan)(void);
-@property (nonatomic, copy) void (^touchesCancelled)(void);
-@property (nonatomic, copy) void (^touchesEnded)(void);
+@property (nullable, nonatomic, copy) void (^touchesBegan)(void);
+@property (nullable, nonatomic, copy) void (^touchesCancelled)(void);
+@property (nullable, nonatomic, copy) void (^touchesEnded)(void);
 
 @end

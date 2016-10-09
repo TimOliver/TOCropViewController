@@ -30,10 +30,4 @@
     XCTAssertNotNil(view);
 }
 
-- (void)testViewControllerInvalidInput
-{
-    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:nil];
-    XCTAssertNil(controller);
-}
-
 @end

@@ -29,29 +29,29 @@
 
 /* The 'Done' buttons to commit the crop. The text button is displayed
  in portrait mode and the icon one, in landscape. */
-@property (nonatomic, strong, readonly) UIButton *doneTextButton;
-@property (nonatomic, strong, readonly) UIButton *doneIconButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *doneTextButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *doneIconButton;
 
 /* The 'Cancel' buttons to cancel the crop. The text button is displayed
  in portrait mode and the icon one, in landscape. */
-@property (nonatomic, strong, readonly) UIButton *cancelTextButton;
-@property (nonatomic, strong, readonly) UIButton *cancelIconButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *cancelTextButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *cancelIconButton;
 
 /* The cropper control buttons */
-@property (nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
-@property (nonatomic, strong, readonly) UIButton *resetButton;
-@property (nonatomic, strong, readonly) UIButton *clampButton;
-@property (nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *resetButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *clampButton;
+@property (nonnull, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
-@property (nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
+@property (nonnull, nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
-@property (nonatomic, copy) void (^cancelButtonTapped)(void);
-@property (nonatomic, copy) void (^doneButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateCounterclockwiseButtonTapped)(void);
-@property (nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
-@property (nonatomic, copy) void (^clampButtonTapped)(void);
-@property (nonatomic, copy) void (^resetButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^cancelButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^doneButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^rotateCounterclockwiseButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^clampButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^resetButtonTapped)(void);
 
 /* State management for the 'clamp' button */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
