@@ -1203,7 +1203,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated
 {
-    if (self.simpleRenderMode)
+    if (self.internalLayoutDisabled)
         return;
     
     CGRect contentRect = self.contentBounds;

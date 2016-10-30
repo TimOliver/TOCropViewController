@@ -329,6 +329,7 @@
     [self.cropView prepareforRotation];
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
     self.cropView.simpleRenderMode = YES;
+    self.cropView.internalLayoutDisabled = YES;
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -355,6 +356,7 @@
     self.toolbarSnapshotView = nil;
     
     [self.cropView setSimpleRenderMode:NO animated:YES];
+    self.cropView.internalLayoutDisabled = NO;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator

@@ -91,6 +91,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL simpleRenderMode;
 
 /**
+ When performing manual content layout (such as during screen rotation), disable any internal layout
+ */
+@property (nonatomic, assign) BOOL internalLayoutDisabled;
+
+/**
  A width x height ratio that the crop box will be rescaled to (eg 4:3 is {4.0f, 3.0f})
  Setting it to CGSizeZero will reset the aspect ratio to the image's own ratio.
  */
