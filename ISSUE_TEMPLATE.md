@@ -7,11 +7,14 @@
 >
 > ---
 > 
-> CocoaPods Users
+> For CocoaPods Users
 >
 > Before filing a bug report, please make sure you are using the latest version
 > of CocoaPods ('gem install cocoapods'), and the latest version of this 
 > library ('pod repo update').
+>
+> Support for CocoaPods-related issues is not provided unless you confirm both of 
+> these points in your submission.
 >
 > ---
 >
