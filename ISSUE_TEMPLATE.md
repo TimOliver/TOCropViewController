@@ -2,6 +2,17 @@
 > the type of issue you're filing and make sure to supply the proper details 
 > needed for it! :)
 >
+> Please note that your issue may be closed without review if you do not supply 
+> the information that is requested here.
+>
+> ---
+> 
+> CocoaPods Users
+>
+> Before filing a bug report, please make sure you are using the latest version
+> of CocoaPods ('gem install cocoapods'), and the latest version of this 
+> library ('pod repo update').
+>
 > ---
 >
 > **Questions**: Please check the closed issues to see if it's already been asked
@@ -22,6 +33,13 @@
 >
 > Please remove this line and everything above it before submitting. 
 
+## Hardware / Software
+
+Which version of the library were you using?
+Which version of iOS are you running?
+What model of iOS device were you testing on?
+If using CocoaPods, which version of CocoaPods are you on?
+
 ## Goals
 
 What is the outcome result you want to achieve with this library?
@@ -39,6 +57,3 @@ What happened instead?  (Please attach a screenshot/screen recording if possible
 What are the steps needed to reproduce this issue?
 If this bug was caused by a specific image, please post it here.
 
-## Hardware / Software
-
-On which version of iOS, and what sort of device did you experience this bug?
