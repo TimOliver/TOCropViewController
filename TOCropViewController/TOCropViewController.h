@@ -24,6 +24,7 @@
 
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
+#import "UIImage+CropRotate.h"
 
 typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
     TOCropViewControllerAspectRatioPresetOriginal,
