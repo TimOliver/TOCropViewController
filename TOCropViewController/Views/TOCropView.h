@@ -138,6 +138,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
 /**
+ * scale image when moving crop frame to center position
+ */
+@property (nonatomic, assign) BOOL scaleWhenMoveCropFrameCenter;
+
+/**
  Create a default instance of the crop view with the supplied image
  */
 - (nonnull instancetype)initWithImage:(nonnull UIImage *)image;

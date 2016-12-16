@@ -1217,8 +1217,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     //The scale we need to scale up the crop box to fit full screen
-    CGFloat scale = MIN(CGRectGetWidth(contentRect)/CGRectGetWidth(cropFrame), CGRectGetHeight(contentRect)/CGRectGetHeight(cropFrame));
-    
+    CGFloat scale = 1.0f;
+    if (self.scaleWhenMoveCropFrameCenter) {
+        scale = MIN(CGRectGetWidth(contentRect)/CGRectGetWidth(cropFrame), CGRectGetHeight(contentRect)/CGRectGetHeight(cropFrame));
+    }
+
     CGPoint focusPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
     CGPoint midPoint = (CGPoint){CGRectGetMidX(contentRect), CGRectGetMidY(contentRect)};
     
