@@ -28,6 +28,27 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
     TOCropViewCroppingStyleCircular     // A fixed, circular crop box
 };
 
+/* When the user taps down to resize the box, this state is used
+ to determine where they tapped and how to manipulate the box */
+typedef NS_OPTIONS(NSInteger, TOCropViewOverlayEdge) {
+    TOCropViewOverlayEdgeNone = 0x0,
+    TOCropViewOverlayEdgeTopLeft = 0x00000001,
+    TOCropViewOverlayEdgeTop = 0x00000010,
+    TOCropViewOverlayEdgeTopRight = 0x00000100,
+    TOCropViewOverlayEdgeRight = 0x00001000,
+    TOCropViewOverlayEdgeBottomRight = 0x00010000,
+    TOCropViewOverlayEdgeBottom = 0x00100000,
+    TOCropViewOverlayEdgeBottomLeft = 0x01000000,
+    TOCropViewOverlayEdgeLeft = 0x10000000,
+};
+
+/** four side edges enabled */
+extern const TOCropViewOverlayEdge sideEdges;
+/** four corner edges enabled */
+extern const TOCropViewOverlayEdge cornerEdges;
+/** all edges enabled */
+extern const TOCropViewOverlayEdge allEdges;
+
 @class TOCropView;
 
 @protocol TOCropViewDelegate <NSObject>
@@ -141,6 +162,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  * scale image when moving crop frame to center position
  */
 @property (nonatomic, assign) BOOL scaleWhenMoveCropFrameCenter;
+
+/**
+ * determine which edges can consume tap event
+ */
+@property (nonatomic, assign) TOCropViewOverlayEdge tappedEdgesEnabled;
 
 /**
  Create a default instance of the crop view with the supplied image

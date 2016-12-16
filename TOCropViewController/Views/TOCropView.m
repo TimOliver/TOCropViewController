@@ -31,19 +31,15 @@ static const NSTimeInterval kTOCropTimerDuration = 0.8f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
 static const CGFloat kTOCropViewCircularPathRadius = 300.0f;
 
-/* When the user taps down to resize the box, this state is used
- to determine where they tapped and how to manipulate the box */
-typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
-    TOCropViewOverlayEdgeNone,
-    TOCropViewOverlayEdgeTopLeft,
-    TOCropViewOverlayEdgeTop,
-    TOCropViewOverlayEdgeTopRight,
-    TOCropViewOverlayEdgeRight,
-    TOCropViewOverlayEdgeBottomRight,
-    TOCropViewOverlayEdgeBottom,
-    TOCropViewOverlayEdgeBottomLeft,
-    TOCropViewOverlayEdgeLeft
-};
+const TOCropViewOverlayEdge sideEdges = TOCropViewOverlayEdgeLeft
+        | TOCropViewOverlayEdgeTop
+        | TOCropViewOverlayEdgeRight
+        | TOCropViewOverlayEdgeBottom;
+const TOCropViewOverlayEdge cornerEdges = TOCropViewOverlayEdgeTopLeft
+        | TOCropViewOverlayEdgeTopRight
+        | TOCropViewOverlayEdgeBottomLeft
+        | TOCropViewOverlayEdgeBottomRight;
+const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
 
 @interface TOCropView () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
@@ -146,6 +142,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self = [super init]) {
         _image = image;
         _croppingStyle = style;
+        _tappedEdgesEnabled = allEdges;
         [self setup];
     }
     
@@ -449,7 +446,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //(Otherwise the image itself will slide with the drag gesture)
     BOOL clampMinFromTop = NO, clampMinFromLeft = NO;
     
-    switch (self.tappedEdge) {
+    switch (self.tappedEdge & self.tappedEdgesEnabled) {
         case TOCropViewOverlayEdgeLeft:
             if (self.aspectRatioLockEnabled) {
                 aspectHorizontal = YES;
