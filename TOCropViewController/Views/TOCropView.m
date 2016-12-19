@@ -935,7 +935,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
     //Upon init, sometimes the box size is still 0, which can result in CALayer issues
     if (cropBoxFrame.size.width < FLT_EPSILON || cropBoxFrame.size.height < FLT_EPSILON)
         return;
-    
+
     //clamp the cropping region to the inset boundaries of the screen
     CGRect contentFrame = self.contentBounds;
     CGFloat xOrigin = ceilf(contentFrame.origin.x);
@@ -943,24 +943,37 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
     cropBoxFrame.origin.x = floorf(MAX(cropBoxFrame.origin.x, xOrigin));
     if (xDelta < -FLT_EPSILON) //If we clamp the x value, ensure we compensate for the subsequent delta generated in the width (Or else, the box will keep growing)
         cropBoxFrame.size.width += xDelta;
-    
+
     CGFloat yOrigin = ceilf(contentFrame.origin.y);
     CGFloat yDelta = cropBoxFrame.origin.y - yOrigin;
     cropBoxFrame.origin.y = floorf(MAX(cropBoxFrame.origin.y, yOrigin));
     if (yDelta < -FLT_EPSILON)
         cropBoxFrame.size.height += yDelta;
-    
+
     //given the clamped X/Y values, make sure we can't extend the crop box beyond the edge of the screen in the current state
     CGFloat maxWidth = (contentFrame.size.width + contentFrame.origin.x) - cropBoxFrame.origin.x;
     cropBoxFrame.size.width = floorf(MIN(cropBoxFrame.size.width, maxWidth));
-    
+
     CGFloat maxHeight = (contentFrame.size.height + contentFrame.origin.y) - cropBoxFrame.origin.y;
     cropBoxFrame.size.height = floorf(MIN(cropBoxFrame.size.height, maxHeight));
-    
+
     //Make sure we can't make the crop box too small
-    cropBoxFrame.size.width  = MAX(cropBoxFrame.size.width, kTOCropViewMinimumBoxSize);
-    cropBoxFrame.size.height = MAX(cropBoxFrame.size.height, kTOCropViewMinimumBoxSize);
-    
+//        cropBoxFrame.size.width = MAX(cropBoxFrame.size.width, kTOCropViewMinimumBoxSize);
+//        cropBoxFrame.size.height = MAX(cropBoxFrame.size.height, kTOCropViewMinimumBoxSize);
+    if (self.exactCropSize.width > 0 && self.exactCropSize.height > 0) {
+        cropBoxFrame.size.width = self.exactCropSize.width;
+        cropBoxFrame.size.height = self.exactCropSize.height;
+    } else {
+        if (self.minCropSize.width > 0 && self.minCropSize.height > 0) {
+            cropBoxFrame.size.width = MAX(cropBoxFrame.size.width, self.minCropSize.width);
+            cropBoxFrame.size.height = MAX(cropBoxFrame.size.height, self.minCropSize.height);
+        }
+        if (self.maxCropSize.width > 0 && self.maxCropSize.height > 0) {
+            cropBoxFrame.size.width = MIN(cropBoxFrame.size.width, self.maxCropSize.width);
+            cropBoxFrame.size.height = MIN(cropBoxFrame.size.height, self.maxCropSize.height);
+        }
+    }
+
     _cropBoxFrame = cropBoxFrame;
     
     self.foregroundContainerView.frame = _cropBoxFrame; //set the clipping view to match the new rect

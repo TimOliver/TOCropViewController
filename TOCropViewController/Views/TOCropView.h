@@ -169,6 +169,21 @@ extern const TOCropViewOverlayEdge allEdges;
 @property (nonatomic, assign) TOCropViewOverlayEdge tappedEdgesEnabled;
 
 /**
+ * minimium crop size
+ */
+@property (nonatomic, assign) CGSize minCropSize;
+
+/**
+ * maximium crop size
+ */
+@property (nonatomic, assign) CGSize maxCropSize;
+
+/**
+ * exact crop size
+ */
+@property (nonatomic, assign) CGSize exactCropSize;
+
+/**
  Create a default instance of the crop view with the supplied image
  */
 - (nonnull instancetype)initWithImage:(nonnull UIImage *)image;
