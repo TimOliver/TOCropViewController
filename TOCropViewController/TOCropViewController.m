@@ -811,6 +811,7 @@
         _cropView.delegate = self;
         _cropView.frame = [UIScreen mainScreen].bounds;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _cropView.centerLockEnabled = YES;
     }
     return _cropView;
 }

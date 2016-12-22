@@ -128,6 +128,11 @@ extern const TOCropViewOverlayEdge allEdges;
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /**
+ * When the cropping box is locked to center (But can still be resized)
+ */
+@property (nonatomic, assign) BOOL centerLockEnabled;
+
+/**
  When the user taps 'reset', whether the aspect ratio will also be reset as well
  Default is YES
  */

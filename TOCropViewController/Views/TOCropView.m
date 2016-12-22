@@ -41,6 +41,12 @@ const TOCropViewOverlayEdge cornerEdges = TOCropViewOverlayEdgeTopLeft
         | TOCropViewOverlayEdgeBottomRight;
 const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
 
+typedef NS_OPTIONS(NSInteger, TOCropViewOverlayEdgeGrowPolicy) {
+    TOCropViewOverlayEdgeGrowPolicyNone = 0x0,
+    TOCropViewOverlayEdgeGrowPolicyAspectRatioLocked = 0x00000001,
+    TOCropViewOverlayEdgeGrowPolicyCenterLocked = 0x00000010,
+};
+
 @interface TOCropView () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong, readwrite) UIImage *image;
@@ -101,6 +107,8 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
  values until the view is configured for the first time. */
 @property (nonatomic, assign) NSInteger restoreAngle;
 @property (nonatomic, assign) CGRect    restoreImageCropFrame;
+
+@property (nonatomic, assign) TOCropViewOverlayEdgeGrowPolicy edgeGrowPolicy;
 
 - (void)setup;
 
@@ -446,9 +454,12 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
     //(Otherwise the image itself will slide with the drag gesture)
     BOOL clampMinFromTop = NO, clampMinFromLeft = NO;
     
+    BOOL aspectRatioLockEnabled = self.aspectRatioLockEnabled;
+    BOOL centerLockEnabled = self.centerLockEnabled;
+    
     switch (self.tappedEdge & self.tappedEdgesEnabled) {
         case TOCropViewOverlayEdgeLeft:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 aspectHorizontal = YES;
                 xDelta = MAX(xDelta, 0);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMaxX(originFrame), CGRectGetMidY(originFrame)};
@@ -463,7 +474,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeRight:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 aspectHorizontal = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMinX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
@@ -477,7 +488,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeBottom:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 aspectVertical = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMinY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
@@ -490,7 +501,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             }
             break;
         case TOCropViewOverlayEdgeTop:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 aspectVertical = YES;
                 yDelta = MAX(0,yDelta);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMaxY(originFrame)};
@@ -508,7 +519,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeTopLeft:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 xDelta = MAX(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -538,7 +549,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeTopRight:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 xDelta = MIN(xDelta, 0);
                 yDelta = MAX(yDelta, 0);
                 
@@ -565,7 +576,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeBottomLeft:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 CGPoint distance;
                 distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
                 distance.y = 1.0f - (-yDelta / CGRectGetHeight(originFrame));
@@ -589,7 +600,7 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
             
             break;
         case TOCropViewOverlayEdgeBottomRight:
-            if (self.aspectRatioLockEnabled) {
+            if (aspectRatioLockEnabled) {
                 
                 CGPoint distance;
                 distance.x = 1.0f - ((-1 * xDelta) / CGRectGetWidth(originFrame));
@@ -616,12 +627,12 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
     CGSize maxSize = (CGSize){CGRectGetWidth(contentFrame), CGRectGetHeight(contentFrame)};
     
     //clamp the box to ensure it doesn't go beyond the bounds we've set
-    if (self.aspectRatioLockEnabled && aspectHorizontal) {
+    if (aspectRatioLockEnabled && aspectHorizontal) {
         maxSize.height = contentFrame.size.width / aspectRatio;
         minSize.width = kTOCropViewMinimumBoxSize * aspectRatio;
     }
         
-    if (self.aspectRatioLockEnabled && aspectVertical) {
+    if (aspectRatioLockEnabled && aspectVertical) {
         maxSize.width = contentFrame.size.height * aspectRatio;
         minSize.height = kTOCropViewMinimumBoxSize / aspectRatio;
     }
@@ -633,23 +644,29 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
     //Clamp the maximum size
     frame.size.width  = MIN(frame.size.width, maxSize.width);
     frame.size.height = MIN(frame.size.height, maxSize.height);
-    
-    //Clamp the X position of the box to the interior of the cropping bounds
-    frame.origin.x = MAX(frame.origin.x, CGRectGetMinX(contentFrame));
-    frame.origin.x = MIN(frame.origin.x, CGRectGetMaxX(contentFrame) - minSize.width);
 
-    //Clamp the Y postion of the box to the interior of the cropping bounds
-    frame.origin.y = MAX(frame.origin.y, CGRectGetMinY(contentFrame));
-    frame.origin.y = MIN(frame.origin.y, CGRectGetMaxY(contentFrame) - minSize.height);
-    
-    //Once the box is completely shrunk, clamp its ability to move
-    if (clampMinFromLeft && frame.size.width <= minSize.width + FLT_EPSILON) {
-        frame.origin.x = CGRectGetMaxX(originFrame) - minSize.width;
-    }
-    
-    //Once the box is completely shrunk, clamp its ability to move
-    if (clampMinFromTop && frame.size.height <= minSize.height + FLT_EPSILON) {
-        frame.origin.y = CGRectGetMaxY(originFrame) - minSize.height;
+    if (centerLockEnabled) {
+        CGSize size = self.bounds.size;
+        frame.origin.x = (size.width - frame.size.width)/2;
+        frame.origin.y = (size.height - frame.size.height)/2;
+    } else {
+        //Clamp the X position of the box to the interior of the cropping bounds
+        frame.origin.x = MAX(frame.origin.x, CGRectGetMinX(contentFrame));
+        frame.origin.x = MIN(frame.origin.x, CGRectGetMaxX(contentFrame) - minSize.width);
+
+        //Clamp the Y postion of the box to the interior of the cropping bounds
+        frame.origin.y = MAX(frame.origin.y, CGRectGetMinY(contentFrame));
+        frame.origin.y = MIN(frame.origin.y, CGRectGetMaxY(contentFrame) - minSize.height);
+
+        //Once the box is completely shrunk, clamp its ability to move
+        if (clampMinFromLeft && frame.size.width <= minSize.width + FLT_EPSILON) {
+            frame.origin.x = CGRectGetMaxX(originFrame) - minSize.width;
+        }
+
+        //Once the box is completely shrunk, clamp its ability to move
+        if (clampMinFromTop && frame.size.height <= minSize.height + FLT_EPSILON) {
+            frame.origin.y = CGRectGetMaxY(originFrame) - minSize.height;
+        }
     }
     
     self.cropBoxFrame = frame;
@@ -1638,6 +1655,32 @@ const TOCropViewOverlayEdge allEdges = sideEdges | cornerEdges;
 - (BOOL)hasAspectRatio
 {
     return (self.aspectRatio.width > FLT_EPSILON && self.aspectRatio.height > FLT_EPSILON);
+}
+
+- (BOOL)aspectRatioLockEnabled {
+    return (self.edgeGrowPolicy & TOCropViewOverlayEdgeGrowPolicyAspectRatioLocked)
+        == TOCropViewOverlayEdgeGrowPolicyAspectRatioLocked;
+}
+
+- (void)setAspectRatioLockEnabled:(BOOL)aspectRatioLockEnabled {
+    if (aspectRatioLockEnabled) {
+        self.edgeGrowPolicy |= TOCropViewOverlayEdgeGrowPolicyAspectRatioLocked;
+    } else {
+        self.edgeGrowPolicy ^= TOCropViewOverlayEdgeGrowPolicyAspectRatioLocked;
+    }
+}
+
+- (BOOL)centerLockEnabled {
+    return (self.edgeGrowPolicy & TOCropViewOverlayEdgeGrowPolicyCenterLocked)
+            == TOCropViewOverlayEdgeGrowPolicyCenterLocked;
+}
+
+- (void)setCenterLockEnabled:(BOOL)centerLockEnabled {
+    if (centerLockEnabled) {
+        self.edgeGrowPolicy |= TOCropViewOverlayEdgeGrowPolicyCenterLocked;
+    } else {
+        self.edgeGrowPolicy ^= TOCropViewOverlayEdgeGrowPolicyCenterLocked;
+    }
 }
 
 @end
