@@ -59,7 +59,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToRect:angle:));
 
 /**
  Called when the user has committed the crop action, and provides 
@@ -69,7 +69,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToImage:rect:angle:));
 
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
@@ -79,7 +79,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToCircleImage:rect:angle:));
 
 /**
  If implemented, when the user hits cancel, or completes a 
@@ -87,7 +87,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  giving you a chance to manually dismiss the view controller
  
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled;
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled NS_SWIFT_NAME(cropViewController(_:didFinishCancelled:));
 
 @end
 
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  @param image The image that will be used to crop.
  */
-- (nonnull instancetype)initWithImage:(nonnull UIImage *)image;
+- (nonnull instancetype)initWithImage:(nonnull UIImage *)image NS_SWIFT_NAME(init(image:));
 
 /** 
  Creates a new instance of a crop view controller with the supplied image and cropping style
@@ -243,7 +243,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param style The cropping style that will be used with this view controller (eg, rectangular, or circular)
  @param image The image that will be cropped
  */
-- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image;
+- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image NS_SWIFT_NAME(init(croppingStyle:image:));
 
 /**
  Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
@@ -257,7 +257,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param aspectRatioPreset The aspect ratio preset
  @param animated Whether the transition to the aspect ratio is animated
  */
-- (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated;
+- (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated NS_SWIFT_NAME(setAspectRatioPresent(_:animated:));
 
 /**
  Play a custom animation of the target image zooming to its position in
@@ -273,7 +273,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                        fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion;
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimated(from:view:frame:setup:completion:));
 
 /**
  Play a custom animation of the target image zooming to its position in
@@ -298,7 +298,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                           angle:(NSInteger)angle
                                    toImageFrame:(CGRect)toFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion;
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimated(from:fromImage:fromView:fromFrame:angle:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -315,7 +315,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                          toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion;
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimated(from:toView:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -334,7 +334,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                          toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion;
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimated(from:croppedImage:toView:toFrame:setup:completion:));
 
 @end
 
