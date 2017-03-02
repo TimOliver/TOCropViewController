@@ -770,21 +770,29 @@
         
         return;
     }
-    
+
+    BOOL delegateHandled = NO;
+
     //If the delegate that only supplies crop data is provided, call it
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
         [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
+        delegateHandled = YES;
     }
-    else if (self.croppingStyle == TOCropViewCroppingStyleCircular && [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)]) {
+
+    //If cropping circular and the circular generation delegate is implemented, calll it
+    if (self.croppingStyle == TOCropViewCroppingStyleCircular && [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)]) {
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
         
         //dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
         });
+
+        delegateHandled = YES;
     }
+
     //If the delegate that requires the specific cropped image is provided, call it
-    else if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)]) {
+    if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)]) {
         UIImage *image = nil;
         if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
             image = self.image;
@@ -797,8 +805,11 @@
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
         });
+
+        delegateHandled = YES;
     }
-    else {
+
+    if (!delegateHandled) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
