@@ -779,7 +779,7 @@
         delegateHandled = YES;
     }
 
-    //If cropping circular and the circular generation delegate is implemented, calll it
+    //If cropping circular and the circular generation delegate is implemented, call it
     if (self.croppingStyle == TOCropViewCroppingStyleCircular && [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)]) {
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
         
