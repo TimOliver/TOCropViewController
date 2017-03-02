@@ -1,7 +1,7 @@
 //
 //  TOCropView.m
 //
-//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2017 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -990,7 +990,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGSize size = self.scrollView.contentSize;
     size.width = floorf(size.width);
     size.height = floorf(size.height);
-    //self.backgroundContainerView.frame = (CGRect){CGPointZero, size};
     self.scrollView.contentSize = size;
     
     //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
@@ -1259,11 +1258,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             // a floating point noise that zooms the image in by about 5 pixels. This fixes that issue.
             if (scale < 1.0f - FLT_EPSILON || scale > 1.0f + FLT_EPSILON) {
                 strongSelf.scrollView.zoomScale *= scale;
+                strongSelf.scrollView.zoomScale = MIN(strongSelf.scrollView.maximumZoomScale, strongSelf.scrollView.zoomScale);
             }
-            
-            offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
-            offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
-            strongSelf.scrollView.contentOffset = offset;
+
+            // If it turns out the zoom operation would have exceeded the minizum zoom scale, don't apply
+            // the content offset
+            if (strongSelf.scrollView.zoomScale < strongSelf.scrollView.maximumZoomScale - FLT_EPSILON) {
+                offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
+                offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
+                strongSelf.scrollView.contentOffset = offset;
+            }
             
             strongSelf.cropBoxFrame = cropFrame;
         }
