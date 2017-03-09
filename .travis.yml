@@ -2,4 +2,4 @@ language: objective-c
 osx_image: xcode8.2
 xcode_project: TOCropViewControllerExample.xcodeproj
 xcode_scheme: TOCropViewControllerTests
-script: xcodebuild -verbose -scheme TOCropViewControllerTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone SE,OS=10.2" test
+script: xcodebuild -verbose -scheme TOCropViewControllerTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone SE,OS=latest' test
