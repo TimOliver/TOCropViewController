@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		144B8CD11D22CD650085D774 /* TOCropViewControllerTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D891B234D07008B8466 /* TOCropViewControllerTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		144B8CD21D22CD650085D774 /* TOActivityCroppedImageProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D9C1B234D4F008B8466 /* TOActivityCroppedImageProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		144B8CD31D22CD650085D774 /* TOCroppedImageAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22BF961E1B2CD017009F4785 /* TOCroppedImageAttributes.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		144B8CD41D22CD650085D774 /* UIImage+CropRotate.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D8B1B234D07008B8466 /* UIImage+CropRotate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		144B8CD11D22CD650085D774 /* TOCropViewControllerTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D891B234D07008B8466 /* TOCropViewControllerTransitioning.h */; };
+		144B8CD21D22CD650085D774 /* TOActivityCroppedImageProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D9C1B234D4F008B8466 /* TOActivityCroppedImageProvider.h */; };
+		144B8CD31D22CD650085D774 /* TOCroppedImageAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22BF961E1B2CD017009F4785 /* TOCroppedImageAttributes.h */; };
+		144B8CD41D22CD650085D774 /* UIImage+CropRotate.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D8B1B234D07008B8466 /* UIImage+CropRotate.h */; };
 		144B8CD51D22CD650085D774 /* TOCropOverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D8E1B234D07008B8466 /* TOCropOverlayView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		144B8CD61D22CD650085D774 /* TOCropScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D901B234D07008B8466 /* TOCropScrollView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		144B8CD61D22CD650085D774 /* TOCropScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D901B234D07008B8466 /* TOCropScrollView.h */; };
 		144B8CD71D22CD650085D774 /* TOCropToolbar.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D921B234D07008B8466 /* TOCropToolbar.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		144B8CD81D22CD650085D774 /* TOCropView.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DB4D941B234D07008B8466 /* TOCropView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		144B8CDA1D22CD730085D774 /* TOCropViewControllerTransitioning.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D8A1B234D07008B8466 /* TOCropViewControllerTransitioning.m */; };
