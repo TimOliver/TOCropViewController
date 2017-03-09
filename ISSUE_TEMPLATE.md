@@ -1,3 +1,6 @@
+- [ ] I have read this issue template and provided all possible information. 
+- [ ] I'm using CocoaPods and have run `pod update` before filing this issue.
+
 > Thanks for considering filing an issue! Before proceeding, please consider
 > the type of issue you're filing and make sure to supply the proper details 
 > needed for it! :)
@@ -10,8 +13,8 @@
 > For CocoaPods Users
 >
 > Before filing a bug report, please make sure you are using the latest version
-> of CocoaPods ('gem install cocoapods'), and the latest version of this 
-> library ('pod repo update').
+> of CocoaPods (`gem install cocoapods`), and the latest version of this 
+> library (`pod repo update`).
 >
 > Support for CocoaPods-related issues is not provided unless you confirm both of 
 > these points in your submission.
