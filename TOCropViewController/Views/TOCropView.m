@@ -174,6 +174,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.resetAspectRatioEnabled = !circularMode;
     self.restoreImageCropFrame = CGRectZero;
     self.restoreAngle = 0;
+    self.cropAdjustingDelay = kTOCropTimerDuration;
+    self.cropViewPadding = kTOCropViewPadding;
     
     /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
      we'll need to manually check the system version to ensure that it's available. */
@@ -814,7 +816,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.resetTimer)
         return;
     
-    self.resetTimer = [NSTimer scheduledTimerWithTimeInterval:kTOCropTimerDuration target:self selector:@selector(timerTriggered) userInfo:nil repeats:NO];
+    self.resetTimer = [NSTimer scheduledTimerWithTimeInterval:self.cropAdjustingDelay target:self selector:@selector(timerTriggered) userInfo:nil repeats:NO];
 }
 
 - (void)timerTriggered
@@ -1611,10 +1613,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (CGRect)contentBounds
 {
     CGRect contentRect = CGRectZero;
-    contentRect.origin.x = kTOCropViewPadding + self.cropRegionInsets.left;
-    contentRect.origin.y = kTOCropViewPadding + self.cropRegionInsets.top;
-    contentRect.size.width = CGRectGetWidth(self.bounds) - ((kTOCropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
-    contentRect.size.height = CGRectGetHeight(self.bounds) - ((kTOCropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
+    contentRect.origin.x = self.cropViewPadding + self.cropRegionInsets.left;
+    contentRect.origin.y = self.cropViewPadding + self.cropRegionInsets.top;
+    contentRect.size.width = CGRectGetWidth(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
+    contentRect.size.height = CGRectGetHeight(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
     return contentRect;
 }
 
