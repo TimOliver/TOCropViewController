@@ -689,17 +689,32 @@
 #pragma mark - Button Feedback -
 - (void)cancelButtonTapped
 {
+    bool isDelegateOrCallbackHandled = NO;
+    
     if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
         [self.delegate cropViewController:self didFinishCancelled:YES];
-        return;
+        
+        if (self.onDidFinishCancelled != nil) {
+            self.onDidFinishCancelled(YES);
+        }
+        
+        isDelegateOrCallbackHandled = YES;
     }
     
-    if (self.navigationController) {
-        [self.navigationController popViewControllerAnimated:YES];
+    if (self.onDidFinishCancelled != nil) {
+        self.onDidFinishCancelled(YES);
+        
+        isDelegateOrCallbackHandled = YES;
     }
-    else {
-        self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    
+    if (!isDelegateOrCallbackHandled) {
+        if (self.navigationController) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else {
+            self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
     }
 }
 
@@ -740,59 +755,90 @@
             }
         }
         __weak typeof(activityController) blockController = activityController;
-        #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
         activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
             if (!completed)
                 return;
             
+            bool isCallbackOrDelegateHandled = NO;
+            
+            if (self.onDidFinishCancelled != nil) {
+                self.onDidFinishCancelled(NO);
+                isCallbackOrDelegateHandled = YES;
+            }
             if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
                 [self.delegate cropViewController:self didFinishCancelled:NO];
+                isCallbackOrDelegateHandled = YES;
             }
-            else {
+            
+            if (!isCallbackOrDelegateHandled) {
                 [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                 blockController.completionWithItemsHandler = nil;
             }
         };
-        #else
+#else
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
             if (!completed)
                 return;
             
+            bool isCallbackOrDelegateHandled = NO
+            
+            if (self.onDidFinishCancelled != nil) {
+                self.onDidFinishCancelled(NO)
+                isCallbackOrDelegateHandled = YES
+            }
             if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
                 [self.delegate cropViewController:self didFinishCancelled:NO];
+                isCallbackOrDelegateHandled = YES
             }
-            else {
+            
+            if (!isCallbackOrDelegateHandled) {
                 [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                 blockController.completionHandler = nil;
             }
         };
-        #endif
+#endif
         
         return;
     }
-
-    BOOL delegateHandled = NO;
-
-    //If the delegate that only supplies crop data is provided, call it
+    
+    BOOL isCallbackOrDelegateHandled = NO;
+    
+    //If the delegate/block that only supplies crop data is provided, call it
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
         [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
-        delegateHandled = YES;
+        isCallbackOrDelegateHandled = YES;
     }
-
-    //If cropping circular and the circular generation delegate is implemented, call it
-    if (self.croppingStyle == TOCropViewCroppingStyleCircular && [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)]) {
+    if (self.onDidCropImageToRect != nil) {
+        self.onDidCropImageToRect(cropFrame, angle);
+        isCallbackOrDelegateHandled = YES;
+    }
+    
+    BOOL isCircularImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)];
+    BOOL isCircularImageCallbackAvailable = self.onDidCropToCircleImage != nil;
+    
+    //If cropping circular and the circular generation delegate/block is implemented, call it
+    if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
         
-        //dispatch on the next run-loop so the animation isn't interuppted by the crop operation
+        //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
+            if (isCircularImageDelegateAvailable) {
+                [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
+            }
+            if (isCircularImageCallbackAvailable) {
+                self.onDidCropToCircleImage(image, cropFrame, angle);
+            }
         });
-
-        delegateHandled = YES;
+        
+        isCallbackOrDelegateHandled = YES;
     }
-
-    //If the delegate that requires the specific cropped image is provided, call it
-    if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)]) {
+    
+    BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)];
+    BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
+    
+    //If the delegate/block that requires the specific cropped image is provided, call it
+    if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
         UIImage *image = nil;
         if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
             image = self.image;
@@ -801,15 +847,21 @@
             image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO];
         }
         
-        //dispatch on the next run-loop so the animation isn't interuppted by the crop operation
+        //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
+            if (isDidCropToImageDelegateAvailable) {
+                [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
+            }
+            if (isDidCropToImageCallbackAvailable) {
+                self.onDidCropToRect(image, cropFrame, angle);
+            }
+            
         });
-
-        delegateHandled = YES;
+        
+        isCallbackOrDelegateHandled = YES;
     }
-
-    if (!delegateHandled) {
+    
+    if (!isCallbackOrDelegateHandled) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
