@@ -38,6 +38,7 @@
 @property (nonatomic, strong) TOCropToolbar *toolbar;
 @property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *toolbarSnapshotView;
+@property (nonatomic, strong, readwrite) UILabel *titleLabel;
 
 /* Transition animation controller */
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
@@ -67,9 +68,13 @@
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout;
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout;
 
+
+
 @end
 
 @implementation TOCropViewController
+
+CGFloat titleLabelHeight;
 
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
@@ -88,8 +93,10 @@
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
         _rotateClockwiseButtonHidden = YES;
+		
+		titleLabelHeight = 0.0f;
     }
-    
+	
     return self;
 }
 
@@ -101,7 +108,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
@@ -109,7 +115,24 @@
     
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.toolbar];
-    
+	
+	// only place title label into the view if the title is defined
+	if(self.title.length > 0){
+		titleLabelHeight = 30.0f;
+		self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, titleLabelHeight)];
+		self.titleLabel.font = [UIFont systemFontOfSize:14.0];
+		self.titleLabel.backgroundColor = [UIColor clearColor];
+		self.titleLabel.textColor = [UIColor whiteColor];
+		self.titleLabel.numberOfLines = 1;
+		self.titleLabel.baselineAdjustment = UIBaselineAdjustmentAlignBaselines;
+		self.titleLabel.clipsToBounds = YES;
+		self.titleLabel.textAlignment = NSTextAlignmentCenter;
+		self.titleLabel.text = self.title;
+		[self.view insertSubview:self.titleLabel aboveSubview:self.cropView];
+	}
+	
+	
+	
     __weak typeof(self) weakSelf = self;
     self.toolbar.doneButtonTapped =     ^{ [weakSelf doneButtonTapped]; };
     self.toolbar.cancelButtonTapped =   ^{ [weakSelf cancelButtonTapped]; };
@@ -268,21 +291,21 @@
     CGRect frame = CGRectZero;
     if (!verticalLayout) {
         frame.origin.x = 44.0f;
-        frame.origin.y = 0.0f;
+        frame.origin.y = 0.0f + titleLabelHeight;
         frame.size.width = CGRectGetWidth(bounds) - 44.0f;
-        frame.size.height = CGRectGetHeight(bounds);
+        frame.size.height = CGRectGetHeight(bounds) - titleLabelHeight;
     }
     else {
         frame.origin.x = 0.0f;
         
         if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
-            frame.origin.y = 0.0f;
+            frame.origin.y = 0.0f + titleLabelHeight;
         } else {
-            frame.origin.y = 44.0f;
+            frame.origin.y = 44.0f + titleLabelHeight;
         }
 
         frame.size.width = CGRectGetWidth(bounds);
-        frame.size.height = CGRectGetHeight(bounds) - 44.0f;
+        frame.size.height = CGRectGetHeight(bounds) - 44.0f - titleLabelHeight;
     }
     
     return frame;
@@ -330,6 +353,7 @@
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
     self.cropView.simpleRenderMode = YES;
     self.cropView.internalLayoutDisabled = YES;
+
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -357,6 +381,8 @@
     
     [self.cropView setSimpleRenderMode:NO animated:YES];
     self.cropView.internalLayoutDisabled = NO;
+	
+	self.titleLabel.frame = CGRectMake(0, 0, self.view.frame.size.width, titleLabelHeight);
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator

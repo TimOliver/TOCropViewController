@@ -155,6 +155,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) CGSize customAspectRatio;
 
 /**
+ Title label which can used to show instruction on the top of the crop view controller
+ */
+@property (nonnull, nonatomic, strong, readonly) UILabel *titleLabel;
+
+/**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
  
  If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio
