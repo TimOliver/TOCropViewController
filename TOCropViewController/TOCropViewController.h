@@ -155,7 +155,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nonatomic, assign) CGSize customAspectRatio;
 
 /**
- Title label which can used to show instruction on the top of the crop view controller
+ Title label which can be used to show instruction on the top of the crop view controller
  */
 @property (nonnull, nonatomic, strong, readonly) UILabel *titleLabel;
 
