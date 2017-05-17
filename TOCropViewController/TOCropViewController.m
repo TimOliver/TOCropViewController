@@ -119,7 +119,10 @@ CGFloat titleLabelHeight;
 	// only place title label into the view if the title is defined
 	if(self.title.length > 0){
 		titleLabelHeight = 30.0f;
-		self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, titleLabelHeight)];
+		CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+		
+		// add status bar height to origin y so that it will not obstruct status bar
+		self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, statusBarHeight, self.view.frame.size.width, titleLabelHeight)];
 		self.titleLabel.font = [UIFont systemFontOfSize:14.0];
 		self.titleLabel.backgroundColor = [UIColor clearColor];
 		self.titleLabel.textColor = [UIColor whiteColor];
@@ -129,6 +132,10 @@ CGFloat titleLabelHeight;
 		self.titleLabel.textAlignment = NSTextAlignmentCenter;
 		self.titleLabel.text = self.title;
 		[self.view insertSubview:self.titleLabel aboveSubview:self.cropView];
+		
+		_cropView.cropRegionInsets = UIEdgeInsetsMake(titleLabelHeight, 0, 0, 0);
+	} else {
+		_cropView.cropRegionInsets = UIEdgeInsetsMake(0, 0, 0, 0);
 	}
 	
 	
@@ -287,25 +294,28 @@ CGFloat titleLabelHeight;
     else {
         bounds = self.parentViewController.view.bounds;
     }
-    
+	
+	
     CGRect frame = CGRectZero;
     if (!verticalLayout) {
         frame.origin.x = 44.0f;
-        frame.origin.y = 0.0f + titleLabelHeight;
+		frame.origin.y = 0.0f;
+		
         frame.size.width = CGRectGetWidth(bounds) - 44.0f;
-        frame.size.height = CGRectGetHeight(bounds) - titleLabelHeight;
+		frame.size.height = CGRectGetHeight(bounds);
+		
     }
     else {
         frame.origin.x = 0.0f;
         
         if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
-            frame.origin.y = 0.0f + titleLabelHeight;
+			frame.origin.y = 0.0f;
         } else {
-            frame.origin.y = 44.0f + titleLabelHeight;
+			frame.origin.y = 44.0f;
         }
 
         frame.size.width = CGRectGetWidth(bounds);
-        frame.size.height = CGRectGetHeight(bounds) - 44.0f - titleLabelHeight;
+		frame.size.height = CGRectGetHeight(bounds) - 44.0f;
     }
     
     return frame;
