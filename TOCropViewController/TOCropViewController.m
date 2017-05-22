@@ -198,10 +198,10 @@
 }
     
 #pragma mark - frame fix
-    - (void) memeCollageExtensionWithWidht:(CGFloat*)width height:(CGFloat*)height yPosition:(CGFloat*)yPosition {
-        self.viewWidth = *(width);
-        self.viewHeight = *(height);
-        self.yPosition = *(yPosition);
+    - (void) memeCollageExtensionWithWidht:(CGFloat)width height:(CGFloat)height yPosition:(CGFloat)yPosition {
+        self.viewWidth = width;
+        self.viewHeight = height;
+        self.yPosition = yPosition;
     }
     
     - (CGRect *)frame {
