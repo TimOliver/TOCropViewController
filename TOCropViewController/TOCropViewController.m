@@ -54,6 +54,9 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
 #pragma clang diagnostic pop
+@property (nonatomic, assign) CGFloat viewWidth;
+@property (nonatomic, assign) CGFloat viewHeight;
+@property (nonatomic, assign) CGFloat yPosition;
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -101,10 +104,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
-    self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
+    self.view.frame = *([self frame]);//[self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.cropView];
     
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
@@ -159,7 +162,10 @@
     [super viewDidAppear:animated];
     self.inTransition = NO;
     self.cropView.simpleRenderMode = NO;
-    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
+    //let application = UIApplication.value(forKey: "sharedApplication") as! UIApplication
+    UIApplication *app = (UIApplication*)[UIApplication valueForKey:@"sharedApplication"];
+//    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
+    if (animated && app.statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
         
         if (self.cropView.gridOverlayHidden) {
@@ -190,6 +196,18 @@
     self.inTransition = NO;
     [self setNeedsStatusBarAppearanceUpdate];
 }
+    
+#pragma mark - frame fix
+    - (void) memeCollageExtensionWithWidht:(CGFloat)width height:(CGFloat)height yPosition:(CGFloat)yPosition {
+        self.viewWidth = width;
+        self.viewHeight = height;
+        self.yPosition = yPosition;
+    }
+    
+    - (CGRect *)frame {
+        CGRect viewFrame = CGRectMake(0,self.yPosition,self.viewWidth, self.viewHeight);
+        return &viewFrame;
+    }
 
 #pragma mark - Status Bar -
 - (UIStatusBarStyle)preferredStatusBarStyle
@@ -456,11 +474,16 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         
-        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+        /*UIAlertController *actionSheet = [[UIAlertController alloc] initWithTitle:nil
                                                                  delegate:self
                                                         cancelButtonTitle:cancelButtonTitle
                                                    destructiveButtonTitle:nil
                                                         otherButtonTitles:nil];
+        UIAlertController *alert = [UIAlertController
+                                    alertControllerWithTitle:nil
+                                    delegate: self
+                                    message:@"Are You Sure Want to Logout!"
+                                    preferredStyle:UIAlertControllerStyleAlert];
         
         for (NSString *item in items) {
             [actionSheet addButtonWithTitle:item];
@@ -469,7 +492,7 @@
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
         else
-            [actionSheet showInView:self.view];
+            [actionSheet showInView:self.view];*/
 #pragma clang diagnostic pop
     }
 }
@@ -872,7 +895,7 @@
     if (!_cropView) {
         _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
-        _cropView.frame = [UIScreen mainScreen].bounds;
+        _cropView.frame = self.view.bounds;//[UIScreen mainScreen].bounds;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return _cropView;

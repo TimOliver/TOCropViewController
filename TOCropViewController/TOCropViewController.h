@@ -371,6 +371,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                         toFrame:(CGRect)frame
                                           setup:(nullable void (^)(void))setup
                                      completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimated(from:croppedImage:toView:toFrame:setup:completion:));
+    
+- (void) memeCollageExtensionWithWidht:(CGFloat)width
+                                height:(CGFloat)height
+                             yPosition:(CGFloat)yPosition;
 
 @end
 
