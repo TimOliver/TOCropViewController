@@ -54,6 +54,8 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
 #pragma clang diagnostic pop
+@property (nonatomic, assign) CGFloat viewWidth;
+@property (nonatomic, assign) CGFloat viewHeight;
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -101,10 +103,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
-    self.cropView.frame = [self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
+    self.view.frame = *([self frame]);//[self frameForCropViewWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
     [self.view addSubview:self.cropView];
     
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)];
@@ -190,6 +192,17 @@
     self.inTransition = NO;
     [self setNeedsStatusBarAppearanceUpdate];
 }
+    
+#pragma mark - frame fix
+    - (void) memeCollageExtensionWithWidht:(CGFloat*)width height:(CGFloat*)height {
+        self.viewWidth = *(width);
+        self.viewHeight = *(height);
+    }
+    
+    - (CGRect *)frame {
+        CGRect frame = CGRectMake(0,0,self.viewWidth, self.viewHeight);
+        return &frame;
+    }
 
 #pragma mark - Status Bar -
 - (UIStatusBarStyle)preferredStatusBarStyle
