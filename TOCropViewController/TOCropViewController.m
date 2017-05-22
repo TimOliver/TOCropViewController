@@ -56,6 +56,7 @@
 #pragma clang diagnostic pop
 @property (nonatomic, assign) CGFloat viewWidth;
 @property (nonatomic, assign) CGFloat viewHeight;
+@property (nonatomic, assign) CGFloat yPosition;
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -194,14 +195,15 @@
 }
     
 #pragma mark - frame fix
-    - (void) memeCollageExtensionWithWidht:(CGFloat*)width height:(CGFloat*)height {
+    - (void) memeCollageExtensionWithWidht:(CGFloat*)width height:(CGFloat*)height yPosition:(CGFloat*)yPosition {
         self.viewWidth = *(width);
         self.viewHeight = *(height);
+        self.yPosition = *(yPosition);
     }
     
     - (CGRect *)frame {
-        CGRect frame = CGRectMake(0,0,self.viewWidth, self.viewHeight);
-        return &frame;
+        CGRect viewFrame = CGRectMake(0,self.yPosition,self.viewWidth, self.viewHeight);
+        return &viewFrame;
     }
 
 #pragma mark - Status Bar -
