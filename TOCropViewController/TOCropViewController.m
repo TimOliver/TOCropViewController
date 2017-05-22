@@ -162,7 +162,10 @@
     [super viewDidAppear:animated];
     self.inTransition = NO;
     self.cropView.simpleRenderMode = NO;
-    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
+    //let application = UIApplication.value(forKey: "sharedApplication") as! UIApplication
+    UIApplication *app = (UIApplication*)[UIApplication valueForKey:@"sharedApplication"];
+//    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
+    if (animated && app.statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
         
         if (self.cropView.gridOverlayHidden) {
