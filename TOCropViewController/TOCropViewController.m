@@ -474,11 +474,16 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         
-        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+        /*UIAlertController *actionSheet = [[UIAlertController alloc] initWithTitle:nil
                                                                  delegate:self
                                                         cancelButtonTitle:cancelButtonTitle
                                                    destructiveButtonTitle:nil
                                                         otherButtonTitles:nil];
+        UIAlertController *alert = [UIAlertController
+                                    alertControllerWithTitle:nil
+                                    delegate: self
+                                    message:@"Are You Sure Want to Logout!"
+                                    preferredStyle:UIAlertControllerStyleAlert];
         
         for (NSString *item in items) {
             [actionSheet addButtonWithTitle:item];
@@ -487,7 +492,7 @@
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
         else
-            [actionSheet showInView:self.view];
+            [actionSheet showInView:self.view];*/
 #pragma clang diagnostic pop
     }
 }
