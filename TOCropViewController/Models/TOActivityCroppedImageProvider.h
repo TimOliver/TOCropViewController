@@ -30,5 +30,6 @@
 @property (nonatomic, readonly) BOOL circular;
 
 - (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular;
+- (void) memeCollageExtensionWithWidht:(CGFloat)width height:(CGFloat)height yPosition:(CGFloat)yPosition;
 
 @end
