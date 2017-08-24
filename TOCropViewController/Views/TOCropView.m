@@ -1241,7 +1241,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     offset.y = MAX(-cropFrame.origin.y, offset.y);
     
     __weak typeof(self) weakSelf = self;
-    void (^translateBlock)() = ^{
+    void (^translateBlock)(void) = ^{
         typeof(self) strongSelf = weakSelf;
         
         // Setting these scroll view properties will trigger
@@ -1383,7 +1383,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.cropBoxLastEditedSize = cropBoxFrame.size;
     self.cropBoxLastEditedAngle = self.angle;
     
-    void (^translateBlock)() = ^{
+    void (^translateBlock)(void) = ^{
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
         
