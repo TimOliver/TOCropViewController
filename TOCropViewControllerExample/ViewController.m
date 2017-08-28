@@ -74,8 +74,7 @@
 #pragma mark - Gesture Recognizer -
 - (void)didTapImageView
 {
-    //When tapping the image view, restore the image to the previous cropping state
-    
+    // When tapping the image view, restore the image to the previous cropping state
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
     cropController.delegate = self;
     CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
@@ -125,7 +124,7 @@
     }
     else {
         self.imageView.hidden = NO;
-        [cropViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [cropViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
