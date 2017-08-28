@@ -68,7 +68,7 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Gesture Recognizer -
@@ -219,6 +219,20 @@
     }
 }
 
+- (void)dismissViewController {
+    
+    // Get Weak Self Reference
+    __weak __typeof(self) weakSelf = self;
+    
+    [self dismissViewControllerAnimated:YES completion:^{
+      
+        // Call Delegate
+        if ([weakSelf.delegate respondsToSelector:@selector(demoViewControllerDidClose:)]) {
+            [weakSelf.delegate demoViewControllerDidClose:weakSelf];
+        }
+    }];
+}
+
 #pragma mark - View Creation/Lifecycle -
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -227,9 +241,13 @@
     self.navigationController.navigationBar.translucent = NO;
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showCropViewController)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto)];
     
+#if TARGET_APP_EXTENSION
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissViewController)];
+#else
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto)];
     self.navigationItem.rightBarButtonItem.enabled = NO;
+#endif
     
     self.imageView = [[UIImageView alloc] init];
     self.imageView.userInteractionEnabled = YES;
