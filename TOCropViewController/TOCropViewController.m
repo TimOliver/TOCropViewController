@@ -159,16 +159,20 @@
     [super viewDidAppear:animated];
     self.inTransition = NO;
     self.cropView.simpleRenderMode = NO;
-    if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
+    
+    if (animated) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
-        
-        if (self.cropView.gridOverlayHidden) {
-            [self.cropView setGridOverlayHidden:NO animated:YES];
-        }
-        
-        if (self.navigationController == nil) {
-            [self.cropView setBackgroundImageViewHidden:NO animated:YES];
-        }
+    }
+    else    {
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
+    
+    if (self.cropView.gridOverlayHidden) {
+        [self.cropView setGridOverlayHidden:NO animated:animated];
+    }
+    
+    if (self.navigationController == nil) {
+        [self.cropView setBackgroundImageViewHidden:NO animated:animated];
     }
 }
 
@@ -452,10 +456,11 @@
         [self presentViewController:alertController animated:YES completion:nil];
     }
     else {
+        
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_8_0
     //TODO: Completely overhaul this once iOS 7 support is dropped
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        
         UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                                  delegate:self
                                                         cancelButtonTitle:cancelButtonTitle
@@ -471,6 +476,7 @@
         else
             [actionSheet showInView:self.view];
 #pragma clang diagnostic pop
+#endif
     }
 }
 

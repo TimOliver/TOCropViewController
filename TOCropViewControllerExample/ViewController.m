@@ -68,14 +68,13 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Gesture Recognizer -
 - (void)didTapImageView
 {
-    //When tapping the image view, restore the image to the previous cropping state
-    
+    // When tapping the image view, restore the image to the previous cropping state
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
     cropController.delegate = self;
     CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
@@ -125,7 +124,7 @@
     }
     else {
         self.imageView.hidden = NO;
-        [cropViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [cropViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
@@ -219,6 +218,20 @@
     }
 }
 
+- (void)dismissViewController {
+    
+    // Get Weak Self Reference
+    __weak __typeof(self) weakSelf = self;
+    
+    [self dismissViewControllerAnimated:YES completion:^{
+      
+        // Call Delegate
+        if ([weakSelf.delegate respondsToSelector:@selector(demoViewControllerDidClose:)]) {
+            [weakSelf.delegate demoViewControllerDidClose:weakSelf];
+        }
+    }];
+}
+
 #pragma mark - View Creation/Lifecycle -
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -227,9 +240,13 @@
     self.navigationController.navigationBar.translucent = NO;
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showCropViewController)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto)];
     
+#if TARGET_APP_EXTENSION
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissViewController)];
+#else
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto)];
     self.navigationItem.rightBarButtonItem.enabled = NO;
+#endif
     
     self.imageView = [[UIImageView alloc] init];
     self.imageView.userInteractionEnabled = YES;
