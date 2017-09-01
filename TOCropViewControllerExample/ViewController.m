@@ -42,7 +42,7 @@
     cropController.delegate = self;
 
     // Uncomment this if you wish to provide extra instructions via a title label
-    //cropController.title = @"Crop your Profile Picture";
+    //cropController.title = @"Crop Image";
 
     // -- Uncomment these if you want to test out restoring to a previous crop setting --
     //cropController.angle = 90; // The initial angle in which the image will be rotated

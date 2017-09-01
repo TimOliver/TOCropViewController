@@ -431,8 +431,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect originFrame = self.cropOriginFrame;
     CGRect contentFrame = self.contentBounds;
     
-    point.x = MAX(contentFrame.origin.x, point.x);
-    point.y = MAX(contentFrame.origin.y, point.y);
+    point.x = MAX(contentFrame.origin.x - kTOCropViewPadding, point.x);
+    point.y = MAX(contentFrame.origin.y - kTOCropViewPadding, point.y);
     
     //The delta between where we first tapped, and where our finger is now
     CGFloat xDelta = ceilf(point.x - self.panOriginPoint.x);
