@@ -46,7 +46,7 @@
 
     // -- Uncomment these if you want to test out restoring to a previous crop setting --
     //cropController.angle = 90; // The initial angle in which the image will be rotated
-    //cropController.imageCropFrame = CGRectMake(0,0,2848,4288); //The
+    //cropController.imageCropFrame = CGRectMake(0,0,2848,4288); //The initial frame that the crop controller will have visible.
     
     // -- Uncomment the following lines of code to test out the aspect ratio features --
     //cropController.aspectRatioPreset = TOCropViewControllerAspectRatioPresetSquare; //Set the initial aspect ratio as a square
