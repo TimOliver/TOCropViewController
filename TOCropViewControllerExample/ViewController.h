@@ -8,25 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
-// Delegate Protocol
-@protocol DemoViewControllerDelegate;
-
-
-
 @interface ViewController : UIViewController
-
-@property (nonatomic, weak) id<DemoViewControllerDelegate> delegate;
-
-@end
-
-
-
-// Delegate Declarations
-@protocol DemoViewControllerDelegate <NSObject>
-
-@optional
-- (void) demoViewControllerDidClose:(ViewController *)viewController;
 
 @end
 

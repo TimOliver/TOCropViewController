@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "TOCropViewController.h"
 
-@interface ViewController () <UINavigationControllerDelegate,UIImagePickerControllerDelegate, TOCropViewControllerDelegate>
+@interface ViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, TOCropViewControllerDelegate>
 
 @property (nonatomic, strong) UIImage *image;           // The image we'll be cropping
 @property (nonatomic, strong) UIImageView *imageView;   // The image view to present the cropped image
@@ -219,17 +219,7 @@
 }
 
 - (void)dismissViewController {
-    
-    // Get Weak Self Reference
-    __weak __typeof(self) weakSelf = self;
-    
-    [self dismissViewControllerAnimated:YES completion:^{
-      
-        // Call Delegate
-        if ([weakSelf.delegate respondsToSelector:@selector(demoViewControllerDidClose:)]) {
-            [weakSelf.delegate demoViewControllerDidClose:weakSelf];
-        }
-    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - View Creation/Lifecycle -

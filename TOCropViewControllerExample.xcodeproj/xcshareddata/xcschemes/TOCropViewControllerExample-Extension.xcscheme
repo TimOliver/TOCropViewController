@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2F64926E1F529E790064203A"
-               BuildableName = "TOCropViewController-ShareExtension.appex"
-               BlueprintName = "TOCropViewController-ShareExtension"
+               BlueprintIdentifier = "2F5062DB1F53E2D900AA9F14"
+               BuildableName = "TOCropViewControllerExample-Extension.appex"
+               BlueprintName = "TOCropViewControllerExample-Extension"
                ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -48,9 +48,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2F64926E1F529E790064203A"
-            BuildableName = "TOCropViewController-ShareExtension.appex"
-            BlueprintName = "TOCropViewController-ShareExtension"
+            BlueprintIdentifier = "2F5062DB1F53E2D900AA9F14"
+            BuildableName = "TOCropViewControllerExample-Extension.appex"
+            BlueprintName = "TOCropViewControllerExample-Extension"
             ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
