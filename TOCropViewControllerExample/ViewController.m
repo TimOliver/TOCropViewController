@@ -39,9 +39,11 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary *)editingInfo
 {
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:image];
-	[cropController setTitle:@"Crop Image"];
     cropController.delegate = self;
-    
+
+    // Uncomment this if you wish to provide extra instructions via a title label
+    //cropController.title = @"Crop your Profile Picture";
+
     // -- Uncomment these if you want to test out restoring to a previous crop setting --
     //cropController.angle = 90; // The initial angle in which the image will be rotated
     //cropController.imageCropFrame = CGRectMake(0,0,2848,4288); //The
