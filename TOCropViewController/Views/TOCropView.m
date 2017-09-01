@@ -1527,6 +1527,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     offset.y = floorf(-midPoint.y + cropTargetPoint.y);
     offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
     offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
+    offset.x = MIN(self.scrollView.contentSize.width - newCropFrame.size.width - self.scrollView.contentInset.right, offset.x);
+    offset.y = MIN(self.scrollView.contentSize.height - newCropFrame.size.height - self.scrollView.contentInset.bottom, offset.y);
     
     //if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
     //so we should call the method manually to update the foregroundImageView's frame
