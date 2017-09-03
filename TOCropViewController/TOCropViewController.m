@@ -319,7 +319,7 @@ CGFloat titleLabelHeight;
         return;
     }
 
-    CGFloat verticalInset = self.topLayoutGuide.length; // status bar
+    CGFloat verticalInset = 0.0f; // self.topLayoutGuide.length; // status bar //FIXME: Is this ever needed?
     verticalInset += kTOCropViewControllerTitleTopPadding;
     verticalInset += self.titleLabel.frame.size.height;
 
@@ -332,16 +332,19 @@ CGFloat titleLabelHeight;
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self.cropView moveCroppedContentToCenterAnimated:NO];
-    
+
+    if (self.title.length) {
+        [self.titleLabel sizeToFit];
+        self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
+        [self adjustCropViewInsetsForTitleLabel];
+        [self.cropView moveCroppedContentToCenterAnimated:NO];
+    }
+
     [UIView performWithoutAnimation:^{
         self.toolbar.statusBarVisible = (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && !self.prefersStatusBarHidden);
         self.toolbar.frame = [self frameForToolBarWithVerticalLayout:self.verticalLayout];
         [self.toolbar setNeedsLayout];
     }];
-
-    [self.titleLabel sizeToFit];
-    self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
-    [self adjustCropViewInsetsForTitleLabel];
 }
 
 #pragma mark - Rotation Handling -
