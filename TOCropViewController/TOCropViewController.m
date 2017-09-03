@@ -858,14 +858,20 @@ CGFloat titleLabelHeight;
         [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
         isCallbackOrDelegateHandled = YES;
     }
+
     if (self.onDidCropImageToRect != nil) {
         self.onDidCropImageToRect(cropFrame, angle);
         isCallbackOrDelegateHandled = YES;
     }
-    
+
+    // Check if the circular APIs were implemented
     BOOL isCircularImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)];
     BOOL isCircularImageCallbackAvailable = self.onDidCropToCircleImage != nil;
-    
+
+    // Check if non-circular was implemented
+    BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)];
+    BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
+
     //If cropping circular and the circular generation delegate/block is implemented, call it
     if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
@@ -882,12 +888,8 @@ CGFloat titleLabelHeight;
         
         isCallbackOrDelegateHandled = YES;
     }
-    
-    BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)];
-    BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
-    
     //If the delegate/block that requires the specific cropped image is provided, call it
-    if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
+    else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
         UIImage *image = nil;
         if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
             image = self.image;
