@@ -430,14 +430,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = self.cropBoxFrame;
     CGRect originFrame = self.cropOriginFrame;
     CGRect contentFrame = self.contentBounds;
-    
+
     point.x = MAX(contentFrame.origin.x - kTOCropViewPadding, point.x);
     point.y = MAX(contentFrame.origin.y - kTOCropViewPadding, point.y);
     
     //The delta between where we first tapped, and where our finger is now
     CGFloat xDelta = ceilf(point.x - self.panOriginPoint.x);
     CGFloat yDelta = ceilf(point.y - self.panOriginPoint.y);
-    
+
     //Current aspect ratio of the crop box in case we need to clamp it
     CGFloat aspectRatio = (originFrame.size.width / originFrame.size.height);
 
@@ -448,7 +448,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //ensure we can properly clamp the XY value of the box if it overruns the minimum size
     //(Otherwise the image itself will slide with the drag gesture)
     BOOL clampMinFromTop = NO, clampMinFromLeft = NO;
-    
+
     switch (self.tappedEdge) {
         case TOCropViewOverlayEdgeLeft:
             if (self.aspectRatioLockEnabled) {
@@ -628,7 +628,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         maxSize.width = contentFrame.size.height * aspectRatio;
         minSize.height = kTOCropViewMinimumBoxSize / aspectRatio;
     }
-    
+
+    // Clamp the width if it goes over
+    if (clampMinFromLeft) {
+        CGFloat maxWidth = CGRectGetMaxX(self.cropOriginFrame) - contentFrame.origin.x;
+        frame.size.width = MIN(frame.size.width, maxWidth);
+    }
+
+    if (clampMinFromTop) {
+        CGFloat maxHeight = CGRectGetMaxY(self.cropOriginFrame) - contentFrame.origin.y;
+        frame.size.height = MIN(frame.size.height, maxHeight);
+    }
+
     //Clamp the minimum size
     frame.size.width  = MAX(frame.size.width, minSize.width);
     frame.size.height = MAX(frame.size.height, minSize.height);
@@ -636,7 +647,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Clamp the maximum size
     frame.size.width  = MIN(frame.size.width, maxSize.width);
     frame.size.height = MIN(frame.size.height, maxSize.height);
-    
+
     //Clamp the X position of the box to the interior of the cropping bounds
     frame.origin.x = MAX(frame.origin.x, CGRectGetMinX(contentFrame));
     frame.origin.x = MIN(frame.origin.x, CGRectGetMaxX(contentFrame) - minSize.width);
@@ -768,8 +779,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.tappedEdge = [self cropEdgeForPoint:self.panOriginPoint];
     }
     
-    if (recognizer.state == UIGestureRecognizerStateEnded)
+    if (recognizer.state == UIGestureRecognizerStateEnded) {
         [self startResetTimer];
+    }
     
     [self updateCropBoxFrameWithGesturePoint:point];
 }
