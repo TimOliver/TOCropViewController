@@ -38,10 +38,10 @@
 @property (nonnull, nonatomic, strong, readonly) UIButton *cancelIconButton;
 
 /* The cropper control buttons */
-@property (nonnull, nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
-@property (nonnull, nonatomic, strong, readonly) UIButton *resetButton;
-@property (nonnull, nonatomic, strong, readonly) UIButton *clampButton;
-@property (nonnull, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
+@property (nonnull, nonatomic, strong, readonly)  UIButton *rotateCounterclockwiseButton;
+@property (nonnull, nonatomic, strong, readonly)  UIButton *resetButton;
+@property (nonnull, nonatomic, strong, readonly)  UIButton *clampButton;
+@property (nullable, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
 @property (nonnull, nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 

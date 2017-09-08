@@ -157,7 +157,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 /**
  Title label which can be used to show instruction on the top of the crop view controller
  */
-@property (nonnull, nonatomic, strong, readonly) UILabel *titleLabel;
+@property (nullable, nonatomic, readonly) UILabel *titleLabel;
 
 /**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
