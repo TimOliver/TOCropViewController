@@ -166,7 +166,7 @@
 - (void)showCropViewController
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Crop Image"
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Crop Image", @"")
                                              style:UIAlertActionStyleDefault
                                            handler:^(UIAlertAction *action) {
                                                self.croppingStyle = TOCropViewCroppingStyleDefault;
@@ -178,7 +178,7 @@
                                                [self presentViewController:standardPicker animated:YES completion:nil];
                                            }];
     
-    UIAlertAction *profileAction = [UIAlertAction actionWithTitle:@"Make Profile Picture"
+    UIAlertAction *profileAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Make Profile Picture", @"")
                                            style:UIAlertActionStyleDefault
                                          handler:^(UIAlertAction *action) {
                                              self.croppingStyle = TOCropViewCroppingStyleCircular;
@@ -228,7 +228,7 @@
 #pragma mark - View Creation/Lifecycle -
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"TOCropViewController";
+    self.title = NSLocalizedString(@"TOCropViewController", @"");
     
     self.navigationController.navigationBar.translucent = NO;
     
