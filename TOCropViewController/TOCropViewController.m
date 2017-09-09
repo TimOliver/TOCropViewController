@@ -739,23 +739,20 @@ CGFloat titleLabelHeight;
 - (void)cancelButtonTapped
 {
     bool isDelegateOrCallbackHandled = NO;
-    
+
+    // Check if the delegate method was implemented and call if so
     if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
         [self.delegate cropViewController:self didFinishCancelled:YES];
-        
-        if (self.onDidFinishCancelled != nil) {
-            self.onDidFinishCancelled(YES);
-        }
-        
         isDelegateOrCallbackHandled = YES;
     }
-    
+
+    // Check if the block version was implemented and call if so
     if (self.onDidFinishCancelled != nil) {
         self.onDidFinishCancelled(YES);
-        
         isDelegateOrCallbackHandled = YES;
     }
-    
+
+    // If neither callbacks were implemented, perform a default dismissing animation
     if (!isDelegateOrCallbackHandled) {
         if (self.navigationController) {
             [self.navigationController popViewControllerAnimated:YES];
