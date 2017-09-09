@@ -85,6 +85,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  If implemented, when the user hits cancel, or completes a 
  UIActivityViewController operation, this delegate will be called,
  giving you a chance to manually dismiss the view controller
+
+ @param cancelled Whether a cropping action was actually performed, or if the user explicitly hit 'Cancel'
  
  */
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled NS_SWIFT_NAME(cropViewController(_:didFinishCancelled:));
