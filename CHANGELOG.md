@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Changed
+- Fixed missing semicolons in iOS 7 code brace.
 - Fixed minor issue with certain `nullable` properties being marked as `nonnull`.
 
 ## 2.1.0 - 2017-09-07

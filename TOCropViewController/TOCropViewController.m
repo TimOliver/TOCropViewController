@@ -827,15 +827,15 @@ CGFloat titleLabelHeight;
             if (!completed)
                 return;
             
-            bool isCallbackOrDelegateHandled = NO
+            bool isCallbackOrDelegateHandled = NO;
             
             if (self.onDidFinishCancelled != nil) {
-                self.onDidFinishCancelled(NO)
-                isCallbackOrDelegateHandled = YES
+                self.onDidFinishCancelled(NO);
+                isCallbackOrDelegateHandled = YES;
             }
             if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
                 [self.delegate cropViewController:self didFinishCancelled:NO];
-                isCallbackOrDelegateHandled = YES
+                isCallbackOrDelegateHandled = YES;
             }
             
             if (!isCallbackOrDelegateHandled) {
