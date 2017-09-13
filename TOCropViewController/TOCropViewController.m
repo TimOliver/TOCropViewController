@@ -322,14 +322,14 @@ CGFloat titleLabelHeight;
     return frame;
 }
 
-- (void)adjustCropViewInsetsForTitleLabel
+- (void)adjustCropViewInsets
 {
-    if (!self.titleLabel.text.length) {
-        UIEdgeInsets insets = UIEdgeInsetsZero;
-        if (@available(iOS 11.0, *)) {
-            insets = self.view.safeAreaInsets;
-        }
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+    }
 
+    if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
             self.cropView.cropRegionInsets = UIEdgeInsetsZero;
         }
@@ -340,11 +340,13 @@ CGFloat titleLabelHeight;
         return;
     }
 
+    [self.titleLabel sizeToFit];
+
     CGFloat verticalInset = 0.0f; // self.topLayoutGuide.length; // status bar //FIXME: Is this ever needed?
     verticalInset += kTOCropViewControllerTitleTopPadding;
     verticalInset += self.titleLabel.frame.size.height;
 
-    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, 0, 0, 0);
+    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, 0, insets.bottom, 0);
 }
 
 - (void)viewDidLayoutSubviews
@@ -354,9 +356,7 @@ CGFloat titleLabelHeight;
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self.cropView moveCroppedContentToCenterAnimated:NO];
 
-    // TODO: Clean this up
-    [self.titleLabel sizeToFit];
-    [self adjustCropViewInsetsForTitleLabel];
+    [self adjustCropViewInsets];
 
     if (self.title.length) {
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
