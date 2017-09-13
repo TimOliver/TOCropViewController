@@ -27,6 +27,9 @@
 /* In horizontal mode, offsets all of the buttons vertically by 20 points. */
 @property (nonatomic, assign) BOOL statusBarVisible;
 
+/* Set an inset that will expand the background view beyond the bounds. */
+@property (nonatomic, assign) UIEdgeInsets backgroundViewOutsets;
+
 /* The 'Done' buttons to commit the crop. The text button is displayed
  in portrait mode and the icon one, in landscape. */
 @property (nonnull, nonatomic, strong, readonly) UIButton *doneTextButton;

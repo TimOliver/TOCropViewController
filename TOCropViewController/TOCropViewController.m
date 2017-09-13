@@ -227,9 +227,14 @@ CGFloat titleLabelHeight;
 
 - (CGRect)frameForToolBarWithVerticalLayout:(BOOL)verticalLayout
 {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+    }
+
     CGRect frame = CGRectZero;
     if (!verticalLayout) {
-        frame.origin.x = 0.0f;
+        frame.origin.x = insets.left;
         frame.origin.y = 0.0f;
         frame.size.width = 44.0f;
         frame.size.height = CGRectGetHeight(self.view.frame);
@@ -238,9 +243,9 @@ CGFloat titleLabelHeight;
         frame.origin.x = 0.0f;
         
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
-            frame.origin.y = CGRectGetHeight(self.view.bounds) - 44.0f;
+            frame.origin.y = CGRectGetHeight(self.view.bounds) - (44.0f + insets.bottom);
         } else {
-            frame.origin.y = 0;
+            frame.origin.y = insets.top;
         }
         
         frame.size.width = CGRectGetWidth(self.view.bounds);
@@ -257,10 +262,14 @@ CGFloat titleLabelHeight;
 
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout
 {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+    }
+
     //On an iPad, if being presented in a modal view controller by a UINavigationController,
     //at the time we need it, the size of our view will be incorrect.
     //If this is the case, derive our view size from our parent view controller instead
-    
     CGRect bounds = CGRectZero;
     if (self.parentViewController == nil) {
         bounds = self.view.bounds;
@@ -269,27 +278,28 @@ CGFloat titleLabelHeight;
         bounds = self.parentViewController.view.bounds;
     }
 	
-	
     CGRect frame = CGRectZero;
     if (!verticalLayout) {
-        frame.origin.x = 44.0f;
+        frame.origin.x = 44.0f + insets.left;
 		frame.origin.y = 0.0f;
 		
-        frame.size.width = CGRectGetWidth(bounds) - 44.0f;
+        frame.size.width = CGRectGetWidth(bounds) - (44.0f + insets.left);
 		frame.size.height = CGRectGetHeight(bounds);
 		
     }
     else {
         frame.origin.x = 0.0f;
-        
+        frame.size.height = CGRectGetHeight(bounds);
+
         if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
 			frame.origin.y = 0.0f;
+            frame.size.height -= insets.bottom;
         } else {
-			frame.origin.y = 44.0f;
+			frame.origin.y = 44.0f + insets.top;
+            frame.size.height -= insets.top;
         }
 
         frame.size.width = CGRectGetWidth(bounds);
-		frame.size.height = CGRectGetHeight(bounds) - 44.0f;
     }
     
     return frame;
@@ -314,8 +324,19 @@ CGFloat titleLabelHeight;
 
 - (void)adjustCropViewInsetsForTitleLabel
 {
-    if (!self.titleLabel) {
-        self.cropView.cropRegionInsets = UIEdgeInsetsZero;
+    if (!self.titleLabel.text.length) {
+        UIEdgeInsets insets = UIEdgeInsetsZero;
+        if (@available(iOS 11.0, *)) {
+            insets = self.view.safeAreaInsets;
+        }
+
+        if (self.verticalLayout) {
+            self.cropView.cropRegionInsets = UIEdgeInsetsZero;
+        }
+        else {
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+        }
+
         return;
     }
 
@@ -333,10 +354,12 @@ CGFloat titleLabelHeight;
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self.cropView moveCroppedContentToCenterAnimated:NO];
 
+    // TODO: Clean this up
+    [self.titleLabel sizeToFit];
+    [self adjustCropViewInsetsForTitleLabel];
+
     if (self.title.length) {
-        [self.titleLabel sizeToFit];
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
-        [self adjustCropViewInsetsForTitleLabel];
         [self.cropView moveCroppedContentToCenterAnimated:NO];
     }
 

@@ -26,6 +26,8 @@
 
 @interface TOCropToolbar()
 
+@property (nonatomic, strong) UIView *backgroundView;
+
 @property (nonatomic, strong, readwrite) UIButton *doneTextButton;
 @property (nonatomic, strong, readwrite) UIButton *doneIconButton;
 
@@ -63,7 +65,9 @@
 }
 
 - (void)setup {
-    self.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
+    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    [self addSubview:self.backgroundView];
     
     _rotateClockwiseButtonHidden = YES;
     
@@ -152,6 +156,15 @@
     self.cancelTextButton.hidden = (verticalLayout);
     self.doneIconButton.hidden   = (!verticalLayout);
     self.doneTextButton.hidden   = (verticalLayout);
+
+    CGRect frame = self.bounds;
+//    frame.origin.x -= self.backgroundViewOutsets.left;
+//    frame.size.width += self.backgroundViewOutsets.left;
+//    frame.size.width += self.backgroundViewOutsets.right;
+//    frame.origin.y -= self.backgroundViewOutsets.top;
+//    frame.size.height += self.backgroundViewOutsets.top;
+//    frame.size.height += self.backgroundViewOutsets.bottom;
+    self.backgroundView.frame = frame;
     
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
     static UIView *containerView = nil;
