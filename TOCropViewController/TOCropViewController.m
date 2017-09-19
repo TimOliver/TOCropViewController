@@ -46,7 +46,6 @@ static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
-@property (nonatomic, assign) BOOL initialLayout;
 
 /* If pushed from a navigation controller, the visibility of that controller's bars. */
 @property (nonatomic, assign) BOOL navigationBarHidden;
@@ -102,7 +101,10 @@ CGFloat titleLabelHeight;
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
+    [self.view addSubview:self.cropView];
+
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:self.verticalLayout];
+    [self.view addSubview:self.toolbar];
 
     __weak typeof(self) weakSelf = self;
     self.toolbar.doneButtonTapped   = ^{ [weakSelf doneButtonTapped]; };
@@ -124,7 +126,7 @@ CGFloat titleLabelHeight;
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     if (animated) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
@@ -293,7 +295,7 @@ CGFloat titleLabelHeight;
 
         if (_toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
 			frame.origin.y = 0.0f;
-            frame.size.height -= insets.bottom;
+            frame.size.height -= (insets.bottom + 44.0f);
         } else {
 			frame.origin.y = 44.0f + insets.top;
             frame.size.height -= insets.top;
@@ -354,9 +356,8 @@ CGFloat titleLabelHeight;
     [super viewDidLayoutSubviews];
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
-    [self.cropView moveCroppedContentToCenterAnimated:NO];
-
     [self adjustCropViewInsets];
+    [self.cropView moveCroppedContentToCenterAnimated:NO];
 
     if (self.title.length) {
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
@@ -956,12 +957,13 @@ CGFloat titleLabelHeight;
 }
 
 - (TOCropView *)cropView {
+    // Lazily create the crop view in case we try and access it before presentation, but
+    // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
         _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
         _cropView.frame = [UIScreen mainScreen].bounds;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self.view addSubview:_cropView];
     }
     return _cropView;
 }
@@ -969,7 +971,6 @@ CGFloat titleLabelHeight;
 - (TOCropToolbar *)toolbar {
     if (!_toolbar) {
         _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
-        [self.view addSubview:_toolbar];
     }
     return _toolbar;
 }
