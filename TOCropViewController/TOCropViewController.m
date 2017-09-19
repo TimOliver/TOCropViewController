@@ -101,10 +101,10 @@ CGFloat titleLabelHeight;
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
-    [self.view addSubview:self.cropView];
-
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:self.verticalLayout];
-    [self.view addSubview:self.toolbar];
+
+    // Perform the initial set up after the initial frame is set
+    [self.cropView performInitialSetup];
 
     __weak typeof(self) weakSelf = self;
     self.toolbar.doneButtonTapped   = ^{ [weakSelf doneButtonTapped]; };
@@ -264,23 +264,25 @@ CGFloat titleLabelHeight;
 
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout
 {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11.0, *)) {
-        insets = self.view.safeAreaInsets;
-    }
-
     //On an iPad, if being presented in a modal view controller by a UINavigationController,
     //at the time we need it, the size of our view will be incorrect.
     //If this is the case, derive our view size from our parent view controller instead
-    CGRect bounds = CGRectZero;
+    UIView *view = nil;
     if (self.parentViewController == nil) {
-        bounds = self.view.bounds;
+        view = self.view;
     }
     else {
-        bounds = self.parentViewController.view.bounds;
+        view = self.parentViewController.view;
     }
-	
+
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11.0, *)) {
+        insets = view.safeAreaInsets;
+    }
+
+    CGRect bounds = view.bounds;
     CGRect frame = CGRectZero;
+
     if (!verticalLayout) {
         frame.origin.x = 44.0f + insets.left;
 		frame.origin.y = 0.0f;
@@ -962,8 +964,8 @@ CGFloat titleLabelHeight;
     if (!_cropView) {
         _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
-        _cropView.frame = [UIScreen mainScreen].bounds;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self.view addSubview:_cropView];
     }
     return _cropView;
 }
@@ -971,6 +973,7 @@ CGFloat titleLabelHeight;
 - (TOCropToolbar *)toolbar {
     if (!_toolbar) {
         _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+        [self.view addSubview:_toolbar];
     }
     return _toolbar;
 }

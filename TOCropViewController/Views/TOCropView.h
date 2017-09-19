@@ -148,6 +148,12 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 - (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image;
 
 /**
+ Performs the initial set up, including laying out the image and applying any restore properties.
+ This should be called once the crop view has been added to a parent that is in its final layout frame.
+ */
+- (void)performInitialSetup;
+
+/**
  When performing large size transitions (eg, orientation rotation),
  set simple mode to YES to temporarily graphically heavy effects like translucency.
  

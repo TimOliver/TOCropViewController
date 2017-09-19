@@ -52,6 +52,9 @@
     // Add the view layers beforehand as this will trigger the initial sets of layouts
     if (self.isDismissing == NO) {
         [containerView addSubview:cropViewController.view];
+
+        //Force a relayout now that the view is in the view hierarchy (so things like the safe area insets are now valid)
+        [cropViewController viewDidLayoutSubviews];
     }
     else {
         [containerView insertSubview:previousController.view belowSubview:cropViewController.view];

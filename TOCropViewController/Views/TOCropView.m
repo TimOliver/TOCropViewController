@@ -267,15 +267,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - View Layout -
-- (void)didMoveToSuperview
+- (void)performInitialSetup
 {
-    [super didMoveToSuperview];
-    
-    //Since this also gets called when getting removed from the superview
-    if (self.superview == nil) {
-        return;
-    }
-    
     //Perform the initial layout of the image
     [self layoutInitialImage];
     
