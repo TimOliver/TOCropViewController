@@ -162,6 +162,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nullable, nonatomic, readonly) UILabel *titleLabel;
 
 /**
+ If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box will swap it's dimensions depending on portrait or landscape sized images.
+ 
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL aspectRatioLockAllowDimensionSwap;
+
+/**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
  
  If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio

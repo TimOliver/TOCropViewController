@@ -594,10 +594,17 @@ CGFloat titleLabelHeight;
             break;
     }
     
+    /*
+     * If the aspectratio lock is not enabled, allow a swap
+     *
+     * If the aspect ratio lock is on, allow a aspect ratio swap
+     * only if the allowDimensionSwap option is specified.
+    */
+    BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled || (self.aspectRatioLockEnabled && self.aspectRatioLockAllowDimensionSwap);
+    
     //If the image is a portrait shape, flip the aspect ratio to match
-    if (aspectRatioPreset != TOCropViewControllerAspectRatioPresetCustom &&
-        self.cropView.cropBoxAspectRatioIsPortrait &&
-        !self.aspectRatioLockEnabled)
+    if (self.cropView.cropBoxAspectRatioIsPortrait &&
+        aspectRatioCanSwapDimensions)
     {
         CGFloat width = aspectRatio.width;
         aspectRatio.width = aspectRatio.height;
@@ -1010,6 +1017,16 @@ CGFloat titleLabelHeight;
 - (BOOL)aspectRatioLockEnabled
 {
     return self.cropView.aspectRatioLockEnabled;
+}
+
+-(void)setAspectRatioLockAllowDimensionSwap:(BOOL)aspectRatioLockAllowDimensionSwap
+{
+    self.cropView.aspectRatioAllowDimensionSwap = aspectRatioLockAllowDimensionSwap;
+}
+
+-(BOOL)aspectRatioLockAllowDimensionSwap
+{
+    return self.cropView.aspectRatioAllowDimensionSwap;
 }
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden

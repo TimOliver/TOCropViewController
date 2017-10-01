@@ -172,6 +172,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.cropBoxResizeEnabled = !circularMode;
     self.aspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
     self.resetAspectRatioEnabled = !circularMode;
+    self.aspectRatioAllowDimensionSwap = NO;
     self.restoreImageCropFrame = CGRectZero;
     self.restoreAngle = 0;
     
