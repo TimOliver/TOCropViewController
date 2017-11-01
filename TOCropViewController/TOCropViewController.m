@@ -254,8 +254,12 @@ CGFloat titleLabelHeight;
         frame.size.height = 44.0f;
         
         // If the bar is at the top of the screen and the status bar is visible, account for the status bar height
-        if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && self.prefersStatusBarHidden == NO) {
-            frame.size.height = 64.0f;
+        if (@available(iOS 11.0, *)) {
+        }
+        else {
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && self.prefersStatusBarHidden == NO) {
+                frame.size.height = 64.0f;
+            }
         }
     }
     
@@ -351,6 +355,30 @@ CGFloat titleLabelHeight;
     verticalInset += self.titleLabel.frame.size.height;
 
     self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, 0, insets.bottom, 0);
+}
+
+- (void)viewSafeAreaInsetsDidChange
+{
+    [super viewSafeAreaInsetsDidChange];
+    
+    if (@available(iOS 11.0, *)) {
+        // Update the toolbar with the necessary insets
+        UIEdgeInsets insets = UIEdgeInsetsZero;
+        if (!self.verticalLayout) {
+            insets.left = self.view.safeAreaInsets.left;
+        }
+        else {
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+                insets.top = self.view.safeAreaInsets.top;
+            }
+            else {
+                insets.bottom = self.view.safeAreaInsets.bottom;
+            }
+        }
+        
+        self.toolbar.backgroundViewOutsets = insets;
+        [self.toolbar setNeedsLayout];
+    }
 }
 
 - (void)viewDidLayoutSubviews

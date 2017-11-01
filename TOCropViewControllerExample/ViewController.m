@@ -54,13 +54,8 @@
 //    cropController.resetAspectRatioEnabled = NO; // When tapping 'reset', the aspect ratio will NOT be reset back to default
 //    cropController.aspectRatioPickerButtonHidden = YES;
 
-//    controller.aspectRatioPreset = .presetSquare
-//    controller.aspectRatioLockEnabled = true
-//    controller.aspectRatioPickerButtonHidden = true
-//    controller.resetAspectRatioEnabled = false
-
     // -- Uncomment this line of code to place the toolbar at the top of the view controller --
-    // cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+    //cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
     
     self.image = image;
     

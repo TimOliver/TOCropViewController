@@ -24,7 +24,7 @@
 
 @interface TOCropToolbar : UIView
 
-/* In horizontal mode, offsets all of the buttons vertically by 20 points. */
+/* In horizontal mode, offsets all of the buttons vertically by height of status bar. */
 @property (nonatomic, assign) BOOL statusBarVisible;
 
 /* Set an inset that will expand the background view beyond the bounds. */

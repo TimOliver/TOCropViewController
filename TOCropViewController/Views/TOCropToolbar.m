@@ -158,12 +158,12 @@
     self.doneTextButton.hidden   = (verticalLayout);
 
     CGRect frame = self.bounds;
-//    frame.origin.x -= self.backgroundViewOutsets.left;
-//    frame.size.width += self.backgroundViewOutsets.left;
-//    frame.size.width += self.backgroundViewOutsets.right;
-//    frame.origin.y -= self.backgroundViewOutsets.top;
-//    frame.size.height += self.backgroundViewOutsets.top;
-//    frame.size.height += self.backgroundViewOutsets.bottom;
+    frame.origin.x -= self.backgroundViewOutsets.left;
+    frame.size.width += self.backgroundViewOutsets.left;
+    frame.size.width += self.backgroundViewOutsets.right;
+    frame.origin.y -= self.backgroundViewOutsets.top;
+    frame.size.height += self.backgroundViewOutsets.top;
+    frame.size.height += self.backgroundViewOutsets.bottom;
     self.backgroundView.frame = frame;
     
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
@@ -181,7 +181,11 @@
         
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
-        frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
+        if (@available(iOS 11.0, *)) {
+            frame.origin.y = 0.0f;
+        } else {
+            frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
+        }
         frame.size.height = 44.0f;
         frame.size.width = [self.cancelTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
 
@@ -216,7 +220,7 @@
             width = CGRectGetMinX(self.cancelTextButton.frame) - CGRectGetMaxX(self.doneTextButton.frame);
         }
         
-        CGRect containerRect = (CGRect){x,frame.origin.y,width,44.0f};
+        CGRect containerRect = CGRectIntegral((CGRect){x,frame.origin.y,width,44.0f});
 
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
@@ -238,7 +242,6 @@
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
         }
-        
         
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     }
@@ -296,7 +299,11 @@
         CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
         if (horizontally) {
             origin.x += CGRectGetMinX(containerRect);
-            origin.y += self.statusBarVisible ? 20.0f : 0.0f;
+            if (@available(iOS 11.0, *)) {
+            }
+            else {
+                origin.y += self.statusBarVisible ? 20.0f : 0.0f;
+            }
         } else {
             origin.y += CGRectGetMinY(containerRect);
         }
