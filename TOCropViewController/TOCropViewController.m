@@ -986,6 +986,14 @@ CGFloat titleLabelHeight;
     self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
 }
 
+- (void)setDoneButtonTitle:(NSString *)title {
+    self.toolbar.doneTextButtonTitle = title;
+}
+
+- (void)setCancelButtonTitle:(NSString *)title {
+    self.toolbar.cancelTextButtonTitle = title;
+}
+
 - (TOCropView *)cropView {
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time

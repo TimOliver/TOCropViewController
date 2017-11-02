@@ -91,10 +91,11 @@
     }
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [_doneTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Done",
-                                                                 @"TOCropViewControllerLocalizable",
-                                                                 resourceBundle,
-                                                                 nil)
+    [_doneTextButton setTitle: _doneTextButtonTitle ?
+        _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
+                                                                  @"TOCropViewControllerLocalizable",
+                                                                  resourceBundle,
+                                                                  nil)
                      forState:UIControlStateNormal];
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
     [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
@@ -108,10 +109,12 @@
     [self addSubview:_doneIconButton];
     
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [_cancelTextButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel",
-                                                                   @"TOCropViewControllerLocalizable",
-                                                                   resourceBundle,
-                                                                   nil)
+    
+    [_cancelTextButton setTitle: _cancelTextButtonTitle ?
+        _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
+                                                                    @"TOCropViewControllerLocalizable",
+                                                                    resourceBundle,
+                                                                    nil)
                        forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -187,7 +190,9 @@
             frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
         }
         frame.size.height = 44.0f;
-        frame.size.width = [self.cancelTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
+        CGFloat cancelButtonWidth = [self.cancelTextButtonTitle ?
+                                     self.cancelTextButtonTitle : self.cancelTextButton.titleLabel.text  sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
+        frame.size.width = MIN(self.frame.size.width / 3.0, cancelButtonWidth);
 
         //If normal layout, place on the left side, else place on the right
         if (self.reverseContentLayout == NO) {
@@ -199,7 +204,9 @@
         self.cancelTextButton.frame = frame;
         
         // Work out the Done button frame
-        frame.size.width = [self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
+        CGFloat doneButtonWidth = [self.cancelTextButtonTitle ?
+                                   self.cancelTextButtonTitle : self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
+        frame.size.width = MIN(self.frame.size.width / 3.0, doneButtonWidth);
         
         if (self.reverseContentLayout == NO) {
             frame.origin.x = boundsSize.width - (frame.size.width + insetPadding);
@@ -387,6 +394,16 @@
         return self.doneIconButton.frame;
     
     return self.doneTextButton.frame;
+}
+
+- (void)setCancelTextButtonTitle:(NSString *)cancelTextButtonTitle {
+    _cancelTextButtonTitle = cancelTextButtonTitle;
+    [_cancelTextButton setTitle:_cancelTextButtonTitle forState:UIControlStateNormal];
+}
+
+- (void)setDoneTextButtonTitle:(NSString *)doneTextButtonTitle {
+    _doneTextButtonTitle = doneTextButtonTitle;
+    [_doneTextButton setTitle:_doneTextButtonTitle forState:UIControlStateNormal];
 }
 
 #pragma mark - Image Generation -

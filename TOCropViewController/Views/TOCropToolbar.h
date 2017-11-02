@@ -34,11 +34,14 @@
  in portrait mode and the icon one, in landscape. */
 @property (nonnull, nonatomic, strong, readonly) UIButton *doneTextButton;
 @property (nonnull, nonatomic, strong, readonly) UIButton *doneIconButton;
+@property (nonnull, nonatomic, copy) NSString *doneTextButtonTitle;
+
 
 /* The 'Cancel' buttons to cancel the crop. The text button is displayed
  in portrait mode and the icon one, in landscape. */
 @property (nonnull, nonatomic, strong, readonly) UIButton *cancelTextButton;
 @property (nonnull, nonatomic, strong, readonly) UIButton *cancelIconButton;
+@property (nonnull, nonatomic, copy) NSString *cancelTextButtonTitle;
 
 /* The cropper control buttons */
 @property (nonnull, nonatomic, strong, readonly)  UIButton *rotateCounterclockwiseButton;
