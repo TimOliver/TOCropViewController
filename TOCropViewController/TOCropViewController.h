@@ -162,6 +162,18 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nullable, nonatomic, readonly) UILabel *titleLabel;
 
 /**
+ Title for the 'Done' button.
+ Setting this will override the Default which is a localized string for "Done".
+ */
+@property (nullable, nonatomic, copy) NSString *doneButtonTitle;
+
+/**
+ Title for the 'Cancel' button.
+ Setting this will override the Default which is a localized string for "Cancel".
+ */
+@property (nullable, nonatomic, copy) NSString *cancelButtonTitle;
+
+/**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
  
  If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio
