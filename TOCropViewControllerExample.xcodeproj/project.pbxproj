@@ -24,7 +24,6 @@
 		144B8CE01D22CD730085D774 /* TOCropToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D931B234D07008B8466 /* TOCropToolbar.m */; };
 		144B8CE11D22CD730085D774 /* TOCropView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D951B234D07008B8466 /* TOCropView.m */; };
 		144B8CE21D22CD730085D774 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
-		144B8CE41D22CE0D0085D774 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 144B8CE31D22CE0D0085D774 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2206119C1B2E6777001A467B /* TOCropViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2206119B1B2E6777001A467B /* TOCropViewControllerTests.m */; };
 		223424701ABBC0CD00BBC2B1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2234246F1ABBC0CD00BBC2B1 /* main.m */; };
 		223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424721ABBC0CD00BBC2B1 /* AppDelegate.m */; };
@@ -33,10 +32,11 @@
 		2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2234247A1ABBC0CD00BBC2B1 /* Images.xcassets */; };
 		2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2234247C1ABBC0CD00BBC2B1 /* LaunchScreen.xib */; };
 		2236AB4A1F595960005C5098 /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236AB491F59590E005C5098 /* ShareViewController.m */; };
+		223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
+		223DCEB91FBAAA5C00F99209 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 223DCEB81FBAAA5C00F99209 /* TOCropViewController.h */; };
 		2271B63E1DAAB59600AA147F /* TOCropViewController-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 2271B63D1DAAB59600AA147F /* TOCropViewController-Bridging-Header.h */; };
 		22BF96201B2CD017009F4785 /* TOCroppedImageAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF961F1B2CD017009F4785 /* TOCroppedImageAttributes.m */; };
 		22C3C5471AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22C3C5491AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings */; };
-		22DB4D861B234CFA008B8466 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		22DB4D961B234D07008B8466 /* TOCropViewControllerTransitioning.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D8A1B234D07008B8466 /* TOCropViewControllerTransitioning.m */; };
 		22DB4D971B234D07008B8466 /* UIImage+CropRotate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D8C1B234D07008B8466 /* UIImage+CropRotate.m */; };
 		22DB4D981B234D07008B8466 /* TOCropOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D8F1B234D07008B8466 /* TOCropOverlayView.m */; };
@@ -91,7 +91,6 @@
 
 /* Begin PBXFileReference section */
 		144B8CC91D22CAFF0085D774 /* TOCropViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TOCropViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		144B8CE31D22CE0D0085D774 /* TOCropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCropViewController.h; sourceTree = "<group>"; };
 		146EFFB51D243822006CE3A0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		15E30F151B47A2660099A975 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		220611971B2E6777001A467B /* TOCropViewControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOCropViewControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +109,8 @@
 		2236AB471F59590E005C5098 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2236AB481F59590E005C5098 /* ShareViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareViewController.h; sourceTree = "<group>"; };
 		2236AB491F59590E005C5098 /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
+		223DCEB71FBAA91300F99209 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		223DCEB81FBAAA5C00F99209 /* TOCropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOCropViewController.h; path = TOCropViewController/TOCropViewController.h; sourceTree = SOURCE_ROOT; };
 		2271B63D1DAAB59600AA147F /* TOCropViewController-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TOCropViewController-Bridging-Header.h"; sourceTree = "<group>"; };
 		22BF961E1B2CD017009F4785 /* TOCroppedImageAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCroppedImageAttributes.h; sourceTree = "<group>"; };
 		22BF961F1B2CD017009F4785 /* TOCroppedImageAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOCroppedImageAttributes.m; sourceTree = "<group>"; };
@@ -186,7 +187,7 @@
 			children = (
 				22DB4D881B234D07008B8466 /* Models */,
 				22DB4D8D1B234D07008B8466 /* Views */,
-				144B8CE31D22CE0D0085D774 /* TOCropViewController.h */,
+				223DCEB81FBAAA5C00F99209 /* TOCropViewController.h */,
 				22DB4D831B234CFA008B8466 /* TOCropViewController.m */,
 				22C3C5491AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings */,
 				2271B63D1DAAB59600AA147F /* TOCropViewController-Bridging-Header.h */,
@@ -305,6 +306,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				223DCEB91FBAAA5C00F99209 /* TOCropViewController.h in Headers */,
 				144B8CD11D22CD650085D774 /* TOCropViewControllerTransitioning.h in Headers */,
 				144B8CD21D22CD650085D774 /* TOActivityCroppedImageProvider.h in Headers */,
 				144B8CD31D22CD650085D774 /* TOCroppedImageAttributes.h in Headers */,
@@ -312,7 +314,6 @@
 				144B8CD41D22CD650085D774 /* UIImage+CropRotate.h in Headers */,
 				144B8CD51D22CD650085D774 /* TOCropOverlayView.h in Headers */,
 				144B8CD61D22CD650085D774 /* TOCropScrollView.h in Headers */,
-				144B8CE41D22CE0D0085D774 /* TOCropViewController.h in Headers */,
 				144B8CD71D22CD650085D774 /* TOCropToolbar.h in Headers */,
 				144B8CD81D22CD650085D774 /* TOCropView.h in Headers */,
 			);
@@ -400,7 +401,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0900;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Tim Oliver";
 				TargetAttributes = {
 					144B8CC81D22CAFF0085D774 = {
@@ -536,7 +537,7 @@
 				22DB4D9E1B234D4F008B8466 /* TOActivityCroppedImageProvider.m in Sources */,
 				22DB4D961B234D07008B8466 /* TOCropViewControllerTransitioning.m in Sources */,
 				22DB4D991B234D07008B8466 /* TOCropScrollView.m in Sources */,
-				22DB4D861B234CFA008B8466 /* TOCropViewController.m in Sources */,
+				223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -612,6 +613,7 @@
 				6AE313511C47DAA200894C5B /* ar */,
 				CDC8C5771C667B9100BB86A4 /* tr */,
 				3AADDE231CA5C43400AE0129 /* vi */,
+				223DCEB71FBAA91300F99209 /* nl */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			sourceTree = "<group>";
@@ -821,7 +823,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = TOCropViewControllerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.timoliver.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -841,7 +843,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = TOCropViewControllerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.timoliver.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

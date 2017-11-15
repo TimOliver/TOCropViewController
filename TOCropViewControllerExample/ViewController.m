@@ -72,6 +72,7 @@
     else { //otherwise dismiss, and then present from the main controller
         [picker dismissViewControllerAnimated:YES completion:^{
             [self presentViewController:cropController animated:YES completion:nil];
+            //[self.navigationController pushViewController:cropController animated:YES];
         }];
     }
 }

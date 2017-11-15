@@ -259,7 +259,7 @@
         frame.origin.y = CGRectGetHeight(self.bounds) - 44.0f;
         self.cancelIconButton.frame = frame;
         
-        frame.origin.y = 0.0f;
+        frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
         frame.size.width = 44.0f;
         frame.size.height = 44.0f;
         self.doneIconButton.frame = frame;
@@ -626,6 +626,12 @@
 - (UIButton *)rotateButton
 {
     return self.rotateCounterclockwiseButton;
+}
+
+- (void)setStatusBarVisible:(BOOL)statusBarVisible
+{
+    _statusBarVisible = statusBarVisible;
+    [self setNeedsLayout];
 }
 
 @end

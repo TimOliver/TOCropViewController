@@ -51,8 +51,9 @@ static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
 @property (nonatomic, assign) BOOL navigationBarHidden;
 @property (nonatomic, assign) BOOL toolbarHidden;
 
-/* Convenience method for checking vertical state */
+/* Convenience method for checking state */
 @property (nonatomic, readonly) BOOL verticalLayout;
+@property (nonatomic, readonly) BOOL statusBarHidden;
 
 /* On iOS 7, the popover view controller that appears when tapping 'Done' */
 #pragma clang diagnostic push
@@ -126,7 +127,7 @@ CGFloat titleLabelHeight;
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
+    
     if (animated) {
         self.inTransition = YES;
         [self setNeedsStatusBarAppearanceUpdate];
@@ -257,7 +258,7 @@ CGFloat titleLabelHeight;
         if (@available(iOS 11.0, *)) {
         }
         else {
-            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && self.prefersStatusBarHidden == NO) {
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && self.statusBarHidden == NO) {
                 frame.size.height = 64.0f;
             }
         }
@@ -336,10 +337,13 @@ CGFloat titleLabelHeight;
     if (@available(iOS 11.0, *)) {
         insets = self.view.safeAreaInsets;
     }
+    else {
+        insets.top = self.statusBarHidden ? 0.0f : 20.0f;
+    }
 
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
-            self.cropView.cropRegionInsets = UIEdgeInsetsZero;
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
         }
         else {
             self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
@@ -350,7 +354,7 @@ CGFloat titleLabelHeight;
 
     [self.titleLabel sizeToFit];
 
-    CGFloat verticalInset = 0.0f; // self.topLayoutGuide.length; // status bar //FIXME: Is this ever needed?
+    CGFloat verticalInset = self.statusBarHidden ? 0.0f : 20.0f; // Status bar
     verticalInset += kTOCropViewControllerTitleTopPadding;
     verticalInset += self.titleLabel.frame.size.height;
 
@@ -377,6 +381,7 @@ CGFloat titleLabelHeight;
         }
         
         self.toolbar.backgroundViewOutsets = insets;
+        self.toolbar.statusBarVisible = !self.statusBarHidden;
         [self.toolbar setNeedsLayout];
     }
 }
@@ -395,7 +400,7 @@ CGFloat titleLabelHeight;
     }
 
     [UIView performWithoutAnimation:^{
-        self.toolbar.statusBarVisible = (self.toolbarPosition == TOCropViewControllerToolbarPositionTop && !self.prefersStatusBarHidden);
+        self.toolbar.statusBarVisible = !self.statusBarHidden;
         self.toolbar.frame = [self frameForToolBarWithVerticalLayout:self.verticalLayout];
         [self.toolbar setNeedsLayout];
     }];
@@ -428,7 +433,6 @@ CGFloat titleLabelHeight;
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
     self.cropView.simpleRenderMode = YES;
     self.cropView.internalLayoutDisabled = YES;
-
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -1131,6 +1135,21 @@ CGFloat titleLabelHeight;
 - (BOOL)verticalLayout
 {
     return CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
+}
+
+- (BOOL)statusBarHidden
+{
+    if (self.navigationController) {
+        return self.navigationController.prefersStatusBarHidden;
+    }
+    
+    //If our presenting controller has already hidden the status bar,
+    //hide the status bar by default
+    if (self.presentingViewController.prefersStatusBarHidden) {
+        return YES;
+    }
+    
+    return YES;
 }
 
 @end
