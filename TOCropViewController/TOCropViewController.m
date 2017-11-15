@@ -444,13 +444,17 @@ CGFloat titleLabelHeight;
         [sublayer removeAllAnimations];
     }
     
-    self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
-    [self.cropView performRelayoutForRotation];
-    
-    [UIView animateWithDuration:duration animations:^{
+    [UIView animateWithDuration:duration
+                          delay:0.0f
+                        options:UIViewAnimationOptionBeginFromCurrentState
+                     animations:
+    ^{
+        self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+        [self.cropView performRelayoutForRotation];
+        
         self.toolbarSnapshotView.alpha = 0.0f;
         self.toolbar.alpha = 1.0f;
-    }];
+    } completion:nil];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
