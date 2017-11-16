@@ -782,9 +782,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.prepareForTransitionHandler    = setup;
 
     [viewController dismissViewControllerAnimated:YES completion:^ {
-        if (completion) {
-            completion();
-        }
+        if (completion) { completion(); }
     }];
 }
 
@@ -806,8 +804,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             strongSelf.cropView.croppingViewsHidden = YES;
         }
 
-        if (strongSelf.prepareForTransitionHandler)
+        if (strongSelf.prepareForTransitionHandler) {
             strongSelf.prepareForTransitionHandler();
+        }
         
         strongSelf.prepareForTransitionHandler = nil;
     };
@@ -827,13 +826,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         typeof (self) strongSelf = weakSelf;
         TOCropViewControllerTransitioning *transitioning = strongSelf.transitionController;
         
-        if (!CGRectIsEmpty(transitioning.toFrame) || transitioning.toView)
+        if (!CGRectIsEmpty(transitioning.toFrame) || transitioning.toView) {
             strongSelf.cropView.croppingViewsHidden = YES;
-        else
+        }
+        else {
             strongSelf.cropView.simpleRenderMode = YES;
+        }
         
-        if (strongSelf.prepareForTransitionHandler)
+        if (strongSelf.prepareForTransitionHandler) {
             strongSelf.prepareForTransitionHandler();
+        }
     };
     
     self.transitionController.isDismissing = YES;
@@ -908,8 +910,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         __weak typeof(activityController) blockController = activityController;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
         activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-            if (!completed)
+            if (!completed) {
                 return;
+            }
             
             bool isCallbackOrDelegateHandled = NO;
             
@@ -929,15 +932,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         };
 #else
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-            if (!completed)
+            if (!completed) {
                 return;
+            }
             
-            bool isCallbackOrDelegateHandled = NO;
+            BOOL isCallbackOrDelegateHandled = NO;
             
             if (self.onDidFinishCancelled != nil) {
                 self.onDidFinishCancelled(NO);
                 isCallbackOrDelegateHandled = YES;
             }
+
             if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
                 [self.delegate cropViewController:self didFinishCancelled:NO];
                 isCallbackOrDelegateHandled = YES;
@@ -949,7 +954,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             }
         };
 #endif
-        
+
         return;
     }
     
@@ -1005,10 +1010,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             if (isDidCropToImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
             }
+
             if (isDidCropToImageCallbackAvailable) {
                 self.onDidCropToRect(image, cropFrame, angle);
             }
-            
         });
         
         isCallbackOrDelegateHandled = YES;
