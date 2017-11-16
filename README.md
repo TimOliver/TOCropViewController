@@ -4,7 +4,7 @@
 <img src="https://github.com/TimOliver/TOCropViewController/blob/master/screenshot.jpg" width="890" style="margin:0 auto" />
 </p>
 
-[![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
+[![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=59efffd0785eab00015357fa&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/59efffd0785eab00015357fa/build/latest?branch=master)
 [![CocoaPods](https://img.shields.io/cocoapods/dt/TOCropViewController.svg?maxAge=3600)](https://cocoapods.org/pods/TOCropViewController)
 [![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
