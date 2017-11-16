@@ -63,6 +63,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 /* Convenience method for getting the vertical inset for both iPhone X and status bar */
 @property (nonatomic, readonly) UIEdgeInsets statusBarSafeInsets;
 
+/* Flag to perform initial setup on the first run */
+@property (nonatomic, assign) BOOL firstTime;
+
 /* On iOS 7, the popover view controller that appears when tapping 'Done' */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -117,9 +120,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Layout the views initially
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
-
-    // Perform the initial set up after the initial frame is set
-    [self.cropView performInitialSetup];
 
     // Set up toolbar default behaviour
     self.toolbar.clampButtonHidden = self.aspectRatioPickerButtonHidden || circularMode;
@@ -411,6 +411,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)viewSafeAreaInsetsDidChange
 {
     [super viewSafeAreaInsetsDidChange];
+    [self adjustCropViewInsets];
     [self adjustToolbarInsets];
 }
 
@@ -422,6 +423,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self adjustCropViewInsets];
     [self.cropView moveCroppedContentToCenterAnimated:NO];
 
+    if (self.firstTime == NO) {
+        [self.cropView performInitialSetup];
+        self.firstTime = YES;
+    }
+    
     if (self.title.length) {
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
         [self.cropView moveCroppedContentToCenterAnimated:NO];

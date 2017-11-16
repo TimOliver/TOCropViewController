@@ -106,37 +106,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) NSInteger restoreAngle;
 @property (nonatomic, assign) CGRect    restoreImageCropFrame;
 
-- (void)setup;
-
-/* Image layout */
-- (void)layoutInitialImage;
-- (void)matchForegroundToBackground;
-
-/* Crop box handling */
-- (TOCropViewOverlayEdge)cropEdgeForPoint:(CGPoint)point;
-- (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point;
-- (void)toggleTranslucencyViewVisible:(BOOL)visible;
-- (void)updateToImageCropFrame:(CGRect)imageCropframe;
-
-/* Editing state */
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated;
-- (void)startEditing;
-
-/* Timer handling */
-- (void)startResetTimer;
-- (void)timerTriggered;
-- (void)cancelResetTimer;
-
-/* Gesture Recognizers */
-- (void)gridPanGestureRecognized:(UIPanGestureRecognizer *)recognizer;
-- (void)longPressGestureRecognized:(UILongPressGestureRecognizer *)recognizer;
-
-/* Reset state */
-- (void)checkForCanReset;
-
-/* Capture rotation state (for 90-degree rotation) */
-- (void)captureStateForImageRotation;
-
 @end
 
 @implementation TOCropView
@@ -387,13 +356,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     normalizedCenter.y = contentCenter.y / self.rotationContentSize.height;
     
     //Work out the new content offset by applying the normalized values to the new layout
-    CGPoint newMidPoint = (CGPoint){self.scrollView.bounds.size.width * 0.5f,
-                                    self.scrollView.bounds.size.height * 0.5f};
+    CGPoint newMidPoint = (CGPoint){CGRectGetMidX(self.contentBounds),CGRectGetMidY(self.contentBounds)};
 
-    // Adjust for any content insets due to the status bar etc
-    newMidPoint.y += self.cropRegionInsets.top;
-    newMidPoint.x += self.cropRegionInsets.left;
-    
     CGPoint translatedContentOffset = CGPointZero;
     translatedContentOffset.x = self.scrollView.contentSize.width * normalizedCenter.x;
     translatedContentOffset.y = self.scrollView.contentSize.height * normalizedCenter.y;

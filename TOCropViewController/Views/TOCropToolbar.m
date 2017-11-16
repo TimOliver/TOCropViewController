@@ -41,16 +41,6 @@
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
 
-- (void)setup;
-- (void)buttonTapped:(id)button;
-
-+ (UIImage *)doneImage;
-+ (UIImage *)cancelImage;
-+ (UIImage *)resetImage;
-+ (UIImage *)rotateCCWImage;
-+ (UIImage *)rotateCWImage;
-+ (UIImage *)clampImage;
-
 @end
 
 @implementation TOCropToolbar
