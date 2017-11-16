@@ -1441,9 +1441,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Work out the new angle, and wrap around once we exceed 360s
     NSInteger newAngle = self.angle;
     newAngle = clockwise ? newAngle + 90 : newAngle - 90;
-    if (newAngle <= -360 || newAngle >= 360)
+    if (newAngle <= -360 || newAngle >= 360) {
         newAngle = 0;
-    
+    }
+
     _angle = newAngle;
     
     //Convert the new angle to radians
@@ -1486,8 +1487,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.zoomScale *= scale;
     }
     
-    newCropFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - newCropFrame.size.width) * 0.5f);
-    newCropFrame.origin.y = floorf((CGRectGetHeight(self.bounds) - newCropFrame.size.height) * 0.5f);
+    newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
+    newCropFrame.origin.y = floorf(CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5f));
     
     //If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = nil;
@@ -1550,7 +1551,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //If we're animated, play an animation of the snapshot view rotating,
     //then fade it out over the live content
     if (animated) {
-        snapshotView.center = self.scrollView.center;
+        snapshotView.center = (CGPoint){CGRectGetMidX(contentBounds), CGRectGetMidY(contentBounds)};
         [self addSubview:snapshotView];
         
         self.backgroundContainerView.hidden = YES;
