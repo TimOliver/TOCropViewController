@@ -62,7 +62,7 @@
     _rotateClockwiseButtonHidden = YES;
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
-    if ([UIView resolveClassMethod:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) {
+    if (@available(iOS 9.0, *)) {
         self.reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
     }
     else {
