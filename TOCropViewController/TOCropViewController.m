@@ -91,7 +91,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
-        _rotateClockwiseButtonHidden = YES;
     }
 	
     return self;
@@ -121,7 +120,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     // Set up toolbar default behaviour
     self.toolbar.clampButtonHidden = self.aspectRatioPickerButtonHidden || circularMode;
-    self.toolbar.rotateClockwiseButtonHidden = self.rotateClockwiseButtonHidden && circularMode;
+    self.toolbar.rotateClockwiseButtonHidden = self.rotateClockwiseButtonHidden;
     
     // Set up the toolbar button actions
     __weak typeof(self) weakSelf = self;
