@@ -60,6 +60,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 @property (nonatomic, readonly) BOOL statusBarHidden;   // Whether it should be hidden or visible at this point
 @property (nonatomic, readonly) CGFloat statusBarHeight; // The height of the status bar when visible
 
+/* Convenience method for getting the vertical inset for both iPhone X and status bar */
+@property (nonatomic, readonly) UIEdgeInsets statusBarSafeInsets;
+
 /* On iOS 7, the popover view controller that appears when tapping 'Done' */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -257,13 +260,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (CGRect)frameForToolbarWithVerticalLayout:(BOOL)verticalLayout
 {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11.0, *)) {
-        insets = self.view.safeAreaInsets;
-    }
-    else {
-        insets.top = self.statusBarHeight;
-    }
+    UIEdgeInsets insets = self.statusBarSafeInsets;
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
@@ -300,13 +297,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         view = self.parentViewController.view;
     }
 
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11.0, *)) {
-        insets = view.safeAreaInsets;
-    }
-    else {
-        insets.top = self.statusBarHeight;
-    }
+    UIEdgeInsets insets = self.statusBarSafeInsets;
 
     CGRect bounds = view.bounds;
     CGRect frame = CGRectZero;
@@ -361,13 +352,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)adjustCropViewInsets
 {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11.0, *)) {
-        insets = self.view.safeAreaInsets;
-    }
-    else {
-        insets.top = self.statusBarHeight;
-    }
+    UIEdgeInsets insets = self.statusBarSafeInsets;
 
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
@@ -1243,6 +1228,25 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
     
     return statusBarHeight;
+}
+
+- (UIEdgeInsets)statusBarSafeInsets
+{
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+
+        // Since iPhone X insets are always 44, check if this is merely
+        // accounting for a non-X status bar and cancel it
+        if (insets.top <= 20.0f + FLT_EPSILON) {
+            insets.top = self.statusBarHeight;
+        }
+    }
+    else {
+        insets.top = self.statusBarHeight;
+    }
+
+    return insets;
 }
 
 @end
