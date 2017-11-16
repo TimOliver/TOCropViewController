@@ -78,7 +78,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Pre-screen-rotation state information */
 @property (nonatomic, assign) CGPoint rotationContentOffset;
 @property (nonatomic, assign) CGSize  rotationContentSize;
-@property (nonatomic, assign) CGSize  rotationBoundSize;
+@property (nonatomic, assign) CGRect  rotationBoundFrame;
 
 /* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
@@ -356,7 +356,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     self.rotationContentOffset = self.scrollView.contentOffset;
     self.rotationContentSize   = self.scrollView.contentSize;
-    self.rotationBoundSize     = self.scrollView.bounds.size;
+    self.rotationBoundFrame     = self.contentBounds;
 }
 
 - (void)performRelayoutForRotation
@@ -378,7 +378,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self captureStateForImageRotation];
     
     //Work out the center point of the content before we rotated
-    CGPoint oldMidPoint = (CGPoint){self.rotationBoundSize.width * 0.5f, self.rotationBoundSize.height * 0.5f};
+    CGPoint oldMidPoint = (CGPoint){CGRectGetMidX(self.rotationBoundFrame), CGRectGetMidY(self.rotationBoundFrame)};
     CGPoint contentCenter = (CGPoint){self.rotationContentOffset.x + oldMidPoint.x, self.rotationContentOffset.y + oldMidPoint.y};
     
     //Normalize it to a percentage we can apply to different sizes
@@ -389,6 +389,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Work out the new content offset by applying the normalized values to the new layout
     CGPoint newMidPoint = (CGPoint){self.scrollView.bounds.size.width * 0.5f,
                                     self.scrollView.bounds.size.height * 0.5f};
+
+    // Adjust for any content insets due to the status bar etc
+    newMidPoint.y += self.cropRegionInsets.top;
+    newMidPoint.x += self.cropRegionInsets.left;
     
     CGPoint translatedContentOffset = CGPointZero;
     translatedContentOffset.x = self.scrollView.contentSize.width * normalizedCenter.x;

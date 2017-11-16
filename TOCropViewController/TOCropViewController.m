@@ -233,7 +233,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     if (self.navigationController) {
-        return self.navigationController.preferredStatusBarStyle;
+        return UIStatusBarStyleLightContent;
     }
 
     // Even though we are a dark theme, leave the status bar
@@ -395,11 +395,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)adjustToolbarInsets
 {
-    // Update the toolbar with the necessary insets
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+
     if (@available(iOS 11.0, *)) {
-
-        UIEdgeInsets insets = UIEdgeInsetsZero;
-
         // Add padding to the left in landscape mode
         if (!self.verticalLayout) {
             insets.left = self.view.safeAreaInsets.left;
@@ -413,12 +411,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 insets.bottom = self.view.safeAreaInsets.bottom;
             }
         }
-
-        // Update the toolbar with these properties
-        self.toolbar.backgroundViewOutsets = insets;
-        self.toolbar.statusBarVisible = !self.statusBarHidden;
-        [self.toolbar setNeedsLayout];
     }
+    else { // iOS <= 10
+        if (!self.statusBarHidden && self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+            insets.top = self.statusBarHeight;
+        }
+    }
+
+    // Update the toolbar with these properties
+    self.toolbar.backgroundViewOutsets = insets;
+    self.toolbar.statusBarHeightInset = self.statusBarHeight;
+    [self.toolbar setNeedsLayout];
 }
 
 - (void)viewSafeAreaInsetsDidChange
@@ -441,8 +444,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
     [UIView performWithoutAnimation:^{
-        self.toolbar.statusBarVisible = !self.statusBarHidden;
         self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
+        [self adjustToolbarInsets];
         [self.toolbar setNeedsLayout];
     }];
 }
@@ -463,14 +466,20 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     else {
         self.toolbarSnapshotView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin;
     }
-
     [self.view addSubview:self.toolbarSnapshotView];
-    
-    [UIView performWithoutAnimation:^{
-        self.toolbar.frame = [self frameForToolbarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
-        [self.toolbar layoutIfNeeded];
-        self.toolbar.alpha = 0.0f;
-    }];
+
+    // Set up the toolbar frame to be just off t
+    CGRect frame = [self frameForToolbarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
+    if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+        frame.origin.x = -frame.size.width;
+    }
+    else {
+        frame.origin.y = self.view.bounds.size.height;
+    }
+    self.toolbar.frame = frame;
+
+    [self.toolbar layoutIfNeeded];
+    self.toolbar.alpha = 0.0f;
     
     [self.cropView prepareforRotation];
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
@@ -486,18 +495,21 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     for (CALayer *sublayer in self.toolbar.layer.sublayers) {
         [sublayer removeAllAnimations];
     }
-    
+
+    // On iOS 11, since these layout calls are done multiple times, if we don't aggregate from the
+    // current state, the animation breaks.
     [UIView animateWithDuration:duration
                           delay:0.0f
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:
     ^{
         self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
+        self.toolbar.frame = [self frameForToolbarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
         [self.cropView performRelayoutForRotation];
-        
-        self.toolbarSnapshotView.alpha = 0.0f;
-        self.toolbar.alpha = 1.0f;
     } completion:nil];
+
+    self.toolbarSnapshotView.alpha = 0.0f;
+    self.toolbar.alpha = 1.0f;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation

@@ -184,11 +184,6 @@
         
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
-        if (@available(iOS 11.0, *)) {
-            frame.origin.y = 0.0f;
-        } else {
-            frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
-        }
         frame.size.height = 44.0f;
         CGFloat cancelButtonWidth = [self.cancelTextButtonTitle ?
                                      self.cancelTextButtonTitle : self.cancelTextButton.titleLabel.text  sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
@@ -259,7 +254,7 @@
         frame.origin.y = CGRectGetHeight(self.bounds) - 44.0f;
         self.cancelIconButton.frame = frame;
         
-        frame.origin.y = self.statusBarVisible ? 20.0f : 0.0f;
+        frame.origin.y = self.statusBarHeightInset;
         frame.size.width = 44.0f;
         frame.size.height = 44.0f;
         self.doneIconButton.frame = frame;
@@ -309,7 +304,7 @@
             if (@available(iOS 11.0, *)) {
             }
             else {
-                origin.y += self.statusBarVisible ? 20.0f : 0.0f;
+                origin.y += self.statusBarHeightInset;
             }
         } else {
             origin.y += CGRectGetMinY(containerRect);
@@ -628,9 +623,9 @@
     return self.rotateCounterclockwiseButton;
 }
 
-- (void)setStatusBarVisible:(BOOL)statusBarVisible
+- (void)setStatusBarHeightInset:(CGFloat)statusBarHeightInset
 {
-    _statusBarVisible = statusBarVisible;
+    _statusBarHeightInset = statusBarHeightInset;
     [self setNeedsLayout];
 }
 
