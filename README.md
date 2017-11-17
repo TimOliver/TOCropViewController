@@ -26,7 +26,7 @@ TOCropViewController is an open-source `UIViewController` subclass built to allo
 * Localized in 18 languages.
 
 ## System Requirements
-iOS 7.0 or above
+iOS 8.0 or above
 
 ## Installation
 
