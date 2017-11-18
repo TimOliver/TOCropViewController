@@ -61,7 +61,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToRect:angle:));
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropImageToRect:angle:));
 
 /**
  Called when the user has committed the crop action, and provides 
@@ -329,7 +329,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                        fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimated(from:view:frame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:view:frame:setup:completion:));
 
 /**
  Play a custom animation of the target image zooming to its position in
@@ -354,7 +354,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                           angle:(NSInteger)angle
                                    toImageFrame:(CGRect)toFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimated(from:fromImage:fromView:fromFrame:angle:toFrame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:fromImage:fromView:fromFrame:angle:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -371,7 +371,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                          toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimated(from:toView:toFrame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimatedFrom(_:toView:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from
@@ -390,7 +390,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
                                          toView:(nullable UIView *)toView
                                         toFrame:(CGRect)frame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimated(from:croppedImage:toView:toFrame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(dismissAnimatedFrom(_:croppedImage:toView:toFrame:setup:completion:));
 
 @end
 
