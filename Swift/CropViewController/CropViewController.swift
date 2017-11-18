@@ -167,24 +167,6 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
     
     /**
-     Title for the 'Done' button.
-     Setting this will override the Default which is a localized string for "Done".
-     */
-    public var doneButtonTitle: String? {
-        set { toCropViewController.doneButtonTitle = newValue }
-        get { return toCropViewController.doneButtonTitle }
-    }
-    
-    /**
-     Title for the 'Cancel' button.
-     Setting this will override the Default which is a localized string for "Cancel".
-     */
-    public var cancelButtonTitle: String? {
-        set { toCropViewController.cancelButtonTitle = newValue }
-        get { return toCropViewController.cancelButtonTitle }
-    }
-    
-    /**
      If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
      
      If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio
@@ -269,7 +251,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
      */
     public var applicationActivities: [UIActivity]? {
         set { toCropViewController.applicationActivities = newValue }
-        get { return toCropViewController.applicationActivities }
+        get { return toCropViewController.applicationActivities as! [UIActivity] }
     }
     
     /**
@@ -278,7 +260,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
      */
     public var excludedActivityTypes: [UIActivityType]? {
         set { toCropViewController.excludedActivityTypes = newValue }
-        get { return toCropViewController.excludedActivityTypes }
+        get { return toCropViewController.excludedActivityTypes as! [UIActivityType] }
     }
     
     /**
@@ -510,15 +492,15 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
 }
 
-fileprivate extension CropViewController {
-    private func setUpCropController() {
+extension CropViewController {
+    fileprivate func setUpCropController() {
         addChildViewController(toCropViewController)
         transitioningDelegate = (toCropViewController as! UIViewControllerTransitioningDelegate)
         toCropViewController.delegate = self
         toCropViewController.didMove(toParentViewController: self)
     }
     
-    private func setUpDelegateHandlers() {
+    fileprivate func setUpDelegateHandlers() {
         guard let delegate = self.delegate else {
             onDidCropToRect = nil
             onDidCropImageToRect = nil

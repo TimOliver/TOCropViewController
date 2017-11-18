@@ -8,6 +8,6 @@ Pod::Spec.new do |s|
   s.source   = { :git => 'https://github.com/TimOliver/TOCropViewController.git', :tag => s.version }
   s.platform = :ios, '8.0'
   s.source_files = 'Swift/CropViewController/**/*.{swift}'
-  s.dependency = 'TOCropViewController'
   s.requires_arc = true
+  s.dependency 'TOCropViewController'
 end
