@@ -21,7 +21,8 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-#import "TOCropOverlayView.h"
+
+@class TOCropOverlayView;
 
 typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
     TOCropViewCroppingStyleDefault,     // The regular, rectangular crop box
