@@ -86,7 +86,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, readonly) BOOL hasAspectRatio;  /* True if an aspect ratio was explicitly applied to this crop view */
 
 /* 90-degree rotation state data */
-@property (nonatomic, assign) BOOL applyInitialRotatedAngle; /* No by default, when setting initialRotatedAngle this will be set to YES, and set back to NO after first application - so it's only done once */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
 @property (nonatomic, assign) NSInteger cropBoxLastEditedAngle; /* Remember which angle we were at when we saved the editing size */
 @property (nonatomic, assign) CGFloat cropBoxLastEditedZoomScale; /* Remember the zoom size when we last edited */
@@ -101,10 +100,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* In iOS 9, a new dynamic blur effect became available. */
 @property (nonatomic, assign) BOOL dynamicBlurEffect;
 
-/* If restoring to  a previous crop setting, these properties hang onto the
+/* If restoring to a previous crop setting, these properties hang onto the
  values until the view is configured for the first time. */
 @property (nonatomic, assign) NSInteger restoreAngle;
 @property (nonatomic, assign) CGRect    restoreImageCropFrame;
+
+/* Set to YES once `performInitialLayout` is called. This lets pending properties get queued until the view
+ has been properly set up in its parent. */
+@property (nonatomic, assign) BOOL initialSetupPerformed;
 
 @end
 
@@ -236,6 +239,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 #pragma mark - View Layout -
 - (void)performInitialSetup
 {
+    // Calling this more than once is potentially destructive
+    if (self.initialSetupPerformed) {
+        return;
+    }
+    
+    // Disable from calling again
+    self.initialSetupPerformed = YES;
+    
     //Perform the initial layout of the image
     [self layoutInitialImage];
     
@@ -1018,7 +1029,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setImageCropFrame:(CGRect)imageCropFrame
 {
-    if (self.superview == nil) {
+    if (!self.initialSetupPerformed) {
         self.restoreImageCropFrame = imageCropFrame;
         return;
     }
@@ -1131,13 +1142,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         newAngle = 0;
     }
     
-    if (self.superview == nil) {
+    if (!self.initialSetupPerformed) {
         self.restoreAngle = newAngle;
         return;
     }
     
-    while (labs(self.angle) != labs(newAngle)) {
-        [self rotateImageNinetyDegreesAnimated:NO];
+    // Negative values are allowed, so rotate clockwise or counter clockwise depending
+    // on direction
+    if (newAngle >= 0) {
+        while (labs(self.angle) != labs(newAngle)) {
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:YES];
+        }
+    }
+    else {
+        while (-labs(self.angle) != -labs(newAngle)) {
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:NO];
+        }
     }
 }
 
@@ -1303,7 +1323,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     _aspectRatio = aspectRatio;
     
     // Will be executed automatically when added to a super view
-    if (self.superview == nil) {
+    if (!self.initialSetupPerformed) {
         return;
     }
     
