@@ -882,8 +882,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
         
         NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
-        if (self.activityItems)
+        if (self.activityItems) {
             [activityItems addObjectsFromArray:self.activityItems];
+        }
         
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:self.applicationActivities];
         activityController.excludedActivityTypes = self.excludedActivityTypes;
