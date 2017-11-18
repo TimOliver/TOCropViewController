@@ -62,9 +62,10 @@
     
     // Perform any last UI updates now so we can potentially factor them into our calculations, but after
     // the container views have been set up
-    if (self.prepareForTransitionHandler)
+    if (self.prepareForTransitionHandler) {
         self.prepareForTransitionHandler();
-    
+    }
+        
     // If origin/destination views were supplied, use them to supplant the
     // frames
     if (!self.isDismissing && self.fromView) {

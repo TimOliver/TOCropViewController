@@ -38,7 +38,6 @@
 		2238CF2A1FC0269C0081B957 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF291FC0269C0081B957 /* Assets.xcassets */; };
 		2238CF2D1FC0269C0081B957 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF2B1FC0269C0081B957 /* LaunchScreen.storyboard */; };
 		2238CF361FC029880081B957 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
-		2238CF401FC029A90081B957 /* CropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2238CF3E1FC029A90081B957 /* CropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2238CF441FC02AE00081B957 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2238CF5A1FC034B00081B957 /* TOCropViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 144B8CC91D22CAFF0085D774 /* TOCropViewController.framework */; };
 		2238CF5B1FC034EF0081B957 /* TOCropViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 144B8CC91D22CAFF0085D774 /* TOCropViewController.framework */; };
@@ -273,7 +272,6 @@
 			children = (
 				2238CF331FC027380081B957 /* Swift */,
 				2238CF321FC0271C0081B957 /* Objective-C */,
-				2238CF3D1FC029A90081B957 /* CropViewController */,
 				2234246B1ABBC0CD00BBC2B1 /* Products */,
 				2238CF581FC030C30081B957 /* Frameworks */,
 			);
@@ -363,13 +361,6 @@
 			isa = PBXGroup;
 			children = (
 				2238CF351FC029880081B957 /* CropViewController.swift */,
-			);
-			path = CropViewController;
-			sourceTree = "<group>";
-		};
-		2238CF3D1FC029A90081B957 /* CropViewController */ = {
-			isa = PBXGroup;
-			children = (
 				2238CF3E1FC029A90081B957 /* CropViewController.h */,
 				2238CF3F1FC029A90081B957 /* Info.plist */,
 			);
@@ -437,7 +428,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2238CF401FC029A90081B957 /* CropViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,7 +1133,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = CropViewController/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Swift/CropViewController/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1177,7 +1167,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = CropViewController/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Swift/CropViewController/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

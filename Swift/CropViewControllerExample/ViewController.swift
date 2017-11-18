@@ -100,7 +100,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         navigationController!.navigationBar.isTranslucent = false
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped(sender:)))
-    
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePhoto))
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        
         imageView.isUserInteractionEnabled = true
         imageView.contentMode = .scaleAspectFit
         view.addSubview(imageView)
@@ -117,6 +119,8 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     @objc public func addButtonTapped(sender: AnyObject) {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let defaultAction = UIAlertAction(title: "Crop Image", style: .default) { (action) in
+            self.croppingStyle = .default
+            
             let imagePicker = UIImagePickerController()
             imagePicker.sourceType = .photoLibrary
             imagePicker.allowsEditing = false
@@ -125,8 +129,11 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         }
         
         let profileAction = UIAlertAction(title: "Make Profile Picture", style: .default) { (action) in
+            self.croppingStyle = .circular
+            
             let imagePicker = UIImagePickerController()
             imagePicker.modalPresentationStyle = .popover
+            imagePicker.popoverPresentationController?.barButtonItem = (sender as! UIBarButtonItem)
             imagePicker.preferredContentSize = CGSize(width: 320, height: 568)
             imagePicker.sourceType = .photoLibrary
             imagePicker.allowsEditing = false
@@ -141,11 +148,22 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         let presentationController = alertController.popoverPresentationController
         presentationController?.barButtonItem = (sender as! UIBarButtonItem)
         present(alertController, animated: true, completion: nil)
-        
     }
     
     @objc public func didTapImageView() {
+        // When tapping the image view, restore the image to the previous cropping state
+        let cropViewController = CropViewController(croppingStyle: self.croppingStyle, image: self.image!)
+        cropViewController.delegate = self
+        let viewFrame = view.convert(imageView.frame, to: navigationController!.view)
         
+        cropViewController.presentAnimatedFrom(self,
+                                               fromImage: self.imageView.image,
+                                               fromView: nil,
+                                               fromFrame: viewFrame,
+                                               angle: self.croppedAngle,
+                                               toImageFrame: self.croppedRect,
+                                               setup: { self.imageView.isHidden = true },
+                                               completion: nil)
     }
     
     public override func viewDidLayoutSubviews() {
@@ -177,6 +195,16 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             self.imageView.frame = imageFrame;
             self.imageView.center = CGPoint(x: self.view.bounds.midX, y: self.view.bounds.midY)
         }
+    }
+    
+    @objc public func sharePhoto() {
+        guard let image = imageView.image else {
+            return
+        }
+        
+        let activityController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        activityController.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem!
+        present(activityController, animated: true, completion: nil)
     }
 }
 

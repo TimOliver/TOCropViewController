@@ -23,14 +23,6 @@
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
 #pragma clang diagnostic pop
 
-- (void)showCropViewController;
-- (void)sharePhoto;
-
-- (void)layoutImageView;
-- (void)didTapImageView;
-
-- (void)updateImageViewWithImage:(UIImage *)image fromCropViewController:(TOCropViewController *)cropViewController;
-
 @end
 
 @implementation ViewController

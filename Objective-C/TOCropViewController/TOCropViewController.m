@@ -258,6 +258,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return hidden;
 }
 
+- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures
+{
+    return UIRectEdgeAll;
+}
+
 - (CGRect)frameForToolbarWithVerticalLayout:(BOOL)verticalLayout
 {
     UIEdgeInsets insets = self.statusBarSafeInsets;
@@ -738,7 +743,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
     
     __weak typeof (self) weakSelf = self;
-    [viewController presentViewController:self animated:YES completion:^ {
+    [viewController presentViewController:self.parentViewController ? self.parentViewController : self
+                                 animated:YES
+                               completion:^
+    {
         typeof (self) strongSelf = weakSelf;
         if (completion) {
             completion();
@@ -798,7 +806,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.transitionController.prepareForTransitionHandler = ^{
         typeof (self) strongSelf = weakSelf;
         TOCropViewControllerTransitioning *transitioning = strongSelf.transitionController;
-        
+
         transitioning.toFrame = [strongSelf.cropView convertRect:strongSelf.cropView.cropBoxFrame toView:strongSelf.view];
         if (!CGRectIsEmpty(transitioning.fromFrame) || transitioning.fromView) {
             strongSelf.cropView.croppingViewsHidden = YES;
