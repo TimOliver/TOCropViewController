@@ -44,7 +44,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 
 @class TOCropViewController;
 
-
 ///------------------------------------------------
 /// @name Delegate
 ///------------------------------------------------
