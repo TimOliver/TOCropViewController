@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 2.3.2 - 2017-11-19
 
+### Fixed
+- Fixed a broken animation where restoring from a cropped image would animate higher than it needed on iPhone X.
+
+## 2.3.2 - 2017-11-19
+
 ### Added
 - A Swift wrapper library named `CropViewController`.
 - Proper handling for when swiping near the Control Center and Notification Center edges on iOS 11.
