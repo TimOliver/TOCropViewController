@@ -1,4 +1,4 @@
-# `TOCropViewController` / `CropViewController`
+# TOCropViewController / CropViewController
 
 <p align="center">
 <img src="https://github.com/TimOliver/TOCropViewController/raw/master/screenshot.jpg" width="890" style="margin:0 auto" />
