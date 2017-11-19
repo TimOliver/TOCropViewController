@@ -728,15 +728,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // Zoom into the scroll view to the appropriate size
     self.scrollView.zoomScale = self.scrollView.minimumZoomScale * scale;
     
-    // Work out the size and offset of the upscaed crop box
+    // Work out the size and offset of the upscaled crop box
     CGRect frame = CGRectZero;
     frame.size = (CGSize){scaledCropSize.width * scale, scaledCropSize.height * scale};
     
     //set the crop box
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
-    cropBoxFrame.origin.x = (self.bounds.size.width - frame.size.width) * 0.5f;
-    cropBoxFrame.origin.y = (self.bounds.size.height - frame.size.height) * 0.5f;
+    cropBoxFrame.origin.x = CGRectGetMidX(bounds) - (frame.size.width * 0.5f);
+    cropBoxFrame.origin.y = CGRectGetMidY(bounds) - (frame.size.height * 0.5f);
     self.cropBoxFrame = cropBoxFrame;
     
     frame.origin.x = (scaledOffset.x * scale) - self.scrollView.contentInset.left;
