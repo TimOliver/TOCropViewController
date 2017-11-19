@@ -13,7 +13,7 @@
 
 `TOCropViewController` is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on `UIImage` objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
 
-`CropViewController` is a Swift version of `TOCropViewController`. It completely wraps all of the Objective-C object code in a pure Swift interface. This allows the API to look and feel 100% more Swifty, and can enable more elegant integrations with `TOCropViewController` in all Swift codebases.
+`CropViewController` is a Swift wrapper for `TOCropViewController`. It completely wraps all of the Objective-C object code in a pure Swift interface. This allows the API to look and feel 100% more Swifty, and can enable more elegant integrations with `TOCropViewController` in all-Swift codebases.
 
 ## Features
 * Crop images by dragging the edges of a grid overlay.
