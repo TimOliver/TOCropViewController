@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.2 - 2017-11-19
+
+### Added
+- A Swift wrapper library named `CropViewController`.
+- Proper handling for when swiping near the Control Center and Notification Center edges on iOS 11.
+
+### Fixed
+- An animation distortion that occurred when restoring from a previous crop view frame.
+- A crash that occurred when restoring to a rotated image.
+- A bug where rotating images on iPhone X in landscape would result in images incorrectly being positioned.
+
 ## 2.1.1 - 2017-11-16
 
 ### Added

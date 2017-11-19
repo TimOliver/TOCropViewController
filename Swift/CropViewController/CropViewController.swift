@@ -251,7 +251,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
      */
     public var applicationActivities: [UIActivity]? {
         set { toCropViewController.applicationActivities = newValue }
-        get { return toCropViewController.applicationActivities as! [UIActivity] }
+        get { return toCropViewController.applicationActivities }
     }
     
     /**
@@ -260,7 +260,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
      */
     public var excludedActivityTypes: [UIActivityType]? {
         set { toCropViewController.excludedActivityTypes = newValue }
-        get { return toCropViewController.excludedActivityTypes as! [UIActivityType] }
+        get { return toCropViewController.excludedActivityTypes }
     }
     
     /**
