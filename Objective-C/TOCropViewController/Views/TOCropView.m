@@ -256,6 +256,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.restoreAngle != 0) {
         self.angle = self.restoreAngle;
         self.restoreAngle = 0;
+        
+        self.cropBoxLastEditedAngle = self.angle;
+        [self captureStateForImageRotation];
     }
     
     //If an image crop frame was also specified before creation, apply it now
