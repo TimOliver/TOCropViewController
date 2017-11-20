@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## 2.3.2 - 2017-11-19
+## 2.3.4 - 2017-11-20
+
+### Fixed
+- A bug where restoring a previous crop state with a different angle than 0 and then rotating the image would result in a distorted image.
+
+## 2.3.3 - 2017-11-19
 
 ### Fixed
 - Fixed a broken animation where restoring from a cropped image would animate higher than it needed on iPhone X.
