@@ -355,15 +355,28 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
         return toCropViewController.preferredStatusBarStyle
     }
     
-    // MARK: - Class Instantiation -
+    ///------------------------------------------------
+    /// @name Object Creation
+    ///------------------------------------------------
     
-    init(image: UIImage) {
+    /**
+     Creates a new instance of a crop view controller with the supplied image
+     
+     @param image The image that will be used to crop.
+     */
+    public init(image: UIImage) {
         self.toCropViewController = TOCropViewController(image: image)
         super.init(nibName: nil, bundle: nil)
         setUpCropController()
     }
     
-    init(croppingStyle: CropViewCroppingStyle, image: UIImage) {
+    /**
+     Creates a new instance of a crop view controller with the supplied image and cropping style
+     
+     @param style The cropping style that will be used with this view controller (eg, rectangular, or circular)
+     @param image The image that will be cropped
+     */
+    public init(croppingStyle: CropViewCroppingStyle, image: UIImage) {
         self.toCropViewController = TOCropViewController(croppingStyle: croppingStyle, image: image)
         super.init(nibName: nil, bundle: nil)
         setUpCropController()

@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Fixed
+- Init methods in `CropViewController` weren't public.
+
 ## 2.3.4 - 2017-11-20
 
 ### Fixed
