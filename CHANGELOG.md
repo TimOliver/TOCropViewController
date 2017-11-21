@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Init methods in `CropViewController` weren't public.
+- Simplified the handling of making rotation buttons visible and hidden.
 
 ## 2.3.4 - 2017-11-20
 
