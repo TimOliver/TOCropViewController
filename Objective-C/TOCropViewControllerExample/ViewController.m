@@ -50,7 +50,7 @@
     //cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
     
     //cropController.rotateButtonsHidden = YES;
-    //cropController.rotateClockwiseButtonHidden = YES;
+    //cropController.rotateClockwiseButtonHidden = NO;
     
     //cropController.doneButtonTitle = @"Title";
     //cropController.cancelButtonTitle = @"Title";

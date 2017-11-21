@@ -129,6 +129,13 @@
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateCounterclockwiseButton];
     
+    _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
+    _rotateClockwiseButton.tintColor = [UIColor whiteColor];
+    [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
+    [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_rotateClockwiseButton];
+    
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
     _resetButton.tintColor = [UIColor whiteColor];
@@ -591,19 +598,6 @@
     }
     
     _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
-    
-    if (_rotateClockwiseButtonHidden == NO) {
-        _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
-        _rotateClockwiseButton.tintColor = [UIColor whiteColor];
-        [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
-        [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:_rotateClockwiseButton];
-    }
-    else {
-        [_rotateClockwiseButton removeFromSuperview];
-        _rotateClockwiseButton = nil;
-    }
     
     [self setNeedsLayout];
 }

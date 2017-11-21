@@ -1116,32 +1116,21 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
 {
     self.toolbar.rotateCounterclockwiseButtonHidden = rotateButtonsHidden;
-    
-    if (self.rotateClockwiseButtonHidden == NO) {
-        self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
-    }
+    self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
 }
 
 - (BOOL)rotateButtonsHidden
 {
-    if (self.rotateClockwiseButtonHidden == NO) {
-        return self.toolbar.rotateCounterclockwiseButtonHidden && self.toolbar.rotateClockwiseButtonHidden;
-    }
-    
-    return self.toolbar.rotateCounterclockwiseButtonHidden;
+    return self.toolbar.rotateCounterclockwiseButtonHidden && self.toolbar.rotateClockwiseButtonHidden;
 }
 
 - (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
 {
-    if (_rotateClockwiseButtonHidden == rotateClockwiseButtonHidden) {
-        return;
-    }
-    
-    _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
-    
-    if (_rotateClockwiseButtonHidden == NO) {
-        self.toolbar.rotateClockwiseButtonHidden = _rotateClockwiseButtonHidden;
-    }
+    self.toolbar.rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
+}
+
+- (BOOL)rotateClockwiseButtonHidden {
+    return self.toolbar.rotateClockwiseButtonHidden;
 }
 
 - (void)setAspectRatioPickerButtonHidden:(BOOL)aspectRatioPickerButtonHidden
