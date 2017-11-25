@@ -326,6 +326,24 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
     
     /**
+     Title for the 'Done' button.
+     Setting this will override the Default which is a localized string for "Done".
+     */
+    public var doneButtonTitle: String! {
+        set { toCropViewController.doneButtonTitle = newValue }
+        get { return toCropViewController.doneButtonTitle }
+    }
+    
+    /**
+     Title for the 'Cancel' button.
+     Setting this will override the Default which is a localized string for "Cancel".
+     */
+    public var cancelButtonTitle: String! {
+        set { toCropViewController.cancelButtonTitle = newValue }
+        get { return toCropViewController.cancelButtonTitle }
+    }
+    
+    /**
      This class internally manages and abstracts access to a `TOCropViewController` instance
      :nodoc:
      */
