@@ -59,8 +59,6 @@
     self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
     [self addSubview:self.backgroundView];
     
-    _rotateClockwiseButtonHidden = YES;
-    
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     if (@available(iOS 9.0, *)) {
         self.reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
