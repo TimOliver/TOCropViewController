@@ -10,6 +10,9 @@
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/TimOliver/TOCropViewController/master/LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+[![Beerpay](https://beerpay.io/TimOliver/TOSplitViewController/badge.svg?style=flat)](https://beerpay.io/TimOliver/TOSplitViewController)
+[![PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M4RKULAVKV7K8)
+
 
 `TOCropViewController` is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on `UIImage` objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
 
@@ -173,8 +176,3 @@ iOS Device mockups used in the screenshot created by [Pixeden](http://www.pixede
 
 ## License
 TOCropViewController is licensed under the MIT License, please see the [LICENSE](LICENSE) file. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TOCropViewController/README.md?pixel)
-
-## Support on Beerpay
-Hey dude! Help me out for a couple of :beers:!
-
-[![Beerpay](https://beerpay.io/TimOliver/TOCropViewController/badge.svg?style=beer-square)](https://beerpay.io/TimOliver/TOCropViewController)  [![Beerpay](https://beerpay.io/TimOliver/TOCropViewController/make-wish.svg?style=flat-square)](https://beerpay.io/TimOliver/TOCropViewController?focus=wish)
