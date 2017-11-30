@@ -173,3 +173,8 @@ iOS Device mockups used in the screenshot created by [Pixeden](http://www.pixede
 
 ## License
 TOCropViewController is licensed under the MIT License, please see the [LICENSE](LICENSE) file. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TOCropViewController/README.md?pixel)
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/TimOliver/TOCropViewController/badge.svg?style=beer-square)](https://beerpay.io/TimOliver/TOCropViewController)  [![Beerpay](https://beerpay.io/TimOliver/TOCropViewController/make-wish.svg?style=flat-square)](https://beerpay.io/TimOliver/TOCropViewController?focus=wish)
