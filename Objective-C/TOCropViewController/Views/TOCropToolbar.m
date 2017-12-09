@@ -296,11 +296,6 @@
         CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
         if (horizontally) {
             origin.x += CGRectGetMinX(containerRect);
-            if (@available(iOS 11.0, *)) {
-            }
-            else {
-                origin.y += self.statusBarHeightInset;
-            }
         } else {
             origin.y += CGRectGetMinY(containerRect);
         }
