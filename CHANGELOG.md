@@ -6,9 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.5 - 2017-12-09
+
 ### Fixed
 - Init methods in `CropViewController` weren't public.
 - Simplified the handling of making rotation buttons visible and hidden.
+- Tool bar icon misalignment error on iOS 10 and below.
 
 ## 2.3.4 - 2017-11-20
 
