@@ -88,6 +88,7 @@
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
     [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [_doneTextButton sizeToFit];
     [self addSubview:_doneTextButton];
     
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -106,6 +107,7 @@
                        forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [_cancelTextButton sizeToFit];
     [self addSubview:_cancelTextButton];
     
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -180,9 +182,7 @@
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;
-        CGFloat cancelButtonWidth = [self.cancelTextButtonTitle ?
-                                     self.cancelTextButtonTitle : self.cancelTextButton.titleLabel.text  sizeWithAttributes:@{NSFontAttributeName:self.cancelTextButton.titleLabel.font}].width + 10;
-        frame.size.width = MIN(self.frame.size.width / 3.0, cancelButtonWidth);
+        frame.size.width = MIN(self.frame.size.width / 3.0, self.cancelTextButton.frame.size.width);
 
         //If normal layout, place on the left side, else place on the right
         if (self.reverseContentLayout == NO) {
@@ -194,9 +194,7 @@
         self.cancelTextButton.frame = frame;
         
         // Work out the Done button frame
-        CGFloat doneButtonWidth = [self.doneTextButtonTitle ?
-                                   self.doneTextButtonTitle : self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
-        frame.size.width = MIN(self.frame.size.width / 3.0, doneButtonWidth);
+        frame.size.width = MIN(self.frame.size.width / 3.0, self.doneTextButton.frame.size.width);
         
         if (self.reverseContentLayout == NO) {
             frame.origin.x = boundsSize.width - (frame.size.width + insetPadding);
@@ -384,11 +382,13 @@
 - (void)setCancelTextButtonTitle:(NSString *)cancelTextButtonTitle {
     _cancelTextButtonTitle = cancelTextButtonTitle;
     [_cancelTextButton setTitle:_cancelTextButtonTitle forState:UIControlStateNormal];
+    [_cancelTextButton sizeToFit];
 }
 
 - (void)setDoneTextButtonTitle:(NSString *)doneTextButtonTitle {
     _doneTextButtonTitle = doneTextButtonTitle;
     [_doneTextButton setTitle:_doneTextButtonTitle forState:UIControlStateNormal];
+    [_doneTextButton sizeToFit];
 }
 
 #pragma mark - Image Generation -
