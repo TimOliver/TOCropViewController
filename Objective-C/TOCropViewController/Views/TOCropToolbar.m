@@ -194,8 +194,8 @@
         self.cancelTextButton.frame = frame;
         
         // Work out the Done button frame
-        CGFloat doneButtonWidth = [self.cancelTextButtonTitle ?
-                                   self.cancelTextButtonTitle : self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
+        CGFloat doneButtonWidth = [self.doneTextButtonTitle ?
+                                   self.doneTextButtonTitle : self.doneTextButton.titleLabel.text sizeWithAttributes:@{NSFontAttributeName:self.doneTextButton.titleLabel.font}].width + 10;
         frame.size.width = MIN(self.frame.size.width / 3.0, doneButtonWidth);
         
         if (self.reverseContentLayout == NO) {
