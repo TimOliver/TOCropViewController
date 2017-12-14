@@ -108,12 +108,6 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /**
- When the aspectRatioLockEnabled is true and this is true, the photo can adjust for different
- orientations by swapping the aspect ratio as appropriate
- */
-@property (nonatomic, assign) BOOL aspectRatioDimensionSwapEnabled;
-
-/**
  When the user taps 'reset', whether the aspect ratio will also be reset as well
  Default is YES
  */
