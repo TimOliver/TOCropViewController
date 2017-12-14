@@ -180,7 +180,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  Default is NO.
  */
-@property (nonatomic, assign) BOOL aspectRatioLockAllowDimensionSwap;
+@property (nonatomic, assign) BOOL aspectRatioLockDimensionSwapEnabled;
 
 /**
  If true, while it can still be resized, the crop box will be locked to its current aspect ratio.

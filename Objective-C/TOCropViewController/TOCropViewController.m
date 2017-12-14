@@ -684,7 +684,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
      * If the aspect ratio lock is on, allow a aspect ratio swap
      * only if the allowDimensionSwap option is specified.
     */
-    BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled || (self.aspectRatioLockEnabled && self.aspectRatioLockAllowDimensionSwap);
+    BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled || (self.aspectRatioLockEnabled && self.aspectRatioLockDimensionSwapEnabled);
     
     //If the image is a portrait shape, flip the aspect ratio to match
     if (self.cropView.cropBoxAspectRatioIsPortrait &&
@@ -1120,14 +1120,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return self.cropView.aspectRatioLockEnabled;
 }
 
--(void)setAspectRatioLockAllowDimensionSwap:(BOOL)aspectRatioLockAllowDimensionSwap
+-(void)setAspectRatioLockDimensionSwapEnabled:(BOOL)aspectRatioLockAllowDimensionSwap
 {
-    self.cropView.aspectRatioAllowDimensionSwap = aspectRatioLockAllowDimensionSwap;
+    self.cropView.aspectRatioDimensionSwapEnabled = aspectRatioLockAllowDimensionSwap;
 }
 
--(BOOL)aspectRatioLockAllowDimensionSwap
+-(BOOL)aspectRatioLockDimensionSwapEnabled
 {
-    return self.cropView.aspectRatioAllowDimensionSwap;
+    return self.cropView.aspectRatioDimensionSwapEnabled;
 }
 
 - (void)setRotateButtonsHidden:(BOOL)rotateButtonsHidden
