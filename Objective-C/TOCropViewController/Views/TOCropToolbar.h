@@ -59,6 +59,8 @@
 @property (nullable, nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nullable, nonatomic, copy) void (^resetButtonTapped)(void);
 
+@property (nullable, nonatomic, copy) void (^flipHorizonyallyButtonTapped)(void);
+
 /* State management for the 'clamp' button */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
 @property (nonatomic, readonly) CGRect clampButtonFrame;

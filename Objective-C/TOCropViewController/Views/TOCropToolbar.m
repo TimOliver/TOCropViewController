@@ -37,6 +37,9 @@
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
+@property (nonatomic, strong) UIButton *flipHorizontal;
+@property (nonatomic, strong) UIButton *flipVertical;
+
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
@@ -144,6 +147,20 @@
     [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
     [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_resetButton];
+    
+    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
+    _flipHorizontal.contentMode = UIViewContentModeCenter;
+    _flipHorizontal.tintColor = [UIColor blackColor];
+    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
+    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_flipHorizontal];
+    
+    _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
+    _flipVertical.contentMode = UIViewContentModeCenter;
+    _flipVertical.tintColor = [UIColor blackColor];
+    [_flipVertical setImage:[TOCropToolbar flipVertical] forState:UIControlStateNormal];
+    [_flipVertical addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_flipVertical];
 }
 
 - (void)layoutSubviews
@@ -239,6 +256,9 @@
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
         }
         
+        [buttonsInOrderHorizontally addObject:self.flipHorizontal];
+        [buttonsInOrderHorizontally addObject:self.flipVertical];
+        
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     }
     else {
@@ -276,13 +296,15 @@
             [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
         }
         
+        [buttonsInOrderVertically addObject:self.flipHorizontal];
+        [buttonsInOrderVertically addObject:self.flipVertical];
+        
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
 }
 
 // The convenience method for calculating button's frame inside of the container rect
-- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
-{
+- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally {
     NSInteger count = buttons.count;
     CGFloat fixedSize = horizontally ? size.width : size.height;
     CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
@@ -323,6 +345,10 @@
     }
     else if (button == self.clampButton && self.clampButtonTapped) {
         self.clampButtonTapped();
+        return;
+    }
+    else if (button == self.flipHorizontal && self.flipHorizonyallyButtonTapped) {
+        self.flipHorizonyallyButtonTapped();
         return;
     }
 }
@@ -581,6 +607,26 @@
     UIGraphicsEndImageContext();
     
     return clampImage;
+}
+
++ (UIImage *)flipHorizontal {
+    UIImage *flipHImage = [UIImage imageNamed:@"flipHorizontal.png"];
+    CGSize newSize = CGSizeMake(20.0, 20.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [flipHImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
++ (UIImage *)flipVertical {
+    UIImage *flipVImage = [UIImage imageNamed:@"flipVertical.png"];
+    CGSize newSize = CGSizeMake(20.0, 20.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [flipVImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
 }
 
 #pragma mark - Accessors -

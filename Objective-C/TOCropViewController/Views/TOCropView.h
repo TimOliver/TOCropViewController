@@ -205,7 +205,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
-
+- (void)flipHorizontally;
 /**
  Animate the grid overlay graphic to be visible
  */
