@@ -132,7 +132,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.resetButtonTapped = ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped = ^{ [weakSelf showAspectRatioDialog]; };
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
-    self.toolbar.rotateClockwiseButtonTapped        = ^{ [weakSelf rotateCropViewClockwise]; };
+    self.toolbar.rotateClockwiseButtonTapped = ^{ [weakSelf rotateCropViewClockwise]; };
+    
+    self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -704,6 +706,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)rotateCropViewCounterclockwise
 {
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
+}
+
+- (void)flipHorizontal{
+    [self.cropView flipHorizontally];
 }
 
 #pragma mark - Crop View Delegates -

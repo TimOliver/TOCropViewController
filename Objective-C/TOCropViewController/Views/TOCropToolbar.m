@@ -37,6 +37,9 @@
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
+@property (nonatomic, strong) UIButton *flipHorizontal;
+@property (nonatomic, strong) UIButton *flipVertical;
+
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
@@ -56,7 +59,7 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.98f alpha:1.0f];
     [self addSubview:self.backgroundView];
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
@@ -85,7 +88,7 @@
                                                                   resourceBundle,
                                                                   nil)
                      forState:UIControlStateNormal];
-    [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
+    [_doneTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [_doneTextButton sizeToFit];
@@ -93,7 +96,7 @@
     
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
-    [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
+    [_doneIconButton setTintColor:[UIColor blackColor]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_doneIconButton];
     
@@ -105,6 +108,7 @@
                                                                     resourceBundle,
                                                                     nil)
                        forState:UIControlStateNormal];
+    [_cancelTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [_cancelTextButton sizeToFit];
@@ -117,32 +121,46 @@
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _clampButton.contentMode = UIViewContentModeCenter;
-    _clampButton.tintColor = [UIColor whiteColor];
+    _clampButton.tintColor = [UIColor blackColor];
     [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_clampButton];
     
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
-    _rotateCounterclockwiseButton.tintColor = [UIColor whiteColor];
+    _rotateCounterclockwiseButton.tintColor = [UIColor blackColor];
     [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateCounterclockwiseButton];
     
     _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
-    _rotateClockwiseButton.tintColor = [UIColor whiteColor];
+    _rotateClockwiseButton.tintColor = [UIColor blackColor];
     [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateClockwiseButton];
     
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
-    _resetButton.tintColor = [UIColor whiteColor];
+    _resetButton.tintColor = [UIColor blackColor];
     _resetButton.enabled = NO;
     [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
     [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_resetButton];
+    
+    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
+    _flipHorizontal.contentMode = UIViewContentModeCenter;
+    _flipHorizontal.tintColor = [UIColor blackColor];
+    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
+    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_flipHorizontal];
+    
+    _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
+    _flipVertical.contentMode = UIViewContentModeCenter;
+    _flipVertical.tintColor = [UIColor blackColor];
+    [_flipVertical setImage:[TOCropToolbar flipVertical] forState:UIControlStateNormal];
+    [_flipVertical addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_flipVertical];
 }
 
 - (void)layoutSubviews
@@ -238,6 +256,9 @@
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
         }
         
+        [buttonsInOrderHorizontally addObject:self.flipHorizontal];
+        [buttonsInOrderHorizontally addObject:self.flipVertical];
+        
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     }
     else {
@@ -275,13 +296,15 @@
             [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
         }
         
+        [buttonsInOrderVertically addObject:self.flipHorizontal];
+        [buttonsInOrderVertically addObject:self.flipVertical];
+        
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
 }
 
 // The convenience method for calculating button's frame inside of the container rect
-- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
-{
+- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally {
     NSInteger count = buttons.count;
     CGFloat fixedSize = horizontally ? size.width : size.height;
     CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
@@ -324,6 +347,10 @@
         self.clampButtonTapped();
         return;
     }
+    else if (button == self.flipHorizontal && self.flipHorizonyallyButtonTapped) {
+        self.flipHorizonyallyButtonTapped();
+        return;
+    }
 }
 
 - (CGRect)clampButtonFrame
@@ -349,7 +376,7 @@
     if (_clampButtonGlowing)
         self.clampButton.tintColor = nil;
     else
-        self.clampButton.tintColor = [UIColor whiteColor];
+        self.clampButton.tintColor = [UIColor blackColor];
 }
 
 - (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden
@@ -403,7 +430,7 @@
         [rectanglePath moveToPoint: CGPointMake(1, 7)];
         [rectanglePath addLineToPoint: CGPointMake(6, 12)];
         [rectanglePath addLineToPoint: CGPointMake(16, 1)];
-        [UIColor.whiteColor setStroke];
+        [UIColor.blackColor setStroke];
         rectanglePath.lineWidth = 2;
         [rectanglePath stroke];
         
@@ -424,7 +451,7 @@
         UIBezierPath* bezierPath = UIBezierPath.bezierPath;
         [bezierPath moveToPoint: CGPointMake(15, 15)];
         [bezierPath addLineToPoint: CGPointMake(1, 1)];
-        [UIColor.whiteColor setStroke];
+        [UIColor.blackColor setStroke];
         bezierPath.lineWidth = 2;
         [bezierPath stroke];
         
@@ -433,7 +460,7 @@
         UIBezierPath* bezier2Path = UIBezierPath.bezierPath;
         [bezier2Path moveToPoint: CGPointMake(1, 15)];
         [bezier2Path addLineToPoint: CGPointMake(15, 1)];
-        [UIColor.whiteColor setStroke];
+        [UIColor.blackColor setStroke];
         bezier2Path.lineWidth = 2;
         [bezier2Path stroke];
         
@@ -452,7 +479,7 @@
     {
         //// Rectangle 2 Drawing
         UIBezierPath* rectangle2Path = [UIBezierPath bezierPathWithRect: CGRectMake(0, 9, 12, 12)];
-        [UIColor.whiteColor setFill];
+        [UIColor.blackColor setFill];
         [rectangle2Path fill];
         
         
@@ -463,7 +490,7 @@
         [rectangle3Path addLineToPoint: CGPointMake(10, 0)];
         [rectangle3Path addLineToPoint: CGPointMake(5, 3)];
         [rectangle3Path closePath];
-        [UIColor.whiteColor setFill];
+        [UIColor.blackColor setFill];
         [rectangle3Path fill];
         
         
@@ -471,7 +498,7 @@
         UIBezierPath* bezierPath = UIBezierPath.bezierPath;
         [bezierPath moveToPoint: CGPointMake(10, 3)];
         [bezierPath addCurveToPoint: CGPointMake(17.5, 11) controlPoint1: CGPointMake(15, 3) controlPoint2: CGPointMake(17.5, 5.91)];
-        [UIColor.whiteColor setStroke];
+        [UIColor.blackColor setStroke];
         bezierPath.lineWidth = 1;
         [bezierPath stroke];
         rotateImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -516,7 +543,7 @@
         [bezier2Path addCurveToPoint: CGPointMake(13, 0) controlPoint1: CGPointMake(9.15, 0.65) controlPoint2: CGPointMake(11, 0)];
         [bezier2Path addCurveToPoint: CGPointMake(22, 9) controlPoint1: CGPointMake(17.97, 0) controlPoint2: CGPointMake(22, 4.03)];
         [bezier2Path closePath];
-        [UIColor.whiteColor setFill];
+        [UIColor.blackColor setFill];
         [bezier2Path fill];
         
         
@@ -527,7 +554,7 @@
         [polygonPath addLineToPoint: CGPointMake(0, 9)];
         [polygonPath addLineToPoint: CGPointMake(5, 15)];
         [polygonPath closePath];
-        [UIColor.whiteColor setFill];
+        [UIColor.blackColor setFill];
         [polygonPath fill];
 
 
@@ -580,6 +607,26 @@
     UIGraphicsEndImageContext();
     
     return clampImage;
+}
+
++ (UIImage *)flipHorizontal {
+    UIImage *flipHImage = [UIImage imageNamed:@"flipHorizontal.png"];
+    CGSize newSize = CGSizeMake(20.0, 20.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [flipHImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
++ (UIImage *)flipVertical {
+    UIImage *flipVImage = [UIImage imageNamed:@"flipVertical.png"];
+    CGSize newSize = CGSizeMake(20.0, 20.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [flipVImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
 }
 
 #pragma mark - Accessors -
