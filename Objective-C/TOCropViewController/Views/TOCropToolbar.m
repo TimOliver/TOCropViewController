@@ -126,19 +126,19 @@
 //    [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
 //    [self addSubview:_clampButton];
     
-    _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
-    _rotateCounterclockwiseButton.tintColor = [UIColor blackColor];
-    [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
-    [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateCounterclockwiseButton];
-    
-    _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
-    _rotateClockwiseButton.tintColor = [UIColor blackColor];
-    [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
-    [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateClockwiseButton];
+//    _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
+//    _rotateCounterclockwiseButton.tintColor = [UIColor blackColor];
+//    [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
+//    [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_rotateCounterclockwiseButton];
+//
+//    _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
+//    _rotateClockwiseButton.tintColor = [UIColor blackColor];
+//    [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
+//    [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_rotateClockwiseButton];
     
 //    _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
 //    _resetButton.contentMode = UIViewContentModeCenter;
@@ -242,9 +242,9 @@
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         NSMutableArray *buttonsInOrderHorizontally = [NSMutableArray new];
-        if (!self.rotateCounterclockwiseButtonHidden) {
-            [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
-        }
+//        if (!self.rotateCounterclockwiseButtonHidden) {
+//            [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
+//        }
         
 //        [buttonsInOrderHorizontally addObject:self.resetButton];
         
@@ -252,9 +252,9 @@
 //            [buttonsInOrderHorizontally addObject:self.clampButton];
 //        }
         
-        if (!self.rotateClockwiseButtonHidden) {
-            [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
-        }
+//        if (!self.rotateClockwiseButtonHidden) {
+//            [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
+//        }
         
         [buttonsInOrderHorizontally addObject:self.flipHorizontal];
         [buttonsInOrderHorizontally addObject:self.flipVertical];
@@ -282,9 +282,9 @@
         CGSize buttonSize = (CGSize){44.0f,44.0f};
         
         NSMutableArray *buttonsInOrderVertically = [NSMutableArray new];
-        if (!self.rotateCounterclockwiseButtonHidden) {
-            [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
-        }
+//        if (!self.rotateCounterclockwiseButtonHidden) {
+//            [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
+//        }
         
         [buttonsInOrderVertically addObject:self.resetButton];
         
@@ -292,9 +292,9 @@
 //            [buttonsInOrderVertically addObject:self.clampButton];
 //        }
         
-        if (!self.rotateClockwiseButtonHidden) {
-            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
-        }
+//        if (!self.rotateClockwiseButtonHidden) {
+//            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
+//        }
         
         [buttonsInOrderVertically addObject:self.flipHorizontal];
         [buttonsInOrderVertically addObject:self.flipVertical];
