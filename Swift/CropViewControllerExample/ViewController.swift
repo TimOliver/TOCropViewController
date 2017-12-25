@@ -22,7 +22,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         guard let image = (info[UIImagePickerControllerOriginalImage] as? UIImage) else { return }
         
         let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
+        cropController.aspectRatioLockEnabled = true
         cropController.delegate = self
+        
         
         // Uncomment this if you wish to provide extra instructions via a title label
         //cropController.title = "Crop Image"

@@ -1585,13 +1585,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)flipHorizontally {
     //Only allow one rotation animation at a time
-    if (self.flipAnimationInProgress)
-    return;
+    if (self.flipAnimationInProgress) {
+        return;
+    }
     
     //Cancel any pending resizing timers
     if (self.resetTimer) {
         [self cancelResetTimer];
         [self setEditing:NO animated:NO];
+        
+        self.cropBoxLastEditedAngle = self.angle;
+        [self captureStateForImageRotation];
     }
     
     if (_someFlipValue == 0) {
@@ -1671,12 +1675,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             [snapshotView removeFromSuperview];
         }];
     }];
-    
-    //[self checkForCanReset];
 }
 
-- (void)captureStateForImageRotation
-{
+- (void)captureStateForImageRotation {
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
     self.cropBoxLastEditedZoomScale = self.scrollView.zoomScale;
     self.cropBoxLastEditedMinZoomScale = self.scrollView.minimumZoomScale;
