@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
     TOCropViewControllerAspectRatioPreset4x3,
     TOCropViewControllerAspectRatioPreset5x4,
     TOCropViewControllerAspectRatioPreset7x5,
+    TOCropViewControllerAspectRatioPreset8x8,
     TOCropViewControllerAspectRatioPreset16x9,
     TOCropViewControllerAspectRatioPresetCustom
 };

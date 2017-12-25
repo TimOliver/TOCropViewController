@@ -119,12 +119,12 @@
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_cancelIconButton];
     
-    _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _clampButton.contentMode = UIViewContentModeCenter;
-    _clampButton.tintColor = [UIColor blackColor];
-    [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
-    [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_clampButton];
+//    _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _clampButton.contentMode = UIViewContentModeCenter;
+//    _clampButton.tintColor = [UIColor blackColor];
+//    [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
+//    [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_clampButton];
     
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
@@ -140,13 +140,13 @@
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateClockwiseButton];
     
-    _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _resetButton.contentMode = UIViewContentModeCenter;
-    _resetButton.tintColor = [UIColor blackColor];
-    _resetButton.enabled = NO;
-    [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
-    [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_resetButton];
+//    _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _resetButton.contentMode = UIViewContentModeCenter;
+//    _resetButton.tintColor = [UIColor blackColor];
+//    _resetButton.enabled = NO;
+//    [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
+//    [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_resetButton];
     
     _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
     _flipHorizontal.contentMode = UIViewContentModeCenter;
@@ -246,11 +246,11 @@
             [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
         }
         
-        [buttonsInOrderHorizontally addObject:self.resetButton];
+//        [buttonsInOrderHorizontally addObject:self.resetButton];
         
-        if (!self.clampButtonHidden) {
-            [buttonsInOrderHorizontally addObject:self.clampButton];
-        }
+//        if (!self.clampButtonHidden) {
+//            [buttonsInOrderHorizontally addObject:self.clampButton];
+//        }
         
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
@@ -288,9 +288,9 @@
         
         [buttonsInOrderVertically addObject:self.resetButton];
         
-        if (!self.clampButtonHidden) {
-            [buttonsInOrderVertically addObject:self.clampButton];
-        }
+//        if (!self.clampButtonHidden) {
+//            [buttonsInOrderVertically addObject:self.clampButton];
+//        }
         
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
