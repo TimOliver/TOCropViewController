@@ -1593,9 +1593,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.resetTimer) {
         [self cancelResetTimer];
         [self setEditing:NO animated:NO];
-        
-        self.cropBoxLastEditedAngle = self.angle;
-        [self captureStateForImageRotation];
+        //[self captureStateForImageRotation];
     }
     
     if (_someFlipValue == 0) {
@@ -1616,6 +1614,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(cropBoxFrame), CGRectGetMidY(cropBoxFrame)};
     CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.scrollView.contentOffset.x, cropMidPoint.y + self.scrollView.contentOffset.y};
     
+    //Work out the dimensions of the crop box when rotated
+    CGRect newCropFrame = CGRectZero;
+    newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
+    
+        //Re-adjust the scrolling dimensions of the scroll view to match the new size
+        self.scrollView.minimumZoomScale *= scale;
+        self.scrollView.zoomScale *= scale;
+    
+    newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
+    newCropFrame.origin.y = floorf(CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5f));
+    
     //If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = [self.foregroundContainerView snapshotViewAfterScreenUpdates:NO];
     self.flipAnimationInProgress = YES;
@@ -1624,7 +1633,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Flip the width/height of the container view so it matches the rotated image view's size
     CGSize containerSize = self.backgroundContainerView.frame.size;
-    self.backgroundContainerView.frame = (CGRect){CGPointZero, {containerSize.height, containerSize.width}};
+    self.backgroundContainerView.frame = (CGRect){CGPointZero, {containerSize.width, containerSize.height}};
     self.backgroundImageView.frame = (CGRect){CGPointZero, self.backgroundImageView.frame.size};
     
     //Rotate the foreground image view to match
@@ -1634,14 +1643,35 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Flip the content size of the scroll view to match the rotated bounds
     self.scrollView.contentSize = self.backgroundContainerView.frame.size;
     
+    self.cropBoxFrame = newCropFrame;
+    [self moveCroppedContentToCenterAnimated:NO];
+    newCropFrame = self.cropBoxFrame;
+    
     //work out how to line up out point of interest into the middle of the crop box
     cropTargetPoint.x *= scale;
     cropTargetPoint.y *= scale;
     
     //swap the target dimensions to match a 90 degree rotation (clockwise or counterclockwise)
-    CGFloat swap = cropTargetPoint.x;
-    cropTargetPoint.x = self.scrollView.contentSize.width - cropTargetPoint.y;
-        cropTargetPoint.y = swap;
+    NSLog(@"cropTargetPoint.x %f", cropTargetPoint.x);
+    NSLog(@"self.scrollView.contentSize.width %f", self.scrollView.contentSize.width);
+
+    
+    //reapply the translated scroll offset to the scroll view
+    CGPoint midPoint = {CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
+    CGPoint offset = CGPointZero;
+    offset.x = floorf(-midPoint.x + cropTargetPoint.x);
+    offset.y = floorf(-midPoint.y + cropTargetPoint.y);
+    offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
+    offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
+    offset.x = MIN(self.scrollView.contentSize.width - (newCropFrame.size.width - self.scrollView.contentInset.right), offset.x);
+    offset.y = MIN(self.scrollView.contentSize.height - (newCropFrame.size.height - self.scrollView.contentInset.bottom), offset.y);
+    
+    //if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
+    //so we should call the method manually to update the foregroundImageView's frame
+    if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && scale == 1) {
+        [self matchForegroundToBackground];
+    }
+    self.scrollView.contentOffset = offset;
     
     snapshotView.center = (CGPoint){CGRectGetMidX(contentBounds), CGRectGetMidY(contentBounds)};
     [self addSubview:snapshotView];
