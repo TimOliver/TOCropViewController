@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.author   = 'Tim Oliver'
   s.source   = { :git => 'https://github.com/TimOliver/TOCropViewController.git', :tag => s.version }
   s.platform = :ios, '8.0'
-  s.source_files = 'Objective-C/TOCropViewController/**/*.{h,m}'
+  s.source_files = 'Objective-C/TOCropViewController/**/*.{h,m,png}'
   s.resource_bundles = {
     'TOCropViewControllerBundle' => ['Objective-C/TOCropViewController/**/*.lproj']
   }
