@@ -611,9 +611,15 @@
 
 + (UIImage *)flipHorizontal {
     NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage *flipHImage;
+    if (!bundleURL) {
+         flipHImage = [UIImage imageNamed:@"flipHorizontal"];
+    } else {
     NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     NSString *imagePath = [bundle pathForResource:@"flipHorizontal" ofType:@"png"];
-    UIImage *flipHImage = [UIImage imageWithContentsOfFile:imagePath];
+        flipHImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+   
     CGSize newSize = CGSizeMake(20.0, 20.0);
     UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
     [flipHImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
@@ -624,9 +630,15 @@
 
 + (UIImage *)flipVertical {
     NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage* flipVImage;
+    if (!bundleURL) {
+        flipVImage = [UIImage imageNamed:@"flipVertical"];
+    } else {
     NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     NSString *imagePath = [bundle pathForResource:@"flipVertical" ofType:@"png"];
-    UIImage *flipVImage = [UIImage imageWithContentsOfFile:imagePath];
+        flipVImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+    
     CGSize newSize = CGSizeMake(20.0, 20.0);
     UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
     [flipVImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
