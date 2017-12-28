@@ -66,12 +66,12 @@
 		2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
 		2F5062F51F53E32D00AA9F14 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223424771ABBC0CD00BBC2B1 /* Main.storyboard */; };
-		5203F34D1FF15F460063DBBC /* flipHorizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F3471FF15F450063DBBC /* flipHorizontal.png */; };
-		5203F34E1FF15F460063DBBC /* flipVertical@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F3481FF15F450063DBBC /* flipVertical@2x.png */; };
-		5203F34F1FF15F460063DBBC /* flipVertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F3491FF15F450063DBBC /* flipVertical.png */; };
-		5203F3501FF15F460063DBBC /* flipVertical@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F34A1FF15F460063DBBC /* flipVertical@3x.png */; };
-		5203F3511FF15F460063DBBC /* flipHorizontal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F34B1FF15F460063DBBC /* flipHorizontal@2x.png */; };
-		5203F3521FF15F460063DBBC /* flipHorizontal@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5203F34C1FF15F460063DBBC /* flipHorizontal@3x.png */; };
+		5254F5691FF3E5FF002C142A /* flipHorizontal@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5631FF3E5FF002C142A /* flipHorizontal@3x.png */; };
+		5254F56A1FF3E5FF002C142A /* flipVertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5641FF3E5FF002C142A /* flipVertical.png */; };
+		5254F56B1FF3E5FF002C142A /* flipHorizontal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5651FF3E5FF002C142A /* flipHorizontal@2x.png */; };
+		5254F56C1FF3E5FF002C142A /* flipHorizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5661FF3E5FF002C142A /* flipHorizontal.png */; };
+		5254F56D1FF3E5FF002C142A /* flipVertical@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5671FF3E5FF002C142A /* flipVertical@2x.png */; };
+		5254F56E1FF3E5FF002C142A /* flipVertical@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5254F5681FF3E5FF002C142A /* flipVertical@3x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -189,12 +189,12 @@
 		22DB4D9D1B234D4F008B8466 /* TOActivityCroppedImageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOActivityCroppedImageProvider.m; sourceTree = "<group>"; };
 		2F5062DC1F53E2D900AA9F14 /* TOCropViewControllerExample-Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TOCropViewControllerExample-Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AADDE231CA5C43400AE0129 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
-		5203F3471FF15F450063DBBC /* flipHorizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flipHorizontal.png; path = "Objective-C/TOCropViewController/New Group/flipHorizontal.png"; sourceTree = SOURCE_ROOT; };
-		5203F3481FF15F450063DBBC /* flipVertical@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "flipVertical@2x.png"; path = "Objective-C/TOCropViewController/New Group/flipVertical@2x.png"; sourceTree = SOURCE_ROOT; };
-		5203F3491FF15F450063DBBC /* flipVertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = flipVertical.png; path = "Objective-C/TOCropViewController/New Group/flipVertical.png"; sourceTree = SOURCE_ROOT; };
-		5203F34A1FF15F460063DBBC /* flipVertical@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "flipVertical@3x.png"; path = "Objective-C/TOCropViewController/New Group/flipVertical@3x.png"; sourceTree = SOURCE_ROOT; };
-		5203F34B1FF15F460063DBBC /* flipHorizontal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "flipHorizontal@2x.png"; path = "Objective-C/TOCropViewController/New Group/flipHorizontal@2x.png"; sourceTree = SOURCE_ROOT; };
-		5203F34C1FF15F460063DBBC /* flipHorizontal@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "flipHorizontal@3x.png"; path = "Objective-C/TOCropViewController/New Group/flipHorizontal@3x.png"; sourceTree = SOURCE_ROOT; };
+		5254F5631FF3E5FF002C142A /* flipHorizontal@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "flipHorizontal@3x.png"; sourceTree = "<group>"; };
+		5254F5641FF3E5FF002C142A /* flipVertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flipVertical.png; sourceTree = "<group>"; };
+		5254F5651FF3E5FF002C142A /* flipHorizontal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "flipHorizontal@2x.png"; sourceTree = "<group>"; };
+		5254F5661FF3E5FF002C142A /* flipHorizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flipHorizontal.png; sourceTree = "<group>"; };
+		5254F5671FF3E5FF002C142A /* flipVertical@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "flipVertical@2x.png"; sourceTree = "<group>"; };
+		5254F5681FF3E5FF002C142A /* flipVertical@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "flipVertical@3x.png"; sourceTree = "<group>"; };
 		6AE313501C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
@@ -421,12 +421,12 @@
 		5254F5621FF3D9BF002C142A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5203F3471FF15F450063DBBC /* flipHorizontal.png */,
-				5203F34B1FF15F460063DBBC /* flipHorizontal@2x.png */,
-				5203F34C1FF15F460063DBBC /* flipHorizontal@3x.png */,
-				5203F3491FF15F450063DBBC /* flipVertical.png */,
-				5203F3481FF15F450063DBBC /* flipVertical@2x.png */,
-				5203F34A1FF15F460063DBBC /* flipVertical@3x.png */,
+				5254F5661FF3E5FF002C142A /* flipHorizontal.png */,
+				5254F5651FF3E5FF002C142A /* flipHorizontal@2x.png */,
+				5254F5631FF3E5FF002C142A /* flipHorizontal@3x.png */,
+				5254F5641FF3E5FF002C142A /* flipVertical.png */,
+				5254F5671FF3E5FF002C142A /* flipVertical@2x.png */,
+				5254F5681FF3E5FF002C142A /* flipVertical@3x.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -669,16 +669,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5203F34F1FF15F460063DBBC /* flipVertical.png in Resources */,
 				223424791ABBC0CD00BBC2B1 /* Main.storyboard in Resources */,
-				5203F34E1FF15F460063DBBC /* flipVertical@2x.png in Resources */,
+				5254F56C1FF3E5FF002C142A /* flipHorizontal.png in Resources */,
 				2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */,
-				5203F3521FF15F460063DBBC /* flipHorizontal@3x.png in Resources */,
+				5254F56A1FF3E5FF002C142A /* flipVertical.png in Resources */,
+				5254F56E1FF3E5FF002C142A /* flipVertical@3x.png in Resources */,
+				5254F56D1FF3E5FF002C142A /* flipVertical@2x.png in Resources */,
 				2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */,
-				5203F34D1FF15F460063DBBC /* flipHorizontal.png in Resources */,
-				5203F3501FF15F460063DBBC /* flipVertical@3x.png in Resources */,
-				5203F3511FF15F460063DBBC /* flipHorizontal@2x.png in Resources */,
+				5254F56B1FF3E5FF002C142A /* flipHorizontal@2x.png in Resources */,
 				22C3C5471AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings in Resources */,
+				5254F5691FF3E5FF002C142A /* flipHorizontal@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
