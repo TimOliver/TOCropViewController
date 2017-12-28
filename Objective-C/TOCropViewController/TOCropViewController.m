@@ -896,10 +896,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     CGRect cropFrame = self.cropView.imageCropFrame;
     NSInteger angle = self.cropView.angle;
+    NSInteger flip = self.cropView.flip;
 
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
-        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular)];
+        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular) flip:flip];
         TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
         
         NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
@@ -1003,7 +1004,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     //If cropping circular and the circular generation delegate/block is implemented, call it
     if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
-        UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
+        UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES flip:flip];
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1024,7 +1025,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             image = self.image;
         }
         else {
-            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO];
+            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO flip:flip];
         }
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation

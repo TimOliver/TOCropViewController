@@ -29,6 +29,7 @@
 @property (nonatomic, assign, readwrite) CGRect cropFrame;
 @property (nonatomic, assign, readwrite) NSInteger angle;
 @property (nonatomic, assign, readwrite) BOOL circular;
+@property (nonatomic, assign, readwrite) NSInteger flip;
 
 @property (atomic, strong) UIImage *croppedImage;
 
@@ -36,13 +37,14 @@
 
 @implementation TOActivityCroppedImageProvider
 
-- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular
-{
+- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flip:(NSInteger) flip {
+    
     if (self = [super initWithPlaceholderItem:[UIImage new]]) {
         _image = image;
         _cropFrame = cropFrame;
         _angle = angle;
         _circular = circular;
+        _flip = flip;
     }
     
     return self;
@@ -60,15 +62,15 @@
 }
 
 #pragma mark - Image Generation -
-- (id)item
-{
+- (id)item {
+    
     //If the user didn't touch the image, just forward along the original
     if (self.angle == 0 && CGRectEqualToRect(self.cropFrame, (CGRect){CGPointZero, self.image.size})) {
         self.croppedImage = self.image;
         return self.croppedImage;
     }
     
-    UIImage *image = [self.image croppedImageWithFrame:self.cropFrame angle:self.angle circularClip:self.circular];
+    UIImage *image = [self.image croppedImageWithFrame:self.cropFrame angle:self.angle circularClip:self.circular flip:self.flip];
     self.croppedImage = image;
     return self.croppedImage;
 }
