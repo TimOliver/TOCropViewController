@@ -1586,6 +1586,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)flipHorizontally {
     NSInteger flip = self.flipHorizontalyValue;
     
+    if (!CGRectEqualToRect(CGRectZero, _cropOriginFrame)) {
+        [self resetLayoutToDefaultAnimated:true];
+    }
+    
     //Only allow one rotation animation at a time
     if (self.flipAnimationInProgress) {
         return;
@@ -1710,11 +1714,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
     
     [self canBeReset];
-    
 }
 
 - (void)flipVertically {
     NSInteger flip = self.flipVerticallyValue;
+    
+    if (!CGRectEqualToRect(CGRectZero, _cropOriginFrame)) {
+        [self resetLayoutToDefaultAnimated:true];
+    }
     
     //Only allow one rotation animation at a time
     if (self.flipAnimationInProgress) {
