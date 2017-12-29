@@ -1586,8 +1586,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)flipHorizontally {
     NSInteger flip = self.flipHorizontalyValue;
     
-    if (!CGRectEqualToRect(CGRectZero, _cropOriginFrame)) {
+    if (!CGRectEqualToRect(CGRectZero, _cropOriginFrame) || self.cropBoxLastEditedZoomScale != 1) {
         [self resetLayoutToDefaultAnimated:true];
+        self.cropBoxLastEditedZoomScale = 1;
     }
     
     //Only allow one rotation animation at a time

@@ -148,19 +148,19 @@
 //    [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
 //    [self addSubview:_resetButton];
     
-//    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
-//    _flipHorizontal.contentMode = UIViewContentModeCenter;
-//    _flipHorizontal.tintColor = [UIColor blackColor];
-//    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
-//    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-//    [self addSubview:_flipHorizontal];
+    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
+    _flipHorizontal.contentMode = UIViewContentModeCenter;
+    _flipHorizontal.tintColor = [UIColor blackColor];
+    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
+    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_flipHorizontal];
     
-    _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
-    _flipVertical.contentMode = UIViewContentModeCenter;
-    _flipVertical.tintColor = [UIColor blackColor];
-    [_flipVertical setImage:[TOCropToolbar flipVertical] forState:UIControlStateNormal];
-    [_flipVertical addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_flipVertical];
+//    _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _flipVertical.contentMode = UIViewContentModeCenter;
+//    _flipVertical.tintColor = [UIColor blackColor];
+//    [_flipVertical setImage:[TOCropToolbar flipVertical] forState:UIControlStateNormal];
+//    [_flipVertical addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_flipVertical];
 }
 
 - (void)layoutSubviews
@@ -256,8 +256,8 @@
 //            [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
 //        }
         
-        //[buttonsInOrderHorizontally addObject:self.flipHorizontal];
-        [buttonsInOrderHorizontally addObject:self.flipVertical];
+        [buttonsInOrderHorizontally addObject:self.flipHorizontal];
+        //[buttonsInOrderHorizontally addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     }
@@ -296,8 +296,8 @@
 //            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
 //        }
         
-        //[buttonsInOrderVertically addObject:self.flipHorizontal];
-        [buttonsInOrderVertically addObject:self.flipVertical];
+        [buttonsInOrderVertically addObject:self.flipHorizontal];
+        //[buttonsInOrderVertically addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
