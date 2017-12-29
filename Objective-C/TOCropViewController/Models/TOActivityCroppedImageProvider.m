@@ -29,7 +29,8 @@
 @property (nonatomic, assign, readwrite) CGRect cropFrame;
 @property (nonatomic, assign, readwrite) NSInteger angle;
 @property (nonatomic, assign, readwrite) BOOL circular;
-@property (nonatomic, assign, readwrite) NSInteger flip;
+@property (nonatomic, assign, readwrite) NSInteger flipHorizontallyValue;
+@property (nonatomic, assign, readwrite) NSInteger flipVerticallyValue;
 
 @property (atomic, strong) UIImage *croppedImage;
 
@@ -37,14 +38,15 @@
 
 @implementation TOActivityCroppedImageProvider
 
-- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flip:(NSInteger) flip {
+- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flipHorizontally:(NSInteger)flipH flipVertically:(NSInteger)flipV {
     
     if (self = [super initWithPlaceholderItem:[UIImage new]]) {
         _image = image;
         _cropFrame = cropFrame;
         _angle = angle;
         _circular = circular;
-        _flip = flip;
+        _flipHorizontallyValue = flipH;
+        _flipVerticallyValue = flipV;
     }
     
     return self;
@@ -70,7 +72,7 @@
         return self.croppedImage;
     }
     
-    UIImage *image = [self.image croppedImageWithFrame:self.cropFrame angle:self.angle circularClip:self.circular flip:self.flip];
+    UIImage *image = [self.image croppedImageWithFrame:self.cropFrame angle:self.angle circularClip:self.circular flipHorizontally:self.flipHorizontallyValue flipVertically:self.flipVerticallyValue];
     self.croppedImage = image;
     return self.croppedImage;
 }

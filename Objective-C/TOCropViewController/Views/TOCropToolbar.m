@@ -351,6 +351,10 @@
         self.flipHorizonyallyButtonTapped();
         return;
     }
+    else if (button == self.flipVertical && self.flipVerticallyButtonTapped) {
+        self.flipVerticallyButtonTapped();
+        return;
+    }
 }
 
 - (CGRect)clampButtonFrame

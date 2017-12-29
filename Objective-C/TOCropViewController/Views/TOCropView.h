@@ -138,7 +138,8 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
-@property (nonatomic, assign) NSInteger flip;
+@property (nonatomic, assign) NSInteger flipHorizontalyValue;
+@property (nonatomic, assign) NSInteger flipVerticallyValue;
 
 /**
  Create a default instance of the crop view with the supplied image
@@ -208,6 +209,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
 - (void)flipHorizontally;
+- (void)flipVertically;
 /**
  Animate the grid overlay graphic to be visible
  */

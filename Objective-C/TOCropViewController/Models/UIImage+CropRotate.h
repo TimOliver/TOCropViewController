@@ -25,6 +25,6 @@
 @interface UIImage (CropRotate)
 
 //- (nonnull UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular;
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular flip:(NSInteger)flip;
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular flipHorizontally:(NSInteger)flipH flipVertically:(NSInteger)flipV;
 
 @end
