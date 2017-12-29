@@ -148,12 +148,12 @@
 //    [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
 //    [self addSubview:_resetButton];
     
-    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
-    _flipHorizontal.contentMode = UIViewContentModeCenter;
-    _flipHorizontal.tintColor = [UIColor blackColor];
-    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
-    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_flipHorizontal];
+//    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _flipHorizontal.contentMode = UIViewContentModeCenter;
+//    _flipHorizontal.tintColor = [UIColor blackColor];
+//    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
+//    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_flipHorizontal];
     
     _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
     _flipVertical.contentMode = UIViewContentModeCenter;
@@ -256,7 +256,7 @@
 //            [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
 //        }
         
-        [buttonsInOrderHorizontally addObject:self.flipHorizontal];
+        //[buttonsInOrderHorizontally addObject:self.flipHorizontal];
         [buttonsInOrderHorizontally addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
@@ -296,7 +296,7 @@
 //            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
 //        }
         
-        [buttonsInOrderVertically addObject:self.flipHorizontal];
+        //[buttonsInOrderVertically addObject:self.flipHorizontal];
         [buttonsInOrderVertically addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
