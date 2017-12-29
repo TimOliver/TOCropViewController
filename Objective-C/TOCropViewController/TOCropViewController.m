@@ -1027,7 +1027,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //If the delegate/block that requires the specific cropped image is provided, call it
     else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
         UIImage *image = nil;
-        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
+        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size}) && flipV == 1 && flipH == 1) {
             image = self.image;
         }
         else {
