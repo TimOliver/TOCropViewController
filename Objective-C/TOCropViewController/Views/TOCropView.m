@@ -111,8 +111,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
 
-@property (nonatomic, assign) int someFlipValue;
-
 @end
 
 @implementation TOCropView
@@ -1596,23 +1594,24 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         //[self captureStateForImageRotation];
     }
     
-    if (_someFlipValue == 0) {
-        _someFlipValue = -1;
-    } else if (_someFlipValue == -1) {
-        _someFlipValue = 1;
+    if (_flip == 0) {
+        _flip = -1;
+    } else if (_flip == -1) {
+        _flip = 1;
     } else {
-        _someFlipValue = -1;
+        _flip = -1;
     }
-    CGAffineTransform flipping = CGAffineTransformMakeScale(_someFlipValue, 1);
+    CGAffineTransform flipping = CGAffineTransformMakeScale(_flip, 1);
     
     //Work out how much we'll need to scale everything to fit to the new rotation
     CGRect contentBounds = self.contentBounds;
     CGRect cropBoxFrame = self.cropBoxFrame;
-    CGFloat scale = MIN(contentBounds.size.width / cropBoxFrame.size.height, contentBounds.size.height / cropBoxFrame.size.width);
+    CGFloat scale = MIN(contentBounds.size.width / cropBoxFrame.size.height, contentBounds.size.width / cropBoxFrame.size.height);
     
     //Work out which section of the image we're currently focusing at
-    CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(cropBoxFrame), CGRectGetMidY(cropBoxFrame)};
-    CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.scrollView.contentOffset.x, cropMidPoint.y + self.scrollView.contentOffset.y};
+    CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(contentBounds), CGRectGetMidY(contentBounds)};
+    CGPoint cropTargetPoint = (CGPoint){self.scrollView.frame.size.width + self.scrollView.contentOffset.x - cropBoxFrame.size.width, cropMidPoint.y + self.scrollView.contentOffset.y};
+    //CGPoint cropTargetPoint = (CGPoint){cropMidPoint.x + self.scrollView.contentOffset.x, cropMidPoint.y + self.scrollView.contentOffset.y};
     
     //Work out the dimensions of the crop box when rotated
     CGRect newCropFrame = CGRectZero;
@@ -1644,18 +1643,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.contentSize = self.backgroundContainerView.frame.size;
     
     self.cropBoxFrame = newCropFrame;
-    [self moveCroppedContentToCenterAnimated:NO];
+    [self moveCroppedContentToCenterAnimated:YES];
     newCropFrame = self.cropBoxFrame;
     
     //work out how to line up out point of interest into the middle of the crop box
     cropTargetPoint.x *= scale;
     cropTargetPoint.y *= scale;
     
-    //swap the target dimensions to match a 90 degree rotation (clockwise or counterclockwise)
     NSLog(@"cropTargetPoint.x %f", cropTargetPoint.x);
     NSLog(@"self.scrollView.contentSize.width %f", self.scrollView.contentSize.width);
 
-    
     //reapply the translated scroll offset to the scroll view
     CGPoint midPoint = {CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
     CGPoint offset = CGPointZero;
@@ -1682,9 +1679,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridOverlayView.hidden = YES;
     
     [UIView animateWithDuration:0.2f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.8f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-        CGAffineTransform transform = CGAffineTransformMakeScale(_someFlipValue, 1);
+        CGAffineTransform transform = CGAffineTransformMakeScale(_flip, 1);
         transform = CGAffineTransformScale(transform, scale, scale);
         snapshotView.transform = transform;
+        self.backgroundImageView.transform = transform;
     } completion:^(BOOL complete) {
         self.backgroundContainerView.hidden = NO;
         self.foregroundContainerView.hidden = NO;
@@ -1705,6 +1703,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             [snapshotView removeFromSuperview];
         }];
     }];
+    
+    [self canBeReset];
+    
 }
 
 - (void)captureStateForImageRotation {

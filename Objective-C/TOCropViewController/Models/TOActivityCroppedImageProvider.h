@@ -28,7 +28,8 @@
 @property (nonatomic, readonly) CGRect cropFrame;
 @property (nonatomic, readonly) NSInteger angle;
 @property (nonatomic, readonly) BOOL circular;
+@property (nonatomic, readonly) NSInteger flip;
 
-- (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular;
+- (instancetype _Nonnull )initWithImage:(UIImage *_Nonnull)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flip:(NSInteger) flip;
 
 @end

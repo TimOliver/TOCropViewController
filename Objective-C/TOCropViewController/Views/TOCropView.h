@@ -138,6 +138,8 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
+@property (nonatomic, assign) NSInteger flip;
+
 /**
  Create a default instance of the crop view with the supplied image
  */
