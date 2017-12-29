@@ -69,7 +69,7 @@
     return [UIImage imageWithCGImage:croppedImage.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
 }
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular flip:(NSInteger)flip {
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular flipHorizontally:(NSInteger)flipH flipVertically:(NSInteger)flipV {
     
     UIImage *croppedImage = nil;
     UIGraphicsBeginImageContextWithOptions(frame.size, ![self hasAlpha] && !circular, self.scale);
@@ -83,7 +83,7 @@
         
         //To conserve memory in not needing to completely re-render the image re-rotated,
         //map the image to a view and then use Core Animation to manipulate its rotation
-        if (angle != 0 && flip == 0) {
+        if (angle != 0 && flipH == 0 && flipV == 0) {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self];
             imageView.layer.minificationFilter = kCAFilterNearest;
             imageView.layer.magnificationFilter = kCAFilterNearest;
@@ -94,11 +94,11 @@
             imageView.center = containerView.center;
             CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
             [containerView.layer renderInContext:context];
-        } else if (angle == 0 && flip != 0) {
+        } else if (angle == 0 && (flipH != 0 || flipV != 0)) {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self];
             imageView.layer.minificationFilter = kCAFilterNearest;
             imageView.layer.magnificationFilter = kCAFilterNearest;
-            imageView.transform = CGAffineTransformMakeScale(flip, 1);
+            imageView.transform = CGAffineTransformMakeScale(flipH, flipV);
             CGRect rotatedRect = CGRectApplyAffineTransform(imageView.bounds, imageView.transform);
             UIView *containerView = [[UIView alloc] initWithFrame:(CGRect){CGPointZero, rotatedRect.size}];
             [containerView addSubview:imageView];

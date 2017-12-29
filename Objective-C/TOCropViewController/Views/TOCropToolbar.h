@@ -60,6 +60,7 @@
 @property (nullable, nonatomic, copy) void (^resetButtonTapped)(void);
 
 @property (nullable, nonatomic, copy) void (^flipHorizonyallyButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^flipVerticallyButtonTapped)(void);
 
 /* State management for the 'clamp' button */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
