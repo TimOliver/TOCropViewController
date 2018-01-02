@@ -6,12 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.6 - 2018-01-02
+
 ### Added
 - `aspectRatioLockDimensionSwapEnabled` to enable or disable the crop view controller aspect ratio dimensions to swap when the aspect ratio is locked.
+
+### Changed
+- Moved all Objective-C code into `CropViewController` framework to avoid needing importing `TOCropViewController` framework.
 
 ### Fixed
 - Size calculation for one of the tool bar buttons was incorrect.
 - Optimized toolbar layout code to be more efficient.
+- Title label was being clipped by the sensour housing on iPhone X.
 
 ## 2.3.5 - 2017-12-09
 
