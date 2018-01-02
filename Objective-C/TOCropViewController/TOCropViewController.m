@@ -350,7 +350,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (!verticalLayout) { frame.origin.x += x; }
 
     // Work out vertical position
-    frame.origin.y = self.statusBarHeight + kTOCropViewControllerTitleTopPadding;
+    if (@available(iOS 11.0, *)) {
+        frame.origin.y = self.view.safeAreaInsets.top + kTOCropViewControllerTitleTopPadding;
+    }
+    else {
+        frame.origin.y = self.statusBarHeight + kTOCropViewControllerTitleTopPadding;
+    }
 
     return frame;
 }
@@ -1090,7 +1095,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (_titleLabel) { return _titleLabel; }
 
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    _titleLabel.font = [UIFont boldSystemFontOfSize:15.0f];
+    _titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     _titleLabel.backgroundColor = [UIColor clearColor];
     _titleLabel.textColor = [UIColor whiteColor];
     _titleLabel.numberOfLines = 1;
