@@ -22,7 +22,7 @@
 
 #import <UIKit/UIKit.h>
 
- #import "TOCropView.h"
+#import "TOCropView.h"
 #import "TOCropToolbar.h"
 
 /* Preset values of the most common aspect ratios that can be used to quickly configure
