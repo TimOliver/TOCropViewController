@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+- `aspectRatioLockDimensionSwapEnabled` to enable or disable the crop view controller aspect ratio dimensions to swap when the aspect ratio is locked.
+
+### Fixed
+- Size calculation for one of the tool bar buttons was incorrect.
+- Optimized toolbar layout code to be more efficient.
+
 ## 2.3.5 - 2017-12-09
 
 ### Fixed
