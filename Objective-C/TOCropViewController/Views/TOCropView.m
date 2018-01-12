@@ -1026,7 +1026,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     frame.size.height = ceilf(cropBoxFrame.size.height * (imageSize.height / contentSize.height));
     frame.size.height = MIN(imageSize.height, frame.size.height);
-    
+
+    // if frame goes beyond boundaries of the image, we move it back
+    // so it is within the boundaries.
+    if (frame.origin.x + frame.size.width > imageSize.width) {
+        frame.origin.x = imageSize.width - frame.size.width;
+    }
+
+    if (frame.origin.y + frame.size.height > imageSize.height) {
+        frame.origin.y = imageSize.height - frame.size.height;
+    }
+
     return frame;
 }
 
