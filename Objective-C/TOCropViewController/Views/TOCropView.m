@@ -113,6 +113,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 @implementation TOCropView
 
+- (instancetype)initWithImage:(UIImage *)image
+{
+    return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
+}
+
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
     if (self = [super init]) {
@@ -124,9 +129,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     return self;
 }
 
-- (instancetype)initWithImage:(UIImage *)image
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image minimalAspectRatio:(CGFloat)minimalAspectRatio
 {
-    return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
+    if (self = [self initWithCroppingStyle:style image:image]) {
+        self.minimalCroppingAspectRatio = minimalAspectRatio;
+    }
+    
+    return self;
 }
 
 - (void)setup
@@ -438,9 +447,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.size.height = frame.size.width / aspectRatio;
                 frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5f);
             }
-            
-            frame.origin.x   = originFrame.origin.x + xDelta;
-            frame.size.width = originFrame.size.width - xDelta;
+            CGFloat newWidth = originFrame.size.width - xDelta;
+            CGFloat newHeight = originFrame.size.height;
+            if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                frame.origin.x   = originFrame.origin.x + xDelta;
+                frame.size.width = originFrame.size.width - xDelta;
+            }
             
             clampMinFromLeft = YES;
             
@@ -455,7 +467,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.size.width = MIN(frame.size.width, contentFrame.size.height * aspectRatio);
             }
             else {
-                frame.size.width = originFrame.size.width + xDelta;
+                CGFloat newWidth = originFrame.size.width + xDelta;
+                CGFloat newHeight = originFrame.size.height;
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.size.width = originFrame.size.width + xDelta;
+                }
             }
             
             break;
@@ -469,7 +485,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.size.height = MIN(frame.size.height, contentFrame.size.width / aspectRatio);
             }
             else {
-                frame.size.height = originFrame.size.height + yDelta;
+                CGFloat newWidth = originFrame.size.width;
+                CGFloat newHeight = originFrame.size.height + yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.size.height = originFrame.size.height + yDelta;
+                }
             }
             break;
         case TOCropViewOverlayEdgeTop:
@@ -483,8 +504,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 frame.size.height = originFrame.size.height - yDelta;
             }
             else {
-                frame.origin.y    = originFrame.origin.y + yDelta;
-                frame.size.height = originFrame.size.height - yDelta;
+                CGFloat newWidth = originFrame.size.width;
+                CGFloat newHeight = originFrame.size.height - yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.origin.y    = originFrame.origin.y + yDelta;
+                    frame.size.height = originFrame.size.height - yDelta;
+                }
             }
             
             clampMinFromTop = YES;
@@ -510,10 +536,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectHorizontal = YES;
             }
             else {
-                frame.origin.x   = originFrame.origin.x + xDelta;
-                frame.size.width = originFrame.size.width - xDelta;
-                frame.origin.y   = originFrame.origin.y + yDelta;
-                frame.size.height = originFrame.size.height - yDelta;
+                CGFloat newWidth = originFrame.size.width - xDelta;
+                CGFloat newHeight = originFrame.size.height - yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.origin.x   = originFrame.origin.x + xDelta;
+                    frame.size.width = originFrame.size.width - xDelta;
+                    frame.origin.y   = originFrame.origin.y + yDelta;
+                    frame.size.height = originFrame.size.height - yDelta;
+                }
             }
             
             clampMinFromTop = YES;
@@ -539,9 +570,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectHorizontal = YES;
             }
             else {
-                frame.size.width  = originFrame.size.width + xDelta;
-                frame.origin.y    = originFrame.origin.y + yDelta;
-                frame.size.height = originFrame.size.height - yDelta;
+                CGFloat newWidth = originFrame.size.width + xDelta;
+                CGFloat newHeight = originFrame.size.height - yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.size.width  = originFrame.size.width + xDelta;
+                    frame.origin.y    = originFrame.origin.y + yDelta;
+                    frame.size.height = originFrame.size.height - yDelta;
+                }
             }
             
             clampMinFromTop = YES;
@@ -563,9 +599,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectHorizontal = YES;
             }
             else {
-                frame.size.height = originFrame.size.height + yDelta;
-                frame.origin.x    = originFrame.origin.x + xDelta;
-                frame.size.width  = originFrame.size.width - xDelta;
+                CGFloat newWidth = originFrame.size.width - xDelta;
+                CGFloat newHeight = originFrame.size.height + yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.size.height = originFrame.size.height + yDelta;
+                    frame.origin.x    = originFrame.origin.x + xDelta;
+                    frame.size.width  = originFrame.size.width - xDelta;
+                }
             }
             
             clampMinFromLeft = YES;
@@ -587,8 +628,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectHorizontal = YES;
             }
             else {
-                frame.size.height = originFrame.size.height + yDelta;
-                frame.size.width = originFrame.size.width + xDelta;
+                CGFloat newWidth = originFrame.size.width + xDelta;
+                CGFloat newHeight = originFrame.size.height + yDelta;
+                
+                if (MIN(newHeight, newWidth) / MAX(newHeight, newWidth) >= (double)_minimalCroppingAspectRatio) {
+                    frame.size.height = originFrame.size.height + yDelta;
+                    frame.size.width = originFrame.size.width + xDelta;
+                }
             }
             break;
         case TOCropViewOverlayEdgeNone: break;

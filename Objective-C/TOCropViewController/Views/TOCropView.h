@@ -139,6 +139,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
 /**
+The minimum croping aspect ratio. If set, user is prevented from setting cropping rectangle to lower aspect ratio than defined by the parameter.
+*/
+@property (nonatomic, assign) CGFloat minimalCroppingAspectRatio;
+
+/**
  Create a default instance of the crop view with the supplied image
  */
 - (nonnull instancetype)initWithImage:(nonnull UIImage *)image;
@@ -147,6 +152,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  Create a new instance of the crop view with the specified image and cropping
  */
 - (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image;
+
+/**
+ Create a new instance of the crop view with the specified image, cropping style and minimal aspect ratio
+ */
+- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image minimalAspectRatio:(CGFloat)minimalAspectRatio;
 
 /**
  Performs the initial set up, including laying out the image and applying any restore properties.
