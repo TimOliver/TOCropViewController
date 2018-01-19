@@ -1466,7 +1466,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Work out how much we'll need to scale everything to fit to the new rotation
     CGRect contentBounds = self.contentBounds;
     CGRect cropBoxFrame = self.cropBoxFrame;
-    CGFloat scale = MIN(contentBounds.size.width / cropBoxFrame.size.height, contentBounds.size.height / cropBoxFrame.size.width);
+    CGFloat scale = 1.0;
+    // When aspect ratio is set we save it
+    if (self.hasAspectRatio) {
+        scale = MIN(contentBounds.size.height / cropBoxFrame.size.height, contentBounds.size.width / cropBoxFrame.size.width);
+    } else {
+        scale = MIN(contentBounds.size.width / cropBoxFrame.size.height, contentBounds.size.height / cropBoxFrame.size.width);
+    }
     
     //Work out which section of the image we're currently focusing at
     CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(cropBoxFrame), CGRectGetMidY(cropBoxFrame)};
@@ -1481,7 +1487,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.zoomScale = self.cropBoxLastEditedZoomScale;
     }
     else {
-        newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
+        CGFloat scaleWidth = floorf(self.cropBoxFrame.size.width * scale);
+        CGFloat scaleHeight = floorf(self.cropBoxFrame.size.height * scale);
+        if (self.hasAspectRatio && self.aspectRatioLockEnabled) {
+            newCropFrame.size = (CGSize){scaleWidth, scaleHeight};
+        } else {
+            newCropFrame.size = (CGSize){scaleHeight, scaleWidth};
+        }
         
         //Re-adjust the scrolling dimensions of the scroll view to match the new size
         self.scrollView.minimumZoomScale *= scale;
@@ -1582,6 +1594,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             } completion:^(BOOL complete) {
                 self.rotateAnimationInProgress = NO;
                 [snapshotView removeFromSuperview];
+                if (self.hasAspectRatio && self.aspectRatioLockEnabled) {
+                    [self moveCroppedContentToCenterAnimated: animated];
+                }
             }];
         }];
     }
