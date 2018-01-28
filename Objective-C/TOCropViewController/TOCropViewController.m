@@ -102,17 +102,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return self;
 }
 
-- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image minimumCropRatio:(CGFloat)minimumCropRatio NS_SWIFT_NAME(init(croppingStyle:image:minimumCropRatio:)){
-    NSParameterAssert(image);
-    
-    self = [self initWithCroppingStyle:style image:image];
-    if (self) {
-        self.minimalCroppingAspectRatio = minimumCropRatio;
-    }
-    
-    return self;
-}
-
 - (instancetype)initWithImage:(UIImage *)image
 {
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
@@ -1084,7 +1073,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
-        _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image minimalAspectRatio:_minimalCroppingAspectRatio];
+        _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self.view addSubview:_cropView];
@@ -1277,6 +1266,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
     return insets;
+}
+
+- (void)setMinimumAspectRatio:(CGFloat)minimumAspectRatio
+{
+    self.cropView.minimumAspectRatio = minimumAspectRatio;
+}
+
+- (CGFloat)minimumAspectRatio
+{
+    return self.cropView.minimumAspectRatio;
 }
 
 @end
