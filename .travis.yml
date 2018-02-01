@@ -1,5 +1,0 @@
-language: objective-c
-osx_image: xcode8.2
-xcode_project: TOCropViewControllerExample.xcodeproj
-xcode_scheme: TOCropViewControllerTests
-script: xcodebuild -verbose -scheme TOCropViewControllerTests -sdk iphonesimulator -destination 'platform=iOS Simulator,id=DB794781-65A7-4884-8D00-AAC3CBD39A44,OS=latest' test

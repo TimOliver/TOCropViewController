@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "0920"
-   version = "1.3">
+   wasCreatedForAppExtension = "YES"
+   version = "2.0">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2F5062DB1F53E2D900AA9F14"
+               BuildableName = "TOCropViewControllerExample-Extension.appex"
+               BlueprintName = "TOCropViewControllerExample-Extension"
+               ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
@@ -20,34 +35,6 @@
                ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "223424821ABBC0CD00BBC2B1"
-               BuildableName = "TOCropViewControllerExampleTests.xctest"
-               BlueprintName = "TOCropViewControllerExampleTests"
-               ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "220611961B2E6777001A467B"
-               BuildableName = "TOCropViewControllerTests.xctest"
-               BlueprintName = "TOCropViewControllerTests"
-               ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -57,33 +44,13 @@
       language = ""
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "223424821ABBC0CD00BBC2B1"
-               BuildableName = "TOCropViewControllerExampleTests.xctest"
-               BlueprintName = "TOCropViewControllerExampleTests"
-               ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "220611961B2E6777001A467B"
-               BuildableName = "TOCropViewControllerTests.xctest"
-               BlueprintName = "TOCropViewControllerTests"
-               ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "223424691ABBC0CD00BBC2B1"
-            BuildableName = "TOCropViewControllerExample.app"
-            BlueprintName = "TOCropViewControllerExample"
+            BlueprintIdentifier = "2F5062DB1F53E2D900AA9F14"
+            BuildableName = "TOCropViewControllerExample-Extension.appex"
+            BlueprintName = "TOCropViewControllerExample-Extension"
             ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -92,15 +59,16 @@
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       language = ""
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES">
+      allowLocationSimulation = "YES"
+      launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
@@ -119,7 +87,8 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      debugDocumentVersioning = "YES">
+      debugDocumentVersioning = "YES"
+      launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference

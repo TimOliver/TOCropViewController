@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "144B8CC81D22CAFF0085D774"
-               BuildableName = "TOCropViewController.framework"
-               BlueprintName = "TOCropViewController"
+               BlueprintIdentifier = "2238CF3B1FC029A90081B957"
+               BuildableName = "CropViewController.framework"
+               BlueprintName = "CropViewController"
                ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,9 +47,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "144B8CC81D22CAFF0085D774"
-            BuildableName = "TOCropViewController.framework"
-            BlueprintName = "TOCropViewController"
+            BlueprintIdentifier = "2238CF3B1FC029A90081B957"
+            BuildableName = "CropViewController.framework"
+            BlueprintName = "CropViewController"
             ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,9 +65,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "144B8CC81D22CAFF0085D774"
-            BuildableName = "TOCropViewController.framework"
-            BlueprintName = "TOCropViewController"
+            BlueprintIdentifier = "2238CF3B1FC029A90081B957"
+            BuildableName = "CropViewController.framework"
+            BlueprintName = "CropViewController"
             ReferencedContainer = "container:TOCropViewControllerExample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
