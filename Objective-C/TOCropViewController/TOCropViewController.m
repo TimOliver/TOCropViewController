@@ -1268,4 +1268,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return insets;
 }
 
+- (void)setMinimumAspectRatio:(CGFloat)minimumAspectRatio
+{
+    self.cropView.minimumAspectRatio = minimumAspectRatio;
+}
+
+- (CGFloat)minimumAspectRatio
+{
+    return self.cropView.minimumAspectRatio;
+}
+
 @end
