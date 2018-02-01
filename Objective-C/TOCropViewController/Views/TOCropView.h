@@ -138,6 +138,16 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
+///**
+// Paddings of the crop rectangle. Default to 14.0
+// */
+@property (nonatomic) CGFloat cropViewPadding;
+
+/**
+ Delay before crop frame is adjusted according new crop area. Default to 0.8
+ */
+@property (nonatomic) NSTimeInterval cropAdjustingDelay;
+
 /**
 The minimum croping aspect ratio. If set, user is prevented from setting cropping rectangle to lower aspect ratio than defined by the parameter.
 */
