@@ -134,12 +134,26 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped = ^{ [weakSelf rotateCropViewClockwise]; };
     
-    self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
-    self.toolbar.flipVerticallyButtonTapped = ^{ [weakSelf flipVertical]; };
+    //self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
+    //self.toolbar.flipVerticallyButtonTapped = ^{ [weakSelf flipVertical]; };
+    
+    UIButton* rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [rotateBtn setImage:[self rotateBtn] forState:UIControlStateNormal];
+    rotateBtn.frame = CGRectMake(16.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+    [rotateBtn addTarget:self
+               action:@selector(rotateBtnPressed)
+     forControlEvents:UIControlEventTouchUpInside];
+    rotateBtn.contentMode = UIViewContentModeScaleAspectFit;
+    [self.cropView addSubview:rotateBtn];
+    
+    UIButton* trashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [trashBtn setImage:[self trashBtn] forState:UIControlStateNormal];
+    trashBtn.frame = CGRectMake(UIScreen.mainScreen.bounds.size.width - 16.0 - 24.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+    trashBtn.contentMode = UIViewContentModeScaleAspectFit;
+    [self.cropView addSubview:trashBtn];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     // If we're animating onto the screen, set a flag
@@ -1277,5 +1291,49 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     return insets;
 }
-
+    
+#pragma mark - Custom buttons' logic -
+    
+- (UIImage *)rotateBtn {
+    NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage* rotateImage;
+    if (!bundleURL) {
+        rotateImage = [UIImage imageNamed:@"group"];
+    } else {
+        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        NSString *imagePath = [bundle pathForResource:@"group" ofType:@"png"];
+        rotateImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+    
+    CGSize newSize = CGSizeMake(24.0, 24.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [rotateImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+    
+- (void)rotateBtnPressed {
+    [self rotateCropViewCounterclockwise];
+}
+    
+- (UIImage *)trashBtn {
+    NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage* trashImage;
+    if (!bundleURL) {
+        trashImage = [UIImage imageNamed:@"icTrash"];
+    } else {
+        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        NSString *imagePath = [bundle pathForResource:@"icTrash" ofType:@"png"];
+        trashImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+    
+    CGSize newSize = CGSizeMake(24.0, 24.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [trashImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+    
 @end

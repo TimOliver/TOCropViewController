@@ -122,7 +122,7 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
                 horizontalFrame = (CGRect){boundsSize.width-(kTOCropOverLayerCornerWidth+18.0f),boundsSize.height,kTOCropOverLayerCornerWidth+18.0f,3.0f};
                 break;
             case 3: //bottom left
-                verticalFrame = (CGRect){-3.0f,boundsSize.height-(kTOCropOverLayerCornerWidth+18.0f),3.0f,kTOCropOverLayerCornerWidth+21.0f};
+                verticalFrame = (CGRect){-3.0f,boundsSize.height-(kTOCropOverLayerCornerWidth+18.0f),3.0f,kTOCropOverLayerCornerWidth+18.0f};
                 horizontalFrame = (CGRect){-3.0f,boundsSize.height,kTOCropOverLayerCornerWidth+21.0f,3.0f};
                 break;
         }
