@@ -107,8 +107,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     // Set up view controller properties
@@ -149,6 +148,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIButton* trashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [trashBtn setImage:[self trashBtn] forState:UIControlStateNormal];
     trashBtn.frame = CGRectMake(UIScreen.mainScreen.bounds.size.width - 16.0 - 24.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+    [trashBtn addTarget:self
+                  action:@selector(trashBtnPressed)
+        forControlEvents:UIControlEventTouchUpInside];
     trashBtn.contentMode = UIViewContentModeScaleAspectFit;
     [self.cropView addSubview:trashBtn];
 }
@@ -1317,6 +1319,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self rotateCropViewCounterclockwise];
 }
     
+- (void)trashBtnPressed {
+    [self.delegate badImageToDelete];
+    [self cancelButtonTapped];
+}
+    
 - (UIImage *)trashBtn {
     NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
     UIImage* trashImage;
@@ -1335,5 +1342,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIGraphicsEndImageContext();
     return newImage;
 }
+    
     
 @end

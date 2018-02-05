@@ -93,6 +93,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  
  */
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled NS_SWIFT_NAME(cropViewController(_:didFinishCancelled:));
+    
+- (void)badImageToDelete;
 
 @end
 
