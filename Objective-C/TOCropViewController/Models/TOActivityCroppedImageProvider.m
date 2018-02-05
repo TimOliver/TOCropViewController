@@ -37,6 +37,17 @@
 @end
 
 @implementation TOActivityCroppedImageProvider
+    
+- (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular {
+    if (self = [super initWithPlaceholderItem:[UIImage new]]) {
+        _image = image;
+        _cropFrame = cropFrame;
+        _angle = angle;
+        _circular = circular;
+    }
+    
+    return self;
+}
 
 - (instancetype)initWithImage:(UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flipHorizontally:(NSInteger)flipH flipVertically:(NSInteger)flipV {
     
