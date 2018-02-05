@@ -31,6 +31,7 @@
 @property (nonatomic, readonly) NSInteger flipHorizontallyValue;
 @property (nonatomic, readonly) NSInteger flipVerticallyValue;
 
+- (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular;
 - (instancetype _Nonnull )initWithImage:(UIImage *_Nonnull)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle circular:(BOOL)circular flipHorizontally:(NSInteger)flipH flipVertically:(NSInteger)flipV;
 
 @end

@@ -521,6 +521,10 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
         toCropViewController.dismissAnimatedFrom(viewController, croppedImage: croppedImage, toView: toView,
                                                  toFrame: toFrame, setup: setup, completion: completion)
     }
+    
+    public func badImageToDelete() {
+        print("Delete image...")
+    }
 }
 
 extension CropViewController {

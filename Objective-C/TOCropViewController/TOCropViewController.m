@@ -107,8 +107,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     // Set up view controller properties
@@ -134,12 +133,29 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped = ^{ [weakSelf rotateCropViewClockwise]; };
     
-    self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
-    self.toolbar.flipVerticallyButtonTapped = ^{ [weakSelf flipVertical]; };
+    //self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
+    //self.toolbar.flipVerticallyButtonTapped = ^{ [weakSelf flipVertical]; };
+    
+    UIButton* rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [rotateBtn setImage:[self rotateBtn] forState:UIControlStateNormal];
+    rotateBtn.frame = CGRectMake(16.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+    [rotateBtn addTarget:self
+               action:@selector(rotateBtnPressed)
+     forControlEvents:UIControlEventTouchUpInside];
+    rotateBtn.contentMode = UIViewContentModeScaleAspectFit;
+    [self.cropView addSubview:rotateBtn];
+    
+    UIButton* trashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [trashBtn setImage:[self trashBtn] forState:UIControlStateNormal];
+    trashBtn.frame = CGRectMake(UIScreen.mainScreen.bounds.size.width - 16.0 - 24.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+    [trashBtn addTarget:self
+                  action:@selector(trashBtnPressed)
+        forControlEvents:UIControlEventTouchUpInside];
+    trashBtn.contentMode = UIViewContentModeScaleAspectFit;
+    [self.cropView addSubview:trashBtn];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     // If we're animating onto the screen, set a flag
@@ -1027,11 +1043,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //If the delegate/block that requires the specific cropped image is provided, call it
     else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
         UIImage *image = nil;
-        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size}) && flipV == 1 && flipH == 1) {
+        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
             image = self.image;
         }
         else {
-            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO flipHorizontally:flipH flipVertically:flipV];
+            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO];
         }
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
@@ -1277,5 +1293,55 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     return insets;
 }
-
+    
+#pragma mark - Custom buttons' logic -
+    
+- (UIImage *)rotateBtn {
+    NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage* rotateImage;
+    if (!bundleURL) {
+        rotateImage = [UIImage imageNamed:@"group"];
+    } else {
+        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        NSString *imagePath = [bundle pathForResource:@"group" ofType:@"png"];
+        rotateImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+    
+    CGSize newSize = CGSizeMake(24.0, 24.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [rotateImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+    
+- (void)rotateBtnPressed {
+    [self rotateCropViewCounterclockwise];
+}
+    
+- (void)trashBtnPressed {
+    [self.delegate badImageToDelete];
+    [self cancelButtonTapped];
+}
+    
+- (UIImage *)trashBtn {
+    NSURL *bundleURL = [[NSBundle bundleForClass:self.class] URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    UIImage* trashImage;
+    if (!bundleURL) {
+        trashImage = [UIImage imageNamed:@"icTrash"];
+    } else {
+        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        NSString *imagePath = [bundle pathForResource:@"icTrash" ofType:@"png"];
+        trashImage = [UIImage imageWithContentsOfFile:imagePath];
+    }
+    
+    CGSize newSize = CGSizeMake(24.0, 24.0);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [trashImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+    
+    
 @end

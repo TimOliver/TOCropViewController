@@ -208,5 +208,6 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         activityController.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem!
         present(activityController, animated: true, completion: nil)
     }
+    
 }
 

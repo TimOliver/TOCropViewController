@@ -59,7 +59,7 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.98f alpha:1.0f];
+    self.backgroundView.backgroundColor = [UIColor colorWithRed:34/255.f green:37/255.f blue:45/255.f alpha:1.0];
     [self addSubview:self.backgroundView];
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
@@ -88,7 +88,7 @@
                                                                   resourceBundle,
                                                                   nil)
                      forState:UIControlStateNormal];
-    [_doneTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    //[_doneTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [_doneTextButton sizeToFit];
@@ -96,7 +96,7 @@
     
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
-    [_doneIconButton setTintColor:[UIColor blackColor]];
+    //[_doneIconButton setTintColor:[UIColor blackColor]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_doneIconButton];
     
@@ -108,7 +108,7 @@
                                                                     resourceBundle,
                                                                     nil)
                        forState:UIControlStateNormal];
-    [_cancelTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    //[_cancelTextButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
     [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [_cancelTextButton sizeToFit];
@@ -148,12 +148,12 @@
 //    [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
 //    [self addSubview:_resetButton];
     
-    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
-    _flipHorizontal.contentMode = UIViewContentModeCenter;
-    _flipHorizontal.tintColor = [UIColor blackColor];
-    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
-    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_flipHorizontal];
+//    _flipHorizontal = [UIButton buttonWithType:UIButtonTypeSystem];
+//    _flipHorizontal.contentMode = UIViewContentModeCenter;
+//    _flipHorizontal.tintColor = [UIColor blackColor];
+//    [_flipHorizontal setImage:[TOCropToolbar flipHorizontal] forState:UIControlStateNormal];
+//    [_flipHorizontal addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:_flipHorizontal];
     
 //    _flipVertical = [UIButton buttonWithType:UIButtonTypeSystem];
 //    _flipVertical.contentMode = UIViewContentModeCenter;
@@ -195,7 +195,7 @@
 #endif
     
     if (verticalLayout == NO) {
-        CGFloat insetPadding = 10.0f;
+        CGFloat insetPadding = 16.0f;
         
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
@@ -256,7 +256,7 @@
 //            [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
 //        }
         
-        [buttonsInOrderHorizontally addObject:self.flipHorizontal];
+        //[buttonsInOrderHorizontally addObject:self.flipHorizontal];
         //[buttonsInOrderHorizontally addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
@@ -296,7 +296,7 @@
 //            [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
 //        }
         
-        [buttonsInOrderVertically addObject:self.flipHorizontal];
+        //[buttonsInOrderVertically addObject:self.flipHorizontal];
         //[buttonsInOrderVertically addObject:self.flipVertical];
         
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
