@@ -81,6 +81,8 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      
      */
     @objc optional func cropViewController(_ cropViewController: CropViewController, didFinishCancelled cancelled: Bool)
+    
+    @objc func didTrashPressed()
 }
 
 ///------------------------------------------------
@@ -523,7 +525,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
     
     public func badImageToDelete() {
-        print("Delete image...")
+        self.delegate?.didTrashPressed()
     }
 }
 
