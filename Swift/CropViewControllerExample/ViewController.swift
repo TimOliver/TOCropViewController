@@ -74,6 +74,10 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         updateImageViewWithImage(image, fromCropViewController: cropViewController)
     }
     
+    func didTrashPressed() {
+        print("trashed...")
+    }
+    
     public func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
         imageView.image = image
         layoutImageView()
