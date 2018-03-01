@@ -325,9 +325,9 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
     
     /**
-     Text for the 'Title' label.
-     Setting this will override the Default which is nothing.
-     */
+     Text for 'Title' label.
+     The default value is empty.
+    */
     public var titleLabelText: String! {
         set { toCropViewController.titleLabelText = newValue }
         get { return toCropViewController.titleLabelText }

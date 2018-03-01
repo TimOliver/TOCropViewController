@@ -169,8 +169,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nullable, nonatomic, readonly) UILabel *titleLabel;
 
 /**
- Title for the 'Title' label.
- Setting this will override the Default which is nothing.
+ Text for 'Title' label.
+ The default value is empty.
  */
 @property (nullable, nonatomic, copy) NSString *titleLabelText;
 
