@@ -1057,8 +1057,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
     self.titleLabel.text = self.title;
+    self.titleLabel.numberOfLines = 0;
     [self.titleLabel sizeToFit];
     self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
+}
+
+- (void)setTitleLabelText:(NSString *)title {
+    [self setTitle: title];
 }
 
 - (void)setDoneButtonTitle:(NSString *)title {
