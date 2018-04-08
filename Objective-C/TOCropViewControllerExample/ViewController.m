@@ -81,6 +81,7 @@
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
     cropController.delegate = self;
     CGRect viewFrame = [self.view convertRect:self.imageView.frame toView:self.navigationController.view];
+    cropController.aspectRatioLockDimensionSwapEnabled = YES;
     [cropController presentAnimatedFromParentViewController:self
                                                   fromImage:self.imageView.image
                                                    fromView:nil

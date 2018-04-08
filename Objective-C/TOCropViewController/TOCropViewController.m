@@ -1118,6 +1118,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 }
 
+- (void)setAspectRatioLockDimensionSwapEnabled:(BOOL)aspectRatioLockDimensionSwapEnabled
+{
+    self.cropView.aspectRatioLockDimensionSwapEnabled = aspectRatioLockDimensionSwapEnabled;
+}
+
 - (BOOL)aspectRatioLockEnabled
 {
     return self.cropView.aspectRatioLockEnabled;
