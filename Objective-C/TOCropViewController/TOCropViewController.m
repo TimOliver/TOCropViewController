@@ -136,23 +136,24 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //self.toolbar.flipHorizonyallyButtonTapped = ^{ [weakSelf flipHorizontal]; };
     //self.toolbar.flipVerticallyButtonTapped = ^{ [weakSelf flipVertical]; };
     
-    UIButton* rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rotateBtn setImage:[self rotateBtn] forState:UIControlStateNormal];
-    rotateBtn.frame = CGRectMake(16.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
-    [rotateBtn addTarget:self
-               action:@selector(rotateBtnPressed)
-     forControlEvents:UIControlEventTouchUpInside];
-    rotateBtn.contentMode = UIViewContentModeScaleAspectFit;
-    [self.cropView addSubview:rotateBtn];
-    
-    UIButton* trashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [trashBtn setImage:[self trashBtn] forState:UIControlStateNormal];
-    trashBtn.frame = CGRectMake(UIScreen.mainScreen.bounds.size.width - 16.0 - 24.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
-    [trashBtn addTarget:self
-                  action:@selector(trashBtnPressed)
-        forControlEvents:UIControlEventTouchUpInside];
-    trashBtn.contentMode = UIViewContentModeScaleAspectFit;
-    [self.cropView addSubview:trashBtn];
+    //uncomment for rotate and delete buttons
+//    UIButton* rotateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [rotateBtn setImage:[self rotateBtn] forState:UIControlStateNormal];
+//    rotateBtn.frame = CGRectMake(16.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+//    [rotateBtn addTarget:self
+//               action:@selector(rotateBtnPressed)
+//     forControlEvents:UIControlEventTouchUpInside];
+//    rotateBtn.contentMode = UIViewContentModeScaleAspectFit;
+//    [self.cropView addSubview:rotateBtn];
+//
+//    UIButton* trashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [trashBtn setImage:[self trashBtn] forState:UIControlStateNormal];
+//    trashBtn.frame = CGRectMake(UIScreen.mainScreen.bounds.size.width - 16.0 - 24.0, UIScreen.mainScreen.bounds.size.height - 91.0f, 22.0, 24.0);
+//    [trashBtn addTarget:self
+//                  action:@selector(trashBtnPressed)
+//        forControlEvents:UIControlEventTouchUpInside];
+//    trashBtn.contentMode = UIViewContentModeScaleAspectFit;
+//    [self.cropView addSubview:trashBtn];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
