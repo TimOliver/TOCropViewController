@@ -1621,7 +1621,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             } completion:^(BOOL complete) {
                 self.rotateAnimationInProgress = NO;
                 [snapshotView removeFromSuperview];
-                if (!self.aspectRatioLockDimensionSwapEnabled) {
+                
+                // If the aspect ratio lock is not enabled, allow a swap
+                // If the aspect ratio lock is on, allow a aspect ratio swap
+                // only if the allowDimensionSwap option is specified.
+                BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled ||
+                (self.aspectRatioLockEnabled && self.aspectRatioLockDimensionSwapEnabled);
+                
+                if (!aspectRatioCanSwapDimensions) {
                     //This will animate the aspect ratio back to the desired locked ratio after the image is rotated.
                     [self setAspectRatio:self.aspectRatio animated:animated];
                 }

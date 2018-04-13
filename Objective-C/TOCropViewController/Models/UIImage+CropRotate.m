@@ -31,7 +31,12 @@
             alphaInfo == kCGImageAlphaPremultipliedFirst || alphaInfo == kCGImageAlphaPremultipliedLast);
 }
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
+-(UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
+{
+    return [self croppedImageWithFrame:frame angle:angle circularClip:circular scale:[UIScreen mainScreen].scale];
+}
+
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular scale:(CGFloat)scale
 {
     UIImage *croppedImage = nil;
     UIGraphicsBeginImageContextWithOptions(frame.size, ![self hasAlpha] && !circular, self.scale);
@@ -66,7 +71,7 @@
     }
     UIGraphicsEndImageContext();
     
-    return [UIImage imageWithCGImage:croppedImage.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
+    return [UIImage imageWithCGImage:croppedImage.CGImage scale:scale orientation:UIImageOrientationUp];
 }
 
 
