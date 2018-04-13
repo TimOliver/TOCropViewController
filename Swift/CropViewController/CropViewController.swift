@@ -183,7 +183,7 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
      
      Default is false.
      */
-    var aspectRatioLockDimensionSwapEnabled: Bool {
+    public var aspectRatioLockDimensionSwapEnabled: Bool {
         set { toCropViewController.aspectRatioLockDimensionSwapEnabled = newValue }
         get { return toCropViewController.aspectRatioLockDimensionSwapEnabled }
     }
