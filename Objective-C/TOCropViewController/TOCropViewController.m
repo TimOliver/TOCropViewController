@@ -455,6 +455,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 //TODO: Deprecate iOS 7 properly at the right time
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.toolbarSnapshotView = [self.toolbar snapshotViewAfterScreenUpdates:NO];
