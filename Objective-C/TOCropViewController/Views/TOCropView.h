@@ -108,6 +108,13 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /**
+ If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box will swap it's dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
+ 
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL aspectRatioLockDimensionSwapEnabled;
+
+/**
  When the user taps 'reset', whether the aspect ratio will also be reset as well
  Default is YES
  */
