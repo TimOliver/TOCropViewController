@@ -161,6 +161,11 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 @property (nonatomic, assign) CGFloat minimumAspectRatio;
 
 /**
+ The maximum scale that user can apply to image by pinching to zoom. Small values are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
+ */
+@property (nonatomic, assign) CGFloat maximumZoomScale;
+
+/**
  Create a default instance of the crop view with the supplied image
  */
 - (nonnull instancetype)initWithImage:(nonnull UIImage *)image;
