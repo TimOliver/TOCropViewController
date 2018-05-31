@@ -1116,7 +1116,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.alpha = alpha;
     self.backgroundImageView.alpha = alpha;
     
-    [UIView animateWithDuration:0.4f animations:^{
+    [UIView animateWithDuration:0.1f animations:^{
         [self toggleTranslucencyViewVisible:!hidden];
         self.gridOverlayView.alpha = alpha;
     }];
@@ -1134,7 +1134,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     self.backgroundImageView.hidden = NO;
     self.backgroundImageView.alpha = beforeAlpha;
-    [UIView animateWithDuration:0.5f animations:^{
+    [UIView animateWithDuration:0.1f animations:^{
         self.backgroundImageView.alpha = toAlpha;
     }completion:^(BOOL complete) {
         if (hidden) {
@@ -1153,7 +1153,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     _gridOverlayHidden = gridOverlayHidden;
     self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     
-    [UIView animateWithDuration:0.4f animations:^{
+    [UIView animateWithDuration:0.1f animations:^{
         self.gridOverlayView.alpha = gridOverlayHidden ? 0.0f : 1.0f;
     }];
 }
