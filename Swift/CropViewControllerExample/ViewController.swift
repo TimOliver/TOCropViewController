@@ -50,7 +50,13 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         
         //If profile picture, push onto the same navigation stack
         if croppingStyle == .circular {
-            picker.pushViewController(cropController, animated: true)
+            if picker.sourceType == .camera {
+                picker.dismiss(animated: true, completion: {
+                    self.present(cropController, animated: true, completion: nil)
+                })
+            } else {
+                picker.pushViewController(cropController, animated: true)
+            }
         }
         else { //otherwise dismiss, and then present from the main controller
             picker.dismiss(animated: true, completion: {
