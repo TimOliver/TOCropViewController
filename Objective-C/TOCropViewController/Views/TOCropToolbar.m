@@ -68,21 +68,25 @@
     }
     
     // In CocoaPods, strings are stored in a separate bundle from the main one
-    NSBundle *resourceBundle = nil;
-    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
-    NSURL *resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-    if (resourceBundleURL) {
-        resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
-    }
-    else {
-        resourceBundle = classBundle;
-    }
+	NSBundle *resourceBundle = nil;
+	NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+	NSURL *objcResourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+	NSURL *swiftResourceBundleURL = [classBundle URLForResource:@"CropViewControllerBundle" withExtension:@"bundle"];
+	if (objcResourceBundleURL) {
+		resourceBundle = [[NSBundle alloc] initWithURL:objcResourceBundleURL];
+	}
+	else if (swiftResourceBundleURL) {
+		resourceBundle = [[NSBundle alloc] initWithURL:swiftResourceBundleURL];
+	}
+	else {
+		resourceBundle = classBundle;
+	}
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle: _doneTextButtonTitle ?
         _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
-                                                                  @"TOCropViewControllerLocalizable",
-                                                                  resourceBundle,
+																  @"TOCropViewControllerLocalizable",
+																  resourceBundle,
                                                                   nil)
                      forState:UIControlStateNormal];
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
@@ -101,8 +105,8 @@
     
     [_cancelTextButton setTitle: _cancelTextButtonTitle ?
         _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
-                                                                    @"TOCropViewControllerLocalizable",
-                                                                    resourceBundle,
+																	@"TOCropViewControllerLocalizable",
+																	resourceBundle,
                                                                     nil)
                        forState:UIControlStateNormal];
     [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];

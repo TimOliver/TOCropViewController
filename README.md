@@ -54,16 +54,10 @@ pod 'CropViewController'
 
 #### As a Carthage Dependency
 
-##### Objective-C
-
 Add the following to your Cartfile:
 ``` 
-github "https://github.com/TimOliver/TOCropViewController"
+github "TimOliver/TOCropViewController"
 ```
-
-##### Swift
-
-Coming soon.
 
 #### Manual Installation
 
