@@ -1,10 +1,10 @@
-# TOCropViewController / CropViewController
+# TOCropViewController
 
 <p align="center">
 <img src="https://github.com/TimOliver/TOCropViewController/raw/master/screenshot.jpg" width="890" style="margin:0 auto" />
 </p>
 
-[![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=59efffd0785eab00015357fa&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/59efffd0785eab00015357fa/build/latest?branch=master)
+[![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
 [![CocoaPods](https://img.shields.io/cocoapods/dt/TOCropViewController.svg?maxAge=3600)](https://cocoapods.org/pods/TOCropViewController)
 [![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
@@ -12,6 +12,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 [![Beerpay](https://beerpay.io/TimOliver/TOCropViewController/badge.svg?style=flat)](https://beerpay.io/TimOliver/TOCropViewController)
 [![PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M4RKULAVKV7K8)
+[![Twitch](https://img.shields.io/badge/twitch-timXD-6441a5.svg)](http://twitch.tv/timXD)
 
 
 `TOCropViewController` is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on `UIImage` objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
