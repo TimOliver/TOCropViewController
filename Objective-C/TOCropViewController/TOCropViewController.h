@@ -42,7 +42,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
 /* Whether the control toolbar is placed at the bottom or the top */
 typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
     TOCropViewControllerToolbarPositionBottom,
-    TOCropViewControllerToolbarPositionTop
+    TOCropViewControllerToolbarPositionTop,
+    /**
+    Hides toolbar with cancel, rotate and Done buttons. Usefull in case you want to provide your custom UI for done, rotate and done function.
+     */
+    TOCropViewControllerToolbarPositionHidden
 };
 
 @class TOCropViewController;
@@ -220,6 +224,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  Default is NO.
  */
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
+
+/*
+ If this controller is embedded in UINavigationController its navigation bar is hidden by default. Set this property to false to show the navigation bar. This must be set before this controller is presented.
+ */
+@property (nonatomic, assign) BOOL hidesNavigationBar;
 
 /**
  When enabled, hides the rotation button, as well as the alternative rotation 

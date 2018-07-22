@@ -30,6 +30,7 @@ static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
 static const CGFloat kTOCropViewCircularPathRadius = 300.0f;
+static const CGFloat kTOMaximumZoomScale = 15.0f;
 
 /* When the user taps down to resize the box, this state is used
  to determine where they tapped and how to manipulate the box */
@@ -54,7 +55,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
 @property (nonatomic, strong) UIView *backgroundContainerView;      /* A view which contains the background image view, to separate its transforms from the scroll view. */
 @property (nonatomic, strong) UIImageView *foregroundImageView;     /* A copy of the background image view, placed over the dimming views */
-@property (nonatomic, strong) UIView *foregroundContainerView;      /* A container view that clips the foreground image view to the crop box frame */
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
@@ -148,6 +148,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.restoreAngle = 0;
     self.cropAdjustingDelay = kTOCropTimerDuration;
     self.cropViewPadding = kTOCropViewPadding;
+    self.maximumZoomScale = kTOMaximumZoomScale;
     
     /* Dynamic animation blurring is only possible on iOS 9, however since the API was available on iOS 8,
      we'll need to manually check the system version to ensure that it's available. */
@@ -304,7 +305,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // Configure the scroll view
     self.scrollView.minimumZoomScale = scale;
-    self.scrollView.maximumZoomScale = 15.0f;
+    self.scrollView.maximumZoomScale = scale * self.maximumZoomScale;
 
     //Set the crop box to the size we calculated and align in the middle of the screen
     CGRect frame = CGRectZero;

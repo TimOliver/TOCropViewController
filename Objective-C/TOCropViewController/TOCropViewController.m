@@ -90,6 +90,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
         self.automaticallyAdjustsScrollViewInsets = NO;
+        self.hidesNavigationBar = true;
         
         // Controller object that handles the transition animation when presenting / dismissing this app
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
@@ -149,12 +150,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // If this controller is pushed onto a navigation stack, set flags noting the
     // state of the navigation controller bars before we present, and then hide them
     if (self.navigationController) {
-        self.navigationBarHidden = self.navigationController.navigationBarHidden;
-        self.toolbarHidden = self.navigationController.toolbarHidden;
-        
-        [self.navigationController setNavigationBarHidden:YES animated:animated];
-        [self.navigationController setToolbarHidden:YES animated:animated];
-        
+        if (self.hidesNavigationBar) {
+            self.navigationBarHidden = self.navigationController.navigationBarHidden;
+            self.toolbarHidden = self.navigationController.toolbarHidden;
+            [self.navigationController setNavigationBarHidden:YES animated:animated];
+            [self.navigationController setToolbarHidden:YES animated:animated];
+        }
+
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     }
     else {
@@ -216,7 +218,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
     
     // Restore the navigation controller to its state before we were presented
-    if (self.navigationController) {
+    if (self.navigationController && self.hidesNavigationBar) {
         [self.navigationController setNavigationBarHidden:self.navigationBarHidden animated:animated];
         [self.navigationController setToolbarHidden:self.toolbarHidden animated:animated];
     }
@@ -277,13 +279,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     else {
         frame.origin.x = 0.0f;
         frame.size.width = CGRectGetWidth(self.view.bounds);
-        frame.size.height = kTOCropViewControllerToolbarHeight;
+        frame.size.height = self.toolbarPosition == TOCropViewControllerToolbarPositionHidden ? 0.0f : kTOCropViewControllerToolbarHeight;
 
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
             frame.origin.y = CGRectGetHeight(self.view.bounds) - (frame.size.height + insets.bottom);
         } else {
             frame.origin.y = insets.top;
         }
+        self.toolbar.hidden = self.toolbarPosition == TOCropViewControllerToolbarPositionHidden;
     }
     
     return frame;
@@ -320,7 +323,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Set Y and adjust for height
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
             frame.size.height -= (insets.bottom + kTOCropViewControllerToolbarHeight);
-        } else {
+        } else if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
 			frame.origin.y = kTOCropViewControllerToolbarHeight + insets.top;
             frame.size.height -= frame.origin.y;
         }

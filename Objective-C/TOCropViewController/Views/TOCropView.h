@@ -55,6 +55,9 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 @property (nonnull, nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
 
+/** A container view that clips the foreground image view to the crop box frame */
+@property (nonatomic, strong) UIView *foregroundContainerView;
+
 /**
  A delegate object that receives notifications from the crop view
  */
@@ -159,6 +162,11 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 The minimum croping aspect ratio. If set, user is prevented from setting cropping rectangle to lower aspect ratio than defined by the parameter.
 */
 @property (nonatomic, assign) CGFloat minimumAspectRatio;
+
+/**
+ The maximum scale that user can apply to image by pinching to zoom. Small values are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
+ */
+@property (nonatomic, assign) CGFloat maximumZoomScale;
 
 /**
  Create a default instance of the crop view with the supplied image

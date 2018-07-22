@@ -69,5 +69,4 @@
     return [UIImage imageWithCGImage:croppedImage.CGImage scale: self.scale orientation:UIImageOrientationUp];
 }
 
-
 @end
