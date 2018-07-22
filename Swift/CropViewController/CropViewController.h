@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TOCropViewController.h"
 
 //! Project version number for CropViewController.
 FOUNDATION_EXPORT double CropViewControllerVersionNumber;
@@ -15,4 +16,3 @@ FOUNDATION_EXPORT double CropViewControllerVersionNumber;
 FOUNDATION_EXPORT const unsigned char CropViewControllerVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <CropViewController/PublicHeader.h>
-

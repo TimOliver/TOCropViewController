@@ -565,20 +565,24 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     
     // In CocoaPods, strings are stored in a separate bundle from the main one
-    NSBundle *resourceBundle = nil;
-    NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
-    NSURL *resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-    if (resourceBundleURL) {
-        resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
-    }
-    else {
-        resourceBundle = classBundle;
-    }
+	NSBundle *resourceBundle = nil;
+	NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
+	NSURL *objcResourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+	NSURL *swiftResourceBundleURL = [classBundle URLForResource:@"CropViewControllerBundle" withExtension:@"bundle"];
+	if (objcResourceBundleURL) {
+		resourceBundle = [[NSBundle alloc] initWithURL:objcResourceBundleURL];
+	}
+	else if (swiftResourceBundleURL) {
+		resourceBundle = [[NSBundle alloc] initWithURL:swiftResourceBundleURL];
+	}
+	else {
+		resourceBundle = classBundle;
+	}
     
     //Prepare the localized options
-    NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-    NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-    NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+	NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+	NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+	NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil);
     
     //Prepare the list that will be fed to the alert view/controller
     NSMutableArray *items = [NSMutableArray array];
