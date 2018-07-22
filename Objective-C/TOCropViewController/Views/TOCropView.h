@@ -55,8 +55,10 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 @property (nonnull, nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
 
-/** A container view that clips the foreground image view to the crop box frame */
-@property (nonatomic, strong) UIView *foregroundContainerView;
+/**
+ A container view that clips the a copy of the image so it appears over the dimming view
+ */
+@property (nonatomic, readonly) UIView *foregroundContainerView;
 
 /**
  A delegate object that receives notifications from the crop view
