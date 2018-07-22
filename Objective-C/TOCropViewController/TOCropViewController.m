@@ -279,14 +279,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     else {
         frame.origin.x = 0.0f;
         frame.size.width = CGRectGetWidth(self.view.bounds);
-        frame.size.height = self.toolbarPosition == TOCropViewControllerToolbarPositionHidden ? 0.0f : kTOCropViewControllerToolbarHeight;
+        frame.size.height = kTOCropViewControllerToolbarHeight;
 
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
             frame.origin.y = CGRectGetHeight(self.view.bounds) - (frame.size.height + insets.bottom);
         } else {
             frame.origin.y = insets.top;
         }
-        self.toolbar.hidden = self.toolbarPosition == TOCropViewControllerToolbarPositionHidden;
     }
     
     return frame;

@@ -41,12 +41,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
 
 /* Whether the control toolbar is placed at the bottom or the top */
 typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
-    TOCropViewControllerToolbarPositionBottom,
-    TOCropViewControllerToolbarPositionTop,
-    /**
-    Hides toolbar with cancel, rotate and Done buttons. Usefull in case you want to provide your custom UI for done, rotate and done function.
-     */
-    TOCropViewControllerToolbarPositionHidden
+    TOCropViewControllerToolbarPositionBottom,  // Bar is placed along the bottom in portrait
+    TOCropViewControllerToolbarPositionTop     // Bar is placed along the top in portrait (Respects the status bar)
 };
 
 @class TOCropViewController;
