@@ -528,10 +528,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
+    // If the size doesn't change (e.g, we did a 180 degree device rotation), don't bother doing a relayout
+    if (CGSizeEqualToSize(size, self.view.bounds.size)) { return; }
+    
     UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
     CGSize currentSize = self.view.bounds.size;
-    if (currentSize.width < size.width)
+    if (currentSize.width < size.width) {
         orientation = UIInterfaceOrientationLandscapeLeft;
+    }
     
     [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
