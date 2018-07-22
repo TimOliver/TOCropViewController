@@ -169,6 +169,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 @property (nullable, nonatomic, readonly) UILabel *titleLabel;
 
 /**
+ Text for 'Title' label.
+ The default value is empty.
+ */
+@property (nullable, nonatomic, copy) NSString *titleLabelText;
+
+/**
  Title for the 'Done' button.
  Setting this will override the Default which is a localized string for "Done".
  */

@@ -335,6 +335,15 @@ public class CropViewController: UIViewController, TOCropViewControllerDelegate 
     }
     
     /**
+     Text for 'Title' label.
+     The default value is empty.
+    */
+    public var titleLabelText: String! {
+        set { toCropViewController.titleLabelText = newValue }
+        get { return toCropViewController.titleLabelText }
+    }
+    
+    /**
      Title for the 'Done' button.
      Setting this will override the Default which is a localized string for "Done".
      */
