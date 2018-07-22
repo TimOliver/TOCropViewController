@@ -60,7 +60,13 @@
     
     //If profile picture, push onto the same navigation stack
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
-        [picker pushViewController:cropController animated:YES];
+        if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+            [picker dismissViewControllerAnimated:YES completion:^{
+                [self presentViewController:cropController animated:YES completion:nil];
+            }];
+        } else {
+            [picker pushViewController:cropController animated:YES];
+        }
     }
     else { //otherwise dismiss, and then present from the main controller
         [picker dismissViewControllerAnimated:YES completion:^{
