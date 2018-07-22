@@ -732,7 +732,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //manually perform a restoration animation here
     if (self.resetTimer) {
         [self cancelResetTimer];
-        [self setEditing:NO animated:NO];
+        [self setEditing:NO resetCropBox:NO animated:NO];
     }
    
     [self setSimpleRenderMode:YES animated:NO];
@@ -851,7 +851,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)timerTriggered
 {
-    [self setEditing:NO animated:YES];
+    [self setEditing:NO resetCropBox:YES animated:YES];
     [self.resetTimer invalidate];
     self.resetTimer = nil;
 }
@@ -1032,7 +1032,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setEditing:(BOOL)editing
 {
-    [self setEditing:editing animated:NO];
+    [self setEditing:editing resetCropBox:NO animated:NO];
 }
 
 - (void)setSimpleRenderMode:(BOOL)simpleMode
@@ -1222,10 +1222,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)startEditing
 {
     [self cancelResetTimer];
-    [self setEditing:YES animated:YES];
+    [self setEditing:YES resetCropBox:NO animated:YES];
 }
 
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+- (void)setEditing:(BOOL)editing resetCropBox:(BOOL)resetCropbox animated:(BOOL)animated
 {
     if (editing == _editing)
         return;
@@ -1234,7 +1234,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     [self.gridOverlayView setGridHidden:!editing animated:animated];
     
-    if (editing == NO) {
+    if (resetCropbox) {
         [self moveCroppedContentToCenterAnimated:animated];
         [self captureStateForImageRotation];
         self.cropBoxLastEditedAngle = self.angle;
@@ -1477,7 +1477,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Cancel any pending resizing timers
     if (self.resetTimer) {
         [self cancelResetTimer];
-        [self setEditing:NO animated:NO];
+        [self setEditing:NO resetCropBox:YES animated:NO];
         
         self.cropBoxLastEditedAngle = self.angle;
         [self captureStateForImageRotation];
