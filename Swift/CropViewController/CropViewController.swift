@@ -18,7 +18,7 @@
 //  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
-//  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.s
+//  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
  An enum containing all of the aspect ratio presets that this view controller supports
@@ -97,6 +97,14 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     */
     public var delegate: CropViewControllerDelegate? {
         didSet { self.setUpDelegateHandlers() }
+    }
+    
+    /**
+     Set the title text that appears at the top of the view controller
+    */
+    override open var title: String? {
+        set { toCropViewController.title = newValue }
+        get { return toCropViewController.title }
     }
     
     /**
