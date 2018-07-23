@@ -22,7 +22,7 @@
 
 #import "TOCropToolbar.h"
 
-#define TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT     0   // convenience debug toggle
+#define TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT 0   // convenience debug toggle
 
 @interface TOCropToolbar()
 
@@ -67,20 +67,8 @@
         self.reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
     }
     
-    // In CocoaPods, strings are stored in a separate bundle from the main one
-	NSBundle *resourceBundle = nil;
-	NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
-	NSURL *objcResourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-	NSURL *swiftResourceBundleURL = [classBundle URLForResource:@"CropViewControllerBundle" withExtension:@"bundle"];
-	if (objcResourceBundleURL) {
-		resourceBundle = [[NSBundle alloc] initWithURL:objcResourceBundleURL];
-	}
-	else if (swiftResourceBundleURL) {
-		resourceBundle = [[NSBundle alloc] initWithURL:swiftResourceBundleURL];
-	}
-	else {
-		resourceBundle = classBundle;
-	}
+    // Get the resource bundle depending on the framework/dependency manager we're using
+    NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle: _doneTextButtonTitle ?

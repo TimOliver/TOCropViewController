@@ -22,6 +22,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TOCropOverlayView : UIView
 
 /** Hides the interior grid lines, sans animation. */
@@ -37,3 +39,5 @@
 - (void)setGridHidden:(BOOL)hidden animated:(BOOL)animated;
 
 @end
+
+NS_ASSUME_NONNULL_END

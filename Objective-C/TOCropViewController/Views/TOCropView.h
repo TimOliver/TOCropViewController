@@ -21,17 +21,14 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TOCropViewConstants.h"
 
 @class TOCropOverlayView;
-
-typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
-    TOCropViewCroppingStyleDefault,     // The regular, rectangular crop box
-    TOCropViewCroppingStyleCircular     // A fixed, circular crop box
-};
-
 @class TOCropView;
 
-@protocol TOCropViewDelegate <NSObject>
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol TOCropViewDelegate<NSObject>
 
 - (void)cropViewDidBecomeResettable:(nonnull TOCropView *)cropView;
 - (void)cropViewDidBecomeNonResettable:(nonnull TOCropView *)cropView;
@@ -58,7 +55,7 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
 /**
  A container view that clips the a copy of the image so it appears over the dimming view
  */
-@property (nonatomic, readonly) UIView *foregroundContainerView;
+@property (nonnull, nonatomic, readonly) UIView *foregroundContainerView;
 
 /**
  A delegate object that receives notifications from the crop view
@@ -260,3 +257,5 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
 @end
+
+NS_ASSUME_NONNULL_END

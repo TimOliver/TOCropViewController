@@ -21,6 +21,9 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TOCropViewConstants.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface TOCropToolbar : UIView
 
@@ -74,5 +77,6 @@
 /* Done button frame for popover controllers */
 @property (nonatomic, readonly) CGRect doneButtonFrame;
 
-
 @end
+
+NS_ASSUME_NONNULL_END

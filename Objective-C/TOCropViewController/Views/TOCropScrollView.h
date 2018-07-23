@@ -22,6 +22,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*
  Subclassing UIScrollView was necessary in order to directly capture
  touch events that weren't otherwise accessible via UIGestureRecognizer objects.
@@ -33,3 +35,5 @@
 @property (nullable, nonatomic, copy) void (^touchesEnded)(void);
 
 @end
+
+NS_ASSUME_NONNULL_END

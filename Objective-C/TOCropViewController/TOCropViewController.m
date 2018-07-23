@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOCropViewController.h"
+
 #import "TOCropViewControllerTransitioning.h"
 #import "TOActivityCroppedImageProvider.h"
 #import "UIImage+CropRotate.h"
@@ -570,20 +571,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //Depending on the shape of the image, work out if horizontal, or vertical options are required
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     
-    // In CocoaPods, strings are stored in a separate bundle from the main one
-	NSBundle *resourceBundle = nil;
-	NSBundle *classBundle = [NSBundle bundleForClass:[self class]];
-	NSURL *objcResourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-	NSURL *swiftResourceBundleURL = [classBundle URLForResource:@"CropViewControllerBundle" withExtension:@"bundle"];
-	if (objcResourceBundleURL) {
-		resourceBundle = [[NSBundle alloc] initWithURL:objcResourceBundleURL];
-	}
-	else if (swiftResourceBundleURL) {
-		resourceBundle = [[NSBundle alloc] initWithURL:swiftResourceBundleURL];
-	}
-	else {
-		resourceBundle = classBundle;
-	}
+    // Get the resource bundle depending on the framework/dependency manager we're using
+	NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
     
     //Prepare the localized options
 	NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);

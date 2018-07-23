@@ -21,7 +21,12 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+
 #import "TOCropViewController.h"
+#import "TOCropView.h"
+#import "TOCropToolbar.h"
+#import "TOCropViewConstants.h"
+#import "UIImage+CropRotate.h"
 
 FOUNDATION_EXPORT double CropViewControllerVersionNumber;
 FOUNDATION_EXPORT const unsigned char CropViewControllerVersionString[];

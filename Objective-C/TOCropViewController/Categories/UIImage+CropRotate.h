@@ -1,5 +1,5 @@
 //
-//  TOCropViewController-Bridging-Header.h
+//  UIImage+CropRotate.h
 //
 //  Copyright 2015-2018 Timothy Oliver. All rights reserved.
 //
@@ -20,12 +20,12 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TOCropViewController.h"
-#import "TOCropView.h"
-#import "TOCropToolbar.h"
-#import "TOCropOverlayView.h"
-#import "TOActivityCroppedImageProvider.h"
-#import "TOCroppedImageAttributes.h"
-#import "TOCropScrollView.h"
-#import "TOCropViewControllerTransitioning.h"
-#import "UIImage+CropRotate.h"
+#import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface UIImage (TOCropRotate)
+- (nonnull UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular;
+@end
+
+NS_ASSUME_NONNULL_END
