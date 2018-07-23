@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.7 - 2018-07-24
+
+### Added
+- `minimumAspectRatio` to set a minimum shape that the cropping box can be scaled to.
+- `cropViewPadding` to specifically control how much padding from the edge the crop box gives.
+- `cropAdjustingDelay` to specifically control how long the timer waits until animating the crop transition.
+- `aspectRatioLockDimensionSwapEnabled` as a stopgap to locking the aspect ratio when rotating the image.
+
+
+### Fixed
+- More thorough sanitation of the final frame calculation.
+- A bug where sometimes the square aspect ratio would stop being square.
+- A memory cycle leak in the Swift wrapper.
+
 ## 2.3.6 - 2018-01-02
 
 ### Added
