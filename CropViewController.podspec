@@ -12,4 +12,5 @@ Pod::Spec.new do |s|
     'TOCropViewControllerBundle' => ['Objective-C/TOCropViewController/**/*.lproj']
   }
   s.requires_arc = true
+  s.swift_version = '4.1'
 end
