@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - More thorough sanitation of the final frame calculation.
 - A bug where sometimes the square aspect ratio would stop being square.
 - A memory cycle leak in the Swift wrapper.
+- A broken animation when rotating the device orientation 180 degrees.
+- A broken animation if you hit 'reset' right after resizing the crop box.
 
 ## 2.3.6 - 2018-01-02
 
