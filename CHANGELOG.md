@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - A memory cycle leak in the Swift wrapper.
 - A broken animation when rotating the device orientation 180 degrees.
 - A broken animation if you hit 'reset' right after resizing the crop box.
+- Danish and Malaysian localisations weren't being imported properly.
 
 ## 2.3.6 - 2018-01-02
 
