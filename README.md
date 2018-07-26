@@ -1,7 +1,7 @@
 # TOCropViewController
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/master/screenshot.jpg" width="890" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/screenshot.jpg" width="890" style="margin:0 auto" />
 </p>
 
 [![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
@@ -15,9 +15,7 @@
 [![Twitch](https://img.shields.io/badge/twitch-timXD-6441a5.svg)](http://twitch.tv/timXD)
 
 
-`TOCropViewController` is an open-source `UIViewController` subclass built to allow users to perform basic manipulation on `UIImage` objects; specifically cropping and some basic rotations. It has been designed with the iOS 8 Photos app in mind, and as such, behaves in an already familiar way.
-
-`CropViewController` is a Swift wrapper for `TOCropViewController`. It completely wraps all of the Objective-C object code in a pure Swift interface. This allows the API to look and feel 100% more Swifty, and can enable more elegant integrations with `TOCropViewController` in all-Swift codebases.
+`TOCropViewController` is an open-source `UIViewController` subclass to crop out sections of `UIImage` objects, as well as perform basic rotations. It is excellent for things like editing profile pictures, or sharing parts of a photo online. It has been designed with the iOS Photos app editor in mind, and as such, behaves in a way that should already feel familiar to users of iOS.
 
 ## Features
 * Crop images by dragging the edges of a grid overlay.
