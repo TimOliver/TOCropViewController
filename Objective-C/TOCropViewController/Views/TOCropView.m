@@ -20,6 +20,8 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include <math.h>
+
 #import "TOCropView.h"
 #import "TOCropOverlayView.h"
 #import "TOCropScrollView.h"
@@ -964,13 +966,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
 {
-    if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame))
+    if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame)) {
         return;
+    }
     
-    //Upon init, sometimes the box size is still 0, which can result in CALayer issues
-    if (cropBoxFrame.size.width < FLT_EPSILON || cropBoxFrame.size.height < FLT_EPSILON)
-        return;
-    
+    // Upon init, sometimes the box size is still 0 (or NaN), which can result in CALayer issues
+    CGSize frameSize = cropBoxFrame.size;
+    if (frameSize.width < FLT_EPSILON || frameSize.height < FLT_EPSILON) { return; }
+    if (isnan(frameSize.width) || isnan(frameSize.height)) { return; }
+
     //clamp the cropping region to the inset boundaries of the screen
     CGRect contentFrame = self.contentBounds;
     CGFloat xOrigin = ceilf(contentFrame.origin.x);
