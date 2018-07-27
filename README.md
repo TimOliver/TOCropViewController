@@ -19,7 +19,7 @@
 
 For Swift developers, `CropViewController` is a Swift wrapper that completely encapsulates `TOCropViewController` and provides a much more native, Swiftier interface.
 
-#### Proudly Powering Apps By Some Awesome Companies
+#### Proudly Powering Some Awesome Companies
 
 <p align="center">
 <img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/users.png" width="900" style="margin:0 auto" />
