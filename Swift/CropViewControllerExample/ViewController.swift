@@ -18,8 +18,8 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     private var croppedRect = CGRect.zero
     private var croppedAngle = 0
     
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        guard let image = (info[UIImagePickerControllerOriginalImage] as? UIImage) else { return }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = (info[UIImagePickerController.InfoKey.originalImage] as? UIImage) else { return }
         
         let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
         cropController.delegate = self
