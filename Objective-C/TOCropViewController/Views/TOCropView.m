@@ -1058,33 +1058,29 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = self.cropBoxFrame;
     CGPoint contentOffset = self.scrollView.contentOffset;
     UIEdgeInsets edgeInsets = self.scrollView.contentInset;
+    CGFloat scale = MIN(imageSize.width / contentSize.width, imageSize.height / contentSize.height);
     
     CGRect frame = CGRectZero;
+    
+    // Calculate the normalized origin
     frame.origin.x = floorf((floorf(contentOffset.x) + edgeInsets.left) * (imageSize.width / contentSize.width));
     frame.origin.x = MAX(0, frame.origin.x);
     
     frame.origin.y = floorf((floorf(contentOffset.y) + edgeInsets.top) * (imageSize.height / contentSize.height));
     frame.origin.y = MAX(0, frame.origin.y);
     
-    frame.size.width = ceilf(cropBoxFrame.size.width * (imageSize.width / contentSize.width));
+    // Calculate the normalized width
+    frame.size.width = ceilf(cropBoxFrame.size.width * scale);
     frame.size.width = MIN(imageSize.width, frame.size.width);
-    
-     if (cropBoxFrame.size.width == cropBoxFrame.size.height) {
-         frame.size.height = frame.size.width;
-     } else {
-         frame.size.height = ceilf(cropBoxFrame.size.height * (imageSize.height / contentSize.height));
-         frame.size.height = MIN(imageSize.height, frame.size.height);
-     }
 
-    // if frame goes beyond boundaries of the image, we move it back
-    // so it is within the boundaries.
-    if (frame.origin.x + frame.size.width > imageSize.width) {
-        frame.origin.x = imageSize.width - frame.size.width;
+    // Calculate normalized height
+    if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
+        frame.size.height = frame.size.width;
+    } else {
+        frame.size.height = ceilf(cropBoxFrame.size.height * scale);
+        frame.size.height = MIN(imageSize.height, frame.size.height);
     }
-
-    if (frame.origin.y + frame.size.height > imageSize.height) {
-        frame.origin.y = imageSize.height - frame.size.height;
-    }
+    frame.size.height = MIN(imageSize.height, frame.size.height);
 
     return frame;
 }
