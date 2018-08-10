@@ -253,6 +253,10 @@
     self.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.view addSubview:self.imageView];
     
+    if (@available(iOS 11.0, *)) {
+        self.imageView.accessibilityIgnoresInvertColors = YES;
+    }
+    
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapImageView)];
     [self.imageView addGestureRecognizer:tapRecognizer];
 }

@@ -218,6 +218,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundImageView.layer.minificationFilter = kCAFilterTrilinear;
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
+    // Disable colour inversion for the image views
+    if (@available(iOS 11.0, *)) {
+        self.foregroundImageView.accessibilityIgnoresInvertColors = YES;
+        self.backgroundImageView.accessibilityIgnoresInvertColors = YES;
+    }
+    
     // The following setup isn't needed during circular cropping
     if (circularMode) {
         UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:(CGRect){0,0,kTOCropViewCircularPathRadius, kTOCropViewCircularPathRadius}];
