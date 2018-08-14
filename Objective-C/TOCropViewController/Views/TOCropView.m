@@ -1413,9 +1413,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         cropBoxFrame.size.width = newWidth;
         offset.x += (delta * 0.5f);
         
-        if (delta < FLT_EPSILON)
+        if (delta < FLT_EPSILON) {
             cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
-        
+        }
+            
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
         if (newWidth > boundsWidth) {
             CGFloat scale = boundsWidth / newWidth;
@@ -1430,9 +1431,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         cropBoxFrame.size.height = newHeight;
         offset.y += (delta * 0.5f);
         
-        if (delta < FLT_EPSILON)
-            cropBoxFrame.origin.x = self.contentBounds.origin.y;
-        
+        if (delta < FLT_EPSILON) {
+            cropBoxFrame.origin.y = self.contentBounds.origin.y;
+        }
+            
         CGFloat boundsHeight = CGRectGetHeight(boundsFrame);
         if (newHeight > boundsHeight) {
             CGFloat scale = boundsHeight / newHeight;
@@ -1449,9 +1451,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
         
-        if (zoomOut)
+        if (zoomOut) {
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
-        
+        }
+            
         [self moveCroppedContentToCenterAnimated:NO];
         [self checkForCanReset];
     };
