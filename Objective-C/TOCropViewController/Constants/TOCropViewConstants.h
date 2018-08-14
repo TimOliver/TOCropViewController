@@ -58,13 +58,9 @@ static inline NSBundle *TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(NSObject *object
     NSBundle *resourceBundle = nil;
     
     NSBundle *classBundle = [NSBundle bundleForClass:object.class];
-    NSURL *objcResourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
-    NSURL *swiftResourceBundleURL = [classBundle URLForResource:@"CropViewControllerBundle" withExtension:@"bundle"];
-    if (objcResourceBundleURL) {
-        resourceBundle = [[NSBundle alloc] initWithURL:objcResourceBundleURL];
-    }
-    else if (swiftResourceBundleURL) {
-        resourceBundle = [[NSBundle alloc] initWithURL:swiftResourceBundleURL];
+    NSURL *resourceBundleURL = [classBundle URLForResource:@"TOCropViewControllerBundle" withExtension:@"bundle"];
+    if (resourceBundleURL) {
+        resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
     }
     else {
         resourceBundle = classBundle;
