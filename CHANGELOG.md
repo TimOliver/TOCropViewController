@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.8 - 2018-08-15
+
+### Added
+- Image does not invert when 'Smart Invert Colors' is enabled.
+
+### Fixed
+- A Core Animation crash when the image size is initially NaN.
+- The image being positioned slightly higher than it should be on iPhone X.
+- An imprecision issue where the reported cropping frame was out of bounds.
+
 ## 2.3.7 - 2018-07-24
 
 ### Added
