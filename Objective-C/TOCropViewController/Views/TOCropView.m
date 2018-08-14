@@ -1405,22 +1405,33 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         cropBoxIsPortrait = self.image.size.width > self.image.size.height;
     else
         cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
-    
+
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = floorf(cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height));
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
         offset.x += (delta * 0.5f);
-        
+
         if (delta < FLT_EPSILON) {
             cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         }
-            
+
+        // If the aspect ratio causes the new width to extend
+        // beyond the content width, we'll need to zoom the image out
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
         if (newWidth > boundsWidth) {
             CGFloat scale = boundsWidth / newWidth;
-            cropBoxFrame.size.height *= scale;
+
+            // Scale the new height
+            CGFloat newHeight = cropBoxFrame.size.height * scale;
+            delta = cropBoxFrame.size.height - newHeight;
+            cropBoxFrame.size.height = newHeight;
+
+            // Offset the Y position so it stays in the middle
+            offset.y += (delta * 0.5f);
+
+            // Clamp the width to the bounds width
             cropBoxFrame.size.width = boundsWidth;
             zoomOut = YES;
         }
@@ -1430,15 +1441,26 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat delta = cropBoxFrame.size.height - newHeight;
         cropBoxFrame.size.height = newHeight;
         offset.y += (delta * 0.5f);
-        
+
         if (delta < FLT_EPSILON) {
             cropBoxFrame.origin.y = self.contentBounds.origin.y;
         }
-            
+
+        // If the aspect ratio causes the new height to extend
+        // beyond the content width, we'll need to zoom the image out
         CGFloat boundsHeight = CGRectGetHeight(boundsFrame);
         if (newHeight > boundsHeight) {
             CGFloat scale = boundsHeight / newHeight;
-            cropBoxFrame.size.width *= scale;
+
+            // Scale the new width
+            CGFloat newWidth = cropBoxFrame.size.width * scale;
+            delta = cropBoxFrame.size.width - newWidth;
+            cropBoxFrame.size.width = newWidth;
+
+            // Offset the Y position so it stays in the middle
+            offset.x += (delta * 0.5f);
+
+            // Clamp the width to the bounds height
             cropBoxFrame.size.height = boundsHeight;
             zoomOut = YES;
         }
