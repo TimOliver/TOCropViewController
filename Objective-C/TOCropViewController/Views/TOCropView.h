@@ -110,7 +110,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /**
- If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box will swap it's dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
+ If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES,
+ the crop box will swap it's dimensions depending on portrait or landscape sized images.
+ This value also controls whether the dimensions can swap when the image is rotated.
  
  Default is NO.
  */
