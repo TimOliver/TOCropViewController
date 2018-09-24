@@ -50,6 +50,11 @@
     // -- Uncomment this line of code to place the toolbar at the top of the view controller --
     //cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
     
+    // -- Uncomment this line of code to include only certain type of preset ratios
+    //cropController.allowedAspectRatios = @[@(TOCropViewControllerAspectRatioPresetOriginal),
+    //                                       @(TOCropViewControllerAspectRatioPresetSquare),
+    //                                       @(TOCropViewControllerAspectRatioPreset3x2)];
+    
     //cropController.rotateButtonsHidden = YES;
     //cropController.rotateClockwiseButtonHidden = NO;
     
