@@ -99,6 +99,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
+        
+        _allowedAspectRatios = @[@(TOCropViewControllerAspectRatioPresetOriginal),
+                                @(TOCropViewControllerAspectRatioPresetSquare),
+                                @(TOCropViewControllerAspectRatioPreset3x2),
+                                @(TOCropViewControllerAspectRatioPreset5x3),
+                                @(TOCropViewControllerAspectRatioPreset4x3),
+                                @(TOCropViewControllerAspectRatioPreset5x4),
+                                @(TOCropViewControllerAspectRatioPreset7x5),
+                                @(TOCropViewControllerAspectRatioPreset16x9)];
     }
 	
     return self;
@@ -580,14 +589,21 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 	NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil);
     
     //Prepare the list that will be fed to the alert view/controller
+    NSArray *portraitRatioTitles = @[originalButtonTitle, squareButtonTitle, @"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"];
+    NSArray *landscapeRatioTitles = @[originalButtonTitle, squareButtonTitle, @"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"];
+    
     NSMutableArray *items = [NSMutableArray array];
-    [items addObject:originalButtonTitle];
-    [items addObject:squareButtonTitle];
     if (verticalCropBox) {
-        [items addObjectsFromArray:@[@"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"]];
+        for(NSNumber *aspectRatio in _allowedAspectRatios){
+            NSInteger index = [aspectRatio integerValue];
+            [items addObject:portraitRatioTitles[index]];
+        }
     }
     else {
-        [items addObjectsFromArray:@[@"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"]];
+        for(NSNumber *aspectRatio in _allowedAspectRatios){
+            NSInteger index = [aspectRatio integerValue];
+            [items addObject:landscapeRatioTitles[index]];
+        }
     }
     
     //Present via a UIAlertController if >= iOS 8
@@ -597,13 +613,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         
         //Add each item to the alert controller
         NSInteger i = 0;
-        for (NSString *item in items) {
-            UIAlertAction *action = [UIAlertAction actionWithTitle:item style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [self setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)i animated:YES];
+        for(NSNumber *aspectRatio in _allowedAspectRatios){
+            UIAlertAction *action = [UIAlertAction actionWithTitle:items[i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)[aspectRatio integerValue] animated:YES];
                 self.aspectRatioLockEnabled = YES;
             }];
             [alertController addAction:action];
-            
             i++;
         }
         
