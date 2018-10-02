@@ -880,19 +880,33 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)cancelButtonTapped
 {
     // show a 'Discard Changes?' confirmation alert when user tap cancel after making changes
-    CGRect cropFrame = self.cropView.imageCropFrame;
-    NSInteger angle = self.cropView.angle;
     
-    BOOL angleChanged = angle != 0;
+    CGRect cropFrame = self.cropView.imageCropFrame;
+    
+    BOOL angleChanged = [self.cropView angleChanged];
     BOOL cropFrameChanged = NO;
     
-    if((NSInteger) (floor(cropFrame.origin.x)) != 0 || (NSInteger) (floor(cropFrame.origin.y)) != 0){
+    // The initial image width / height when first appear in the crop view
+    NSInteger initialImageWidth = (NSInteger) (cropFrame.size.width);
+    NSInteger initialImageHeight = (NSInteger) (cropFrame.size.height);
+    
+    // If the image is rotated four times (a circle back to original), the width and height are supposed to equal to originals,
+    // but weirdly there's seems to have ~2 pixels of error
+    NSInteger tolerance = 2;
+    
+    // if the angle is not 0, 180, 360.. etc, swap the width and height for the image
+    if (self.angle % 180 != 0) {
+        initialImageWidth = (NSInteger) floor(cropFrame.size.height);
+        initialImageHeight = (NSInteger) floor(cropFrame.size.width);
+    }
+    
+    if ((NSInteger) (floor(cropFrame.origin.x)) != 0 || (NSInteger) (floor(cropFrame.origin.y)) != 0) {
         cropFrameChanged = YES;
-    } else if ((NSInteger) (floor(cropFrame.size.width)) != (NSInteger) (floor(self.image.size.width)) || (NSInteger) (floor(cropFrame.size.height)) != (NSInteger) (floor(self.image.size.height))){
+    } else if (labs(initialImageWidth - (NSInteger) floor(self.image.size.width)) > tolerance || labs(initialImageHeight - (NSInteger) floor(self.image.size.height)) > tolerance){
         cropFrameChanged = YES;
     }
     
-    if(angleChanged || cropFrameChanged){
+    if (angleChanged || cropFrameChanged) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Discard Changes?" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         // Get the resource bundle depending on the framework/dependency manager we're using
         NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
