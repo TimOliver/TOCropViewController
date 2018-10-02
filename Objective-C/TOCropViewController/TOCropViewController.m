@@ -879,6 +879,59 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #pragma mark - Button Feedback -
 - (void)cancelButtonTapped
 {
+    // show a 'Discard Changes?' confirmation alert when user tap cancel after making changes
+    CGRect cropFrame = self.cropView.imageCropFrame;
+    NSInteger angle = self.cropView.angle;
+    
+    BOOL angleChanged = angle != 0;
+    BOOL cropFrameChanged = NO;
+    
+    if((NSInteger) (floor(cropFrame.origin.x)) != 0 || (NSInteger) (floor(cropFrame.origin.y)) != 0){
+        cropFrameChanged = YES;
+    } else if ((NSInteger) (floor(cropFrame.size.width)) != (NSInteger) (floor(self.image.size.width)) || (NSInteger) (floor(cropFrame.size.height)) != (NSInteger) (floor(self.image.size.height))){
+        cropFrameChanged = YES;
+    }
+    
+    if(angleChanged || cropFrameChanged){
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Discard Changes?" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        // Get the resource bundle depending on the framework/dependency manager we're using
+        NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
+        NSString *yesButtonTitle = NSLocalizedStringFromTableInBundle(@"Yes", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+        NSString *noButtonTitle = NSLocalizedStringFromTableInBundle(@"No", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+        
+        __weak typeof (self) weakSelf = self;
+        [alertController addAction:[UIAlertAction actionWithTitle:yesButtonTitle style:UIAlertActionStyleDestructive handler: ^(UIAlertAction * _Nonnull action) {
+            typeof (self) strongSelf = weakSelf;
+            bool isDelegateOrCallbackHandled = NO;
+            
+            // Check if the delegate method was implemented and call if so
+            if ([strongSelf.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
+                [strongSelf.delegate cropViewController:self didFinishCancelled:YES];
+                isDelegateOrCallbackHandled = YES;
+            }
+            
+            // Check if the block version was implemented and call if so
+            if (strongSelf.onDidFinishCancelled != nil) {
+                strongSelf.onDidFinishCancelled(YES);
+                isDelegateOrCallbackHandled = YES;
+            }
+            
+            // If neither callbacks were implemented, perform a default dismissing animation
+            if (!isDelegateOrCallbackHandled) {
+                if (strongSelf.navigationController) {
+                    [strongSelf.navigationController popViewControllerAnimated:YES];
+                }
+                else {
+                    strongSelf.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+                    [strongSelf.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                }
+            }
+        }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:noButtonTitle style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alertController animated:YES completion: nil];
+        return;
+    }
+    
     bool isDelegateOrCallbackHandled = NO;
 
     // Check if the delegate method was implemented and call if so
