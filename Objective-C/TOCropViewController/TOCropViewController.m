@@ -99,6 +99,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
+        _zoomEnabled = YES;
         
         _allowedAspectRatios = @[@(TOCropViewControllerAspectRatioPresetOriginal),
                                 @(TOCropViewControllerAspectRatioPresetSquare),
@@ -193,7 +194,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     
     // Re-enable translucency now that the animation has completed
     self.cropView.simpleRenderMode = NO;
-
+    
+    // Scrollview.pinchGesture.enabled must be called in viewDidAppear or later, else system will reset it to YES
+    [self.cropView setZoomable: self.zoomEnabled];
+    
     // Now that the presentation animation will have finished, animate
     // the status bar fading out, and if present, the title label fading in
     void (^updateContentBlock)(void) = ^{

@@ -258,6 +258,13 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
+
+/**
+ Enable / Disable zooming of the image
+
+ @param zoomable Whether the zooming of image is allowed
+ */
+- (void)setZoomable:(BOOL)zoomable;
 @end
 
 NS_ASSUME_NONNULL_END

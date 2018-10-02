@@ -1378,6 +1378,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
+- (void)setZoomable:(BOOL)zoomable{
+    self.scrollView.pinchGestureRecognizer.enabled = zoomable;
+}
+
 - (void)setAspectRatio:(CGSize)aspectRatio
 {
     [self setAspectRatio:aspectRatio animated:NO];

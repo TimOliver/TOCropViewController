@@ -189,6 +189,14 @@
  */
 @property (nonatomic, assign) BOOL resetAspectRatioEnabled;
 
+
+/**
+ If true, the scroll view containing the image can be zoomed.
+ 
+ Default is YES
+ */
+@property (nonatomic, assign) BOOL zoomEnabled;
+
 /**
  The position of the Toolbar the default value is `TOCropViewControllerToolbarPositionBottom`.
  */
