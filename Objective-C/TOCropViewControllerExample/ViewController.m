@@ -34,6 +34,9 @@
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:image];
     cropController.delegate = self;
 
+    // Uncomment this if you wish to always show grid
+    // [cropController.cropView setAlwaysShowGrid:YES];
+
     // Uncomment this if you wish to provide extra instructions via a title label
     //cropController.title = @"Crop Image";
 

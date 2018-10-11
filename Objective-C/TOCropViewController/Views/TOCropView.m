@@ -111,6 +111,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
 
+@property (nonatomic, assign) BOOL gridHidden;
+@property (nonatomic, assign) BOOL toggleGridAnimation;
+
 @end
 
 @implementation TOCropView
@@ -237,7 +240,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // The white grid overlay view
     self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
     self.gridOverlayView.userInteractionEnabled = NO;
-    self.gridOverlayView.gridHidden = YES;
+    self.toggleGridAnimation = YES;
+    self.gridHidden = YES;
+    self.gridOverlayView.gridHidden = self.gridHidden;
     [self addSubview:self.gridOverlayView];
     
     // The pan controller to recognize gestures meant to resize the grid view
@@ -1156,6 +1161,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
+-(void)setAlwaysShowGrid:(BOOL)showGrid {
+    self.gridHidden = !showGrid;
+
+    if (self.gridHidden) {
+        self.toggleGridAnimation = NO;
+    }
+
+    [self.gridOverlayView setGridHidden:self.gridHidden animated:YES];
+}
+
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
@@ -1239,8 +1254,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     
     _editing = editing;
-    
-    [self.gridOverlayView setGridHidden:!editing animated:animated];
+
+    if (_editing && self.toggleGridAnimation) {
+        [self.gridOverlayView setGridHidden:!editing animated:animated];
+    } else {
+        [self.gridOverlayView setGridHidden:self.gridHidden animated:animated];
+    }
     
     if (resetCropbox) {
         [self moveCroppedContentToCenterAnimated:animated];
