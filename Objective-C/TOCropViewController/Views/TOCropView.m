@@ -114,6 +114,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) BOOL gridHidden;
 @property (nonatomic, assign) BOOL toggleGridAnimation;
 
+@property (nonatomic, assign) BOOL translucencyViewHidden;
+
 @end
 
 @implementation TOCropView
@@ -206,7 +208,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.translucencyView = toolbar;
         self.translucencyView.frame = CGRectInset(self.bounds, -1.0f, -1.0f);
     }
-    self.translucencyView.hidden = NO;
+    self.translucencyView.hidden = self.translucencyViewHidden;
     self.translucencyView.userInteractionEnabled = NO;
     self.translucencyView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.translucencyView];
@@ -1171,6 +1173,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self.gridOverlayView setGridHidden:self.gridHidden animated:YES];
 }
 
+-(void)setTranslucencyOff:(BOOL)disableTranslucency {
+    self.translucencyView.hidden = disableTranslucency;
+    self.translucencyViewHidden = disableTranslucency;
+}
+
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
@@ -1663,7 +1670,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         } completion:^(BOOL complete) {
             self.backgroundContainerView.hidden = NO;
             self.foregroundContainerView.hidden = NO;
-            self.translucencyView.hidden = NO;
+            self.translucencyView.hidden = self.translucencyViewHidden;
             self.gridOverlayView.hidden = NO;
             
             self.backgroundContainerView.alpha = 0.0f;

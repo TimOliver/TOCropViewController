@@ -37,6 +37,9 @@
     // Uncomment this if you wish to always show grid
     // [cropController.cropView setAlwaysShowGrid:YES];
 
+    // Uncomment this if you do not want translucency effect
+    // [cropController.cropView setTranslucencyOff:YES];
+
     // Uncomment this if you wish to provide extra instructions via a title label
     //cropController.title = @"Crop Image";
 
