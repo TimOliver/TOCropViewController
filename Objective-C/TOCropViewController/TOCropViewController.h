@@ -216,6 +216,12 @@
 @property (nonatomic, assign) BOOL rotateButtonsHidden;
 
 /**
+ When enabled, hides the 'Reset' button on the toolbar.
+
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL resetButtonHidden;
+/**
  When enabled, hides the 'Aspect Ratio Picker' button on the toolbar.
  
  Default is NO.

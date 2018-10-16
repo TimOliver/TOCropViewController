@@ -1133,6 +1133,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateClockwiseButtonHidden = rotateButtonsHidden;
 }
 
+- (void)setResetButtonHidden:(BOOL)resetButtonHidden
+{
+    self.toolbar.resetButtonHidden = resetButtonHidden;
+}
+
 - (BOOL)rotateButtonsHidden
 {
     return self.toolbar.rotateCounterclockwiseButtonHidden && self.toolbar.rotateClockwiseButtonHidden;
