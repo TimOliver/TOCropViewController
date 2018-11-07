@@ -1261,7 +1261,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
         // Since iPhone X insets are always 44, check if this is merely
         // accounting for a non-X status bar and cancel it
-        if (insets.top <= 20.0f + FLT_EPSILON) {
+        if (insets.top <= 40.0f + FLT_EPSILON) {
             insets.top = self.statusBarHeight;
         }
     }
