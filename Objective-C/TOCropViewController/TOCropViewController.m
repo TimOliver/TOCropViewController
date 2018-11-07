@@ -367,6 +367,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     UIEdgeInsets insets = self.statusBarSafeInsets;
 
+    // If there is no title text, inset the top of the content as high as possible
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
             self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
