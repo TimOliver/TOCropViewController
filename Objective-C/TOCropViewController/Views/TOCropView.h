@@ -134,6 +134,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) NSInteger angle;
 
+
+/**
+ True if the original angle set before the crop view is shown doesn't equal to the latest angle
+ */
+@property (nonatomic, readonly) BOOL angleChanged;
+
 /**
  Hide all of the crop elements for transition animations 
  */
