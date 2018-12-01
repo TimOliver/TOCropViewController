@@ -18,11 +18,6 @@
 @property (nonatomic, assign) CGRect croppedFrame;
 @property (nonatomic, assign) NSInteger angle;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-@property (nonatomic, strong) UIPopoverController *activityPopoverController;
-#pragma clang diagnostic pop
-
 @end
 
 @implementation ViewController
@@ -223,23 +218,15 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)sharePhoto
+- (void)sharePhoto:(id)sender
 {
     if (self.imageView.image == nil)
         return;
     
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[self.imageView.image] applicationActivities:nil];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [self presentViewController:activityController animated:YES completion:nil];
-    }
-    else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [self.activityPopoverController dismissPopoverAnimated:NO];
-        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
-        [self.activityPopoverController presentPopoverFromBarButtonItem:self.navigationItem.rightBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-#pragma clang diagnostic pop
-    }
+    activityController.modalPresentationStyle = UIModalPresentationPopover;
+    activityController.popoverPresentationController.barButtonItem = sender;
+    [self presentViewController:activityController animated:YES completion:nil];
 }
 
 - (void)dismissViewController {
@@ -258,7 +245,7 @@
 #if TARGET_APP_EXTENSION
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissViewController)];
 #else
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sharePhoto:)];
     self.navigationItem.rightBarButtonItem.enabled = NO;
 #endif
     

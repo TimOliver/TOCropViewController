@@ -67,12 +67,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 /* Flag to perform initial setup on the first run */
 @property (nonatomic, assign) BOOL firstTime;
 
-/* On iOS 7, the popover view controller that appears when tapping 'Done' */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-@property (nonatomic, strong) UIPopoverController *activityPopoverController;
-#pragma clang diagnostic pop
-
 @end
 
 @implementation TOCropViewController
@@ -456,11 +450,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 #pragma mark - Rotation Handling -
 
-//TODO: Deprecate iOS 7 properly at the right time
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+- (void)_willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     self.toolbarSnapshotView = [self.toolbar snapshotViewAfterScreenUpdates:NO];
     self.toolbarSnapshotView.frame = self.toolbar.frame;
@@ -492,7 +482,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.cropView.internalLayoutDisabled = YES;
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+- (void)_willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     //Remove all animations in the toolbar
     self.toolbar.frame = [self frameForToolbarWithVerticalLayout:!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
@@ -517,7 +507,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.alpha = 1.0f;
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+- (void)_didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     [self.toolbarSnapshotView removeFromSuperview];
     self.toolbarSnapshotView = nil;
@@ -539,14 +529,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         orientation = UIInterfaceOrientationLandscapeLeft;
     }
     
-    [self willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+    [self _willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
+        [self _willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self didRotateFromInterfaceOrientation:orientation];
+        [self _didRotateFromInterfaceOrientation:orientation];
     }];
 }
-#pragma clang diagnostic pop
 
 #pragma mark - Reset -
 - (void)resetCropViewLayout
