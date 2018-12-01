@@ -107,9 +107,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) NSInteger restoreAngle;
 @property (nonatomic, assign) CGRect    restoreImageCropFrame;
 
-/* Angle set on the crop view before it was presented */
-@property (nonatomic, assign) NSInteger initialAngle;
-
 /* Set to YES once `performInitialLayout` is called. This lets pending properties get queued until the view
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
@@ -151,7 +148,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.resetAspectRatioEnabled = !circularMode;
     self.restoreImageCropFrame = CGRectZero;
     self.restoreAngle = 0;
-    self.initialAngle = 0;
     self.cropAdjustingDelay = kTOCropTimerDuration;
     self.cropViewPadding = kTOCropViewPadding;
     self.maximumZoomScale = kTOMaximumZoomScale;
@@ -1202,21 +1198,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 }
 
-- (BOOL)angleChanged {
-    NSInteger tmpAngle = self.angle;
-    NSInteger tmpInitialAngle = self.initialAngle;
-    
-    if (tmpAngle < 0) {
-        tmpAngle += 360;
-    }
-    
-    if (tmpInitialAngle < 0) {
-        tmpInitialAngle += 360;
-    }
-    
-    return tmpAngle % 360 != tmpInitialAngle % 360;
-}
-
 - (void)setAngle:(NSInteger)angle
 {
     //The initial layout would not have been performed yet.
@@ -1227,7 +1208,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     if (!self.initialSetupPerformed) {
-        self.initialAngle = newAngle;
         self.restoreAngle = newAngle;
         return;
     }

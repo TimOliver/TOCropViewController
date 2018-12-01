@@ -162,7 +162,15 @@
 @property (nullable, nonatomic, copy) NSString *cancelButtonTitle;
 
 /**
- If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box will swap it's dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
+ Shows a confirmation dialog when the user hits 'Cancel' and there are pending changes.
+ (Default is NO)
+ */
+@property (nonatomic, assign) BOOL showCancelConfirmationDialog;
+
+/**
+ If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box
+ will swap it's dimensions depending on portrait or landscape sized images.
+ This value also controls whether the dimensions can swap when the image is rotated.
  
  Default is NO.
  */
