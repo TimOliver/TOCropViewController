@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.4.0 - 2018-12-01
+
+### Added
+- Swift 4.2 Support
+- Romanian and Hungarian localizations
+- The ability to show only certain aspect ratios
+- A setting to allow confirmation before cancelling a crop
+
+### Fixed
+- Fixed layout issue on the new iPad Pro
+- Fixed issues with the aspect ratio settings when zooming out
+- Fixed an issue when rotating images would sometimes break
+- A bug where the completion handler of the cropping operation wouldn't fire
+
+### Removed
+- iOS 7 Support
+
 ## 2.3.8 - 2018-08-15
 
 ### Added
