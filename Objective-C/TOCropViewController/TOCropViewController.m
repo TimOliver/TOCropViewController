@@ -747,7 +747,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                                      completion:(void (^)(void))completion
 {
     [self presentAnimatedFromParentViewController:viewController fromImage:nil fromView:fromView fromFrame:fromFrame
-                                            angle:0 toImageFrame:CGRectZero setup:setup completion:nil];
+                                            angle:0 toImageFrame:CGRectZero setup:setup completion:completion];
 }
 
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
