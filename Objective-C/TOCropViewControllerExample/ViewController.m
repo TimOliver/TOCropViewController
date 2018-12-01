@@ -34,12 +34,6 @@
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:image];
     cropController.delegate = self;
 
-    // Uncomment this if you wish to always show grid
-    // [cropController.cropView setAlwaysShowGrid:YES];
-
-    // Uncomment this if you do not want translucency effect
-    // [cropController.cropView setTranslucencyOff:YES];
-
     // Uncomment this if you wish to provide extra instructions via a title label
     //cropController.title = @"Crop Image";
 
@@ -69,6 +63,12 @@
 
     // -- Uncomment this line of code to show a confirmation dialog when cancelling --
     //cropController.showCancelConfirmationDialog = YES;
+
+    // Uncomment this if you wish to always show grid
+    //cropController.cropView.alwaysShowCroppingGrid = YES;
+
+    // Uncomment this if you do not want translucency effect
+    //cropController.cropView.translucencyAlwaysHidden = YES;
 
     self.image = image;
     
