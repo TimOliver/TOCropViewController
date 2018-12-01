@@ -1,7 +1,7 @@
 # TOCropViewController
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/screenshot.jpg" width="890" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/screenshot.jpg" width="900" style="margin:0 auto" />
 </p>
 
 [![CI Status](http://img.shields.io/travis/TimOliver/TOCropViewController.svg?style=flat)](http://api.travis-ci.org/TimOliver/TOCropViewController.svg)
