@@ -880,6 +880,37 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #pragma mark - Button Feedback -
 - (void)cancelButtonTapped
 {
+    if (!self.cropView.canBeReset || !self.showCancelConfirmationDialog) {
+        [self dismissCropViewController];
+        return;
+    }
+
+    // Get the resource bundle depending on the framework/dependency manager we're using
+    NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
+
+    NSString *title = NSLocalizedStringFromTableInBundle(@"Delete Changes?", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+
+
+    NSString *yesButtonTitle = NSLocalizedStringFromTableInBundle(@"Yes", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    NSString *noButtonTitle = NSLocalizedStringFromTableInBundle(@"No", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+
+    __weak typeof (self) weakSelf = self;
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:yesButtonTitle style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        [weakSelf dismissCropViewController];
+    }];
+    [alertController addAction:yesAction];
+
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:noButtonTitle style:UIAlertActionStyleCancel handler:nil];
+    [alertController addAction:noAction];
+
+    [weakSelf presentViewController:alertController animated:YES completion: nil];
+}
+
+- (void)dismissCropViewController
+{
     bool isDelegateOrCallbackHandled = NO;
 
     // Check if the delegate method was implemented and call if so
