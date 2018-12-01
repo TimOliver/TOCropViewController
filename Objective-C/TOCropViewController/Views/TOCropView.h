@@ -149,9 +149,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
-///**
-// Paddings of the crop rectangle. Default to 14.0
-// */
+/**
+ Paddings of the crop rectangle. Default to 14.0
+*/
 @property (nonatomic) CGFloat cropViewPadding;
 
 /**
@@ -168,6 +168,11 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  The maximum scale that user can apply to image by pinching to zoom. Small values are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
  */
 @property (nonatomic, assign) CGFloat maximumZoomScale;
+
+/**
+ Whether zooming in the scroll view is enabled.
+ */
+@property (nonatomic, assign) BOOL zoomable;
 
 /**
  Create a default instance of the crop view with the supplied image
@@ -258,13 +263,6 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
-
-/**
- Enable / Disable zooming of the image
-
- @param zoomable Whether the zooming of image is allowed
- */
-- (void)setZoomable:(BOOL)zoomable;
 @end
 
 NS_ASSUME_NONNULL_END

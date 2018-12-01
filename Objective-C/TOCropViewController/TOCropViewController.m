@@ -196,7 +196,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.cropView.simpleRenderMode = NO;
     
     // Scrollview.pinchGesture.enabled must be called in viewDidAppear or later, else system will reset it to YES
-    [self.cropView setZoomable: self.zoomEnabled];
+    self.cropView.zoomable = self.zoomEnabled;
     
     // Now that the presentation animation will have finished, animate
     // the status bar fading out, and if present, the title label fading in
@@ -1333,6 +1333,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (CGFloat)minimumAspectRatio
 {
     return self.cropView.minimumAspectRatio;
+}
+
+- (void)setZoomEnabled:(BOOL)zoomEnabled
+{
+    if (_zoomEnabled == zoomEnabled) { return; }
+    _zoomEnabled = zoomEnabled;
+    self.cropView.zoomable = _zoomEnabled;
 }
 
 @end
