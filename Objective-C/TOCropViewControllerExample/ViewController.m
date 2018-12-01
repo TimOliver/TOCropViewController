@@ -60,7 +60,10 @@
     
     //cropController.doneButtonTitle = @"Title";
     //cropController.cancelButtonTitle = @"Title";
-    
+
+    // -- Uncomment this line of code to show a confirmation dialog when cancelling --
+    //cropController.showCancelConfirmationDialog = YES;
+
     self.image = image;
     
     //If profile picture, push onto the same navigation stack
