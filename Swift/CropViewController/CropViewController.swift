@@ -237,6 +237,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.rotateButtonsHidden = newValue }
         get { return toCropViewController.rotateButtonsHidden }
     }
+    /**
+     When enabled, hides the 'Reset' button on the toolbar.
+
+     Default is false.
+     */
+    public var resetButtonHidden: Bool {
+        set { toCropViewController.resetButtonHidden = newValue }
+        get { return toCropViewController.resetButtonHidden }
+    }
     
     /**
      When enabled, hides the 'Aspect Ratio Picker' button on the toolbar.

@@ -220,7 +220,9 @@
             [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
         }
         
-        [buttonsInOrderHorizontally addObject:self.resetButton];
+        if (!self.resetButtonHidden) {
+            [buttonsInOrderHorizontally addObject:self.resetButton];
+        }
         
         if (!self.clampButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.clampButton];
@@ -229,7 +231,6 @@
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
         }
-        
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     }
     else {
@@ -257,7 +258,9 @@
             [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
         }
         
-        [buttonsInOrderVertically addObject:self.resetButton];
+        if (!self.resetButtonHidden) {
+            [buttonsInOrderVertically addObject:self.resetButton];
+        }
         
         if (!self.clampButtonHidden) {
             [buttonsInOrderVertically addObject:self.clampButton];
@@ -274,22 +277,24 @@
 // The convenience method for calculating button's frame inside of the container rect
 - (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
 {
-    NSInteger count = buttons.count;
-    CGFloat fixedSize = horizontally ? size.width : size.height;
-    CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
-    CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
-    
-    for (NSInteger i = 0; i < count; i++) {
-        UIView *button = buttons[i];
-        CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
-        CGFloat diffOffset = padding + i * (fixedSize + padding);
-        CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
-        if (horizontally) {
-            origin.x += CGRectGetMinX(containerRect);
-        } else {
-            origin.y += CGRectGetMinY(containerRect);
+    if (buttons.count > 0){
+        NSInteger count = buttons.count;
+        CGFloat fixedSize = horizontally ? size.width : size.height;
+        CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
+        CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
+        
+        for (NSInteger i = 0; i < count; i++) {
+            UIView *button = buttons[i];
+            CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
+            CGFloat diffOffset = padding + i * (fixedSize + padding);
+            CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
+            if (horizontally) {
+                origin.x += CGRectGetMinX(containerRect);
+            } else {
+                origin.y += CGRectGetMinY(containerRect);
+            }
+            button.frame = (CGRect){origin, size};
         }
-        button.frame = (CGRect){origin, size};
     }
 }
 
@@ -587,6 +592,16 @@
     [self setNeedsLayout];
 }
 
+- (void)setResetButtonHidden:(BOOL)resetButtonHidden
+{
+    if (_resetButtonHidden == resetButtonHidden) {
+        return;
+    }
+    
+    _resetButtonHidden = resetButtonHidden;
+    
+    [self setNeedsLayout];
+}
 - (UIButton *)rotateButton
 {
     return self.rotateCounterclockwiseButton;
