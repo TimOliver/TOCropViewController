@@ -341,7 +341,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self captureStateForImageRotation];
     
     //save the size for checking if we're in a resettable state
-    self.originalCropBoxSize = self.resetAspectRatioEnabled ? scaledImageSize : cropBoxSize;
+    self.originalCropBoxSize = self.resetAspectRatioEnabled ? scaledImageSize : self.cropBoxFrame.size;
     self.originalContentOffset = self.scrollView.contentOffset;
     
     [self checkForCanReset];

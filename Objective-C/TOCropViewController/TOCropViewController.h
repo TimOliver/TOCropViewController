@@ -244,6 +244,10 @@
 @property (nullable, nonatomic, strong) NSArray<UIActivityType> *excludedActivityTypes;
 
 /**
+ The aspect ratios which user can select in the actionsheet
+ */
+@property (nullable, nonatomic, strong) NSArray <NSNumber *> *allowedAspectRatios;
+/**
  When the user hits cancel, or completes a
  UIActivityViewController operation, this block will be called,
  giving you a chance to manually dismiss the view controller
