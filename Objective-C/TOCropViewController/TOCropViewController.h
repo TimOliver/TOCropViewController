@@ -42,7 +42,9 @@
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropImageToRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropImageToRect:angle:));
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+        didCropImageToRect:(CGRect)cropRect
+                     angle:(NSInteger)angle;
 
 /**
  Called when the user has committed the crop action, and provides 
@@ -52,7 +54,9 @@
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToImage:rect:angle:));
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+            didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
+                     angle:(NSInteger)angle;
 
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
@@ -62,7 +66,9 @@
  @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle NS_SWIFT_NAME(cropViewController(_:didCropToCircleImage:rect:angle:));
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+    didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
+                     angle:(NSInteger)angle;
 
 /**
  If implemented, when the user hits cancel, or completes a 
@@ -72,7 +78,8 @@
  @param cancelled Whether a cropping action was actually performed, or if the user explicitly hit 'Cancel'
  
  */
-- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled NS_SWIFT_NAME(cropViewController(_:didFinishCancelled:));
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+        didFinishCancelled:(BOOL)cancelled;
 
 @end
 
@@ -258,9 +265,11 @@
 @property (nullable, nonatomic, strong) NSArray<UIActivityType> *excludedActivityTypes;
 
 /**
- The aspect ratios which user can select in the actionsheet
+ An array of `TOCropViewControllerAspectRatioPreset` enum values denoting which
+ aspect ratios the crop view controller may display (Default is nil. All are shown)
  */
-@property (nullable, nonatomic, strong) NSArray <NSNumber *> *allowedAspectRatios;
+@property (nullable, nonatomic, strong) NSArray<NSNumber *> *allowedAspectRatios;
+
 /**
  When the user hits cancel, or completes a
  UIActivityViewController operation, this block will be called,

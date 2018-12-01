@@ -99,15 +99,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
-        
-        _allowedAspectRatios = @[@(TOCropViewControllerAspectRatioPresetOriginal),
-                                @(TOCropViewControllerAspectRatioPresetSquare),
-                                @(TOCropViewControllerAspectRatioPreset3x2),
-                                @(TOCropViewControllerAspectRatioPreset5x3),
-                                @(TOCropViewControllerAspectRatioPreset4x3),
-                                @(TOCropViewControllerAspectRatioPreset5x4),
-                                @(TOCropViewControllerAspectRatioPreset7x5),
-                                @(TOCropViewControllerAspectRatioPreset16x9)];
     }
 	
     return self;
@@ -592,77 +583,47 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //Prepare the list that will be fed to the alert view/controller
     
     // Ratio titles according to the order of enum TOCropViewControllerAspectRatioPreset
-    NSArray *portraitRatioTitles = @[originalButtonTitle, squareButtonTitle, @"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"];
-    NSArray *landscapeRatioTitles = @[originalButtonTitle, squareButtonTitle, @"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"];
-    
-    NSMutableArray *items = [NSMutableArray array];
-    if (verticalCropBox) {
-        for(NSNumber *aspectRatio in _allowedAspectRatios){
-            NSInteger index = [aspectRatio integerValue];
-            [items addObject:portraitRatioTitles[index]];
-        }
-    }
-    else {
-        for(NSNumber *aspectRatio in _allowedAspectRatios){
-            NSInteger index = [aspectRatio integerValue];
-            [items addObject:landscapeRatioTitles[index]];
-        }
-    }
-    
-    //Present via a UIAlertController if >= iOS 8
-    if (NSClassFromString(@"UIAlertController")) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
-        
-        //Add each item to the alert controller
-        NSInteger i = 0;
-        for(NSNumber *aspectRatio in _allowedAspectRatios){
-            UIAlertAction *action = [UIAlertAction actionWithTitle:items[i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [self setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)[aspectRatio integerValue] animated:YES];
-                self.aspectRatioLockEnabled = YES;
-            }];
-            [alertController addAction:action];
-            i++;
-        }
-        
-        alertController.modalPresentationStyle = UIModalPresentationPopover;
-        UIPopoverPresentationController *presentationController = [alertController popoverPresentationController];
-        presentationController.sourceView = self.toolbar;
-        presentationController.sourceRect = self.toolbar.clampButtonFrame;
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-    else {
-        
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_8_0
-    //TODO: Completely overhaul this once iOS 7 support is dropped
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                                 delegate:self
-                                                        cancelButtonTitle:cancelButtonTitle
-                                                   destructiveButtonTitle:nil
-                                                        otherButtonTitles:nil];
-        
-        for (NSString *item in items) {
-            [actionSheet addButtonWithTitle:item];
-        }
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
-        else
-            [actionSheet showInView:self.view];
-#pragma clang diagnostic pop
-#endif
-    }
-}
+    NSArray<NSString *> *portraitRatioTitles = @[originalButtonTitle, squareButtonTitle, @"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"];
+    NSArray<NSString *> *landscapeRatioTitles = @[originalButtonTitle, squareButtonTitle, @"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"];
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_8_0
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    [self setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)buttonIndex animated:YES];
-    self.aspectRatioLockEnabled = YES;
+    NSMutableArray *ratioValues = [NSMutableArray array];
+    NSMutableArray *itemStrings = [NSMutableArray array];
+
+    if (self.allowedAspectRatios == nil) {
+        for (NSInteger i = 0; i < TOCropViewControllerAspectRatioPresetCustom; i++) {
+            NSString *itemTitle = verticalCropBox ? portraitRatioTitles[i] : landscapeRatioTitles[i];
+            [itemStrings addObject:itemTitle];
+            [ratioValues addObject:@(i)];
+        }
+    }
+    else {
+        for (NSNumber *allowedRatio in self.allowedAspectRatios) {
+            TOCropViewControllerAspectRatioPreset ratio = allowedRatio.integerValue;
+            NSString *itemTitle = verticalCropBox ? portraitRatioTitles[ratio] : landscapeRatioTitles[ratio];
+            [itemStrings addObject:itemTitle];
+            [ratioValues addObject:allowedRatio];
+        }
+    }
+
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
+
+    //Add each item to the alert controller
+    for (NSInteger i = 0; i < itemStrings.count; i++) {
+        id handlerBlock = ^(UIAlertAction *action) {
+            [self setAspectRatioPreset:[ratioValues[i] integerValue] animated:YES];
+            self.aspectRatioLockEnabled = YES;
+        };
+        UIAlertAction *action = [UIAlertAction actionWithTitle:itemStrings[i] style:UIAlertActionStyleDefault handler:handlerBlock];
+        [alertController addAction:action];
+    }
+
+    alertController.modalPresentationStyle = UIModalPresentationPopover;
+    UIPopoverPresentationController *presentationController = [alertController popoverPresentationController];
+    presentationController.sourceView = self.toolbar;
+    presentationController.sourceRect = self.toolbar.clampButtonFrame;
+    [self presentViewController:alertController animated:YES completion:nil];
 }
-#endif
 
 - (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated
 {
@@ -954,28 +915,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:self.applicationActivities];
         activityController.excludedActivityTypes = self.excludedActivityTypes;
-        
-        if (NSClassFromString(@"UIPopoverPresentationController")) {
-            activityController.modalPresentationStyle = UIModalPresentationPopover;
-            activityController.popoverPresentationController.sourceView = self.toolbar;
-            activityController.popoverPresentationController.sourceRect = self.toolbar.doneButtonFrame;
-            [self presentViewController:activityController animated:YES completion:nil];
-        }
-        else {
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-                [self presentViewController:activityController animated:YES completion:nil];
-            }
-            else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [self.activityPopoverController dismissPopoverAnimated:NO];
-                self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
-                [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-#pragma clang diagnostic pop
-            }
-        }
+
+        activityController.modalPresentationStyle = UIModalPresentationPopover;
+        activityController.popoverPresentationController.sourceView = self.toolbar;
+        activityController.popoverPresentationController.sourceRect = self.toolbar.doneButtonFrame;
+        [self presentViewController:activityController animated:YES completion:nil];
+
         __weak typeof(activityController) blockController = activityController;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
+
         activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
             if (!completed) {
                 return;
@@ -997,30 +944,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 blockController.completionWithItemsHandler = nil;
             }
         };
-#else
-        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-            if (!completed) {
-                return;
-            }
-            
-            BOOL isCallbackOrDelegateHandled = NO;
-            
-            if (self.onDidFinishCancelled != nil) {
-                self.onDidFinishCancelled(NO);
-                isCallbackOrDelegateHandled = YES;
-            }
-
-            if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
-                [self.delegate cropViewController:self didFinishCancelled:NO];
-                isCallbackOrDelegateHandled = YES;
-            }
-            
-            if (!isCallbackOrDelegateHandled) {
-                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                blockController.completionHandler = nil;
-            }
-        };
-#endif
 
         return;
     }
