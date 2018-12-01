@@ -203,7 +203,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.translucencyView = toolbar;
         self.translucencyView.frame = CGRectInset(self.bounds, -1.0f, -1.0f);
     }
-    self.translucencyView.hidden = NO;
+    self.translucencyView.hidden = self.translucencyAlwaysHidden;
     self.translucencyView.userInteractionEnabled = NO;
     self.translucencyView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.translucencyView];
@@ -1156,6 +1156,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
+-(void)setAlwaysShowCroppingGrid:(BOOL)alwaysShowCroppingGrid
+{
+    if (alwaysShowCroppingGrid == _alwaysShowCroppingGrid) { return; }
+    _alwaysShowCroppingGrid = alwaysShowCroppingGrid;
+    [self.gridOverlayView setGridHidden:!_alwaysShowCroppingGrid animated:YES];
+}
+
+-(void)setTranslucencyAlwaysHidden:(BOOL)translucencyAlwaysHidden
+{
+    if (_translucencyAlwaysHidden == translucencyAlwaysHidden) { return; }
+    _translucencyAlwaysHidden = translucencyAlwaysHidden;
+    self.translucencyView.hidden = _translucencyAlwaysHidden;
+}
+
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
@@ -1239,8 +1253,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     
     _editing = editing;
-    
-    [self.gridOverlayView setGridHidden:!editing animated:animated];
+
+    if (_editing && !self.alwaysShowCroppingGrid) {
+        [self.gridOverlayView setGridHidden:!editing animated:animated];
+    } else {
+        [self.gridOverlayView setGridHidden:!self.alwaysShowCroppingGrid animated:animated];
+    }
     
     if (resetCropbox) {
         [self moveCroppedContentToCenterAnimated:animated];
@@ -1644,7 +1662,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         } completion:^(BOOL complete) {
             self.backgroundContainerView.hidden = NO;
             self.foregroundContainerView.hidden = NO;
-            self.translucencyView.hidden = NO;
+            self.translucencyView.hidden = self.translucencyAlwaysHidden;
             self.gridOverlayView.hidden = NO;
             
             self.backgroundContainerView.alpha = 0.0f;

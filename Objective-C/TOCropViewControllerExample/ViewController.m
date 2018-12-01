@@ -64,6 +64,12 @@
     // -- Uncomment this line of code to show a confirmation dialog when cancelling --
     //cropController.showCancelConfirmationDialog = YES;
 
+    // Uncomment this if you wish to always show grid
+    //cropController.cropView.alwaysShowCroppingGrid = YES;
+
+    // Uncomment this if you do not want translucency effect
+    //cropController.cropView.translucencyAlwaysHidden = YES;
+
     self.image = image;
     
     //If profile picture, push onto the same navigation stack

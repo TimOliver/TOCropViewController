@@ -160,14 +160,42 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSTimeInterval cropAdjustingDelay;
 
 /**
-The minimum croping aspect ratio. If set, user is prevented from setting cropping rectangle to lower aspect ratio than defined by the parameter.
+The minimum croping aspect ratio. If set, user is prevented from setting cropping
+ rectangle to lower aspect ratio than defined by the parameter.
 */
 @property (nonatomic, assign) CGFloat minimumAspectRatio;
 
 /**
- The maximum scale that user can apply to image by pinching to zoom. Small values are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
+ The maximum scale that user can apply to image by pinching to zoom. Small values
+ are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
  */
 @property (nonatomic, assign) CGFloat maximumZoomScale;
+
+/**
+ Always show the cropping grid lines, even when the user isn't interacting.
+ This also disables the fading animation.
+ (Default is NO)
+ */
+@property (nonatomic, assign) BOOL alwaysShowCroppingGrid;
+
+/**
+ Permanently hides the translucency effect covering the outside bounds of the
+ crop box. (Default is NO)
+ */
+@property (nonatomic, assign) BOOL translucencyAlwaysHidden;
+
+///*
+// if YES it will always show grid
+// if NO it will never show grid
+// NOTE : Do not use this method if you want to keep grid hide/show animation
+// */
+//- (void)setAlwaysShowGrid:(BOOL)showGrid;
+//
+///*
+// if YES it will disable translucency effect
+// */
+//- (void)setTranslucencyOff:(BOOL)disableTranslucency;
+
 
 /**
  Create a default instance of the crop view with the supplied image
