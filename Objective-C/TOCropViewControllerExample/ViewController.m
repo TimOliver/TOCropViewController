@@ -54,7 +54,7 @@
     //cropController.allowedAspectRatios = @[@(TOCropViewControllerAspectRatioPresetOriginal),
     //                                       @(TOCropViewControllerAspectRatioPresetSquare),
     //                                       @(TOCropViewControllerAspectRatioPreset3x2)];
-    
+
     //cropController.rotateButtonsHidden = YES;
     //cropController.rotateClockwiseButtonHidden = NO;
     
