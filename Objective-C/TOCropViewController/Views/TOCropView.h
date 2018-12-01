@@ -258,6 +258,18 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
+/*
+ if YES it will always show grid
+ if NO it will never show grid
+ NOTE : Do not use this method if you want to keep grid hide/show animation
+ */
+- (void)setAlwaysShowGrid:(BOOL)showGrid;
+
+/*
+ if YES it will disable translucency effect
+ */
+- (void)setTranslucencyOff:(BOOL)disableTranslucency;
+
 @end
 
 NS_ASSUME_NONNULL_END
