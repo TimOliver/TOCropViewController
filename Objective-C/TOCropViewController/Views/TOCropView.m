@@ -56,7 +56,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Views */
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
 @property (nonatomic, strong) UIView *backgroundContainerView;      /* A view which contains the background image view, to separate its transforms from the scroll view. */
-@property (nonatomic, strong, readwrite) UIView *foregroundContainerView;@property (nonatomic, strong) UIImageView *foregroundImageView; /* A copy of the background image view, placed over the dimming views */
+@property (nonatomic, strong, readwrite) UIView *foregroundContainerView;
+@property (nonatomic, strong) UIImageView *foregroundImageView;     /* A copy of the background image view, placed over the dimming views */
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
@@ -1254,11 +1255,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _editing = editing;
 
-    if (_editing && !self.alwaysShowCroppingGrid) {
-        [self.gridOverlayView setGridHidden:!editing animated:animated];
-    } else {
-        [self.gridOverlayView setGridHidden:!self.alwaysShowCroppingGrid animated:animated];
-    }
+    // Toggle the visiblity of the gridlines when not editing
+    BOOL hidden = !_editing;
+    if (self.alwaysShowCroppingGrid) { hidden = NO; } // Override this if the user requires
+    [self.gridOverlayView setGridHidden:hidden animated:animated];
     
     if (resetCropbox) {
         [self moveCroppedContentToCenterAnimated:animated];
