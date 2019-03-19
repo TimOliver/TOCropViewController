@@ -1,8 +1,8 @@
 env:
   LC_ALL: "en_US.UTF-8"
   REPO_PATH: "TimOliver/TOCropViewController"
-  PODSPEC_PATH: "TOCropViewController.podspec"
-  FRAMEWORK_PLIST_PATH: "Objective-C/TOCropViewController/Supporting/Info.plist"
+  PODSPEC_PATHS: "TOCropViewController.podspec,CropViewController.podspec"
+  FRAMEWORK_PLIST_PATHS: "Objective-C/TOCropViewController/Supporting/Info.plist,Swift/CropViewController/Info.plist"
   BUILDKITE_CLEAN_CHECKOUT: true
 
 steps:  
