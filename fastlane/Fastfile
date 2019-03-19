@@ -99,7 +99,6 @@ end
 
 desc "Using the GitHub Web API, commit the local contents of a file to master via a bot account"
 lane :commit_file do |options|
-  repo_name = options[:repo_name]
   file_path = options[:file_path]
   message = options[:commit_message]
 
