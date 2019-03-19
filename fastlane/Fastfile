@@ -75,7 +75,7 @@ lane :release do
 
   # Publish to CocoaPods trunk (This will fall-through if this release has previously been pushed)
   begin 
-    pod_push(use_bundle_exec: true, allow_warnings: true)
+    pod_push(path: ENV["PODSPEC_PATH"], use_bundle_exec: true, allow_warnings: true)
   rescue => ex
     UI.error(ex)
   end
