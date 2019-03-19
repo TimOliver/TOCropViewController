@@ -1,10 +1,170 @@
-update_fastlane
-
 default_platform(:ios)
 
-platform :ios do
-  desc "Description of what the lane does"
-  lane :test do
-    run_tests(scheme: "TOCropViewControllerTests", clean: true)
+before_all do
+  update_fastlane
+end
+
+desc "Runs the unit tests to ensure the build is working"
+lane :test do
+  scan(scheme: ENV["TEST_SCHEME"], devices: ["iPhone SE"], clean: true)
+end
+
+desc "Cuts a new release and distributes it on CocoaPods and Carthage"
+lane :release do
+
+  UI.message "Fetching latest tag"
+
+  # Fetch the latest tag that would have just been added
+
+  # We get the desired tag number from the Buildkite release message
+  release_message = ENV["BUILDKITE_MESSAGE"]
+
+  # See if we can extract the new version from the message
+  latest_version = release_message.scan(/[vV]?(\d{1,3}\.\d{1,3}\.\d{1,3})/).last.first
+  if !latest_version 
+    UI.user_error! "--- ERROR: Was unable to find version number in build message. ---"
+    next
   end
+
+  UI.success "--- Found latest tag version: #{latest_version} ---"
+
+  UI.message "Extracting Release Notes from CHANGELOG"
+
+  # Load the Release Notes from file, and throw an error if they weren't updated
+  changelog_contents = File.read("../CHANGELOG.md")
+  v = latest_version.split(".")
+  release_notes = changelog_contents.scan(/#{v[0]}\.#{v[1]}\.#{v[2]}\ [Rr]elease\ [Nn]otes.*\n\=+\n([\s\S]*?)(\d{1,3}\.\d{1,3}\.\d{1,3}\ [Rr]elease\ [Nn]otes.*\n\=+\n|\Z)/).last
+  if !release_notes 
+    UI.user_error! "--- ERROR: Unable to find Release Notes entry for v#{latest_version} in CHANGELOG. ---"
+    next
+  end
+
+  UI.message "Release notes for v#{latest_version} found!"
+
+  UI.message "Bumping Podspec Version"
+
+  # Get the current commit sha to keep as backup in case the next commits have already previously finished
+  commit_sha = last_git_commit[:commit_hash]
+
+  # Update the Podspec version and push to the repo
+  ENV["PODSPEC_PATHS"].split(",").each do |podspec|
+    podspec_version = version_get_podspec(path: "./#{podspec}")
+    if podspec_version != latest_version
+      UI.message "Podspec version was #{podspec_version}. Updating Podspec version"
+      version_bump_podspec(path: "./#{podspec}", version_number: latest_version)
+      commit_file(file_path: "#{podspec}", commit_message: "Bumped Podspec Version to v#{latest_version}")
+      commit_sha = commit[:json]["commit"]["sha"]
+    end
+  end
+
+  UI.message "Podspec version bumped!"
+
+  UI.message "Bumping framework version"
+
+  # Update and push framework version number if the current version doesn't match
+  ENV["FRAMEWORK_PLIST_PATHS"].split(",").each do |framework_path|
+    framework_version = get_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString")
+    if framework_version != latest_version
+      UI.message "Framework version was #{framework_version}. Updating framework version"
+      set_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString", value: latest_version)
+      commit = commit_file(file_path: "#{framework_path}", commit_message: "Bumped Framework Version to v#{latest_version}")
+      commit_sha = commit[:json]["commit"]["sha"]
+    end
+  end
+
+  UI.message "Framework version bumped!"
+
+  UI.message "Pushing new tag to GitHub"
+
+  # Create a new tag and commit it against the last commit
+  push_new_tag(tag: latest_version, commit_sha: commit_sha)
+
+  UI.message "Pushing new version to CocoaPods trunk"
+
+  # Publish to CocoaPods trunk (This will fall-through if this release has previously been pushed)
+  ENV["PODSPEC_PATHS"].split(",").each do |podspec|
+    begin
+      pod_push(path: "./#{podspec}", use_bundle_exec: true, allow_warnings: true)
+    rescue => ex
+      UI.error(ex)
+    end
+  end
+
+  UI.message "Uploading to GitHub Releases"
+
+  # Publish the Release on GitHub
+  set_github_release(repository_name: ENV["REPO_PATH"], 
+                      api_token: ENV["GITHUB_TOKEN"],
+                      name: "v#{latest_version}",
+                      tag_name: latest_version,
+                      description: release_notes.first)
+
+end
+
+desc "Using the GitHub Web API, commit the local contents of a file to master via a bot account"
+lane :commit_file do |options|
+  file_path = options[:file_path]
+  message = options[:commit_message]
+
+  # Fetch the file so we can extract the sha
+  result = Fastlane::Actions::GithubApiAction.run(
+    server_url: "https://api.github.com",
+    api_token: ENV["GITHUB_TOKEN"],
+    path: "/repos/#{ENV["REPO_PATH"]}/contents/#{file_path}",
+    error_handlers: {
+      '*' => proc do |result|
+        UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
+      end
+    }
+  )
+
+  # Check the sha value was returned
+  sha = result[:json]["sha"]
+  if !sha 
+    UI.error("Was unable to find sha value for #{file_path}")
+  end
+
+  # Encode the content as base 64
+  content = Base64.encode64(File.read("../#{file_path}"))
+  author = {"name": "XD-CI", email: ENV["AUTHOR_EMAIL"]}
+
+  # Upload the local copy of that file back up
+  result = Fastlane::Actions::GithubApiAction.run(
+    server_url: "https://api.github.com",
+    api_token: ENV["GITHUB_TOKEN"],
+    http_method: "PUT",
+    path: "/repos/#{ENV["REPO_PATH"]}/contents/#{file_path}",
+    body: {"message": message, "sha": sha, "content": content, "author": author, "committer": author},
+    error_handlers: {
+      '*' => proc do |result|
+        UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
+      end
+    }
+  )
+
+  result
+end
+
+desc "Uploads a new tag to GitHub against the provided sha"
+lane :push_new_tag do |options|
+  tag = options[:tag]
+  commit_sha = options[:commit_sha]
+
+  # Now that all of the new tag versions have been pushed, tag the latest commit
+  tag_message = "Release v#{tag}"
+  tagger = {"name": "XD-CI", email: ENV["AUTHOR_EMAIL"]}
+
+  Fastlane::Actions::GithubApiAction.run(
+    server_url: "https://api.github.com",
+    api_token: ENV["GITHUB_TOKEN"],
+    http_method: "POST",
+    path: "/repos/#{ENV["REPO_PATH"]}/git/tags",
+    body: {"message": tag_message, "tag": tag, "object": commit_sha, "type": "commit", "tagger": tagger},
+    error_handlers: {
+      '*' => proc do |result|
+        UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
+      end
+    }
+  )
+
 end

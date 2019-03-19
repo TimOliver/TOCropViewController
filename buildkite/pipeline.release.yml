@@ -1,0 +1,10 @@
+env:
+  LC_ALL: "en_US.UTF-8"
+  REPO_PATH: "TimOliver/TOCropViewController"
+  PODSPEC_PATHS: "TOCropViewController.podspec,CropViewController.podspec"
+  FRAMEWORK_PLIST_PATHS: "Objective-C/TOCropViewController/Supporting/Info.plist,Swift/CropViewController/Info.plist"
+  BUILDKITE_CLEAN_CHECKOUT: true
+
+steps:  
+  - label: ':fastlane: Cut New Release'
+    command: 'bundle install && bundle exec fastlane release'

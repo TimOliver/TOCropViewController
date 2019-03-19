@@ -1,0 +1,6 @@
+env:
+  TEST_SCHEME: "TOCropViewControllerTests"
+
+steps:  
+  - label: ':fastlane: Run Tests'
+    command: 'bundle install && bundle exec fastlane test'
