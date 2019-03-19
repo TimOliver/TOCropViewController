@@ -44,11 +44,11 @@ lane :release do
 
   # Update the Podspec version and push to the repo
   ENV["PODSPEC_PATHS"].split(",").each do |podspec|
-    podspec_version = version_get_podspec(path: podspec)
+    podspec_version = version_get_podspec(path: "./#{podspec}")
     if podspec_version != latest_version
       UI.message "Updating Podspec version"
-      version_bump_podspec(path: podspec, version_number: latest_version)
-      commit_file(file_path: podspec, commit_message: "Bumped Podspec Version to v#{latest_version}")
+      version_bump_podspec(path: "./#{podspec}", version_number: latest_version)
+      commit_file(file_path: "#{podspec}", commit_message: "Bumped Podspec Version to v#{latest_version}")
       commit_sha = commit[:json]["commit"]["sha"]
     end
   end
@@ -59,11 +59,11 @@ lane :release do
 
   # Update and push framework version number if the current version doesn't match
   ENV["FRAMEWORK_PLIST_PATHS"].split(",").each do |framework_path|
-    framework_version = get_info_plist_value(path: framework_path, key: "CFBundleShortVersionString")
+    framework_version = get_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString")
     if framework_version != latest_version
       UI.message "Updating framework version"
-      set_info_plist_value(path: framework_path, key: "CFBundleShortVersionString", value: latest_version)
-      commit = commit_file(file_path: framework_path, commit_message: "Bumped Framework Version to v#{latest_version}")
+      set_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString", value: latest_version)
+      commit = commit_file(file_path: "#{framework_path}", commit_message: "Bumped Framework Version to v#{latest_version}")
       commit_sha = commit[:json]["commit"]["sha"]
     end
   end
@@ -80,7 +80,7 @@ lane :release do
   # Publish to CocoaPods trunk (This will fall-through if this release has previously been pushed)
   ENV["PODSPEC_PATHS"].split(",").each do |podspec|
     begin
-      pod_push(path: podspec, use_bundle_exec: true, allow_warnings: true)
+      pod_push(path: "./#{podspec}", use_bundle_exec: true, allow_warnings: true)
     rescue => ex
       UI.error(ex)
     end
