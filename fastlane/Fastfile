@@ -51,14 +51,14 @@ lane :release do
       commit_file(file_path: podspec, commit_message: "Bumped Podspec Version to v#{latest_version}")
       commit_sha = commit[:json]["commit"]["sha"]
     end
-  do
+  end
 
   UI.message "Podspec version bumped!"
 
   UI.message "Bumping framework version"
 
   # Update and push framework version number if the current version doesn't match
-  ENV["FRAMEWORK_PLIST_PATHS"].split[","].each do |framework_path|
+  ENV["FRAMEWORK_PLIST_PATHS"].split(",").each do |framework_path|
     framework_version = get_info_plist_value(path: framework_path, key: "CFBundleShortVersionString")
     if framework_version != latest_version
       UI.message "Updating framework version"
