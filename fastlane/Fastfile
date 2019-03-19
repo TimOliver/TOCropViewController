@@ -107,7 +107,7 @@ lane :commit_file do |options|
   result = Fastlane::Actions::GithubApiAction.run(
     server_url: "https://api.github.com",
     api_token: ENV["GITHUB_TOKEN"],
-    path: "/repos/#{repo_name}/contents/#{file_path}",
+    path: "/repos/#{ENV["REPO_PATH"]}/contents/#{file_path}",
     error_handlers: {
       '*' => proc do |result|
         UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
