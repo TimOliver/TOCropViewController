@@ -58,7 +58,7 @@ lane :release do
   UI.message "Bumping framework version"
 
   # Update and push framework version number if the current version doesn't match
-  ENV["FRAMEWORK_PLIST_PATH"].split[","].each { |framework_path|
+  ENV["FRAMEWORK_PLIST_PATHS"].split[","].each { |framework_path|
     framework_version = get_info_plist_value(path: framework_path, key: "CFBundleShortVersionString")
     if framework_version != latest_version
       UI.message "Updating framework version"
