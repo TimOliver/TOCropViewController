@@ -85,14 +85,14 @@ For a complete working example, check out the sample apps included in this repo.
 func presentCropViewController {
   let image: UIImage = ... //Load an image
   
-  let cropViewController = CropViewController(image: image)
+  let cropViewController = TOCropViewController(image: image)
   cropViewController.delegate = self
   present(cropViewController, animated: true, completion: nil)
 }
 
-func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
-        // 'image' is the newly cropped version of the original image
-    }
+func cropViewController(_ cropViewController: TOCropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+    // 'image' is the newly cropped version of the original image
+}
 ```
 
 #### Objective-C
