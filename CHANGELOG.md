@@ -1,6 +1,10 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+## Added
+- Swift 5.0 Support, by Oscar Gorog (@OkiRules)
+- Updated README.md, by Oscar Gorog (@OkiRules)
+
 2.4.0 Release Notes (2018-12-01)
 =============================================================
 
