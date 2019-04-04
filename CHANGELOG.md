@@ -1,6 +1,9 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.4.1 Release Notes (2019-04-04)
+=============================================================
+
 ## Added
 - Swift 5.0 Support, by Oscar Gorog (@OkiRules)
 - Updated README.md, by Oscar Gorog (@OkiRules)
