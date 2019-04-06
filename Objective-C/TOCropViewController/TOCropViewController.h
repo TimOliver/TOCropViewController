@@ -152,6 +152,11 @@
 @property (nonatomic, assign) CGSize customAspectRatio;
 
 /**
+ Give the custom aspect ratio a name. Default: "Custom"
+ */
+@property (nullable, nonatomic, copy) NSString *customAspectRatioName;
+
+/**
  Title label which can be used to show instruction on the top of the crop view controller
  */
 @property (nullable, nonatomic, readonly) UILabel *titleLabel;
