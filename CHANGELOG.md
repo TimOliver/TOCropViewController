@@ -4,21 +4,22 @@ x.y.z Release Notes (yyyy-MM-dd)
 ## Added
 - Swift 5.0 Support ([#343](https://github.com/TimOliver/TOCropViewController/pull/343))
 - Persian Language Support ([#337](https://github.com/TimOliver/TOCropViewController/pull/337))
+- Added `customAspectRatioName` property to expose the custom aspect ratio as a selectable choice ([344](https://github.com/TimOliver/TOCropViewController/pull/344))
 
 2.4.0 Release Notes (2018-12-01)
 =============================================================
 
 ## Added
 - Swift 4.2 Support
-- Romanian and Hungarian localizations
-- The ability to show only certain aspect ratios
-- A setting to allow confirmation before cancelling a crop
+- Romanian and Hungarian localizations.
+- The ability to show only certain aspect ratios.
+- A setting to allow confirmation before cancelling a crop.
 
 ## Fixed
 - Fixed layout issue on the new iPad Pro
-- Fixed issues with the aspect ratio settings when zooming out
-- Fixed an issue when rotating images would sometimes break
-- A bug where the completion handler of the cropping operation wouldn't fire
+- Fixed issues with the aspect ratio settings when zooming out.
+- Fixed an issue when rotating images would sometimes break.
+- A bug where the completion handler of the cropping operation wouldn't fire.
 
 ## Removed
 - iOS 7 Support
