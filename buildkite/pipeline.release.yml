@@ -7,4 +7,4 @@ env:
 
 steps:  
   - label: ':fastlane: Cut New Release'
-    command: 'bundle install && bundle exec fastlane release'
+    command: 'bundle update && bundle exec fastlane release'
