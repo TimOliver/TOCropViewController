@@ -99,7 +99,7 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
 ```objc
 - (void)presentCropViewController
 {
-  UIImage *image = ...; //Load an image
+  UIImage *image = ...; // Load an image
   
   TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
   cropViewController.delegate = self;
