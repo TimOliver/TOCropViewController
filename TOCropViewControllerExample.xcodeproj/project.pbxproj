@@ -203,6 +203,8 @@
 		A93782D3214A81A200CAE7EE /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
 		CDC8C5771C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		E4C7D121221D7465003F381A /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		E4C7D122221D7548003F381A /* fa-IR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fa-IR"; path = "fa-IR.lproj/TOCropViewControllerLocalizable.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -662,6 +664,8 @@
 				ms,
 				hu,
 				ro,
+				fa,
+				"fa-IR",
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -907,6 +911,8 @@
 				220C8EA321062F7300A9B25D /* ms */,
 				A93782CF214A55F900CAE7EE /* hu */,
 				A93782D3214A81A200CAE7EE /* ro */,
+				E4C7D121221D7465003F381A /* fa */,
+				E4C7D122221D7548003F381A /* fa-IR */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			sourceTree = "<group>";
