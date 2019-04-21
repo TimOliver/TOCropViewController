@@ -42,7 +42,7 @@ iOS 8.0 or above
 ## Installation
 
 <details>
-<summary>**CocoaPods**</summary>
+  <summary><h3>CocoaPods</h3></summary>
 ##### Objective-C
 
 Add the following to your Podfile:
