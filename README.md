@@ -60,10 +60,22 @@ pod 'CropViewController'
 
 #### As a Carthage Dependency
 
-Add the following to your Cartfile:
+1. Add the following to your Cartfile:
 ``` 
 github "TimOliver/TOCropViewController"
 ```
+
+2. Run `carthage update`
+
+#### Objective-C
+
+3. From the `Carthage/Build` folder, import just `TOCropViewController.framework` into your app's project in Xcode. 
+
+#### Swift
+
+3. From the `Carthage/Build` folder, import just `CropViewController.framework` into your app's project in Xcode. 
+
+4. Follow the remaining steps on [Getting Started with Carthage](https://github.com/Carthage/Carthage#getting-started) to finish integrating the framework.
 
 #### Manual Installation
 
