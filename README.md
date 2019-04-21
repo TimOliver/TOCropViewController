@@ -42,15 +42,15 @@ iOS 8.0 or above
 ## Installation
 
 <details>
-  <summary><h3>CocoaPods</h3></summary>
-##### Objective-C
+  <summary><strong>CocoaPods</strong></summary>
+  <h4>Objective-C</h4>
 
 Add the following to your Podfile:
 ``` ruby
 pod 'TOCropViewController'
 ```
 
-##### Swift
+<h4>Swift</h4>
 
 Add the following to your Podfile:
 ``` ruby
@@ -59,7 +59,7 @@ pod 'CropViewController'
 </details>
 
 <details>
-<summary>**Carthage**</summary>
+  <summary><strong>Carthage</strong></summary>
 
 1. Add the following to your Cartfile:
 ``` 
@@ -75,7 +75,7 @@ github "TimOliver/TOCropViewController"
 </details>
 
 <details>
-<summary>**Manual Installation**</summary>
+<summary><strong>Manual Installation</strong></summary>
 
 All of the necessary source and resource files for `TOCropViewController` are in `Objective-C/TOCropViewController`, and all of the necessary Swift files are in `Swift/CropViewController`.
 
