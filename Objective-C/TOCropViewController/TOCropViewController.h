@@ -152,7 +152,8 @@
 @property (nonatomic, assign) CGSize customAspectRatio;
 
 /**
- Give the custom aspect ratio a name. Default: "Custom"
+ If this is set alongside `customAspectRatio`, the custom aspect ratio
+ will be shown as a selectable choice in the list of aspect ratios. (Default is `nil`)
  */
 @property (nullable, nonatomic, copy) NSString *customAspectRatioName;
 
