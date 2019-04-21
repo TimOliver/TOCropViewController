@@ -41,8 +41,8 @@ iOS 8.0 or above
 
 ## Installation
 
-#### As a CocoaPods Dependency
-
+<details>
+<summary>**CocoaPods**</summary>
 ##### Objective-C
 
 Add the following to your Podfile:
@@ -56,9 +56,10 @@ Add the following to your Podfile:
 ``` ruby
 pod 'CropViewController'
 ```
+</details>
 
-
-#### As a Carthage Dependency
+<details>
+<summary>**Carthage**</summary>
 
 1. Add the following to your Cartfile:
 ``` 
@@ -67,21 +68,19 @@ github "TimOliver/TOCropViewController"
 
 2. Run `carthage update`
 
-#### Objective-C
-
-3. From the `Carthage/Build` folder, import just `TOCropViewController.framework` into your app's project in Xcode. 
-
-#### Swift
-
-3. From the `Carthage/Build` folder, import just `CropViewController.framework` into your app's project in Xcode. 
+3. From the `Carthage/Build` folder, import one of the two frameworks into your Xcode project. For Objective-C projects, import just `TOCropViewController.framework`  and for Swift, import `CropViewController.framework` instead. Each framework is separate; you do not need to import both.
 
 4. Follow the remaining steps on [Getting Started with Carthage](https://github.com/Carthage/Carthage#getting-started) to finish integrating the framework.
 
-#### Manual Installation
+</details>
+
+<details>
+<summary>**Manual Installation**</summary>
 
 All of the necessary source and resource files for `TOCropViewController` are in `Objective-C/TOCropViewController`, and all of the necessary Swift files are in `Swift/CropViewController`.
 
 For Objective-C projects, copy just the `TOCropViewController` directory to your Xcode project. For Swift projects, copy both `TOCropViewController` and `CropViewController` to your project.
+</details>
 
 ## Examples
 Using `TOCropViewController` is very straightforward. Simply create a new instance passing the `UIImage` object you wish to crop, and then present it modally on the screen.
