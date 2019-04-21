@@ -1,10 +1,16 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.5.0 Release Notes (2019-04-21)
+=============================================================
+
 ## Added
 - Swift 5.0 Support ([#343](https://github.com/TimOliver/TOCropViewController/pull/343))
 - Persian Language Support ([#337](https://github.com/TimOliver/TOCropViewController/pull/337))
-- Added `customAspectRatioName` property to expose the custom aspect ratio as a selectable choice ([344](https://github.com/TimOliver/TOCropViewController/pull/344))
+- Added `customAspectRatioName` property to expose the custom aspect ratio as a selectable choice ([#344](https://github.com/TimOliver/TOCropViewController/pull/344))
+
+## Fixed
+- Made delegate in `CropViewController` weak. ([#338](https://github.com/TimOliver/TOCropViewController/pull/338))
 
 2.4.0 Release Notes (2018-12-01)
 =============================================================
