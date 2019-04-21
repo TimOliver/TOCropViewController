@@ -1,6 +1,9 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+## Added
+- Swift 5.0 Support ([#343](https://github.com/TimOliver/TOCropViewController/pull/343))
+
 2.4.0 Release Notes (2018-12-01)
 =============================================================
 

@@ -99,7 +99,7 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
 ```objc
 - (void)presentCropViewController
 {
-  UIImage *image = ...; //Load an image
+  UIImage *image = ...; // Load an image
   
   TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
   cropViewController.delegate = self;
@@ -113,10 +113,27 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
 ```
 
 ### Making a Circular Cropped Image
+
+#### Swift
+```swift
+func presentCropViewController() {
+    var image: UIImage? // Load an image
+    let cropViewController = CropViewController(croppingStyle: .circular, image: image)
+    cropViewController.delegate = self
+    self.present(cropViewController, animated: true, completion: nil)
+}
+
+func cropViewController(_ cropViewController: TOCropViewController?, didCropToCircularImage image: UIImage?, with cropRect: CGRect, angle: Int) {
+    // 'image' is the newly cropped, circular version of the original image
+}
+```
+
+
+#### Objective-C
 ```objc
 - (void)presentCropViewController
 {
-UIImage *image = ...; //Load an image
+UIImage *image = ...; // Load an image
 
 TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:image];
 cropViewController.delegate = self;
@@ -130,10 +147,22 @@ cropViewController.delegate = self;
 ```
 
 ### Sharing Cropped Images Via a Share Sheet
+
+#### Swift
+```swift
+func presentCropViewController() {
+    var image: UIImage? // Load an image
+    let cropViewController = CropViewController(image: image)
+    cropViewController.showActivitySheetOnDone = true
+    self.present(cropViewController, animated: true, completion: nil)
+}
+```
+
+#### Objective-C
 ```objc
 - (void)presentCropViewController
 {
-  UIImage *image = ...; //Load an image
+  UIImage *image = ...; // Load an image
   
   TOCropViewController *cropViewController = [[TOCropViewController alloc] initWithImage:image];
   cropViewController.showActivitySheetOnDone = YES;
@@ -144,8 +173,24 @@ cropViewController.delegate = self;
 ### Presenting With a Custom Animation
 Optionally, `TOCropViewController` also supports a custom presentation animation where an already-visible copy of the image will zoom in to fill the screen.
 
+#### Swift
+```swift
+
+func presentCropViewController() {
+    var image: UIImage? // Load an image
+    var imageView = UIImageView(image: image)
+    var frame: CGRect = view.convert(imageView.frame, to: view)
+    
+    let cropViewController = CropViewController(image: image)
+    cropViewController.delegate = self
+    self.present(cropViewController, animated: true, completion: nil)
+    cropViewController.presentAnimated(fromParentViewController: self, fromFrame: frame, completion: nil)
+}
+```
+
+#### Objective-C
 ```objc
-- (void)presentViewController
+- (void)presentCropViewController
 {
   UIImage *image = ...;
   UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
