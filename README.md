@@ -41,35 +41,47 @@ iOS 8.0 or above
 
 ## Installation
 
-#### As a CocoaPods Dependency
-
-##### Objective-C
+<details>
+  <summary><strong>CocoaPods</strong></summary>
+  
+  <h4>Objective-C</h4>
 
 Add the following to your Podfile:
 ``` ruby
 pod 'TOCropViewController'
 ```
 
-##### Swift
+<h4>Swift</h4>
 
 Add the following to your Podfile:
 ``` ruby
 pod 'CropViewController'
 ```
+</details>
 
+<details>
+  <summary><strong>Carthage</strong></summary>
 
-#### As a Carthage Dependency
-
-Add the following to your Cartfile:
+1. Add the following to your Cartfile:
 ``` 
 github "TimOliver/TOCropViewController"
 ```
 
-#### Manual Installation
+2. Run `carthage update`
+
+3. From the `Carthage/Build` folder, import one of the two frameworks into your Xcode project. For Objective-C projects, import just `TOCropViewController.framework`  and for Swift, import `CropViewController.framework` instead. Each framework is separate; you do not need to import both.
+
+4. Follow the remaining steps on [Getting Started with Carthage](https://github.com/Carthage/Carthage#getting-started) to finish integrating the framework.
+
+</details>
+
+<details>
+<summary><strong>Manual Installation</strong></summary>
 
 All of the necessary source and resource files for `TOCropViewController` are in `Objective-C/TOCropViewController`, and all of the necessary Swift files are in `Swift/CropViewController`.
 
 For Objective-C projects, copy just the `TOCropViewController` directory to your Xcode project. For Swift projects, copy both `TOCropViewController` and `CropViewController` to your project.
+</details>
 
 ## Examples
 Using `TOCropViewController` is very straightforward. Simply create a new instance passing the `UIImage` object you wish to crop, and then present it modally on the screen.
@@ -78,7 +90,8 @@ While `TOCropViewController` prefers to be presented modally, it can also be pus
 
 For a complete working example, check out the sample apps included in this repo.
 
-### Basic Implementation
+<details>
+<summary><strong>Basic Implementation</strong></summary>
 
 #### Swift
 ```swift
@@ -111,8 +124,10 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
   // 'image' is the newly cropped version of the original image
 }
 ```
+</details>
 
-### Making a Circular Cropped Image
+<details>
+<summary><strong>Making a Circular Cropped Image</strong></summary>
 
 #### Swift
 ```swift
@@ -145,8 +160,10 @@ cropViewController.delegate = self;
 // 'image' is the newly cropped, circular version of the original image
 }
 ```
+</details>
 
-### Sharing Cropped Images Via a Share Sheet
+<details>
+<summary><strong>Sharing Cropped Images Via a Share Sheet</strong></summary>
 
 #### Swift
 ```swift
@@ -169,8 +186,11 @@ func presentCropViewController() {
   [self presentViewController:cropViewController animated:YES completion:nil];
 }
 ```
+</details>
 
-### Presenting With a Custom Animation
+<details>
+<summary><strong>Presenting With a Custom Animation</strong></summary>
+
 Optionally, `TOCropViewController` also supports a custom presentation animation where an already-visible copy of the image will zoom in to fill the screen.
 
 #### Swift
@@ -202,6 +222,7 @@ func presentCropViewController() {
   [cropViewController presentAnimatedFromParentViewController:self fromFrame:frame completion:nil];
 }
 ```
+</details>
 
 ## Architecture of `TOCropViewController`
 While traditional cropping UI implementations will usually just have a dimming view with a square hole cut out of the middle, `TOCropViewController` goes about its implementation a little differently.
