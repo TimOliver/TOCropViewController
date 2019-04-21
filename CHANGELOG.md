@@ -1,12 +1,11 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
-2.4.1 Release Notes (2019-04-04)
+2.4.1 Release Notes (2019-04-21)
 =============================================================
 
 ## Added
-- Swift 5.0 Support, by Oscar Gorog (@OkiRules)
-- Updated README.md, by Oscar Gorog (@OkiRules)
+- Swift 5.0 Support ([#343](https://github.com/TimOliver/TOCropViewController/pull/343))
 
 2.4.0 Release Notes (2018-12-01)
 =============================================================
