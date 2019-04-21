@@ -598,6 +598,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             [ratioValues addObject:allowedRatio];
         }
     }
+    //Add Custom as Selectable AspectRatio
+    if (!CGSizeEqualToSize(CGSizeZero, _customAspectRatio)) {
+	if (_customAspectRatioName.length > 0) [itemStrings addObject:_customAspectRatioName];
+	else [itemStrings addObject:@"Custom"];
+	[ratioValues addObject:@(TOCropViewControllerAspectRatioPresetCustom)];
+    }
 
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
