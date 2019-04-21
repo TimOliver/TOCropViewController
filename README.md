@@ -90,7 +90,8 @@ While `TOCropViewController` prefers to be presented modally, it can also be pus
 
 For a complete working example, check out the sample apps included in this repo.
 
-### Basic Implementation
+<details>
+<summary><strong>Basic Implementation</strong></summary>
 
 #### Swift
 ```swift
@@ -123,8 +124,10 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
   // 'image' is the newly cropped version of the original image
 }
 ```
+</details>
 
-### Making a Circular Cropped Image
+<details>
+<summary><strong>Making a Circular Cropped Image</strong></summary>
 
 #### Swift
 ```swift
@@ -157,8 +160,10 @@ cropViewController.delegate = self;
 // 'image' is the newly cropped, circular version of the original image
 }
 ```
+</details>
 
-### Sharing Cropped Images Via a Share Sheet
+<details>
+<summary><strong>Sharing Cropped Images Via a Share Sheet</strong></summary>
 
 #### Swift
 ```swift
@@ -181,8 +186,11 @@ func presentCropViewController() {
   [self presentViewController:cropViewController animated:YES completion:nil];
 }
 ```
+</details>
 
-### Presenting With a Custom Animation
+<details>
+<summary><strong>Presenting With a Custom Animation</strong></summary>
+
 Optionally, `TOCropViewController` also supports a custom presentation animation where an already-visible copy of the image will zoom in to fill the screen.
 
 #### Swift
@@ -214,6 +222,7 @@ func presentCropViewController() {
   [cropViewController presentAnimatedFromParentViewController:self fromFrame:frame completion:nil];
 }
 ```
+</details>
 
 ## Architecture of `TOCropViewController`
 While traditional cropping UI implementations will usually just have a dimming view with a square hole cut out of the middle, `TOCropViewController` goes about its implementation a little differently.
