@@ -124,6 +124,8 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
   // 'image' is the newly cropped version of the original image
 }
 ```
+
+Similar to many `UIKit` `UIViewController` subclasses, like `MFMailComposeViewController`, the class responsible for presenting view controller should also take care of dismissing it upon cancellation. To dismiss `TOCropViewController`, implement the `cropViewController:didFinishCancelled:` delegate method, and call `dismissViewController:animated:` from there.
 </details>
 
 <details>
