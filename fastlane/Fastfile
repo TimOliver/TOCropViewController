@@ -79,6 +79,15 @@ lane :release do
   # Create a new tag and commit it against the last commit
   push_new_tag(tag: latest_version, commit_sha: commit_sha)
 
+  UI.message "Uploading to GitHub Releases"
+
+  # Publish the Release on GitHub
+  set_github_release(repository_name: ENV["REPO_PATH"], 
+                      api_token: ENV["GITHUB_TOKEN"],
+                      name: "v#{latest_version}",
+                      tag_name: latest_version,
+                      description: release_notes.first)
+
   UI.message "Pushing new version to CocoaPods trunk"
 
   # Publish to CocoaPods trunk (This will fall-through if this release has previously been pushed)
@@ -89,16 +98,7 @@ lane :release do
       UI.error(ex)
     end
   end
-
-  UI.message "Uploading to GitHub Releases"
-
-  # Publish the Release on GitHub
-  set_github_release(repository_name: ENV["REPO_PATH"], 
-                      api_token: ENV["GITHUB_TOKEN"],
-                      name: "v#{latest_version}",
-                      tag_name: latest_version,
-                      description: release_notes.first)
-
+  
 end
 
 desc "Using the GitHub Web API, commit the local contents of a file to master via a bot account"
