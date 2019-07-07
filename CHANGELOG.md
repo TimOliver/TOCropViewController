@@ -1,6 +1,20 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.5.1 Release Notes (2019-07-08)
+=============================================================
+
+## Added
+
+* Finnish Language Support ([#360](https://github.com/TimOliver/TOCropViewController/pull/360))
+
+## Enhancements
+
+* Improved the UX of the cancellation dialog by changing the buttons from affirmative actions to explicit actions. ([#362](https://github.com/TimOliver/TOCropViewController/pull/362))
+
+## Fixed
+* A crash that would occur if the cancellation confirmation dialog was attempted to be displayed on iPad. ([#362](https://github.com/TimOliver/TOCropViewController/pull/362))
+
 2.5.0 Release Notes (2019-04-21)
 =============================================================
 
