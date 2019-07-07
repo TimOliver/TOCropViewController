@@ -841,7 +841,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #pragma mark - Button Feedback -
 - (void)cancelButtonTapped
 {
-    if (!self.cropView.canBeReset || !self.showCancelConfirmationDialog) {
+    if (!self.showCancelConfirmationDialog) {
         [self dismissCropViewController];
         return;
     }
@@ -849,14 +849,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
 
-    NSString *title = NSLocalizedStringFromTableInBundle(@"Delete Changes?", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
+    alertController.popoverPresentationController.sourceView = self.toolbar.visibleCancelButton;
 
-
-    NSString *yesButtonTitle = NSLocalizedStringFromTableInBundle(@"Yes", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-    NSString *noButtonTitle = NSLocalizedStringFromTableInBundle(@"No", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    NSString *yesButtonTitle = NSLocalizedStringFromTableInBundle(@"Delete Changes", @"TOCropViewControllerLocalizable", resourceBundle, nil);
+    NSString *noButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
 
     __weak typeof (self) weakSelf = self;
     UIAlertAction *yesAction = [UIAlertAction actionWithTitle:yesButtonTitle style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
