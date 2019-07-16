@@ -3,7 +3,7 @@ name: Bug Report
 about: Report a bug you may have found in TOCropViewController
 title: ''
 labels: bug
-assignees: ''
+assignees: TimOliver
 
 ---
 

@@ -3,7 +3,7 @@ name: Feature Request
 about: Suggest a new idea for TOCropViewController
 title: ''
 labels: feature
-assignees: ''
+assignees: TimOliver
 
 ---
 
