@@ -24,7 +24,7 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 <img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/users.png" width="900" style="margin:0 auto" />
 </p>
 
-#### A huge thanks to these donators
+#### Very kindly donated to by
 
 <p float="left">
 	<a href="https://apps.apple.com/us/app/mematic-the-meme-maker/id491076730">
