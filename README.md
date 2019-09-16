@@ -28,10 +28,10 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 
 <p float="left">
 	<a href="https://apps.apple.com/us/app/mematic-the-meme-maker/id491076730">
-	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/Mematic.jpg" width="100" style="padding-right:20px" />
+	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/Mematic.jpg" height="100" style="padding-right:20px" />
 	</a>   
 	<a href="https://apps.apple.com/us/app/credminder-credential-manager/id1438352691">
-	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/CredMinder.jpg" width="100" />
+	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/CredMinder.jpg" height="100" />
 	</a>
 </p>
 
