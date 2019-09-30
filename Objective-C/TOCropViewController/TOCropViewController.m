@@ -75,7 +75,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     NSParameterAssert(image);
 
-    self = [super init];
+    self = [super initWithNibName:nil bundle:nil];
     if (self) {
         // Init parameters
         _image = image;
