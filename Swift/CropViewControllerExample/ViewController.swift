@@ -22,6 +22,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         guard let image = (info[UIImagePickerController.InfoKey.originalImage] as? UIImage) else { return }
         
         let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
+        cropController.modalPresentationStyle = .fullScreen
         cropController.delegate = self
         
         // Uncomment this if you wish to provide extra instructions via a title label
@@ -91,7 +92,8 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
                                                    toView: imageView,
                                                    toFrame: CGRect.zero,
                                                    setup: { self.layoutImageView() },
-                                                   completion: { self.imageView.isHidden = false })
+                                                   completion: {
+                                                    self.imageView.isHidden = false })
         }
         else {
             self.imageView.isHidden = false
