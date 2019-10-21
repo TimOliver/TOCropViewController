@@ -3,7 +3,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 ## Added
 
-* Brazilian Portugese Language Support ([#380](https://github.com/TimOliver/TOCropViewController/issues/380))
+* Brazilian Portuguese Language Support ([#380](https://github.com/TimOliver/TOCropViewController/issues/380))
 
 2.5.1 Release Notes (2019-07-08)
 =============================================================
