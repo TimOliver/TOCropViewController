@@ -557,6 +557,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
 
 extension CropViewController {
     fileprivate func setUpCropController() {
+        modalPresentationStyle = .fullScreen
         addChild(toCropViewController)
         transitioningDelegate = (toCropViewController as! UIViewControllerTransitioningDelegate)
         toCropViewController.delegate = self
