@@ -141,6 +141,9 @@
 		220C8EAA2106344D00A9B25D /* UIImage+CropRotate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CropRotate.m"; sourceTree = "<group>"; };
 		220C8EAB2106344D00A9B25D /* UIImage+CropRotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CropRotate.h"; sourceTree = "<group>"; };
 		220C8EB32106353700A9B25D /* CropViewController-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CropViewController-Bridging-Header.h"; sourceTree = "<group>"; };
+		22154471235D92DE0005D91E /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/TOCropViewControllerLocalizable.strings"; sourceTree = "<group>"; };
+		22154472235D95330005D91E /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		22154473235D95330005D91E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2234246A1ABBC0CD00BBC2B1 /* TOCropViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOCropViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2234246E1ABBC0CD00BBC2B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2234246F1ABBC0CD00BBC2B1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -423,6 +426,8 @@
 		2238CF581FC030C30081B957 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22154472235D95330005D91E /* CHANGELOG.md */,
+				22154473235D95330005D91E /* README.md */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -668,6 +673,7 @@
 				fa,
 				"fa-IR",
 				fi,
+				"pt-BR",
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -916,6 +922,7 @@
 				E4C7D121221D7465003F381A /* fa */,
 				E4C7D122221D7548003F381A /* fa-IR */,
 				88BBE90E22C206340073D22A /* fi */,
+				22154471235D92DE0005D91E /* pt-BR */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			sourceTree = "<group>";
