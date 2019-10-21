@@ -5,6 +5,10 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 * Brazilian Portuguese Language Support ([#380](https://github.com/TimOliver/TOCropViewController/issues/380))
 
+## Fixed
+
+* A visual glitch that would occur in iOS 13 because the Swift view controller wasn't explicitly marked as full screen.
+
 2.5.1 Release Notes (2019-07-08)
 =============================================================
 
