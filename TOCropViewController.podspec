@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'TOCropViewController'
-  s.version  = '2.5.1'
+  s.version  = '2.5.2'
   s.license  =  { :type => 'MIT', :file => 'LICENSE' }
   s.summary  = 'A view controller that enables cropping and rotation of UIImage objects.'
   s.homepage = 'https://github.com/TimOliver/TOCropViewController'
