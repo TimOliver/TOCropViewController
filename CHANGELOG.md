@@ -1,13 +1,18 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.5.2 Release Notes (2019-10-23)
+=============================================================
+
 ## Added
 
 * Brazilian Portuguese Language Support ([#380](https://github.com/TimOliver/TOCropViewController/issues/380))
 
 ## Fixed
 
-* A visual glitch that would occur in iOS 13 because the Swift view controller wasn't explicitly marked as full screen.
+* A visual glitch that would occur in iOS 13 because the Swift view controller wasn't explicitly marked as full screen. ([#385](https://github.com/TimOliver/TOCropViewController/issues/385))
+* A visual glitch where the image would snap upwards during the presentation animation on non-Face ID devices. ([#387](https://github.com/TimOliver/TOCropViewController/issues/387))
+* A bug where subclassing the class in Swift would fail because it wasn't using the desginated initializer. ([#379](https://github.com/TimOliver/TOCropViewController/issues/379))
 
 2.5.1 Release Notes (2019-07-08)
 =============================================================
