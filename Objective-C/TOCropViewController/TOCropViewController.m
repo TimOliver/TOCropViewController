@@ -1197,7 +1197,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (BOOL)statusBarHidden
 {
-    // Defer behavioir to the hosting navigation controller
+    // Defer behaviour to the hosting navigation controller
     if (self.navigationController) {
         return self.navigationController.prefersStatusBarHidden;
     }
@@ -1217,6 +1217,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGFloat statusBarHeight = 0.0f;
     if (@available(iOS 11.0, *)) {
         statusBarHeight = self.view.safeAreaInsets.top;
+
+        // On non-Face ID devices, always disregard the top inset
+        // unless we explicitly set the status bar to be visible.
+        if (self.statusBarHidden &&
+            self.view.safeAreaInsets.bottom <= FLT_EPSILON)
+        {
+            statusBarHeight = 0.0f;
+        }
     }
     else {
         if (self.statusBarHidden) {
@@ -1235,12 +1243,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIEdgeInsets insets = UIEdgeInsetsZero;
     if (@available(iOS 11.0, *)) {
         insets = self.view.safeAreaInsets;
-
-        // Since iPhone X insets are always 44, check if this is merely
-        // accounting for a non-X status bar and cancel it
-        if (insets.top <= 40.0f + FLT_EPSILON) {
-            insets.top = self.statusBarHeight;
-        }
+        insets.top = self.statusBarHeight;
     }
     else {
         insets.top = self.statusBarHeight;
