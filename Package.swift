@@ -12,6 +12,10 @@ let package = Package(
         .library(
             name: "TOCropViewController",
             targets: ["TOCropViewController"]
+        ),
+        .library(
+            name: "CropViewController",
+            targets: ["CropViewController"]
         )
     ],
     targets: [
@@ -28,6 +32,16 @@ let package = Package(
                 "Views",
             ],
             publicHeadersPath: "Include"
+        ),
+        .target(
+            name: "CropViewController",
+            dependencies: [
+                "TOCropViewController"
+            ],
+            path: "Swift/CropViewController",
+            sources: [
+                "."
+            ]
         )
     ]
 )
