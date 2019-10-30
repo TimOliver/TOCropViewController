@@ -22,7 +22,7 @@
 
 #include <math.h>
 
-#import "TOCropView.h"
+#import "../Views/TOCropView.h"
 #import "TOCropOverlayView.h"
 #import "TOCropScrollView.h"
 

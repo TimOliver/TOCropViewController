@@ -22,10 +22,10 @@
 
 #import "TOCropViewController.h"
 
-#import "TOCropViewControllerTransitioning.h"
-#import "TOActivityCroppedImageProvider.h"
-#import "UIImage+CropRotate.h"
-#import "TOCroppedImageAttributes.h"
+#import "Models/TOCropViewControllerTransitioning.h"
+#import "Models/TOActivityCroppedImageProvider.h"
+#import "Categories/UIImage+CropRotate.h"
+#import "Models/TOCroppedImageAttributes.h"
 
 static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
 static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
