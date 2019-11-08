@@ -72,6 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL rotateCounterclockwiseButtonHidden;
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 @property (nonatomic, assign) BOOL resetButtonHidden;
+@property (nonatomic, assign) BOOL doneButtonHidden;
+@property (nonatomic, assign) BOOL cancelButtonHidden;
 
 /* Enable the reset button */
 @property (nonatomic, assign) BOOL resetButtonEnabled;

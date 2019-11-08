@@ -258,6 +258,26 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
+     When enabled, hides the 'Done' button on the toolbar.
+
+     Default is false.
+     */
+    public var doneButtonHidden: Bool {
+        set { toCropViewController.doneButtonHidden = newValue }
+        get { return toCropViewController.doneButtonHidden }
+    }
+    
+    /**
+     When enabled, hides the 'Cancel' button on the toolbar.
+
+     Default is false.
+     */
+    public var cancelButtonHidden: Bool {
+        set { toCropViewController.cancelButtonHidden = newValue }
+        get { return toCropViewController.cancelButtonHidden }
+    }
+
+    /**
      If `showActivitySheetOnDone` is true, then these activity items will
      be supplied to that UIActivityViewController in addition to the
      `TOActivityCroppedImageProvider` object.
