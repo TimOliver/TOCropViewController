@@ -1138,7 +1138,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.doneButtonHidden = doneButtonHidden;
 }
 
-- (BOOL)doneButtonsHidden
+- (BOOL)doneButtonHidden
 {
     return self.toolbar.doneButtonHidden;
 }
@@ -1148,7 +1148,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.cancelButtonHidden = cancelButtonHidden;
 }
 
-- (BOOL)cancelButtonsHidden
+- (BOOL)cancelButtonHidden
 {
     return self.toolbar.cancelButtonHidden;
 }
