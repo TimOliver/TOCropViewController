@@ -83,7 +83,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         imageView.image = image
         layoutImageView()
         
-        self.navigationItem.rightBarButtonItem?.isEnabled = true
+        self.navigationItem.leftBarButtonItem?.isEnabled = true
         
         if cropViewController.croppingStyle != .circular {
             imageView.isHidden = true
@@ -107,9 +107,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         title = NSLocalizedString("CropViewController", comment: "")
         navigationController!.navigationBar.isTranslucent = false
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped(sender:)))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePhoto))
-        navigationItem.rightBarButtonItem?.isEnabled = false
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped(sender:)))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePhoto))
+        navigationItem.leftBarButtonItem?.isEnabled = false
         
         imageView.isUserInteractionEnabled = true
         imageView.contentMode = .scaleAspectFit
