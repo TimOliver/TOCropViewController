@@ -47,6 +47,10 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         //cropController.doneButtonTitle = "Title"
         //cropController.cancelButtonTitle = "Title"
         
+        //cropController.toolbar.doneButtonHidden = true
+        //cropController.toolbar.cancelButtonHidden = true
+        //cropController.toolbar.clampButtonHidden = true
+
         self.image = image
         
         //If profile picture, push onto the same navigation stack
