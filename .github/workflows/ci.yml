@@ -1,0 +1,15 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run a one-line script
+      run: 'bundle install && bundle exec fastlane test'
+      env:
+        TEST_SCHEME: "TOCropViewControllerTests"
