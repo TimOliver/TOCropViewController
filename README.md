@@ -5,7 +5,6 @@
 </p>
 
 [![CI](https://github.com/TimOliver/TOCropViewController/workflows/CI/badge.svg)](https://github.com/TimOliver/TOCropViewController/actions?query=workflow%3ACI)
-[![Build status](https://badge.buildkite.com/f2e7dda942eae2aadb2c456f1f8a9fba97c8feb378ad8638df.svg)](https://buildkite.com/xd-ci/tocropviewcontroller-run-ci)
 [![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/TimOliver/TOCropViewController/master/LICENSE)
