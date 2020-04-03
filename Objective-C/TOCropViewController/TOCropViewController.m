@@ -37,7 +37,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 /* The cropping style of the crop view */
 @property (nonatomic, assign, readwrite) TOCropViewCroppingStyle croppingStyle;
-@property (nonatomic, assign) BOOL cropsToSquare;
 
 /* Views */
 @property (nonatomic, strong) TOCropToolbar *toolbar;

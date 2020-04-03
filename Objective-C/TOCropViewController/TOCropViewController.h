@@ -143,7 +143,7 @@
 /**
   The option of cropping image to square while showing circular overlay
  */
-@property (nonatomic, assign) BOOL cropsToSquare;
+@property (nonatomic, assign, readwrite) BOOL cropsToSquare;
 
 /**
  A choice from one of the pre-defined aspect ratio presets
