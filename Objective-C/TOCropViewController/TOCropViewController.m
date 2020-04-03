@@ -37,6 +37,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 /* The cropping style of the crop view */
 @property (nonatomic, assign, readwrite) TOCropViewCroppingStyle croppingStyle;
+@property (nonatomic, assign, readwrite) BOOL cropsToSquare;
 
 /* Views */
 @property (nonatomic, strong) TOCropToolbar *toolbar;
@@ -901,10 +902,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     CGRect cropFrame = self.cropView.imageCropFrame;
     NSInteger angle = self.cropView.angle;
-
+    
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
-        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular)];
+        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular && !self.cropsToSquare)];
         TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
         
         NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
@@ -969,7 +970,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
 
     //If cropping circular and the circular generation delegate/block is implemented, call it
-    if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
+    if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable) && !self.cropsToSquare) {
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
