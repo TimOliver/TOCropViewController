@@ -141,6 +141,11 @@
 @property (nonatomic, readonly) TOCropViewCroppingStyle croppingStyle;
 
 /**
+  The option of cropping image to square while showing circular overlay
+ */
+@property (nonatomic, assign, readwrite) BOOL cropsToSquare;
+
+/**
  A choice from one of the pre-defined aspect ratio presets
  */
 @property (nonatomic, assign) TOCropViewControllerAspectRatioPreset aspectRatioPreset;

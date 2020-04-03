@@ -148,6 +148,13 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
+      The option of cropping image to square while showing circular overlay
+     */
+    public var cropsToSquare: Bool {
+        return toCropViewController.cropsToSquare
+    }
+    
+    /**
       A choice from one of the pre-defined aspect ratio presets
     */
     public var aspectRatioPreset: CropViewControllerAspectRatioPreset {
