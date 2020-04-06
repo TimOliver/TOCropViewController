@@ -95,7 +95,7 @@ For a complete working example, check out the sample apps included in this repo.
 
 #### Swift
 ```swift
-func presentCropViewController {
+func presentCropViewController() {
   let image: UIImage = ... //Load an image
   
   let cropViewController = CropViewController(image: image)
