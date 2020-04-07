@@ -596,28 +596,28 @@ extension CropViewController {
         if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropImageToRect:angle:))) {
             self.onDidCropImageToRect = {[weak self] rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(self, didCropImageToRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle)
             }
         }
         
         if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToImage:withRect:angle:))) {
             self.onDidCropToRect = {[weak self] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(self, didCropToImage: image, withRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
             }
         }
         
         if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToCircularImage:withRect:angle:))) {
             self.onDidCropToCircleImage = {[weak self] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(self, didCropToCircularImage: image, withRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
             }
         }
         
         if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didFinishCancelled:))) {
             self.onDidFinishCancelled = {[weak self] finished in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(self, didFinishCancelled: finished)
+                delegate.cropViewController!(strongSelf, didFinishCancelled: finished)
             }
         }
     }
