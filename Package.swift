@@ -34,7 +34,7 @@ let package = Package(
             ],
             path: "Swift/CropViewController",
             sources: [
-                "."
+                "CropViewController.swift"
             ]
         )
     ]
