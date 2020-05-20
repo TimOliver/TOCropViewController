@@ -5,9 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "TOCropViewController",
-    platforms: [
-        .iOS(.v8)
-    ],
+    platforms: [.iOS(.v8)],
     products: [
         .library(
             name: "TOCropViewController",
@@ -22,20 +20,15 @@ let package = Package(
         .target(
             name: "TOCropViewController",
             path: ".",
-            sources: [
-                "Objective-C/TOCropViewController",
-            ],
+            exclude: ["Objective-C/TOCropViewController/Supporting"],
+            sources: ["Objective-C/TOCropViewController"],
             publicHeadersPath: "include"
         ),
         .target(
             name: "CropViewController",
-            dependencies: [
-                "TOCropViewController"
-            ],
+            dependencies: ["TOCropViewController"],
             path: "Swift/CropViewController",
-            sources: [
-                "CropViewController.swift"
-            ]
+            sources: ["CropViewController.swift"]
         )
     ]
 )
