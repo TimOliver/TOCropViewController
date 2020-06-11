@@ -60,6 +60,18 @@ pod 'CropViewController'
 </details>
 
 <details>
+  <summary><strong>Swift Package Manager</strong></summary>
+
+Add the following to your `Package.swift`:
+``` swift
+dependencies: [
+  // ...
+  .package(url: "https://github.com/TimOliver/TOCropViewController.git"),
+],
+```
+</details>
+
+<details>
   <summary><strong>Carthage</strong></summary>
 
 1. Add the following to your Cartfile:
