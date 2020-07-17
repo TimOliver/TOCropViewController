@@ -1,1 +1,0 @@
-../Objective-C/TOCropViewController/Models/TOCroppedImageAttributes.h
