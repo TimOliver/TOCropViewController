@@ -1,6 +1,13 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.5.4 Release Notes (2020-07-20)
+=============================================================
+
+## Fixed
+
+* Various fixes and improvements to SPM support. ([#417](https://github.com/TimOliver/TOCropViewController/pull/417) [#422](https://github.com/TimOliver/TOCropViewController/pull/422))
+
 2.5.3 Release Notes (2020-06-11)
 =============================================================
 
