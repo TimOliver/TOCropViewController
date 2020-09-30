@@ -1,6 +1,13 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.5.5 Release Notes (2020-10-01)
+=============================================================
+
+## Fixed 
+
+* Duplicate header build warnings when installing via CocoaPods. ([#432](https://github.com/TimOliver/TOCropViewController/pull/432))
+
 2.5.4 Release Notes (2020-07-20)
 =============================================================
 
