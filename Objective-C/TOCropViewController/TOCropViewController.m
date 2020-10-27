@@ -1040,11 +1040,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 }
 
 - (void)setDoneButtonColor:(UIColor *)color {
-    self.toolbar.doneTextButtonColor = color;
+    self.toolbar.doneButtonColor = color;
 }
 
 - (void)setCancelButtonColor:(UIColor *)color {
-    self.toolbar.cancelTextButtonColor = color;
+    self.toolbar.cancelButtonColor = color;
 }
 
 
