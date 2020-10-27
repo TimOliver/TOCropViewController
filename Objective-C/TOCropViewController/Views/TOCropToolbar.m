@@ -73,8 +73,8 @@
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle: _doneTextButtonTitle ?
         _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
-                                                                  @"TOCropViewControllerLocalizable",
-                                                                  resourceBundle,
+																  @"TOCropViewControllerLocalizable",
+																  resourceBundle,
                                                                   nil)
                      forState:UIControlStateNormal];
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
@@ -87,7 +87,6 @@
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_doneIconButton sizeToFit];
     [self addSubview:_doneIconButton];
     
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -106,7 +105,6 @@
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_cancelIconButton sizeToFit];
     [self addSubview:_cancelIconButton];
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -399,6 +397,8 @@
         return;
 
     _showOnlyIcons = showOnlyIcons;
+    [_doneIconButton sizeToFit];
+    [_cancelIconButton sizeToFit];
     [self setNeedsLayout];
 }
 
