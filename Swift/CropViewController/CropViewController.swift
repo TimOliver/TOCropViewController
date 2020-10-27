@@ -398,6 +398,24 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.cancelButtonTitle = newValue }
         get { return toCropViewController.cancelButtonTitle }
     }
+
+    /**
+    Color for the 'Done' button.
+    Setting this will override the default color.
+    */
+    public var doneButtonColor: UIColor {
+        set { toCropViewController.doneButtonColor = newValue }
+        get { return toCropViewController.doneButtonColor }
+    }
+    
+    /**
+    Color for the 'Cancel' button.
+    Setting this will override the default color.
+    */
+    public var cancelButtonColor: UIColor {
+        set { toCropViewController.cancelButtonColor = newValue }
+        get { return toCropViewController.cancelButtonColor }
+    }
     
     /**
      This class internally manages and abstracts access to a `TOCropViewController` instance

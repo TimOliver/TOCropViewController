@@ -1039,6 +1039,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.cancelTextButtonTitle = title;
 }
 
+- (void)setDoneButtonColor:(UIColor *)color {
+    self.toolbar.doneTextButtonColor = color;
+}
+
+- (void)setCancelButtonColor:(UIColor *)color {
+    self.toolbar.cancelTextButtonColor = color;
+}
+
+
 - (TOCropView *)cropView {
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time
