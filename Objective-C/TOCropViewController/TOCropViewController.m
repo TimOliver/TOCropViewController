@@ -1013,6 +1013,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 }
 
+- (void)commitCurrentCrop
+{
+    [self doneButtonTapped];
+}
+
 #pragma mark - Property Methods -
 
 - (void)setTitle:(NSString *)title
@@ -1031,15 +1036,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
 }
 
-- (void)setDoneButtonTitle:(NSString *)title {
+- (void)setDoneButtonTitle:(NSString *)title
+{
     self.toolbar.doneTextButtonTitle = title;
 }
 
-- (void)setCancelButtonTitle:(NSString *)title {
+- (void)setCancelButtonTitle:(NSString *)title
+{
     self.toolbar.cancelTextButtonTitle = title;
 }
 
-- (TOCropView *)cropView {
+- (TOCropView *)cropView
+{
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
@@ -1051,7 +1059,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return _cropView;
 }
 
-- (TOCropToolbar *)toolbar {
+- (TOCropToolbar *)toolbar
+{
     if (!_toolbar) {
         _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
         [self.view addSubview:_toolbar];
@@ -1119,7 +1128,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
 }
 
-- (BOOL)rotateClockwiseButtonHidden {
+- (BOOL)rotateClockwiseButtonHidden
+{
     return self.toolbar.rotateClockwiseButtonHidden;
 }
 
