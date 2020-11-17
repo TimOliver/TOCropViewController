@@ -887,11 +887,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     // If neither callbacks were implemented, perform a default dismissing animation
     if (!isDelegateOrCallbackHandled) {
-        if (self.navigationController) {
+        if (self.navigationController && self.navigationController.viewControllers.count > 1) {
             [self.navigationController popViewControllerAnimated:YES];
         }
         else {
-            self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         }
     }
@@ -939,8 +938,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             }
             
             if (!isCallbackOrDelegateHandled) {
-                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                blockController.completionWithItemsHandler = nil;
+                if (self.navigationController != nil && self.navigationController.viewControllers.count > 1) {
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
+                else {
+                    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                    blockController.completionWithItemsHandler = nil;
+                }
             }
         };
 
@@ -1013,6 +1017,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 }
 
+- (void)commitCurrentCrop
+{
+    [self doneButtonTapped];
+}
+
 #pragma mark - Property Methods -
 
 - (void)setTitle:(NSString *)title
@@ -1031,11 +1040,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
 }
 
-- (void)setDoneButtonTitle:(NSString *)title {
+- (void)setDoneButtonTitle:(NSString *)title
+{
     self.toolbar.doneTextButtonTitle = title;
 }
 
-- (void)setCancelButtonTitle:(NSString *)title {
+- (void)setCancelButtonTitle:(NSString *)title
+{
     self.toolbar.cancelTextButtonTitle = title;
 }
 
@@ -1047,8 +1058,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.cancelButtonColor = color;
 }
 
-
-- (TOCropView *)cropView {
+- (TOCropView *)cropView
+{
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
@@ -1060,7 +1071,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return _cropView;
 }
 
-- (TOCropToolbar *)toolbar {
+- (TOCropToolbar *)toolbar
+{
     if (!_toolbar) {
         _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
         [self.view addSubview:_toolbar];
@@ -1128,7 +1140,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
 }
 
-- (BOOL)rotateClockwiseButtonHidden {
+- (BOOL)rotateClockwiseButtonHidden
+{
     return self.toolbar.rotateClockwiseButtonHidden;
 }
 
