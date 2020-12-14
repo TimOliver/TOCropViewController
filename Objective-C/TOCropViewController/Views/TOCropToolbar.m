@@ -78,7 +78,11 @@
                                                                   nil)
                      forState:UIControlStateNormal];
     [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-    [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+    if (@available(iOS 13.0, *)) {
+        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
+    } else {
+        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+    }
     [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [_doneTextButton sizeToFit];
     [self addSubview:_doneTextButton];
@@ -407,6 +411,11 @@
 #pragma mark - Image Generation -
 + (UIImage *)doneImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"checkmark"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *doneImage = nil;
     
     UIGraphicsBeginImageContextWithOptions((CGSize){17,14}, NO, 0.0f);
@@ -430,6 +439,11 @@
 
 + (UIImage *)cancelImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"xmark"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *cancelImage = nil;
     
     UIGraphicsBeginImageContextWithOptions((CGSize){16,16}, NO, 0.0f);
@@ -459,6 +473,11 @@
 
 + (UIImage *)rotateCCWImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"rotate.left.fill"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *rotateImage = nil;
     
     UIGraphicsBeginImageContextWithOptions((CGSize){18,21}, NO, 0.0f);
@@ -496,6 +515,11 @@
 
 + (UIImage *)rotateCWImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"rotate.right.fill"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *rotateCCWImage = [self.class rotateCCWImage];
     UIGraphicsBeginImageContextWithOptions(rotateCCWImage.size, NO, rotateCCWImage.scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -509,6 +533,11 @@
 
 + (UIImage *)resetImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"arrow.counterclockwise"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *resetImage = nil;
     
     UIGraphicsBeginImageContextWithOptions((CGSize){22,18}, NO, 0.0f);
@@ -553,6 +582,11 @@
 
 + (UIImage *)clampImage
 {
+    if (@available(iOS 13.0, *)) {
+        return [UIImage systemImageNamed:@"aspectratio.fill"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+    }
+
     UIImage *clampImage = nil;
     
     UIGraphicsBeginImageContextWithOptions((CGSize){22,16}, NO, 0.0f);
