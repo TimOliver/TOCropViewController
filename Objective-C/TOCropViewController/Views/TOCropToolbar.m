@@ -288,12 +288,16 @@
         CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
         
         for (NSInteger i = 0; i < count; i++) {
-            UIView *button = buttons[i];
+            UIButton *button = buttons[i];
             CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-CGRectGetHeight(button.bounds)) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
             CGFloat diffOffset = padding + i * (fixedSize + padding);
             CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
             if (horizontally) {
                 origin.x += CGRectGetMinX(containerRect);
+                if (@available(iOS 13.0, *)) {
+                    UIImage *image = button.imageView.image;
+                    button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, image.baselineOffsetFromBottom, 0);
+                }
             } else {
                 origin.y += CGRectGetMinY(containerRect);
             }
@@ -474,8 +478,9 @@
 + (UIImage *)rotateCCWImage
 {
     if (@available(iOS 13.0, *)) {
-        return [UIImage systemImageNamed:@"rotate.left.fill"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+        return [[UIImage systemImageNamed:@"rotate.left.fill"
+                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+                imageWithBaselineOffsetFromBottom:4];
     }
 
     UIImage *rotateImage = nil;
@@ -516,8 +521,9 @@
 + (UIImage *)rotateCWImage
 {
     if (@available(iOS 13.0, *)) {
-        return [UIImage systemImageNamed:@"rotate.right.fill"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+        return [[UIImage systemImageNamed:@"rotate.right.fill"
+                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+                imageWithBaselineOffsetFromBottom:4];
     }
 
     UIImage *rotateCCWImage = [self.class rotateCCWImage];
@@ -534,8 +540,9 @@
 + (UIImage *)resetImage
 {
     if (@available(iOS 13.0, *)) {
-        return [UIImage systemImageNamed:@"arrow.counterclockwise"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+        return [[UIImage systemImageNamed:@"arrow.counterclockwise"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+                imageWithBaselineOffsetFromBottom:0];;
     }
 
     UIImage *resetImage = nil;
@@ -583,8 +590,9 @@
 + (UIImage *)clampImage
 {
     if (@available(iOS 13.0, *)) {
-        return [UIImage systemImageNamed:@"aspectratio.fill"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
+        return [[UIImage systemImageNamed:@"aspectratio.fill"
+                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+                imageWithBaselineOffsetFromBottom:0];
     }
 
     UIImage *clampImage = nil;
