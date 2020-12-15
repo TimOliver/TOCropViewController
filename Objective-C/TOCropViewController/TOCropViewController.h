@@ -175,6 +175,18 @@
 @property (nullable, nonatomic, copy) NSString *cancelButtonTitle;
 
 /**
+ Color for the 'Done' button.
+ Setting this will override the default color.
+ */
+@property (nullable, nonatomic, copy) UIColor *doneButtonColor;
+
+/**
+ Color for the 'Cancel' button.
+ Setting this will override the default color.
+ */
+@property (nullable, nonatomic, copy) UIColor *cancelButtonColor;
+
+/**
  Shows a confirmation dialog when the user hits 'Cancel' and there are pending changes.
  (Default is NO)
  */

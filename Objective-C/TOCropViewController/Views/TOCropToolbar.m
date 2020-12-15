@@ -412,6 +412,20 @@
     [_doneTextButton sizeToFit];
 }
 
+- (void)setCancelButtonColor:(UIColor *)cancelButtonColor {
+    _cancelButtonColor = cancelButtonColor;
+    [_cancelTextButton setTitleColor:_cancelButtonColor forState:UIControlStateNormal];
+    [_cancelIconButton setTintColor:_cancelButtonColor];
+    [_cancelTextButton sizeToFit];
+}
+
+- (void)setDoneButtonColor:(UIColor *)doneButtonColor {
+    _doneButtonColor = doneButtonColor;
+    [_doneTextButton setTitleColor:_doneButtonColor forState:UIControlStateNormal];
+    [_doneIconButton setTintColor:_doneButtonColor];
+    [_doneTextButton sizeToFit];
+}
+
 #pragma mark - Image Generation -
 + (UIImage *)doneImage
 {
