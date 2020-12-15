@@ -1053,6 +1053,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)setShowOnlyIcons:(BOOL)showOnlyIcons {
     self.toolbar.showOnlyIcons = showOnlyIcons;
 }
+  
+- (void)setDoneButtonColor:(UIColor *)color {
+    self.toolbar.doneButtonColor = color;
+}
+
+- (void)setCancelButtonColor:(UIColor *)color {
+    self.toolbar.cancelButtonColor = color;
+}
 
 - (TOCropView *)cropView
 {
