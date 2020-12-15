@@ -409,6 +409,16 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
 
     /**
+    If true, button icons are visible in portairt instead button text.
+
+    Default is NO.
+    */
+    public var showOnlyIcons: Bool {
+        set { toCropViewController.showOnlyIcons = newValue }
+        get { return toCropViewController.showOnlyIcons }
+    }
+
+    /**
     Color for the 'Done' button.
     Setting this will override the default color.
     */

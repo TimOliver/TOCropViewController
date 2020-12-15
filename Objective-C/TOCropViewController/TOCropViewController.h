@@ -175,6 +175,13 @@
 @property (nullable, nonatomic, copy) NSString *cancelButtonTitle;
 
 /**
+ If true, button icons are visible in portairt instead button text.
+
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL showOnlyIcons;
+
+/**
  Color for the 'Done' button.
  Setting this will override the default color.
  */

@@ -1050,6 +1050,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.cancelTextButtonTitle = title;
 }
 
+- (void)setShowOnlyIcons:(BOOL)showOnlyIcons {
+    self.toolbar.showOnlyIcons = showOnlyIcons;
+}
+  
 - (void)setDoneButtonColor:(UIColor *)color {
     self.toolbar.doneButtonColor = color;
 }

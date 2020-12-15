@@ -48,6 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *cancelTextButtonTitle;
 @property (nonatomic, copy) UIColor *cancelButtonColor;
 
+@property (nonatomic, assign) BOOL showOnlyIcons;
+
 /* The cropper control buttons */
 @property (nonatomic, strong, readonly)  UIButton *rotateCounterclockwiseButton;
 @property (nonatomic, strong, readonly)  UIButton *resetButton;
