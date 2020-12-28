@@ -34,39 +34,47 @@
 - (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
 {
     UIImage *croppedImage = nil;
-    UIGraphicsBeginImageContextWithOptions(frame.size, ![self hasAlpha] && !circular, self.scale);
+    UIGraphicsBeginImageContextWithOptions(frame.size, !self.hasAlpha && !circular, self.scale);
     {
         CGContextRef context = UIGraphicsGetCurrentContext();
-        
+
+        // If we're capturing a circular image, set the clip mask first
         if (circular) {
             CGContextAddEllipseInRect(context, (CGRect){CGPointZero, frame.size});
             CGContextClip(context);
         }
-        
-        //To conserve memory in not needing to completely re-render the image re-rotated,
-        //map the image to a view and then use Core Animation to manipulate its rotation
+
+        // Offset the origin (Which is the top left corner) to start where our cropping origin is
+        CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
+
+        // If an angle was supplied, rotate the entire canvas + coordinate space to match
         if (angle != 0) {
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:self];
-            imageView.layer.minificationFilter = kCAFilterNearest;
-            imageView.layer.magnificationFilter = kCAFilterNearest;
-            imageView.transform = CGAffineTransformRotate(CGAffineTransformIdentity, angle * (M_PI/180.0f));
-            CGRect rotatedRect = CGRectApplyAffineTransform(imageView.bounds, imageView.transform);
-            UIView *containerView = [[UIView alloc] initWithFrame:(CGRect){CGPointZero, rotatedRect.size}];
-            [containerView addSubview:imageView];
-            imageView.center = containerView.center;
-            CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
-            [containerView.layer renderInContext:context];
+            // Rotation in radians
+            CGFloat rotation = angle * (M_PI/180.0f);
+
+            // Work out the new bounding size of the canvas after rotation
+            CGRect imageBounds = (CGRect){CGPointZero, self.size};
+            CGRect rotatedBounds = CGRectApplyAffineTransform(imageBounds,
+                                                              CGAffineTransformMakeRotation(rotation));
+            // As we're rotating from the top left corner, and not the center of the canvas, the frame
+            // will have rotated out of our visible canvas. Compensate for this.
+            CGContextTranslateCTM(context, -rotatedBounds.origin.x, -rotatedBounds.origin.y);
+
+            // Perform the rotation transformation
+            CGContextRotateCTM(context, rotation);
         }
-        else {
-            CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
-            [self drawAtPoint:CGPointZero];
-        }
+
+        // Draw the image with all of the transformation parameters applied.
+        // We do not need to worry about specifying the size here since we're already
+        // constrained by the context image size
+        [self drawAtPoint:CGPointZero];
         
         croppedImage = UIGraphicsGetImageFromCurrentImageContext();
     }
     UIGraphicsEndImageContext();
-    
-    return [UIImage imageWithCGImage:croppedImage.CGImage scale: self.scale orientation:UIImageOrientationUp];
+
+    // Re-apply the retina scale we originally had
+    return [UIImage imageWithCGImage:croppedImage.CGImage scale:self.scale orientation:UIImageOrientationUp];
 }
 
 @end
