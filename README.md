@@ -1,7 +1,7 @@
 # TOCropViewController
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/screenshot.jpg" width="900" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/screenshot.jpg" width="900" style="margin:0 auto" />
 </p>
 
 [![CI](https://github.com/TimOliver/TOCropViewController/workflows/CI/badge.svg)](https://github.com/TimOliver/TOCropViewController/actions?query=workflow%3ACI)
@@ -20,7 +20,7 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 #### Proudly powering apps by
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/users.png" width="900" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/users.png" width="900" style="margin:0 auto" />
 </p>
 
 ## Features
@@ -245,23 +245,6 @@ While traditional cropping UI implementations will usually just have a dimming v
 </p>
 
 Since there are two views that are overlaid over the image (A dimming view and a translucency view), trying to cut a hole open in both of them would be rather complex. Instead, an image view is placed in a scroll view in the background, and a copy of the image view is placed on top, inside a container view that is clipped to the designated cropping size. The size and position of the foreground image is then made to match the background view, creating the illusion that there is a hole in the dimming views, and minimising the number of views onscreen.
-
-## Supporters
-
-### Sponsors
-
-<a href="https://github.com/marcosgriselli"><img src="https://avatars0.githubusercontent.com/u/14804033?s=460&v=4" width="100" /></a>
-
-### Donations
-
-<p float="left">
-	<a href="https://apps.apple.com/us/app/mematic-the-meme-maker/id491076730">
-	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/Mematic.jpg" height="100" style="padding-right:20px" />
-	</a>   
-	<a href="https://apps.apple.com/us/app/credminder-credential-manager/id1438352691">
-	<img src="https://github.com/TimOliver/TOCropViewController/raw/master/Images/Donators/CredMinder.jpg" height="100" />
-	</a>
-</p>
 
 ## Credits
 `TOCropViewController` was originally created by [Tim Oliver](http://twitter.com/TimOliverAU) as a component for [iComics](http://icomics.co), a comic reader app for iOS.
