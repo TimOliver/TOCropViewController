@@ -29,7 +29,6 @@
 static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
-static const CGFloat kTOCropViewCircularPathRadius = 300.0f;
 static const CGFloat kTOMaximumZoomScale = 15.0f;
 
 /* When the user taps down to resize the box, this state is used
@@ -61,7 +60,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) UIView *translucencyView;             /* A blur view that is made visible when the user isn't interacting with the crop view */
 @property (nonatomic, strong) id translucencyEffect;                /* The dark blur visual effect applied to the visual effect view. */
 @property (nonatomic, strong, readwrite) TOCropOverlayView *gridOverlayView;   /* A grid view overlaid on top of the foreground image view's container. */
-@property (nonatomic, strong) CAShapeLayer *circularMaskLayer;      /* Managing the clipping of the foreground container into a circle */
 
 /* Gesture Recognizers */
 @property (nonatomic, strong) UIPanGestureRecognizer *gridPanGestureRecognizer; /* The gesture recognizer in charge of controlling the resizing of the crop view */
@@ -226,14 +224,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     // The following setup isn't needed during circular cropping
-    if (circularMode) {
-        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:(CGRect){0,0,kTOCropViewCircularPathRadius, kTOCropViewCircularPathRadius}];
-        self.circularMaskLayer = [[CAShapeLayer alloc] init];
-        self.circularMaskLayer.path = circlePath.CGPath;
-        self.foregroundContainerView.layer.mask = self.circularMaskLayer;
-        
-        return;
-    }
+    if (circularMode) { return; }
     
     // The white grid overlay view
     self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
@@ -1020,9 +1011,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridOverlayView.frame = _cropBoxFrame; //set the new overlay view to match the same region
     
     // If the mask layer is present, adjust its transform to fit the new container view size
-    if (self.circularMaskLayer) {
-        CGFloat scale = _cropBoxFrame.size.width / kTOCropViewCircularPathRadius;
-        self.circularMaskLayer.transform = CATransform3DScale(CATransform3DIdentity, scale, scale, 1.0f);
+    if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
+        CGFloat halfWidth = self.foregroundContainerView.frame.size.width * 0.5f;
+        self.foregroundContainerView.layer.cornerRadius = halfWidth;
     }
     
     //reset the scroll view insets to match the region of the new crop rect
