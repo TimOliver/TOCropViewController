@@ -97,7 +97,7 @@ lane :release do
   
 end
 
-desc "Using the GitHub Web API, commit the local contents of a file to master via a bot account"
+desc "Using the GitHub Web API, commit the local contents of a file to main via a bot account"
 lane :commit_file do |options|
   file_path = options[:file_path]
   message = options[:commit_message]
