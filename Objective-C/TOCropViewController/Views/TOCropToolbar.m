@@ -92,7 +92,10 @@
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_doneIconButton];
-    
+
+    // Set the default color for the done buttons
+    self.doneButtonColor = nil;
+
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     
     [_cancelTextButton setTitle: _cancelTextButtonTitle ?
@@ -423,6 +426,8 @@
 }
 
 - (void)setCancelButtonColor:(UIColor *)cancelButtonColor {
+    // Default color is app tint color
+    if (cancelButtonColor == _cancelButtonColor) { return; }
     _cancelButtonColor = cancelButtonColor;
     [_cancelTextButton setTitleColor:_cancelButtonColor forState:UIControlStateNormal];
     [_cancelIconButton setTintColor:_cancelButtonColor];
@@ -430,6 +435,13 @@
 }
 
 - (void)setDoneButtonColor:(UIColor *)doneButtonColor {
+    // Set the default color when nil is specified
+    if (doneButtonColor == nil) {
+        doneButtonColor = [UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f];
+    }
+
+    if (doneButtonColor == _doneButtonColor) { return; }
+
     _doneButtonColor = doneButtonColor;
     [_doneTextButton setTitleColor:_doneButtonColor forState:UIControlStateNormal];
     [_doneIconButton setTintColor:_doneButtonColor];

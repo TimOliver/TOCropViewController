@@ -51,6 +51,10 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         //cropController.toolbar.cancelButtonHidden = true
         //cropController.toolbar.clampButtonHidden = true
 
+        // Set toolbar action button colors
+        // cropController.doneButtonColor = UIColor.red
+        // cropController.cancelButtonColor = UIColor.green
+
         self.image = image
         
         //If profile picture, push onto the same navigation stack

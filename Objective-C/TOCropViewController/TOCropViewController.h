@@ -185,7 +185,7 @@
  Color for the 'Done' button.
  Setting this will override the default color.
  */
-@property (nullable, nonatomic, copy) UIColor *doneButtonColor;
+@property (null_resettable, nonatomic, copy) UIColor *doneButtonColor;
 
 /**
  Color for the 'Cancel' button.
