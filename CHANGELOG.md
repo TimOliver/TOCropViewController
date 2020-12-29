@@ -1,6 +1,30 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.6.0 Release Notes (2020-12-30)
+=============================================================
+
+## Added
+
+* Extremely basic support for Mac Catalyst, with an accompanying sample app. ([#464](https://github.com/TimOliver/TOCropViewController/pull/464))
+* Switched to using system SF Symbol icons on iOS 13.0 and up. ([#455](https://github.com/TimOliver/TOCropViewController/pull/455))
+* `doneButtonColor` and `cancelButtonColor` properties to control the color of the main call-to-action buttons in the toolbar. ([#436](https://github.com/TimOliver/TOCropViewController/pull/436))
+* `showOnlyIcons` property to disable showing the "Cancel" and "Done" text labels. ([#438](https://github.com/TimOliver/TOCropViewController/pull/438))
+* `commitCurrentCrop()` method to programmatically simulate tapping the 'Done' button. ([#441](https://github.com/TimOliver/TOCropViewController/pull/441))
+* Added Catalan localization. ([#449](https://github.com/TimOliver/TOCropViewController/pull/449))
+
+## Fixed
+* Fixed an issue where visible snapping would occur during the presentation animation on iPad models with rounded corners. ([#461](https://github.com/TimOliver/TOCropViewController/pull/461))
+* Improved logic for detecting whether the controller needs to be popped or dismissed from its current presentation context.  ([#443](https://github.com/TimOliver/TOCropViewController/pull/443))
+* Fixed a CocoaPods installation issue where warnings would be displayed about importing the header references needed for SPM support. ([#445](https://github.com/TimOliver/TOCropViewController/pull/445))
+* Added provisions for later versions of SPM no longer supporting iOS 8. ([#448](https://github.com/TimOliver/TOCropViewController/pull/448))
+* Added `allowedAspectRatios` property to Swift layer. ([#453](https://github.com/TimOliver/TOCropViewController/pull/453))
+
+## Enhancements
+* Added back in resource support for SPM on Xcode 12. ([#466](https://github.com/TimOliver/TOCropViewController/pull/466))
+* Fixed a potential performance slow-down by replacing a custom mask, with standard `CALAyer` rounded corners for circular crops. ([#462](https://github.com/TimOliver/TOCropViewController/pull/462))
+* Rewrote how rotated regions of an image are extracted to not rely on Core Animation hackery. ([#463](https://github.com/TimOliver/TOCropViewController/pull/463))
+
 2.5.5 Release Notes (2020-10-01)
 =============================================================
 
