@@ -65,6 +65,10 @@
     // Uncomment this if you do not want translucency effect
     //cropController.cropView.translucencyAlwaysHidden = YES;
 
+    // Set toolbar action button colors
+    // cropController.doneButtonColor = [UIColor redColor];
+    // cropController.cancelButtonColor = [UIColor greenColor];
+
     self.image = image;
     
     //If profile picture, push onto the same navigation stack
