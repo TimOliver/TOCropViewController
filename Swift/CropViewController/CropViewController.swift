@@ -519,6 +519,13 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         toCropViewController.view.frame = view.bounds
         toCropViewController.viewDidLayoutSubviews()
     }
+
+    /**
+     Commits the crop action as if user pressed done button in the bottom bar themself
+     */
+    public func commitCurrentCrop() {
+        toCropViewController.commitCurrentCrop()
+    }
     
     /**
     Resets object of TOCropViewController class as if user pressed reset button in the bottom bar themself
