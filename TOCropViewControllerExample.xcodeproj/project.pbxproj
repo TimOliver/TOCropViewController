@@ -330,8 +330,6 @@
 		223424611ABBC0CC00BBC2B1 = {
 			isa = PBXGroup;
 			children = (
-				22F7331C259B71C400956847 /* TOCropViewControllerExample-Extension.entitlements */,
-				22F7331B259B71C400956847 /* TOCropViewControllerExample.entitlements */,
 				2238CF331FC027380081B957 /* Swift */,
 				2238CF321FC0271C0081B957 /* Objective-C */,
 				2234246B1ABBC0CD00BBC2B1 /* Products */,
@@ -370,6 +368,8 @@
 		2234246D1ABBC0CD00BBC2B1 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22F7331C259B71C400956847 /* TOCropViewControllerExample-Extension.entitlements */,
+				22F7331B259B71C400956847 /* TOCropViewControllerExample.entitlements */,
 				2234246E1ABBC0CD00BBC2B1 /* Info.plist */,
 				2234246F1ABBC0CD00BBC2B1 /* main.m */,
 			);
@@ -1157,7 +1157,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TOCropViewControllerExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample.entitlements";
 				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1177,7 +1177,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TOCropViewControllerExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample.entitlements";
 				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1320,7 +1320,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = "TOCropViewControllerExample-Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample-Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -1347,7 +1347,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_ENTITLEMENTS = "TOCropViewControllerExample-Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample-Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
