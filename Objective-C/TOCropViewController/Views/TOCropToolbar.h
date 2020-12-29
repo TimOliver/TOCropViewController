@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) UIButton *cancelIconButton;
 @property (nonatomic, readonly) UIView *visibleCancelButton;
 @property (nonatomic, copy) NSString *cancelTextButtonTitle;
-@property (null_resettable, nonatomic, copy) UIColor *cancelButtonColor;
+@property (nullable, nonatomic, copy) UIColor *cancelButtonColor;
 
 @property (nonatomic, assign) BOOL showOnlyIcons;
 
