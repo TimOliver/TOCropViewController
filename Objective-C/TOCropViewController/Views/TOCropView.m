@@ -173,7 +173,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Background Image View
     self.backgroundImageView = [[UIImageView alloc] initWithImage:self.image];
-    self.backgroundImageView.backgroundColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
     self.backgroundImageView.layer.minificationFilter = kCAFilterTrilinear;
     
     //Background container view
@@ -213,7 +212,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self addSubview:self.foregroundContainerView];
     
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
-    self.foregroundImageView.backgroundColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
     self.foregroundImageView.layer.minificationFilter = kCAFilterTrilinear;
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
