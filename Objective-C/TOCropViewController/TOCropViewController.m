@@ -92,7 +92,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
+
+        #if TARGET_OS_MACCATALYST
+        _toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        #else
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
+        #endif
     }
 	
     return self;
@@ -1220,6 +1225,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (BOOL)verticalLayout
 {
+#if TARGET_OS_MACCATALYST
+    return YES;
+#endif
+
     return CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds);
 }
 
@@ -1268,6 +1277,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // that have a physical hardware inset, like an iPhone X notch
         BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
                                     && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
+
+        // Always have insetting on Mac Catalyst
+        #if TARGET_OS_MACCATALYST
+        hardwareRelatedInset = YES;
+        #endif
 
         // Unless the status bar is visible, or we need to account
         // for a hardware notch, always treat the status bar height as zero
