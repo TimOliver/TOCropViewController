@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -14,6 +14,7 @@ var platforms: [SupportedPlatform] {
 
 let package = Package(
     name: "TOCropViewController",
+    defaultLocalization: "en",
     platforms: platforms,
     products: [
         .library(
@@ -30,6 +31,7 @@ let package = Package(
             name: "TOCropViewController",
             path: "Objective-C/TOCropViewController/",
 			exclude:["Supporting/Info.plist"],
+            resources: [.process("Resources")],
             publicHeadersPath: "include"
         ),
         .target(
