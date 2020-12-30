@@ -30,7 +30,7 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 * The choice of having the controller return the cropped image to a delegate, or immediately pass it to a `UIActivityViewController`.
 * A custom animation and layout when the device is rotated to landscape mode.
 * Custom 'opening' and 'dismissal' animations.
-* Localized in 18 languages.
+* Localized in 28 languages.
 
 ## System Requirements
 iOS 8.0 or above
