@@ -20,7 +20,7 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 #### Proudly powering apps by
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/users.png" width="900" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/users.png" width="840" style="margin:0 auto" />
 </p>
 
 ## Features
