@@ -1,7 +1,7 @@
 # TOCropViewController
 
 <p align="center">
-<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/screenshot.jpg" width="900" style="margin:0 auto" />
+<img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/screenshot.png" width="840" style="margin:0 auto" />
 </p>
 
 [![CI](https://github.com/TimOliver/TOCropViewController/workflows/CI/badge.svg)](https://github.com/TimOliver/TOCropViewController/actions?query=workflow%3ACI)
