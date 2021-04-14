@@ -1080,7 +1080,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         frame.size.height = frame.size.width;
     } else {
         frame.size.height = ceilf(cropBoxFrame.size.height * scale);
-        frame.size.height = MIN(imageSize.height, frame.size.height);
     }
     frame.size.height = MIN(imageSize.height, frame.size.height);
 
