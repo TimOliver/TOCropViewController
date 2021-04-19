@@ -141,6 +141,10 @@
     _resetButton.enabled = NO;
     [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
     [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    _resetButton.accessibilityLabel = NSLocalizedStringFromTableInBundle(@"Reset",
+                                                                         @"TOCropViewControllerLocalizable",
+                                                                         resourceBundle,
+                                                                         nil);
     [self addSubview:_resetButton];
 }
 
