@@ -8,6 +8,10 @@
 
 #import "ViewController.h"
 #import "TOCropViewController.h"
+#import "UIImage+Animated.h"
+
+
+@import Photos;
 
 @interface ViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, TOCropViewControllerDelegate>
 
@@ -25,7 +29,28 @@
 #pragma mark - Image Picker Delegate -
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
 {
-    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    __block UIImage *image = nil;
+    
+    NSURL * refUrl = [info objectForKey:UIImagePickerControllerReferenceURL];
+    if (refUrl) {
+        PHAsset * asset = [[PHAsset fetchAssetsWithALAssetURLs:@[refUrl] options:nil] lastObject];
+        if (asset) {
+            PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+            options.synchronous = YES;
+            options.networkAccessAllowed = NO;
+            options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                NSNumber * isError = [info objectForKey:PHImageErrorKey];
+                NSNumber * isCloud = [info objectForKey:PHImageResultIsInCloudKey];
+                if ([isError boolValue] || [isCloud boolValue] || ! imageData) {
+                    // fail
+                } else {
+                    image = [UIImage animatedImageFromData:imageData];
+                }
+            }];
+        }
+    }
+    
     TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:image];
     cropController.delegate = self;
 

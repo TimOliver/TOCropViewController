@@ -21,6 +21,8 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "UIImage+CropRotate.h"
+#import "TOImageFrame.h"
+#import "UIImage+Animated.h"
 
 @implementation UIImage (CropRotate)
 
@@ -31,8 +33,8 @@
             alphaInfo == kCGImageAlphaPremultipliedFirst || alphaInfo == kCGImageAlphaPremultipliedLast);
 }
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
-{
+
+- (UIImage *)crop:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular {
     UIImage *croppedImage = nil;
     UIGraphicsBeginImageContextWithOptions(frame.size, !self.hasAlpha && !circular, self.scale);
     {
@@ -77,4 +79,21 @@
     return [UIImage imageWithCGImage:croppedImage.CGImage scale:self.scale orientation:UIImageOrientationUp];
 }
 
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
+{
+    if (self.images) {
+        NSArray<TOImageFrame *> * frames = [self frames];
+        NSMutableArray<TOImageFrame*> * croppedFrames = [NSMutableArray arrayWithCapacity:frames.count];
+
+        [frames enumerateObjectsUsingBlock:^(TOImageFrame * _Nonnull imageFrame, NSUInteger idx, BOOL * _Nonnull stop) {
+            UIImage* croppedImage = [imageFrame.image crop:frame angle:angle circularClip:circular];
+            TOImageFrame* croppedImageFrame = [TOImageFrame frameWithImage:croppedImage duration:imageFrame.duration];
+            [croppedFrames addObject:croppedImageFrame];
+        }];
+        
+        return [UIImage animatedImageFromFrames:croppedFrames];
+    }
+
+    return [self crop:frame angle:angle circularClip:circular];
+}
 @end

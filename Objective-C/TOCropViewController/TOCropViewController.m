@@ -103,10 +103,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return self;
 }
 
+
 - (instancetype)initWithImage:(UIImage *)image
 {
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
 }
+
 
 - (void)viewDidLoad
 {
