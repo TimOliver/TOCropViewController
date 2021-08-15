@@ -20,6 +20,8 @@ For Swift developers, `CropViewController` is a Swift wrapper that completely en
 <img src="https://github.com/TimOliver/TOCropViewController/raw/main/Images/users.png" width="840" style="margin:0 auto" />
 </p>
 
+_Looking for something more? If `TOCropViewController` doesn't meet your exact requirements, please consider [IMG.LY](https://img.ly/?via=tim) with video editing and photo filter capabilities instead! (Disclaimer: Affiliate Link)_
+
 ## Features
 * Crop images by dragging the edges of a grid overlay.
 * Optionally, crop circular copies of images.
