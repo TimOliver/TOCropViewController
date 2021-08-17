@@ -270,7 +270,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIEdgeInsets insets = self.statusBarSafeInsets;
 
     CGRect frame = CGRectZero;
-    if (!verticalLayout) { // In landscape laying out toolbar to the left
+    if (!verticalLayout && !self.isAlwaysVerticalLayout) { // In landscape laying out toolbar to the left
         frame.origin.x = insets.left;
         frame.origin.y = 0.0f;
         frame.size.width = kTOCropViewControllerToolbarHeight;
@@ -310,7 +310,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGRect frame = CGRectZero;
 
     // Horizontal layout (eg landscape)
-    if (!verticalLayout) {
+    if (!verticalLayout && !self.isAlwaysVerticalLayout) {
         frame.origin.x = kTOCropViewControllerToolbarHeight + insets.left;
         frame.size.width = CGRectGetWidth(bounds) - frame.origin.x;
 		frame.size.height = CGRectGetHeight(bounds);
@@ -338,7 +338,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGFloat x = 0.0f; // Additional X offset in landscape mode
 
     // Adjust for landscape layout
-    if (!verticalLayout) {
+    if (!verticalLayout && !self.isAlwaysVerticalLayout) {
         x = kTOCropViewControllerTitleTopPadding;
         if (@available(iOS 11.0, *)) {
             x += self.view.safeAreaInsets.left;
@@ -377,7 +377,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
           }
         }
         else {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, insets.bottom, 0.0f);
         }
 
         return;

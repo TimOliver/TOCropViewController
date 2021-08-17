@@ -436,6 +436,11 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         get { return toCropViewController.cancelButtonColor }
     }
     
+    public var isAlwaysVerticalLayout: Bool {
+        set { self.toCropViewController.isAlwaysVerticalLayout = newValue }
+        get { self.toCropViewController.isAlwaysVerticalLayout }
+    }
+    
     /**
      This class internally manages and abstracts access to a `TOCropViewController` instance
      :nodoc:

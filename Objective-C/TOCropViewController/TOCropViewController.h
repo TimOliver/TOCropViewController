@@ -310,6 +310,11 @@
 @property (nullable, nonatomic, strong) NSArray<NSNumber *> *allowedAspectRatios;
 
 /**
+ If true, always layout as vertical.
+ */
+@property (nonatomic, assign) BOOL isAlwaysVerticalLayout;
+
+/**
  When the user hits cancel, or completes a
  UIActivityViewController operation, this block will be called,
  giving you a chance to manually dismiss the view controller
