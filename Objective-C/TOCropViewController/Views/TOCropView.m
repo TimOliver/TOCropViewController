@@ -222,14 +222,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.backgroundImageView.accessibilityIgnoresInvertColors = YES;
     }
     
-    // The following setup isn't needed during circular cropping
-    if (circularMode) { return; }
-    
     // The white grid overlay view
     self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
     self.gridOverlayView.userInteractionEnabled = NO;
     self.gridOverlayView.gridHidden = YES;
     [self addSubview:self.gridOverlayView];
+    
+    // The following setup isn't needed during circular cropping
+    if (circularMode) { return; }
     
     // The pan controller to recognize gestures meant to resize the grid view
     self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
