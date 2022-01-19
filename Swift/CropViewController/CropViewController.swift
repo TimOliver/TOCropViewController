@@ -39,9 +39,9 @@ public typealias CropViewControllerToolbarPosition = TOCropViewControllerToolbar
  */
 public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
 
-///------------------------------------------------
+// ------------------------------------------------
 /// @name Delegate
-///------------------------------------------------
+// ------------------------------------------------
 
 @objc public protocol CropViewControllerDelegate: NSObjectProtocol {
     /**
@@ -51,7 +51,7 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect rect: CGRect, angle: Int)
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect cropRect: CGRect, angle: Int)
     
     /**
      Called when the user has committed the crop action, and provides
@@ -84,9 +84,9 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
     @objc optional func cropViewController(_ cropViewController: CropViewController, didFinishCancelled cancelled: Bool)
 }
 
-///------------------------------------------------
+// ------------------------------------------------
 /// @name Class
-///------------------------------------------------
+// ------------------------------------------------
 
 open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     
@@ -474,9 +474,9 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         return UIRectEdge.all
     }
     
-    ///------------------------------------------------
+    // ------------------------------------------------
     /// @name Object Creation
-    ///------------------------------------------------
+    // ------------------------------------------------
     
     /**
      Creates a new instance of a crop view controller with the supplied image
