@@ -242,8 +242,6 @@
     [super viewDidLoad];
     self.title = NSLocalizedString(@"TOCropViewController", @"");
     
-    self.navigationController.navigationBar.translucent = NO;
-    
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showCropViewController)];
     
 #if TARGET_APP_EXTENSION

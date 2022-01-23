@@ -113,7 +113,6 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         super.viewDidLoad()
         
         title = NSLocalizedString("CropViewController", comment: "")
-        navigationController!.navigationBar.isTranslucent = false
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped(sender:)))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePhoto))
