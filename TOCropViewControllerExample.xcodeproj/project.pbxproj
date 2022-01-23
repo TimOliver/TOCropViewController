@@ -185,6 +185,10 @@
 		22C3C5541AC8CA4200E86280 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		22C3C5551AC8CA4900E86280 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		22C3C5561AC8CA5000E86280 /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		22D83E74279D951200CF0D8E /* CropViewController.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = CropViewController.podspec; sourceTree = "<group>"; };
+		22D83E75279D951200CF0D8E /* TOCropViewController.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = TOCropViewController.podspec; sourceTree = "<group>"; };
+		22D83E76279D951200CF0D8E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		22D83E77279D951200CF0D8E /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		22DB4D831B234CFA008B8466 /* TOCropViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOCropViewController.m; sourceTree = "<group>"; };
 		22DB4D891B234D07008B8466 /* TOCropViewControllerTransitioning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCropViewControllerTransitioning.h; sourceTree = "<group>"; };
 		22DB4D8A1B234D07008B8466 /* TOCropViewControllerTransitioning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOCropViewControllerTransitioning.m; sourceTree = "<group>"; };
@@ -334,6 +338,10 @@
 				2238CF321FC0271C0081B957 /* Objective-C */,
 				2234246B1ABBC0CD00BBC2B1 /* Products */,
 				2238CF581FC030C30081B957 /* Frameworks */,
+				22D83E77279D951200CF0D8E /* CHANGELOG.md */,
+				22D83E76279D951200CF0D8E /* README.md */,
+				22D83E74279D951200CF0D8E /* CropViewController.podspec */,
+				22D83E75279D951200CF0D8E /* TOCropViewController.podspec */,
 			);
 			sourceTree = "<group>";
 		};
