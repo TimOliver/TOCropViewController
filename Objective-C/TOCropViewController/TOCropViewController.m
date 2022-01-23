@@ -954,6 +954,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         };
 
         return;
+    } else {
+      self.toolbar.doneTextButton.enabled = false;
     }
     
     BOOL isCallbackOrDelegateHandled = NO;
