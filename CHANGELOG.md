@@ -1,6 +1,17 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.6.1 Release Notes (2022-01-23)
+=============================================================
+
+## Fixed
+
+* Removed unneeded layaout calculation. ([#485](https://github.com/TimOliver/TOCropViewController/pull/485))
+* Incorrect accessibility label for the 'Reset' button. ([#487](https://github.com/TimOliver/TOCropViewController/pull/487))
+* Improved Japanese localization. ([#502](https://github.com/TimOliver/TOCropViewController/pull/502))
+* Fixed an API typo in the Swift interface. ([#504](https://github.com/TimOliver/TOCropViewController/pull/504))
+* Fixed incorrect comment formatting producing HTML errors. ([#507](https://github.com/TimOliver/TOCropViewController/pull/507))
+
 2.6.0 Release Notes (2020-12-30)
 =============================================================
 
