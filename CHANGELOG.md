@@ -6,7 +6,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 ## Fixed
 
-* Removed unneeded layaout calculation. ([#485](https://github.com/TimOliver/TOCropViewController/pull/485))
+* Removed unneeded layout calculation. ([#485](https://github.com/TimOliver/TOCropViewController/pull/485))
 * Incorrect accessibility label for the 'Reset' button. ([#487](https://github.com/TimOliver/TOCropViewController/pull/487))
 * Improved Japanese localization. ([#502](https://github.com/TimOliver/TOCropViewController/pull/502))
 * Fixed an API typo in the Swift interface. ([#504](https://github.com/TimOliver/TOCropViewController/pull/504))
