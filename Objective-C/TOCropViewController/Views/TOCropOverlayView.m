@@ -63,6 +63,7 @@
         _linesBackgroundColor = linesColor;
         [self setup];
     }
+    return self;
 }
 
 - (void)setup
