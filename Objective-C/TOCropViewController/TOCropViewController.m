@@ -73,7 +73,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 @implementation TOCropViewController
 
-- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image toolbarButtonsBackgroundColor:(UIColor *)toolbarButtonsColor cropViewBackgroundColor:(UIColor *)backgroundColor
+- (instancetype)initWithImage:(UIImage *)image toolbarButtonsBackgroundColor:(UIColor *)toolbarButtonsColor cropViewBackgroundColor:(UIColor *)backgroundColor
 {
     NSParameterAssert(image);
 
@@ -81,7 +81,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (self) {
         // Init parameters
         _image = image;
-        _croppingStyle = style;
+        _croppingStyle = TOCropViewCroppingStyleCustom;
         _toolbarButtonsBackgroundColor = toolbarButtonsColor;
         _cropViewBackgroundColor = backgroundColor;
 
@@ -1107,7 +1107,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
         if (_croppingStyle == TOCropViewCroppingStyleCustom) {
-            _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image backgroundColor:self.cropViewBackgroundColor overlayViewLinesColor:self.toolbarButtonsBackgroundColor];
+            _cropView = [[TOCropView alloc] initWithImage:self.image backgroundColor:self.cropViewBackgroundColor overlayViewLinesColor:self.toolbarButtonsBackgroundColor];
         } else {
             _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         }

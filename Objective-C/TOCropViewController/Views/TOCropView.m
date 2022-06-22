@@ -115,13 +115,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 @implementation TOCropView
 
-- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image backgroundColor:(UIColor *)backgroundColor overlayViewLinesColor:(UIColor *)overlayViewLinesColor
+- (instancetype)initWithImage:(UIImage *)image backgroundColor:(UIColor *)backgroundColor overlayViewLinesColor:(UIColor *)overlayViewLinesColor
 {
     if (self = [super init]) {
         _backgroundColor = backgroundColor;
         _overlayViewLinesColor = overlayViewLinesColor;
         _image = image;
-        _croppingStyle = style;
+        _croppingStyle = TOCropViewCroppingStyleCustom;
     }
     return self;
 }

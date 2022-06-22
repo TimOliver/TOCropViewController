@@ -22,6 +22,7 @@
 
 #if canImport(TOCropViewController)
 import TOCropViewController
+import UIKit
 #endif
 
 /**
@@ -477,7 +478,14 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     // ------------------------------------------------
     /// @name Object Creation
     // ------------------------------------------------
-    
+
+    public init(image: UIImage, toolbarButtonsBackgroundColor: UIColor, cropViewBackgroundColor: UIColor) {
+        self.toCropViewController = TOCropViewController(image: image, toolbarButtonsBackgroundColor: toolbarButtonsBackgroundColor, cropViewBackgroundColor: cropViewBackgroundColor)
+        super.init(nibName: nil, bundle: nil)
+        setUpCropController()
+    }
+
+
     /**
      Creates a new instance of a crop view controller with the supplied image
      
