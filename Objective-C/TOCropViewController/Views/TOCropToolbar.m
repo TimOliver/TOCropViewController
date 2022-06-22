@@ -55,6 +55,7 @@
         _backgroundColor = backgroundColor;
         [self setup];
     }
+    return self;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
