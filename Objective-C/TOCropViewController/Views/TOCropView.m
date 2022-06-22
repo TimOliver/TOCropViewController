@@ -108,7 +108,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
 
-@property (nonatomic, assign) UIColor *backgroundColor;
+@property (nonatomic, assign) UIColor *cropViewBackgroundColor;
 @property (nonatomic, assign) UIColor *overlayViewLinesColor;
 
 @end
@@ -118,7 +118,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (instancetype)initWithImage:(UIImage *)image backgroundColor:(UIColor *)backgroundColor overlayViewLinesColor:(UIColor *)overlayViewLinesColor
 {
     if (self = [super init]) {
-        _backgroundColor = backgroundColor;
+        _cropViewBackgroundColor = backgroundColor;
         _overlayViewLinesColor = overlayViewLinesColor;
         _image = image;
         _croppingStyle = TOCropViewCroppingStyleCustom;
@@ -134,6 +134,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
     if (self = [super init]) {
+        _cropViewBackgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
         _image = image;
         _croppingStyle = style;
         [self setup];
@@ -151,7 +152,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //View properties
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    self.backgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
+    self.backgroundColor = _cropViewBackgroundColor;
     self.cropBoxFrame = CGRectZero;
     self.applyInitialCroppedImageFrame = NO;
     self.editing = NO;
@@ -205,8 +206,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Translucency View
     if (NSClassFromString(@"UIVisualEffectView")) {
-        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-        self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
+        if (!customMode) {
+            self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+            self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
+        }
         self.translucencyView.frame = self.bounds;
     }
     else {
