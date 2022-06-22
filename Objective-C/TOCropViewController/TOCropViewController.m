@@ -120,8 +120,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIScrollView *sc = self.view.subviews.firstObject.subviews.firstObject;
     if (@available(iOS 11,*)) {
         [sc setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-    } else {
-    self.automaticallyAdjustsScrollViewInsets = NO;
     }
     self.hidesNavigationBar = true;
 
@@ -1340,8 +1338,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         else {
             if (@available(iOS 11, *)) {
                 statusBarHeight = self.view.safeAreaInsets.top;
-            } else {
-            statusBarHeight = self.topLayoutGuide.length;
             }
         }
     }
