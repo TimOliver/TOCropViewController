@@ -27,7 +27,8 @@
  */
 typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
     TOCropViewCroppingStyleDefault,     // The regular, rectangular crop box
-    TOCropViewCroppingStyleCircular     // A fixed, circular crop box
+    TOCropViewCroppingStyleCircular,    // A fixed, circular crop box
+    TOCropViewCroppingStyleCustom       // Custom style, rectangular crop box.
 };
 
 /**

@@ -22,8 +22,6 @@
 
 #import "TOCropOverlayView.h"
 
-static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
-
 @interface TOCropOverlayView ()
 
 @property (nonatomic, strong) NSArray *horizontalGridLines;
@@ -36,6 +34,12 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
 @property (nonatomic, strong) NSArray *bottomRightLineViews;
 @property (nonatomic, strong) NSArray *topRightLineViews;
 
+@property (nonatomic, assign) UIColor *linesBackgroundColor;
+
+@property (nonatomic, assign, readonly) TOCropViewCroppingStyle croppingStyle;
+
+@property (nonatomic, assign) CGFloat kTOCropOverLayerCornerWidth;
+
 @end
 
 @implementation TOCropOverlayView
@@ -44,10 +48,21 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
 {
     if (self = [super initWithFrame:frame]) {
         self.clipsToBounds = NO;
+        _linesBackgroundColor = [UIColor whiteColor];
         [self setup];
     }
     
     return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame croppingStyle:(TOCropViewCroppingStyle)style linesBackgroundColor:(UIColor *)linesColor
+{
+    if (self = [super initWithFrame:frame]) {
+        self.clipsToBounds = NO;
+        _croppingStyle = style;
+        _linesBackgroundColor = linesColor;
+        [self setup];
+    }
 }
 
 - (void)setup
@@ -104,26 +119,31 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     
     //corner liness
     NSArray *cornerLines = @[self.topLeftLineViews, self.topRightLineViews, self.bottomRightLineViews, self.bottomLeftLineViews];
+    if (self.croppingStyle == TOCropViewCroppingStyleCustom) {
+        self.kTOCropOverLayerCornerWidth = 40.0f;
+    } else {
+        self.kTOCropOverLayerCornerWidth = 20.0f;
+    }
     for (NSInteger i = 0; i < 4; i++) {
         NSArray *cornerLine = cornerLines[i];
         
         CGRect verticalFrame = CGRectZero, horizontalFrame = CGRectZero;
         switch (i) {
             case 0: //top left
-                verticalFrame = (CGRect){-3.0f,-3.0f,3.0f,kTOCropOverLayerCornerWidth+3.0f};
-                horizontalFrame = (CGRect){0,-3.0f,kTOCropOverLayerCornerWidth,3.0f};
+                verticalFrame = (CGRect){-3.0f,-3.0f,3.0f,self.kTOCropOverLayerCornerWidth+3.0f};
+                horizontalFrame = (CGRect){0,-3.0f,self.kTOCropOverLayerCornerWidth,3.0f};
                 break;
             case 1: //top right
-                verticalFrame = (CGRect){boundsSize.width,-3.0f,3.0f,kTOCropOverLayerCornerWidth+3.0f};
-                horizontalFrame = (CGRect){boundsSize.width-kTOCropOverLayerCornerWidth,-3.0f,kTOCropOverLayerCornerWidth,3.0f};
+                verticalFrame = (CGRect){boundsSize.width,-3.0f,3.0f,self.kTOCropOverLayerCornerWidth+3.0f};
+                horizontalFrame = (CGRect){boundsSize.width-self.kTOCropOverLayerCornerWidth,-3.0f,self.kTOCropOverLayerCornerWidth,3.0f};
                 break;
             case 2: //bottom right
-                verticalFrame = (CGRect){boundsSize.width,boundsSize.height-kTOCropOverLayerCornerWidth,3.0f,kTOCropOverLayerCornerWidth+3.0f};
-                horizontalFrame = (CGRect){boundsSize.width-kTOCropOverLayerCornerWidth,boundsSize.height,kTOCropOverLayerCornerWidth,3.0f};
+                verticalFrame = (CGRect){boundsSize.width,boundsSize.height-self.kTOCropOverLayerCornerWidth,3.0f,self.kTOCropOverLayerCornerWidth+3.0f};
+                horizontalFrame = (CGRect){boundsSize.width-self.self.kTOCropOverLayerCornerWidth,boundsSize.height,self.kTOCropOverLayerCornerWidth,3.0f};
                 break;
             case 3: //bottom left
-                verticalFrame = (CGRect){-3.0f,boundsSize.height-kTOCropOverLayerCornerWidth,3.0f,kTOCropOverLayerCornerWidth};
-                horizontalFrame = (CGRect){-3.0f,boundsSize.height,kTOCropOverLayerCornerWidth+3.0f,3.0f};
+                verticalFrame = (CGRect){-3.0f,boundsSize.height-self.kTOCropOverLayerCornerWidth,3.0f,self.kTOCropOverLayerCornerWidth};
+                horizontalFrame = (CGRect){-3.0f,boundsSize.height,self.kTOCropOverLayerCornerWidth+3.0f,3.0f};
                 break;
         }
         
@@ -223,7 +243,7 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
 
 - (nonnull UIView *)createNewLineView {
     UIView *newLine = [[UIView alloc] initWithFrame:CGRectZero];
-    newLine.backgroundColor = [UIColor whiteColor];
+    newLine.backgroundColor = _linesBackgroundColor;
     [self addSubview:newLine];
     return newLine;
 }

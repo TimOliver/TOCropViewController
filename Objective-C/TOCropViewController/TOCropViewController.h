@@ -371,6 +371,7 @@
  */
 - (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image NS_SWIFT_NAME(init(croppingStyle:image:));
 
+- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image toolbarButtonsBackgroundColor:(nonnull UIColor *)toolbarButtonsColor cropViewBackgroundColor:(nonnull UIColor *)backgroundColor NS_SWIFT_NAME(init(croppingStyle:image:toolbarButtonsBackgroundColor:cropViewBackgroundColor:));
 /**
  Commits the crop action as if user pressed done button in the bottom bar themself
  */

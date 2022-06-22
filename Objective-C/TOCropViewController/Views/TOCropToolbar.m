@@ -41,13 +41,27 @@
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
 
+@property (nonatomic, assign) UIColor *buttonsTintColor;
+@property (nonatomic, assign) UIColor *backgroundColor;
+
 @end
 
 @implementation TOCropToolbar
 
+- (instancetype)initWithFrame:(CGRect)frame buttonsTintColor:(UIColor *)buttonsTintColor backgroundColor:(UIColor *)backgroundColor
+{
+    if (self = [super initWithFrame:frame]) {
+        _buttonsTintColor = buttonsTintColor;
+        _backgroundColor = backgroundColor;
+        [self setup];
+    }
+}
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
+        _buttonsTintColor = [UIColor whiteColor];
+        _backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
         [self setup];
     }
     
@@ -56,7 +70,7 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    self.backgroundView.backgroundColor = self.backgroundColor;
     [self addSubview:self.backgroundView];
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode

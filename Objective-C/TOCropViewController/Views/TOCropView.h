@@ -207,6 +207,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(nonnull UIImage *)image;
 
+- (nonnull instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image backgroundColor:(UIColor *)backgroundColor overlayViewLinesColor:(UIColor *)overlayViewLinesColor;
 /**
  Performs the initial set up, including laying out the image and applying any restore properties.
  This should be called once the crop view has been added to a parent that is in its final layout frame.

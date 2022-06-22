@@ -43,6 +43,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 @property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *toolbarSnapshotView;
 @property (nonatomic, strong, readwrite) UILabel *titleLabel;
+@property (nonatomic, assign) UIColor *toolbarButtonsBackgroundColor;
+@property (nonatomic, assign) UIColor *cropViewBackgroundColor;
 
 /* Transition animation controller */
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
@@ -71,6 +73,24 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 @implementation TOCropViewController
 
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image toolbarButtonsBackgroundColor:(UIColor *)toolbarButtonsColor cropViewBackgroundColor:(UIColor *)backgroundColor
+{
+    NSParameterAssert(image);
+
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
+        // Init parameters
+        _image = image;
+        _croppingStyle = style;
+        _toolbarButtonsBackgroundColor = toolbarButtonsColor;
+        _cropViewBackgroundColor = backgroundColor;
+
+        [self setup];
+    }
+
+    return self;
+}
+
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
     NSParameterAssert(image);
@@ -81,31 +101,41 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         _image = image;
         _croppingStyle = style;
         
-        // Set up base view controller behaviour
-        self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-        self.modalPresentationStyle = UIModalPresentationFullScreen;
-        self.automaticallyAdjustsScrollViewInsets = NO;
-        self.hidesNavigationBar = true;
-        
-        // Controller object that handles the transition animation when presenting / dismissing this app
-        _transitionController = [[TOCropViewControllerTransitioning alloc] init];
-
-        // Default initial behaviour
-        _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
-
-        #if TARGET_OS_MACCATALYST
-        _toolbarPosition = TOCropViewControllerToolbarPositionTop;
-        #else
-        _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
-        #endif
+        [self setup];
     }
-	
+
     return self;
 }
 
 - (instancetype)initWithImage:(UIImage *)image
 {
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
+}
+
+- (void)setup
+{
+    // Set up base view controller behaviour
+    self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    self.modalPresentationStyle = UIModalPresentationFullScreen;
+    UIScrollView *sc = self.view.subviews.firstObject.subviews.firstObject;
+    if (@available(iOS 11,*)) {
+        [sc setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
+    } else {
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    self.hidesNavigationBar = true;
+
+    // Controller object that handles the transition animation when presenting / dismissing this app
+    _transitionController = [[TOCropViewControllerTransitioning alloc] init];
+
+    // Default initial behaviour
+    _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
+
+    #if TARGET_OS_MACCATALYST
+    _toolbarPosition = TOCropViewControllerToolbarPositionTop;
+    #else
+    _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
+    #endif
 }
 
 - (void)viewDidLoad
@@ -1074,7 +1104,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Lazily create the crop view in case we try and access it before presentation, but
     // don't add it until our parent view controller view has loaded at the right time
     if (!_cropView) {
-        _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
+        if (_croppingStyle == TOCropViewCroppingStyleCustom) {
+            _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image backgroundColor:self.cropViewBackgroundColor overlayViewLinesColor:self.toolbarButtonsBackgroundColor];
+        } else {
+            _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
+        }
         _cropView.delegate = self;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self.view addSubview:_cropView];
@@ -1085,7 +1119,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (TOCropToolbar *)toolbar
 {
     if (!_toolbar) {
-        _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+        if (_croppingStyle == TOCropViewCroppingStyleCustom) {
+            _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero buttonsTintColor:self.toolbarButtonsBackgroundColor backgroundColor:self.cropViewBackgroundColor];
+        } else {
+            _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
+        }
         [self.view addSubview:_toolbar];
     }
     return _toolbar;
@@ -1296,7 +1334,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             statusBarHeight = 0.0f;
         }
         else {
+            if (@available(iOS 11, *)) {
+                statusBarHeight = self.view.safeAreaInsets.top;
+            } else {
             statusBarHeight = self.topLayoutGuide.length;
+            }
         }
     }
     

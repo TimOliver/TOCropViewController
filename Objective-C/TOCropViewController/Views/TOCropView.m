@@ -108,9 +108,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
 
+@property (nonatomic, assign) UIColor *backgroundColor;
+@property (nonatomic, assign) UIColor *overlayViewLinesColor;
+
 @end
 
 @implementation TOCropView
+
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image backgroundColor:(UIColor *)backgroundColor overlayViewLinesColor:(UIColor *)overlayViewLinesColor
+{
+    if (self = [super init]) {
+        _backgroundColor = backgroundColor;
+        _overlayViewLinesColor = overlayViewLinesColor;
+        _image = image;
+        _croppingStyle = style;
+    }
+}
 
 - (instancetype)initWithImage:(UIImage *)image
 {
@@ -133,6 +146,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     __weak typeof(self) weakSelf = self;
     
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
+    BOOL customMode = (self.croppingStyle == TOCropViewCroppingStyleCustom);
     
     //View properties
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
@@ -223,9 +237,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // The following setup isn't needed during circular cropping
     if (circularMode) { return; }
-    
-    // The white grid overlay view
-    self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
+
+    if (customMode) {
+        // The custom designed overlay view
+        self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame croppingStyle:self.croppingStyle linesBackgroundColor:self.overlayViewLinesColor];
+    } else {
+        // The white grid overlay view
+        self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
+    }
     self.gridOverlayView.userInteractionEnabled = NO;
     self.gridOverlayView.gridHidden = YES;
     [self addSubview:self.gridOverlayView];

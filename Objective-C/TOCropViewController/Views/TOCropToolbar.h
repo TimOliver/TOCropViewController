@@ -84,6 +84,8 @@ NS_ASSUME_NONNULL_BEGIN
 /* Done button frame for popover controllers */
 @property (nonatomic, readonly) CGRect doneButtonFrame;
 
+- (nonnull instancetype)initWithFrame:(CGRect)frame buttonsTintColor:(UIColor *)buttonsTintColor backgroundColor:(UIColor *)backgroundColor;
+
 @end
 
 NS_ASSUME_NONNULL_END
