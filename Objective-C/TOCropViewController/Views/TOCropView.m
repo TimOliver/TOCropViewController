@@ -123,6 +123,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         _image = image;
         _croppingStyle = style;
     }
+    return self;
 }
 
 - (instancetype)initWithImage:(UIImage *)image
