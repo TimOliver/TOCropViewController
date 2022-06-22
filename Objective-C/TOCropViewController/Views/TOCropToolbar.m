@@ -43,14 +43,16 @@
 
 @property (nonatomic, assign) UIColor *buttonsTintColor;
 @property (nonatomic, assign) UIColor *backgroundColor;
+@property (nonatomic, assign) TOCropViewCroppingStyle croppingStyle;
 
 @end
 
 @implementation TOCropToolbar
 
-- (instancetype)initWithFrame:(CGRect)frame buttonsTintColor:(UIColor *)buttonsTintColor backgroundColor:(UIColor *)backgroundColor
+- (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style buttonsTintColor:(UIColor *)buttonsTintColor backgroundColor:(UIColor *)backgroundColor
 {
-    if (self = [super initWithFrame:frame]) {
+    if (self = [super initWithFrame:CGRectZero]) {
+        _croppingStyle = style;
         _buttonsTintColor = buttonsTintColor;
         _backgroundColor = backgroundColor;
         [self setup];
@@ -61,8 +63,6 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        _buttonsTintColor = [UIColor whiteColor];
-        _backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
         [self setup];
     }
     
@@ -70,6 +70,12 @@
 }
 
 - (void)setup {
+    
+    if (_croppingStyle != TOCropViewCroppingStyleCustom) {
+        self.buttonsTintColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    }
+
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
     self.backgroundView.backgroundColor = self.backgroundColor;
     [self addSubview:self.backgroundView];

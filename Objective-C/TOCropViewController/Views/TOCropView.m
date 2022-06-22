@@ -135,7 +135,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (instancetype)initWithCroppingStyle:(TOCropViewCroppingStyle)style image:(UIImage *)image
 {
     if (self = [super init]) {
-        _cropViewBackgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
         _image = image;
         _croppingStyle = style;
         [self setup];
@@ -150,6 +149,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
     BOOL customMode = (self.croppingStyle == TOCropViewCroppingStyleCustom);
+
+    if (!customMode) {
+        self.cropViewBackgroundColor = TOCROPVIEW_BACKGROUND_COLOR;
+    }
     
     //View properties
     self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;

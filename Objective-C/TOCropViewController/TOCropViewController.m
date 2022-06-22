@@ -1122,7 +1122,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     if (!_toolbar) {
         if (_croppingStyle == TOCropViewCroppingStyleCustom) {
-            _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero buttonsTintColor:self.toolbarButtonsBackgroundColor backgroundColor:self.cropViewBackgroundColor];
+            _toolbar = [[TOCropToolbar alloc] initWithCroppingStyle:_croppingStyle buttonsTintColor:self.toolbarButtonsBackgroundColor backgroundColor:self.cropViewBackgroundColor];
         } else {
             _toolbar = [[TOCropToolbar alloc] initWithFrame:CGRectZero];
         }

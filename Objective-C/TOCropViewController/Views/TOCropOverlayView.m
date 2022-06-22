@@ -48,7 +48,6 @@
 {
     if (self = [super initWithFrame:frame]) {
         self.clipsToBounds = NO;
-        _linesBackgroundColor = [UIColor whiteColor];
         [self setup];
     }
     
@@ -68,6 +67,9 @@
 
 - (void)setup
 {
+    if (_croppingStyle != TOCropViewCroppingStyleCustom) {
+        self.linesBackgroundColor = [UIColor whiteColor];
+    }
     UIView *(^newLineView)(void) = ^UIView *(void){
         return [self createNewLineView];
     };
