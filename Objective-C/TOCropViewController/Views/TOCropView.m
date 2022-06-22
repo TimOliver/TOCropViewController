@@ -122,6 +122,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         _overlayViewLinesColor = overlayViewLinesColor;
         _image = image;
         _croppingStyle = TOCropViewCroppingStyleCustom;
+        [self setup];
     }
     return self;
 }
@@ -209,8 +210,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         if (!customMode) {
             self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
             self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
+            self.translucencyView.frame = self.bounds;
         }
-        self.translucencyView.frame = self.bounds;
     }
     else {
         UIToolbar *toolbar = [[UIToolbar alloc] init];
