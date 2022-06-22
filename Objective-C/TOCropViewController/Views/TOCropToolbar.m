@@ -63,6 +63,7 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
+        _buttonsTintColor = [UIColor whiteColor];
         [self setup];
     }
     
@@ -70,14 +71,12 @@
 }
 
 - (void)setup {
-    
-    if (_croppingStyle != TOCropViewCroppingStyleCustom) {
-        self.buttonsTintColor = [UIColor whiteColor];
-        self.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
-    }
-
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = self.backgroundColor;
+    if (_croppingStyle != TOCropViewCroppingStyleCustom) {
+        self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    } else {
+        self.backgroundView.backgroundColor = self.backgroundColor;
+    }
     [self addSubview:self.backgroundView];
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
