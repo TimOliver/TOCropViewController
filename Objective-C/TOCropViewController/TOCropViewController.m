@@ -345,10 +345,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (!verticalLayout) {
         frame.origin.x = kTOCropViewControllerToolbarHeight + insets.left;
         frame.size.width = CGRectGetWidth(bounds) - frame.origin.x;
-		frame.size.height = CGRectGetHeight(bounds);
+        if (_croppingStyle == TOCropViewCroppingStyleCustom) {
+            frame.size.height = _toolbar.bounds.size.height;
+        } else {
+            frame.size.height = CGRectGetHeight(bounds);
+        }
     }
     else { // Vertical layout
-        frame.size.height = CGRectGetHeight(bounds);
+        if (_croppingStyle == TOCropViewCroppingStyleCustom) {
+            frame.size.height = bounds.size.height / 1.5;
+        } else {
+            frame.size.height = CGRectGetHeight(bounds);
+        }
         frame.size.width = CGRectGetWidth(bounds);
 
         // Set Y and adjust for height
