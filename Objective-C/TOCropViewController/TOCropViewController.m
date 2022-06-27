@@ -38,6 +38,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 /* The cropping style of the crop view */
 @property (nonatomic, assign, readwrite) TOCropViewCroppingStyle croppingStyle;
 
+/* Buttons */
+@property (nonatomic, strong, readwrite) UIButton *doneButton;
+@property (nonatomic, strong, readwrite) UIButton *cancelButton;
+
 /* Views */
 @property (nonatomic, strong) TOCropToolbar *toolbar;
 @property (nonatomic, strong, readwrite) TOCropView *cropView;
@@ -166,6 +170,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.clampButtonTapped = ^{ [weakSelf showAspectRatioDialog]; };
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped        = ^{ [weakSelf rotateCropViewClockwise]; };
+
+    if (_croppingStyle == TOCropViewCroppingStyleCustom) {
+        [self addCancelButton];
+        [self addDoneButton];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -265,6 +274,66 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
+- (void)addDoneButton {
+    _doneButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_doneButton setTitle:@"✓ Save" forState:UIControlStateNormal];
+    if (@available(iOS 13.0, *)) {
+        [_doneButton .titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
+    } else {
+        [_doneButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+    }
+    [_doneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_doneButton setBackgroundColor:[UIColor colorWithRed: 0.26 green: 0.04 blue: 0.88 alpha: 1.00]];
+
+    _doneButton.layer.cornerRadius = 5;
+    _doneButton.clipsToBounds = YES;
+
+    [_doneButton addTarget:self action:@selector(doneButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    [self.view addSubview:_doneButton];
+    _doneButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_doneButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20].active = true;
+    [_doneButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-kTOCropViewControllerToolbarHeight - 52].active = true;
+    [_doneButton.heightAnchor constraintEqualToConstant:32].active = true;
+    [_doneButton.widthAnchor constraintEqualToConstant:124].active = true;
+}
+
+- (void)addCancelButton {
+    _cancelButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    if (@available(iOS 13.0, *)) {
+        [_cancelButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
+    } else {
+        [_cancelButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+    }
+    [_cancelButton setTitleColor:_toolbarButtonsBackgroundColor forState:UIControlStateNormal];
+    [_cancelButton setBackgroundColor:[UIColor clearColor]];
+    _cancelButton.layer.borderWidth = 1;
+    _cancelButton.layer.borderColor = [UIColor colorWithRed: 0.26 green: 0.04 blue: 0.88 alpha: 1.00].CGColor;
+
+    _cancelButton.layer.cornerRadius = 5;
+    _cancelButton.clipsToBounds = YES;
+
+    [_cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    [self.view addSubview:_cancelButton];
+    _cancelButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_cancelButton.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20].active = true;
+    [_cancelButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-kTOCropViewControllerToolbarHeight - 52].active = true;
+    [_cancelButton.heightAnchor constraintEqualToConstant:32].active = true;
+    [_cancelButton.widthAnchor constraintEqualToConstant:124].active = true;
+}
+
+- (void)doneButtonPressed:(UIButton *)sender {
+    __weak typeof(self) weakSelf = self;
+    [weakSelf doneButtonTapped];
+}
+
+- (void)cancelButtonPressed:(UIButton *)sender {
+    __weak typeof(self) weakSelf = self;
+    [weakSelf cancelButtonTapped];
+}
+
 #pragma mark - Status Bar -
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
@@ -347,6 +416,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         frame.size.width = CGRectGetWidth(bounds) - frame.origin.x;
         if (_croppingStyle == TOCropViewCroppingStyleCustom) {
             frame.size.height = _toolbar.bounds.size.height;
+            _cancelButton.hidden = YES;
+            _doneButton.hidden = YES;
         } else {
             frame.size.height = CGRectGetHeight(bounds);
         }
