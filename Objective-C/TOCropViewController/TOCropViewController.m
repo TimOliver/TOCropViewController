@@ -290,12 +290,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     [_doneButton addTarget:self action:@selector(doneButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 
+    if (@available(iOS 9.0, *)) {
     [self.view addSubview:_doneButton];
     _doneButton.translatesAutoresizingMaskIntoConstraints = false;
     [_doneButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20].active = true;
     [_doneButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-kTOCropViewControllerToolbarHeight - 52].active = true;
     [_doneButton.heightAnchor constraintEqualToConstant:32].active = true;
     [_doneButton.widthAnchor constraintEqualToConstant:124].active = true;
+    }
 }
 
 - (void)addCancelButton {
@@ -316,12 +318,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     [_cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 
+    if (@available(iOS 9.0, *)) {
     [self.view addSubview:_cancelButton];
     _cancelButton.translatesAutoresizingMaskIntoConstraints = false;
     [_cancelButton.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20].active = true;
     [_cancelButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-kTOCropViewControllerToolbarHeight - 52].active = true;
     [_cancelButton.heightAnchor constraintEqualToConstant:32].active = true;
     [_cancelButton.widthAnchor constraintEqualToConstant:124].active = true;
+    }
 }
 
 - (void)doneButtonPressed:(UIButton *)sender {
