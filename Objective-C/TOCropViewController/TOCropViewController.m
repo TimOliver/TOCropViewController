@@ -429,6 +429,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     else { // Vertical layout
         if (_croppingStyle == TOCropViewCroppingStyleCustom) {
             frame.size.height = bounds.size.height / 1.5;
+            _cancelButton.hidden = NO;
+            _doneButton.hidden = NO;
         } else {
             frame.size.height = CGRectGetHeight(bounds);
         }
