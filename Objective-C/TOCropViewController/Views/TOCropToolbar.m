@@ -381,7 +381,7 @@
     if (_clampButtonGlowing)
         self.clampButton.tintColor = nil;
     else
-        self.clampButton.tintColor = [UIColor whiteColor];
+        self.clampButton.tintColor = _buttonsTintColor;
 }
 
 - (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden
