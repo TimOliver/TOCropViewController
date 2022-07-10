@@ -129,6 +129,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01291601287B3F2000A177C5 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		144B8CC91D22CAFF0085D774 /* TOCropViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TOCropViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		146EFFB51D243822006CE3A0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		15E30F151B47A2660099A975 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
@@ -698,6 +699,7 @@
 				cs,
 				sk,
 				ca,
+				uk,
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -950,6 +952,7 @@
 				FFD1D3CD24D41CFF00E79B71 /* cs */,
 				FFD1D3CE24D41D0700E79B71 /* sk */,
 				72B9DCDC25763340006E160C /* ca */,
+				01291601287B3F2000A177C5 /* uk */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			sourceTree = "<group>";
