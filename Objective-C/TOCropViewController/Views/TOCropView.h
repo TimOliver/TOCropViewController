@@ -48,6 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) TOCropViewCroppingStyle croppingStyle;
 
 /**
+ A semi-transparent grey view, overlaid on top of the background image
+ */
+@property (nonatomic, strong, readonly) UIView *overlayView;
+
+/**
  A grid view overlaid on top of the foreground image view's container.
  */
 @property (nonnull, nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
