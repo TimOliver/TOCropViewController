@@ -93,7 +93,7 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
         
         CGRect frame = CGRectZero;
         switch (i) {
-            case 0: frame = (CGRect){0,-1.0f,boundsSize.width+2.0f, 1.0f}; break; //top
+            case 0: frame = (CGRect){-1.0f,-1.0f,boundsSize.width+2.0f, 1.0f}; break; //top
             case 1: frame = (CGRect){boundsSize.width,0.0f,1.0f,boundsSize.height}; break; //right
             case 2: frame = (CGRect){-1.0f,boundsSize.height,boundsSize.width+2.0f,1.0f}; break; //bottom
             case 3: frame = (CGRect){-1.0f,0,1.0f,boundsSize.height+1.0f}; break; //left
