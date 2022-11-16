@@ -1295,6 +1295,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         if (self.statusBarHidden) {
             statusBarHeight = 0.0f;
         }
+        else if (@available(iOS 11.0, *)) {
+            statusBarHeight = self.view.safeAreaInsets.top;
+        }
         else {
             statusBarHeight = self.topLayoutGuide.length;
         }
