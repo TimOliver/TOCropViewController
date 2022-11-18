@@ -169,6 +169,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
+     If this is set alongside `customAspectRatio`, the custom aspect ratio
+     will be shown as a selectable choice in the list of aspect ratios. (Default is `nil`)
+     */
+    public var customAspectRatioName: String? {
+        set { toCropViewController.customAspectRatioName = newValue }
+        get { return toCropViewController.customAspectRatioName }
+    }
+    
+    /**
      Title label which can be used to show instruction on the top of the crop view controller
      */
     public var titleLabel: UILabel? {
