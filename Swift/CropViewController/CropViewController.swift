@@ -437,6 +437,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
 
     /**
+     Shows a confirmation dialog when the user hits 'Cancel' and there are pending changes.
+     (Default is NO)
+     */
+    public var showCancelConfirmationDialog: Bool {
+        set { toCropViewController.showCancelConfirmationDialog = newValue }
+        get { return toCropViewController.showCancelConfirmationDialog }
+    }
+    
+    /**
     Color for the 'Done' button.
     Setting this will override the default color.
     */
