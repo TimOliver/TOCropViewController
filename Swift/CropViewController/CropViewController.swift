@@ -96,6 +96,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public var image: UIImage { return self.toCropViewController.image }
     
     /**
+     The minimum croping aspect ratio. If set, user is prevented from
+     setting cropping rectangle to lower aspect ratio than defined by the parameter.
+     */
+    public var minimumAspectRatio: CGFloat {
+        set { toCropViewController.minimumAspectRatio = newValue }
+        get { return toCropViewController.minimumAspectRatio }
+    }
+
+    /**
      The view controller's delegate that will receive the resulting
      cropped image, as well as crop information.
     */
