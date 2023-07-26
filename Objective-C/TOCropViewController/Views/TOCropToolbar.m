@@ -56,7 +56,7 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    self.backgroundView.backgroundColor = [UIColor colorWithWhite:1.00f alpha:1.0f];
     [self addSubview:self.backgroundView];
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
@@ -71,32 +71,39 @@
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
     
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _doneTextButton.layer.cornerRadius = 3;
+    _doneTextButton.layer.masksToBounds = YES;
+    [_doneTextButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_doneTextButton setTitle: _doneTextButtonTitle ?
         _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
 																  @"TOCropViewControllerLocalizable",
 																  resourceBundle,
                                                                   nil)
                      forState:UIControlStateNormal];
-    [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-    if (@available(iOS 13.0, *)) {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
-    } else {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
-    }
+    [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
+       _doneTextButton.backgroundColor = [UIColor colorWithRed:67/255.0 green:11/255.0 blue:224/255.0 alpha:1.0];
     [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_doneTextButton sizeToFit];
+//    [_doneTextButton sizeToFit];
+    [_doneTextButton setFrame:CGRectMake(0, 0, 124, 32)];
+    [_doneTextButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
+    [_doneTextButton setTintColor:[UIColor whiteColor]];
     [self addSubview:_doneTextButton];
     
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
-    [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
+//    [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_doneIconButton];
 
     // Set the default color for the done buttons
-    self.doneButtonColor = nil;
+//    self.doneButtonColor = nil;
 
     _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_cancelTextButton.layer setBorderWidth:1.0f];
+      [_cancelTextButton.layer setBorderColor:[[UIColor colorWithRed:67/255.0 green:11/255.0 blue:224/255.0 alpha:1.0] CGColor]];
+      _cancelTextButton.layer.cornerRadius = 3;
+      _cancelTextButton.layer.masksToBounds = YES;
+      [_cancelTextButton setTitleColor:[UIColor colorWithRed:45.0/255.0 green:45.0/255.0 blue:45.0/255.0 alpha:1.0] forState:UIControlStateNormal];
     
     [_cancelTextButton setTitle: _cancelTextButtonTitle ?
         _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
@@ -104,9 +111,9 @@
 																	resourceBundle,
                                                                     nil)
                        forState:UIControlStateNormal];
-    [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+    [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
     [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_cancelTextButton sizeToFit];
+    [_cancelTextButton setFrame:CGRectMake(0, 0, 124, 32)];
     [self addSubview:_cancelTextButton];
     
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -119,21 +126,21 @@
     _clampButton.tintColor = [UIColor whiteColor];
     [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_clampButton];
+//    [self addSubview:_clampButton];
     
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateCounterclockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateCounterclockwiseButton];
+//    [self addSubview:_rotateCounterclockwiseButton];
     
     _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateClockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateClockwiseButton];
+//    [self addSubview:_rotateClockwiseButton];
     
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
@@ -145,7 +152,7 @@
                                                                          @"TOCropViewControllerLocalizable",
                                                                          resourceBundle,
                                                                          nil);
-    [self addSubview:_resetButton];
+//    [self addSubview:_resetButton];
 }
 
 - (void)layoutSubviews
