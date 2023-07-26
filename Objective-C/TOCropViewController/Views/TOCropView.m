@@ -1659,8 +1659,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             self.translucencyView.hidden = self.translucencyAlwaysHidden;
             self.gridOverlayView.hidden = NO;
             
-            self.backgroundContainerView.alpha = 0.0f;
-            self.gridOverlayView.alpha = 0.0f;
+            self.backgroundContainerView.alpha = 1.0f;
+            self.gridOverlayView.alpha = 1.0f;
             
             self.translucencyView.alpha = 1.0f;
             
