@@ -44,7 +44,8 @@
  */
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
         didCropImageToRect:(CGRect)cropRect
-                     angle:(NSInteger)angle;
+                     angle:(NSInteger)angle
+                   flipped:(BOOL)flipped;
 
 /**
  Called when the user has committed the crop action, and provides 
@@ -56,7 +57,8 @@
  */
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
             didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
-                     angle:(NSInteger)angle;
+                     angle:(NSInteger)angle
+                   flipped:(BOOL)flipped;
 
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
@@ -68,7 +70,8 @@
  */
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
     didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
-                     angle:(NSInteger)angle;
+                     angle:(NSInteger)angle
+                   flipped:(BOOL)flipped;
 
 /**
  If implemented, when the user hits cancel, or completes a 
@@ -130,6 +133,14 @@
  the image 'restored' to a previous cropping layout.
  */
 @property (nonatomic, assign) NSInteger angle;
+
+/**
+ Indicates if the image is flipped around vertical axis
+ 
+ This property can be set before the controller is presented to have
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) BOOL flippedHorizontally;
 
 /**
  The toolbar view managed by this view controller.
@@ -327,7 +338,7 @@
                     (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropImageToRect)(CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropImageToRect)(CGRect cropRect, NSInteger angle, BOOL flipped);
 
 /**
  Called when the user has committed the crop action, and provides
@@ -338,7 +349,7 @@
                     (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropToRect)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropToRect)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL flipped);
 
 /**
  If the cropping style is set to circular, this block will return a circle-cropped version of the selected
@@ -349,7 +360,7 @@
                     (In the original image's local co-ordinate space)
  @param angle The angle of the image when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropToCircleImage)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropToCircleImage)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL flipped);
 
 
 ///------------------------------------------------
@@ -391,6 +402,11 @@
 - (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated NS_SWIFT_NAME(setAspectRatioPreset(_:animated:));
 
 /**
+ Flips image around vertical axis as if user pressed flip button in the upper right corner themself
+ */
+- (void)flipImageHorizontally;
+
+/**
  Play a custom animation of the target image zooming to its position in
  the crop controller while the background fades in. 
  
@@ -418,6 +434,7 @@
  @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
  @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
+ @param flipped Was the image flipped on the  x axis.
  @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
@@ -427,9 +444,10 @@
                                        fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
+                            flippedHorizontally:(BOOL)flipped
                                    toImageFrame:(CGRect)toFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:fromImage:fromView:fromFrame:angle:toFrame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:fromImage:fromView:fromFrame:angle:flippedHorizontally:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from

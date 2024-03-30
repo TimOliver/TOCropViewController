@@ -17,6 +17,7 @@
 @property (nonatomic, assign) TOCropViewCroppingStyle croppingStyle; //The cropping style
 @property (nonatomic, assign) CGRect croppedFrame;
 @property (nonatomic, assign) NSInteger angle;
+@property (nonatomic, assign) BOOL isFlippedHorizontally;
 
 @end
 
@@ -83,7 +84,9 @@
     }
     else { //otherwise dismiss, and then present from the main controller
         [picker dismissViewControllerAnimated:YES completion:^{
-            [self presentViewController:cropController animated:YES completion:nil];
+            [self presentViewController:cropController animated:YES completion:^{
+                [self addFlipButtonTo:cropController];
+            }];
             //[self.navigationController pushViewController:cropController animated:YES];
         }];
     }
@@ -92,6 +95,20 @@
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
     [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)addFlipButtonTo:(TOCropViewController*)cropController
+{
+    UIButton* flipButton = [UIButton new];
+    [flipButton setTitle:@"Flip" forState:UIControlStateNormal];
+    [flipButton addTarget:cropController action:@selector(flipImageHorizontally) forControlEvents:UIControlEventTouchUpInside];
+    flipButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [cropController.view addSubview:flipButton];
+    NSArray<NSLayoutConstraint*>* buttonConstraints = @[
+        [NSLayoutConstraint constraintWithItem:flipButton attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:cropController.view attribute:NSLayoutAttributeTrailing multiplier:1 constant:-20],
+        [NSLayoutConstraint constraintWithItem:flipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:cropController.view attribute:NSLayoutAttributeTop multiplier:1 constant:20],
+    ];
+    [NSLayoutConstraint activateConstraints:buttonConstraints];
 }
 
 #pragma mark - Gesture Recognizer -
@@ -106,20 +123,24 @@
                                                    fromView:nil
                                                   fromFrame:viewFrame
                                                       angle:self.angle
+                                        flippedHorizontally:self.isFlippedHorizontally
                                                toImageFrame:self.croppedFrame
                                                       setup:^{ self.imageView.hidden = YES; }
-                                                 completion:nil];
+                                                 completion:^{
+        [self addFlipButtonTo:cropController];
+    }];
 }
 
 #pragma mark - Cropper Delegate -
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
     self.croppedFrame = cropRect;
     self.angle = angle;
+    self.isFlippedHorizontally = flipped;
     [self updateImageViewWithImage:image fromCropViewController:cropViewController];
 }
 
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
     self.croppedFrame = cropRect;
     self.angle = angle;
@@ -189,13 +210,7 @@
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Crop Image", @"")
                                              style:UIAlertActionStyleDefault
                                            handler:^(UIAlertAction *action) {
-                                               self.croppingStyle = TOCropViewCroppingStyleDefault;
-                                               
-                                               UIImagePickerController *standardPicker = [[UIImagePickerController alloc] init];
-                                               standardPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                                               standardPicker.allowsEditing = NO;
-                                               standardPicker.delegate = self;
-                                               [self presentViewController:standardPicker animated:YES completion:nil];
+                                                [self cropImage];
                                            }];
     
     UIAlertAction *profileAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Make Profile Picture", @"")
@@ -268,6 +283,17 @@
 {
     [super viewDidLayoutSubviews];
     [self layoutImageView];
+}
+
+- (void)cropImage
+{
+    self.croppingStyle = TOCropViewCroppingStyleDefault;
+    
+    UIImagePickerController *standardPicker = [[UIImagePickerController alloc] init];
+    standardPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    standardPicker.allowsEditing = NO;
+    standardPicker.delegate = self;
+    [self presentViewController:standardPicker animated:YES completion:nil];
 }
 
 @end

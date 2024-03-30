@@ -31,7 +31,7 @@
             alphaInfo == kCGImageAlphaPremultipliedFirst || alphaInfo == kCGImageAlphaPremultipliedLast);
 }
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle flippedHorizontally:(BOOL)flipped circularClip:(BOOL)circular
 {
     UIImage *croppedImage = nil;
     UIGraphicsBeginImageContextWithOptions(frame.size, !self.hasAlpha && !circular, self.scale);
@@ -63,7 +63,13 @@
             // Perform the rotation transformation
             CGContextRotateCTM(context, rotation);
         }
-
+        
+        if (flipped)
+        {
+            CGContextScaleCTM(context, -1, 1);
+            CGContextTranslateCTM(context, -self.size.width, 0);
+        }
+        
         // Draw the image with all of the transformation parameters applied.
         // We do not need to worry about specifying the size here since we're already
         // constrained by the context image size

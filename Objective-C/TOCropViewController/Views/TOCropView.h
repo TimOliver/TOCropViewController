@@ -139,6 +139,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) NSInteger angle;
 
+@property (nonatomic, assign) BOOL flippedHorizontally;
+
 /**
  Hide all of the crop elements for transition animations 
  */
@@ -290,6 +292,11 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  fills the entire crop view region
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
+
+/**
+ Flips image around vertical axis
+ */
+- (void)flipImageHorizontally;
 
 @end
 

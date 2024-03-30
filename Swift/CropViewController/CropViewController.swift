@@ -51,7 +51,7 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect cropRect: CGRect, angle: Int)
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect cropRect: CGRect, angle: Int, flipped: Bool)
     
     /**
      Called when the user has committed the crop action, and provides
@@ -61,7 +61,7 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int)
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool)
     
     /**
      If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
@@ -71,7 +71,7 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int)
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool)
     
     /**
      If implemented, when the user hits cancel, or completes a
@@ -142,6 +142,17 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public var angle: Int {
         set { toCropViewController.angle = newValue }
         get { return toCropViewController.angle }
+    }
+    
+    /**
+     Indicates if the image is flipped around vertical axis
+     
+     This property can be set before the controller is presented to have
+     the image 'restored' to a previous cropping layout.
+     */
+    public var flippedHorizontally: Bool {
+        set { toCropViewController.flippedHorizontally = newValue }
+        get { toCropViewController.flippedHorizontally }
     }
     
     /**
@@ -337,7 +348,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    public var onDidCropImageToRect: ((CGRect, Int) -> (Void))? {
+    public var onDidCropImageToRect: ((CGRect, Int, Bool) -> (Void))? {
         set { toCropViewController.onDidCropImageToRect = newValue }
         get { return toCropViewController.onDidCropImageToRect }
     }
@@ -350,7 +361,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    public var onDidCropToRect: ((UIImage, CGRect, NSInteger) -> (Void))? {
+    public var onDidCropToRect: ((UIImage, CGRect, NSInteger, Bool) -> (Void))? {
         set { toCropViewController.onDidCropToRect = newValue }
         get { return toCropViewController.onDidCropToRect }
     }
@@ -363,7 +374,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
      @param angle The angle of the image when it was cropped
      */
-    public var onDidCropToCircleImage: ((UIImage, CGRect, NSInteger) -> (Void))? {
+    public var onDidCropToCircleImage: ((UIImage, CGRect, NSInteger, Bool) -> (Void))? {
         set { toCropViewController.onDidCropToCircleImage = newValue }
         get { return toCropViewController.onDidCropToCircleImage }
     }
@@ -546,6 +557,13 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
+     Flips image around vertical axis as if user pressed flip button in the upper right corner themself
+     */
+    public func flipImageHorizontally() {
+        toCropViewController.flipImageHorizontally()
+    }
+    
+    /**
     Play a custom animation of the target image zooming to its position in
     the crop controller while the background fades in.
 
@@ -578,11 +596,11 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      @param completion A block that is called once the transition animation is completed.
     */
     public func presentAnimatedFrom(_ viewController: UIViewController, fromImage image: UIImage?,
-                                    fromView: UIView?, fromFrame: CGRect, angle: Int, toImageFrame toFrame: CGRect,
+                                    fromView: UIView?, fromFrame: CGRect, angle: Int, flipped: Bool, toImageFrame toFrame: CGRect,
                                     setup: (() -> (Void))?, completion:(() -> (Void))?)
     {
         toCropViewController.presentAnimatedFrom(viewController, fromImage: image, fromView: fromView,
-                                                 fromFrame: fromFrame, angle: angle, toFrame: toFrame,
+                                                 fromFrame: fromFrame, angle: angle, flippedHorizontally: flipped, toFrame: toFrame,
                                                  setup: setup, completion: completion)
     }
     
@@ -641,24 +659,24 @@ extension CropViewController {
             return
         }
         
-        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropImageToRect:angle:))) {
-            self.onDidCropImageToRect = {[weak self] rect, angle in
+        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropImageToRect:angle:flipped:))) {
+            self.onDidCropImageToRect = {[weak self] rect, angle, flipped in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle, flipped: flipped)
             }
         }
         
-        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToImage:withRect:angle:))) {
-            self.onDidCropToRect = {[weak self] image, rect, angle in
+        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToImage:withRect:angle:flipped:))) {
+            self.onDidCropToRect = {[weak self] image, rect, angle, flipped in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle, flipped: flipped)
             }
         }
         
-        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToCircularImage:withRect:angle:))) {
-            self.onDidCropToCircleImage = {[weak self] image, rect, angle in
+        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToCircularImage:withRect:angle:flipped:))) {
+            self.onDidCropToCircleImage = {[weak self] image, rect, angle, flipped in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
+                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle, flipped: flipped)
             }
         }
         
