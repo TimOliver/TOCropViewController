@@ -78,6 +78,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL doneButtonHidden;
 @property (nonatomic, assign) BOOL cancelButtonHidden;
 
+/* For languages like Arabic where they natively present content flipped from English */
+@property (nonatomic, assign) BOOL reverseContentLayout;
+
 /* Enable the reset button */
 @property (nonatomic, assign) BOOL resetButtonEnabled;
 
