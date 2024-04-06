@@ -241,6 +241,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     // Even though we are a dark theme, leave the status bar
     // as black so it's not obvious that it's still visible during the transition
+    if (@available(iOS 13.0, *)) {
+        return UIStatusBarStyleDarkContent;
+    }
     return UIStatusBarStyleDefault;
 }
 
