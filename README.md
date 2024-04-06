@@ -5,10 +5,10 @@
 </p>
 
 [![CI](https://github.com/TimOliver/TOCropViewController/workflows/CI/badge.svg)](https://github.com/TimOliver/TOCropViewController/actions?query=workflow%3ACI)
-[![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+![Version](https://img.shields.io/cocoapods/v/TOCropViewController.svg?style=flat)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/TimOliver/TOCropViewController/master/LICENSE)
-[![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)](http://cocoadocs.org/docsets/TOCropViewController)
+![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)
 
 `TOCropViewController` is an open-source `UIViewController` subclass to crop out sections of `UIImage` objects, as well as perform basic rotations. It is excellent for things like editing profile pictures, or sharing parts of a photo online. It has been designed with the iOS Photos app editor in mind, and as such, behaves in a way that should already feel familiar to users of iOS.
 
