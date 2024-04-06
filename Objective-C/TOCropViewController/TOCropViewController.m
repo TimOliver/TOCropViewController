@@ -1186,6 +1186,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return self.toolbar.cancelButtonHidden;
 }
 
+- (BOOL)reverseContentLayout
+{
+    return self.toolbar.reverseContentLayout;
+}
+- (void)setReverseContentLayout:(BOOL)reverseContentLayout
+{
+
+    self.toolbar.reverseContentLayout = reverseContentLayout;
+}
+
 - (void)setResetAspectRatioEnabled:(BOOL)resetAspectRatioEnabled
 {
     self.cropView.resetAspectRatioEnabled = resetAspectRatioEnabled;

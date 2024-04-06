@@ -285,6 +285,14 @@
  */
 @property (nonatomic, assign) BOOL cancelButtonHidden;
 
+/**
+ When enabled, the toolbar is displayed in RTL layout.
+
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL reverseContentLayout
+;
+
 /** 
  If `showActivitySheetOnDone` is true, then these activity items will 
  be supplied to that UIActivityViewController in addition to the 

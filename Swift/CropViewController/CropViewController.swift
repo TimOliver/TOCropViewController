@@ -435,7 +435,18 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.cancelButtonColor = newValue }
         get { return toCropViewController.cancelButtonColor }
     }
-    
+
+    /**
+    A computed property to get or set the reverse layout on toolbar.
+    By setting this property, you can control the direction in which the toolbar is laid out.
+
+    Default is NO.
+    */
+    public var reverseContentLayout: Bool {
+        set { toCropViewController.reverseContentLayout = newValue }
+        get { toCropViewController.reverseContentLayout }
+    }
+
     /**
      This class internally manages and abstracts access to a `TOCropViewController` instance
      :nodoc:
