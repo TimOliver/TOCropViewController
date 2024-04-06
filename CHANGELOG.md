@@ -1,6 +1,13 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.7.1 Release Notes (2024-04-06)
+=============================================================
+
+## Enchancements
+
+* Added better support for Swift Concurrency. ([#563](https://github.com/TimOliver/TOCropViewController/pull/563))
+
 2.7.0 Release Notes (2024-04-06)
 =============================================================
 
