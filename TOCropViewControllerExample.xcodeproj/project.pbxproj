@@ -176,6 +176,7 @@
 		2238CF441FC02AE00081B957 /* TOCropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCropViewController.h; sourceTree = "<group>"; };
 		223DCEB71FBAA91300F99209 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		22A105DC2BC1377A00DB3A80 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		22BF961E1B2CD017009F4785 /* TOCroppedImageAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCroppedImageAttributes.h; sourceTree = "<group>"; };
 		22BF961F1B2CD017009F4785 /* TOCroppedImageAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOCroppedImageAttributes.m; sourceTree = "<group>"; };
 		22C3C5481AC8CA0D00E86280 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
@@ -349,6 +350,7 @@
 				22D83E76279D951200CF0D8E /* README.md */,
 				22D83E74279D951200CF0D8E /* CropViewController.podspec */,
 				22D83E75279D951200CF0D8E /* TOCropViewController.podspec */,
+				22A105DC2BC1377A00DB3A80 /* Package.swift */,
 			);
 			sourceTree = "<group>";
 		};
