@@ -1,7 +1,7 @@
 //
 //  TOCropViewConstants.h
 //
-//  Copyright 2015-2022 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatioPreset) {
     TOCropViewControllerAspectRatioPreset5x4,
     TOCropViewControllerAspectRatioPreset7x5,
     TOCropViewControllerAspectRatioPreset16x9,
+    TOCropViewControllerAspectRatioPreset16x6,
     TOCropViewControllerAspectRatioPresetCustom
 };
 

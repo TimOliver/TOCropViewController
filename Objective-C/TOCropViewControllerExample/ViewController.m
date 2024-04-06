@@ -52,7 +52,9 @@
 
     //cropController.rotateButtonsHidden = YES;
     //cropController.rotateClockwiseButtonHidden = NO;
-    
+
+    //cropController.reverseContentLayout = YES;
+
     //cropController.doneButtonTitle = @"Title";
     //cropController.cancelButtonTitle = @"Title";
 

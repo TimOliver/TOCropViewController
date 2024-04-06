@@ -1,7 +1,7 @@
 //
 //  TOCropToolbar.h
 //
-//  Copyright 2015-2022 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -21,7 +21,12 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+
+#if !__has_include(<TOCropViewController/TOCropViewConstants.h>)
 #import "TOCropViewConstants.h"
+#else
+#import <TOCropViewController/TOCropViewConstants.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -77,6 +82,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL resetButtonHidden;
 @property (nonatomic, assign) BOOL doneButtonHidden;
 @property (nonatomic, assign) BOOL cancelButtonHidden;
+
+/* For languages like Arabic where they natively present content flipped from English */
+@property (nonatomic, assign) BOOL reverseContentLayout;
 
 /* Enable the reset button */
 @property (nonatomic, assign) BOOL resetButtonEnabled;

@@ -1,7 +1,7 @@
 //
 //  TOCropToolbar.h
 //
-//  Copyright 2015-2022 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -39,8 +39,6 @@
 
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
-@property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
-
 @end
 
 @implementation TOCropToolbar
@@ -61,10 +59,10 @@
     
     // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     if (@available(iOS 9.0, *)) {
-        self.reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
+        _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
     }
     else {
-        self.reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
+        _reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
     }
     
     // Get the resource bundle depending on the framework/dependency manager we're using
@@ -341,6 +339,14 @@
 - (CGRect)clampButtonFrame
 {
     return self.clampButton.frame;
+}
+
+- (void)setReverseContentLayout:(BOOL)reverseContentLayout {
+    if (_reverseContentLayout == reverseContentLayout)
+        return;
+
+    _reverseContentLayout = reverseContentLayout;
+    [self setNeedsLayout];
 }
 
 - (void)setClampButtonHidden:(BOOL)clampButtonHidden {

@@ -1,7 +1,7 @@
 //
 //  TOCropViewController.h
 //
-//  Copyright 2015-2022 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -22,9 +22,15 @@
 
 #import <UIKit/UIKit.h>
 
+#if !__has_include(<TOCropViewController/TOCropViewConstants.h>)
 #import "TOCropViewConstants.h"
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
+#else
+#import <TOCropViewController/TOCropViewConstants.h>
+#import <TOCropViewController/TOCropView.h>
+#import <TOCropViewController/TOCropToolbar.h>
+#endif
 
 @class TOCropViewController;
 
@@ -284,6 +290,14 @@
  Default is NO.
  */
 @property (nonatomic, assign) BOOL cancelButtonHidden;
+
+/**
+ When enabled, the toolbar is displayed in RTL layout.
+
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL reverseContentLayout
+;
 
 /** 
  If `showActivitySheetOnDone` is true, then these activity items will 

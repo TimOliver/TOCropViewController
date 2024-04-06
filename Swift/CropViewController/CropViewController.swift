@@ -1,7 +1,7 @@
 //
 //  CropViewController.swift
 //
-//  Copyright 2017-2022 Timothy Oliver. All rights reserved.
+//  Copyright 2017-2024 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -96,6 +96,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public var image: UIImage { return self.toCropViewController.image }
     
     /**
+     The minimum croping aspect ratio. If set, user is prevented from
+     setting cropping rectangle to lower aspect ratio than defined by the parameter.
+     */
+    public var minimumAspectRatio: CGFloat {
+        set { toCropViewController.minimumAspectRatio = newValue }
+        get { return toCropViewController.minimumAspectRatio }
+    }
+
+    /**
      The view controller's delegate that will receive the resulting
      cropped image, as well as crop information.
     */
@@ -166,6 +175,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public var customAspectRatio: CGSize {
         set { toCropViewController.customAspectRatio = newValue }
         get { return toCropViewController.customAspectRatio }
+    }
+    
+    /**
+     If this is set alongside `customAspectRatio`, the custom aspect ratio
+     will be shown as a selectable choice in the list of aspect ratios. (Default is `nil`)
+     */
+    public var customAspectRatioName: String? {
+        set { toCropViewController.customAspectRatioName = newValue }
+        get { return toCropViewController.customAspectRatioName }
     }
     
     /**
@@ -419,6 +437,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
 
     /**
+     Shows a confirmation dialog when the user hits 'Cancel' and there are pending changes.
+     (Default is NO)
+     */
+    public var showCancelConfirmationDialog: Bool {
+        set { toCropViewController.showCancelConfirmationDialog = newValue }
+        get { return toCropViewController.showCancelConfirmationDialog }
+    }
+    
+    /**
     Color for the 'Done' button.
     Setting this will override the default color.
     */
@@ -435,7 +462,18 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.cancelButtonColor = newValue }
         get { return toCropViewController.cancelButtonColor }
     }
-    
+
+    /**
+    A computed property to get or set the reverse layout on toolbar.
+    By setting this property, you can control the direction in which the toolbar is laid out.
+
+    Default is NO.
+    */
+    public var reverseContentLayout: Bool {
+        set { toCropViewController.reverseContentLayout = newValue }
+        get { toCropViewController.reverseContentLayout }
+    }
+
     /**
      This class internally manages and abstracts access to a `TOCropViewController` instance
      :nodoc:
