@@ -84,7 +84,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Set up base view controller behaviour
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
-        self.automaticallyAdjustsScrollViewInsets = NO;
         self.hidesNavigationBar = true;
         
         // Controller object that handles the transition animation when presenting / dismissing this app
@@ -1286,32 +1285,22 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (CGFloat)statusBarHeight
 {
     CGFloat statusBarHeight = 0.0f;
-    if (@available(iOS 11.0, *)) {
-        statusBarHeight = self.view.safeAreaInsets.top;
+    statusBarHeight = self.view.safeAreaInsets.top;
 
-        // We do need to include the status bar height on devices
-        // that have a physical hardware inset, like an iPhone X notch
-        BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
-                                    && UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
+    // We do need to include the status bar height on devices
+    // that have a physical hardware inset, like an iPhone X notch
+    BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
+                                && UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
 
-        // Always have insetting on Mac Catalyst
-        #if TARGET_OS_MACCATALYST
-        hardwareRelatedInset = YES;
-        #endif
+    // Always have insetting on Mac Catalyst
+    #if TARGET_OS_MACCATALYST
+    hardwareRelatedInset = YES;
+    #endif
 
-        // Unless the status bar is visible, or we need to account
-        // for a hardware notch, always treat the status bar height as zero
-        if (self.statusBarHidden && !hardwareRelatedInset) {
-            statusBarHeight = 0.0f;
-        }
-    }
-    else {
-        if (self.statusBarHidden) {
-            statusBarHeight = 0.0f;
-        }
-        else {
-            statusBarHeight = self.topLayoutGuide.length;
-        }
+    // Unless the status bar is visible, or we need to account
+    // for a hardware notch, always treat the status bar height as zero
+    if (self.statusBarHidden && !hardwareRelatedInset) {
+        statusBarHeight = 0.0f;
     }
     
     return statusBarHeight;
@@ -1320,14 +1309,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (UIEdgeInsets)statusBarSafeInsets
 {
     UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11.0, *)) {
-        insets = self.view.safeAreaInsets;
-        insets.top = self.statusBarHeight;
-    }
-    else {
-        insets.top = self.statusBarHeight;
-    }
-
+    insets = self.view.safeAreaInsets;
+    insets.top = self.statusBarHeight;
     return insets;
 }
 

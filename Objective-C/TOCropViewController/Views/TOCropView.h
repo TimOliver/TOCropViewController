@@ -21,7 +21,12 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+
+#if !__has_include(<TOCropViewController/TOCropViewConstants.h>)
 #import "TOCropViewConstants.h"
+#else
+#import <TOCropViewController/TOCropViewConstants.h>
+#endif
 
 @class TOCropOverlayView;
 @class TOCropView;
