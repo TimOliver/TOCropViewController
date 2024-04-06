@@ -4,7 +4,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 2.7.1 Release Notes (2024-04-06)
 =============================================================
 
-## Enchancements
+## Enhancements
 
 * Added better support for Swift Concurrency. ([#563](https://github.com/TimOliver/TOCropViewController/pull/563))
 
@@ -18,7 +18,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 * A new aspect ratio setting of 16:6. ([#557](https://github.com/TimOliver/TOCropViewController/pull/557))
 * Ukranian localization. ([#529](https://github.com/TimOliver/TOCropViewController/pull/529))
 
-## Enchancements
+## Enhancements
 
 * Updated project for Xcode 15. ([#571](https://github.com/TimOliver/TOCropViewController/pull/571))
 * Exposed `reverseContentLayout` as an external property. ([#568](https://github.com/TimOliver/TOCropViewController/pull/568))
