@@ -1,14 +1,19 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.7.0 Release Notes (2024-04-06)
+=============================================================
+
 ## Added
 
+* Set minimum version to iOS 11. ([#571](https://github.com/TimOliver/TOCropViewController/pull/571))
 * A `PrivacyInfo.xcprivacy` file to the resource bundle in order to be compliant with Apple's new privacy requirements. ([#569](https://github.com/TimOliver/TOCropViewController/pull/569))
 * A new aspect ratio setting of 16:6. ([#557](https://github.com/TimOliver/TOCropViewController/pull/557))
 * Ukranian localization. ([#529](https://github.com/TimOliver/TOCropViewController/pull/529))
 
 ## Enchancements
 
+* Updated project for Xcode 15. ([#571](https://github.com/TimOliver/TOCropViewController/pull/571))
 * Exposed `reverseContentLayout` as an external property. ([#568](https://github.com/TimOliver/TOCropViewController/pull/568))
 * Exposed `cropView` as an external property. ([#532](https://github.com/TimOliver/TOCropViewController/pull/532))
 * Added a way to revert back to the original aspect ratio after selecting a custom ratio from the list. ([#543](https://github.com/TimOliver/TOCropViewController/pull/543))
