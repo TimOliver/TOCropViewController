@@ -689,6 +689,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self.cropView setAspectRatio:aspectRatio animated:animated];
 }
 
+- (void)flipImageHorizontally
+{
+	[self.cropView flipImageHorizontally];
+}
+
 - (void)rotateCropViewClockwise
 {
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES];
@@ -718,7 +723,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                                      completion:(void (^)(void))completion
 {
     [self presentAnimatedFromParentViewController:viewController fromImage:nil fromView:fromView fromFrame:fromFrame
-                                            angle:0 toImageFrame:CGRectZero setup:setup completion:completion];
+                                            angle:0 flippedHorizontally:NO toImageFrame:CGRectZero setup:setup completion:completion];
 }
 
 - (void)presentAnimatedFromParentViewController:(UIViewController *)viewController
@@ -726,6 +731,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                                        fromView:(UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
+                            flippedHorizontally:(BOOL)flipped
                                    toImageFrame:(CGRect)toFrame
                                           setup:(void (^)(void))setup
                                      completion:(void (^)(void))completion
@@ -739,6 +745,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         self.angle = angle;
         self.imageCropFrame = toFrame;
     }
+    self.flippedHorizontally = flipped;
     
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self.parentViewController ? self.parentViewController : self
@@ -909,12 +916,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)doneButtonTapped
 {
     CGRect cropFrame = self.cropView.imageCropFrame;
-    NSInteger angle = self.cropView.angle;
+    NSInteger angle = self.angle;
+    BOOL flipped = self.flippedHorizontally;
 
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
-        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle circular:(self.croppingStyle == TOCropViewCroppingStyleCircular)];
-        TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle originalImageSize:self.image.size];
+        TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle flipped:flipped circular:(self.croppingStyle == TOCropViewCroppingStyleCircular)];
+        TOCroppedImageAttributes *attributes = [[TOCroppedImageAttributes alloc] initWithCroppedFrame:cropFrame angle:angle flippedHorizontally:flipped originalImageSize:self.image.size];
         
         NSMutableArray *activityItems = [@[imageItem, attributes] mutableCopy];
         if (self.activityItems) {
@@ -966,35 +974,35 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     BOOL isCallbackOrDelegateHandled = NO;
     
     //If the delegate/block that only supplies crop data is provided, call it
-    if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
-        [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
+    if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:flipped:)]) {
+        [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle flipped:flipped];
         isCallbackOrDelegateHandled = YES;
     }
 
     if (self.onDidCropImageToRect != nil) {
-        self.onDidCropImageToRect(cropFrame, angle);
+        self.onDidCropImageToRect(cropFrame, angle, flipped);
         isCallbackOrDelegateHandled = YES;
     }
 
     // Check if the circular APIs were implemented
-    BOOL isCircularImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)];
+    BOOL isCircularImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:flipped:)];
     BOOL isCircularImageCallbackAvailable = self.onDidCropToCircleImage != nil;
 
     // Check if non-circular was implemented
-    BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)];
+    BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:flipped:)];
     BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
 
     //If cropping circular and the circular generation delegate/block is implemented, call it
     if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
-        UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
+        UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle flippedHorizontally:flipped circularClip:YES];
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isCircularImageDelegateAvailable) {
-                [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
+                [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle flipped:flipped];
             }
             if (isCircularImageCallbackAvailable) {
-                self.onDidCropToCircleImage(image, cropFrame, angle);
+                self.onDidCropToCircleImage(image, cropFrame, angle, flipped);
             }
         });
         
@@ -1003,21 +1011,21 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     //If the delegate/block that requires the specific cropped image is provided, call it
     else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
         UIImage *image = nil;
-        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
+        if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size}) && !flipped) {
             image = self.image;
         }
         else {
-            image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:NO];
+            image = [self.image croppedImageWithFrame:cropFrame angle:angle flippedHorizontally:flipped circularClip:NO];
         }
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isDidCropToImageDelegateAvailable) {
-                [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
+                [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle flipped:flipped];
             }
 
             if (isDidCropToImageCallbackAvailable) {
-                self.onDidCropToRect(image, cropFrame, angle);
+                self.onDidCropToRect(image, cropFrame, angle, flipped);
             }
         });
         
@@ -1229,6 +1237,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (NSInteger)angle
 {
     return self.cropView.angle;
+}
+
+- (void)setFlippedHorizontally:(BOOL)flipped
+{
+    self.cropView.flippedHorizontally = flipped;
+}
+
+- (BOOL)flippedHorizontally
+{
+    return self.cropView.flippedHorizontally;
 }
 
 - (void)setImageCropFrame:(CGRect)imageCropFrame

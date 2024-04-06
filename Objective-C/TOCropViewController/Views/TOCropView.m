@@ -103,6 +103,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  values until the view is configured for the first time. */
 @property (nonatomic, assign) NSInteger restoreAngle;
 @property (nonatomic, assign) CGRect    restoreImageCropFrame;
+@property (nonatomic, assign) BOOL      restoreHorizontalFlip;
 
 /* Set to YES once `performInitialLayout` is called. This lets pending properties get queued until the view
  has been properly set up in its parent. */
@@ -145,6 +146,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.resetAspectRatioEnabled = !circularMode;
     self.restoreImageCropFrame = CGRectZero;
     self.restoreAngle = 0;
+	self.restoreHorizontalFlip = NO;
     self.cropAdjustingDelay = kTOCropTimerDuration;
     self.cropViewPadding = kTOCropViewPadding;
     self.maximumZoomScale = kTOMaximumZoomScale;
@@ -259,7 +261,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.restoreAngle = 0;
         self.cropBoxLastEditedAngle = self.angle;
     }
-    
+	
+	if (self.restoreHorizontalFlip) {
+		self.flippedHorizontally = YES;
+	}
+	
     //If an image crop frame was also specified before creation, apply it now
     if (!CGRectIsEmpty(self.restoreImageCropFrame)) {
         self.imageCropFrame = self.restoreImageCropFrame;
@@ -702,9 +708,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         _aspectRatio = CGSizeZero;
     }
     
-    if (animated == NO || self.angle != 0) {
+    if (animated == NO || self.angle != 0 || self.flippedHorizontally) {
         //Reset all of the rotation transforms
         _angle = 0;
+        _flippedHorizontally = NO;
 
         //Set the scroll to 1.0f to reset the transform scale
         self.scrollView.zoomScale = 1.0f;
@@ -1234,6 +1241,27 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 }
 
+- (CGAffineTransform)imageViewTransform
+{
+    return CGAffineTransformScale(CGAffineTransformRotate(CGAffineTransformIdentity, self.angleInRadians), _flippedHorizontally ? -1 : 1, 1);
+}
+
+- (void)setFlippedHorizontally:(BOOL)flippedHorizontally
+{
+	_flippedHorizontally = flippedHorizontally;
+	if (!self.initialSetupPerformed) {
+		self.restoreHorizontalFlip = flippedHorizontally;
+		return;
+	}
+
+    CGAffineTransform transform = self.imageViewTransform;
+	
+	self.backgroundImageView.transform = transform;
+	self.foregroundImageView.transform = transform;
+    
+    [self checkForCanReset];
+}
+
 #pragma mark - Editing Mode -
 - (void)startEditing
 {
@@ -1367,6 +1395,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                          animations:translateBlock
                          completion:nil];
     });
+}
+
+- (void)flipImageHorizontally
+{
+	self.flippedHorizontally = !self.flippedHorizontally;
 }
 
 - (void)setSimpleRenderMode:(BOOL)simpleMode animated:(BOOL)animated
@@ -1537,21 +1570,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     _angle = newAngle;
-    
-    //Convert the new angle to radians
-    CGFloat angleInRadians = 0.0f;
-    switch (newAngle) {
-        case 90:    angleInRadians = M_PI_2;            break;
-        case -90:   angleInRadians = -M_PI_2;           break;
-        case 180:   angleInRadians = M_PI;              break;
-        case -180:  angleInRadians = -M_PI;             break;
-        case 270:   angleInRadians = (M_PI + M_PI_2);   break;
-        case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
-        default:                                        break;
-    }
-    
+
     // Set up the transformation matrix for the rotation
-    CGAffineTransform rotation = CGAffineTransformRotate(CGAffineTransformIdentity, angleInRadians);
+    CGAffineTransform rotation = self.imageViewTransform;
     
     //Work out how much we'll need to scale everything to fit to the new rotation
     CGRect contentBounds = self.contentBounds;
@@ -1705,6 +1726,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.angle != 0) { //Image has been rotated
         canReset = YES;
     }
+	if (self.flippedHorizontally) {
+		canReset = YES;
+	}
     else if (self.scrollView.zoomScale > self.scrollView.minimumZoomScale + FLT_EPSILON) { //image has been zoomed in
         canReset = YES;
     }
@@ -1744,6 +1768,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (BOOL)hasAspectRatio
 {
     return (self.aspectRatio.width > FLT_EPSILON && self.aspectRatio.height > FLT_EPSILON);
+}
+
+- (CGFloat)angleInRadians
+{
+    CGFloat angleInRadians = 0.0f;
+    switch (_angle) {
+        case 90:    angleInRadians = M_PI_2;            break;
+        case -90:   angleInRadians = -M_PI_2;           break;
+        case 180:   angleInRadians = M_PI;              break;
+        case -180:  angleInRadians = -M_PI;             break;
+        case 270:   angleInRadians = (M_PI + M_PI_2);   break;
+        case -270:  angleInRadians = -(M_PI + M_PI_2);  break;
+        default:                                        break;
+    }
+    return angleInRadians;
 }
 
 @end

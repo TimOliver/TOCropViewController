@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, CropViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+final class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     private let imageView = UIImageView()
     
@@ -17,6 +17,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     
     private var croppedRect = CGRect.zero
     private var croppedAngle = 0
+    private var flippedHorizontally = false
+    
+    private weak var cropController: CropViewController?
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         guard let image = (info[UIImagePickerController.InfoKey.originalImage] as? UIImage) else { return }
@@ -64,7 +67,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         if croppingStyle == .circular {
             if picker.sourceType == .camera {
                 picker.dismiss(animated: true, completion: {
-                    self.present(cropController, animated: true, completion: nil)
+                    self.present(cropController, animated: true, completion: { [weak self, weak cropController] in
+                        self?.addFlipButton(to: cropController)
+                    })
                 })
             } else {
                 picker.pushViewController(cropController, animated: true)
@@ -72,22 +77,12 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         }
         else { //otherwise dismiss, and then present from the main controller
             picker.dismiss(animated: true, completion: {
-                self.present(cropController, animated: true, completion: nil)
+                self.present(cropController, animated: true, completion: { [weak self, weak cropController] in
+                    self?.addFlipButton(to: cropController)
+                })
                 //self.navigationController!.pushViewController(cropController, animated: true)
             })
         }
-    }
-    
-    public func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
-        self.croppedRect = cropRect
-        self.croppedAngle = angle
-        updateImageViewWithImage(image, fromCropViewController: cropViewController)
-    }
-    
-    public func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
-        self.croppedRect = cropRect
-        self.croppedAngle = angle
-        updateImageViewWithImage(image, fromCropViewController: cropViewController)
     }
     
     public func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
@@ -182,9 +177,12 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
                                                fromView: nil,
                                                fromFrame: viewFrame,
                                                angle: self.croppedAngle,
+                                               flipped: self.flippedHorizontally,
                                                toImageFrame: self.croppedRect,
                                                setup: { self.imageView.isHidden = true },
-                                               completion: nil)
+                                               completion: { [weak cropViewController] in
+            self.addFlipButton(to: cropViewController)
+        })
     }
     
     public override func viewDidLayoutSubviews() {
@@ -227,5 +225,37 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         activityController.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem!
         present(activityController, animated: true, completion: nil)
     }
+    
+    private func addFlipButton(to controller: CropViewController?) {
+        guard let controller = controller else { return }
+        let flipButton = UIButton(type: .custom)
+        flipButton.setTitle("Flip", for: .normal)
+        flipButton.addTarget(self, action: #selector(flipImageHorizontally), for: .touchUpInside)
+        cropController = controller
+        flipButton.translatesAutoresizingMaskIntoConstraints = false
+        controller.view.addSubview(flipButton)
+        NSLayoutConstraint.activate([
+            flipButton.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor, constant: -20),
+            flipButton.topAnchor.constraint(equalTo: controller.view.topAnchor, constant: 20)
+        ])
+    }
+    
+    @objc private func flipImageHorizontally() {
+        cropController?.flipImageHorizontally()
+    }
 }
 
+extension ViewController: CropViewControllerDelegate {
+    public func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        self.flippedHorizontally = flipped
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+    
+    public func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+}
