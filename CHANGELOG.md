@@ -1,6 +1,17 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.7.2 Release Notes (2024-04-08)
+=============================================================
+
+## Added
+
+* Initial support for visionOS. ([#572](https://github.com/TimOliver/TOCropViewController/pull/572))
+
+## Fixed
+
+* A crash when tapping the aspect ratio button. ([#573](https://github.com/TimOliver/TOCropViewController/pull/573))
+
 2.7.1 Release Notes (2024-04-06)
 =============================================================
 
