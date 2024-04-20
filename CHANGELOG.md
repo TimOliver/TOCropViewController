@@ -7,6 +7,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 ## Fixed
 
 * An invalid configuration in the privacy manifest. ([#576](https://github.com/TimOliver/TOCropViewController/pull/576))
+* Removed deprecated Core Graphics render APIs. ([#578](https://github.com/TimOliver/TOCropViewController/pull/578)) 
 
 2.7.2 Release Notes (2024-04-08)
 =============================================================
