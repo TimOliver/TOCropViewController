@@ -33,10 +33,13 @@
 
 - (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
 {
-    UIImage *croppedImage = nil;
-    UIGraphicsBeginImageContextWithOptions(frame.size, !self.hasAlpha && !circular, self.scale);
-    {
-        CGContextRef context = UIGraphicsGetCurrentContext();
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
+    format.opaque = !self.hasAlpha && !circular;
+    format.scale = self.scale;
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:frame.size format:format];
+    UIImage *croppedImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
+        CGContextRef context = rendererContext.CGContext;
 
         // If we're capturing a circular image, set the clip mask first
         if (circular) {
@@ -68,10 +71,7 @@
         // We do not need to worry about specifying the size here since we're already
         // constrained by the context image size
         [self drawAtPoint:CGPointZero];
-        
-        croppedImage = UIGraphicsGetImageFromCurrentImageContext();
-    }
-    UIGraphicsEndImageContext();
+    }];
 
     // Re-apply the retina scale we originally had
     return [UIImage imageWithCGImage:croppedImage.CGImage scale:self.scale orientation:UIImageOrientationUp];
