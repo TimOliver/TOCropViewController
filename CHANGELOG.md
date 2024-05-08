@@ -1,6 +1,13 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.7.4 Release Notes (2024-05-08)
+=============================================================
+
+## Fixed
+
+* Another invalid configuration in the privacy manifest. ([#580](https://github.com/TimOliver/TOCropViewController/pull/580))
+
 2.7.3 Release Notes (2024-04-20)
 =============================================================
 
