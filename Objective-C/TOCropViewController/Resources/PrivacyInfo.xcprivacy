@@ -9,6 +9,23 @@
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array/>
 	<key>NSPrivacyAccessedAPITypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryPhotoLibrary</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>Image cropping functionality</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryCamera</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>Image capturing for cropping</string>
+			</array>
+		</dict>
+    	</array>
 </dict>
 </plist>
