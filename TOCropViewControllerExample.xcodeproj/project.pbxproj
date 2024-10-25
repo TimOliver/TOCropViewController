@@ -98,6 +98,13 @@
 		2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
 		2F5062F51F53E32D00AA9F14 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223424771ABBC0CD00BBC2B1 /* Main.storyboard */; };
+		94189B982CC92BAA000C5263 /* UIView+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = 94189B962CC92BAA000C5263 /* UIView+Pixels.h */; };
+		94189B992CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9A2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9B2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9C2CC92BAA000C5263 /* UIView+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = 94189B962CC92BAA000C5263 /* UIView+Pixels.h */; };
+		94189B9D2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9E2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
 		FE3E0E3A21098448004DAE93 /* TOCropViewConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 220C8E9F21062DD300A9B25D /* TOCropViewConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -217,6 +224,8 @@
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		72B9DCDC25763340006E160C /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		88BBE90E22C206340073D22A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		94189B962CC92BAA000C5263 /* UIView+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Pixels.h"; sourceTree = "<group>"; };
+		94189B972CC92BAA000C5263 /* UIView+Pixels.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Pixels.m"; sourceTree = "<group>"; };
 		A93782CF214A55F900CAE7EE /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782D3214A81A200CAE7EE /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
@@ -335,6 +344,8 @@
 			children = (
 				220C8EAB2106344D00A9B25D /* UIImage+CropRotate.h */,
 				220C8EAA2106344D00A9B25D /* UIImage+CropRotate.m */,
+				94189B962CC92BAA000C5263 /* UIView+Pixels.h */,
+				94189B972CC92BAA000C5263 /* UIView+Pixels.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -501,6 +512,7 @@
 				144B8CD31D22CD650085D774 /* TOCroppedImageAttributes.h in Headers */,
 				144B8CD61D22CD650085D774 /* TOCropScrollView.h in Headers */,
 				144B8CD51D22CD650085D774 /* TOCropOverlayView.h in Headers */,
+				94189B9C2CC92BAA000C5263 /* UIView+Pixels.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,6 +522,7 @@
 			files = (
 				04262DA520F6FD1000024177 /* CropViewController.h in Headers */,
 				04262DA220F6FC4600024177 /* TOCropToolbar.h in Headers */,
+				94189B982CC92BAA000C5263 /* UIView+Pixels.h in Headers */,
 				04262DA320F6FC4600024177 /* TOCropView.h in Headers */,
 				04262DA420F6FC4600024177 /* TOCropViewController.h in Headers */,
 				220C8EA82106341600A9B25D /* TOCropViewConstants.h in Headers */,
@@ -799,6 +812,7 @@
 				144B8CE01D22CD730085D774 /* TOCropToolbar.m in Sources */,
 				144B8CE11D22CD730085D774 /* TOCropView.m in Sources */,
 				144B8CE21D22CD730085D774 /* TOCropViewController.m in Sources */,
+				94189B9D2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,6 +839,7 @@
 				22DB4D9E1B234D4F008B8466 /* TOActivityCroppedImageProvider.m in Sources */,
 				22DB4D961B234D07008B8466 /* TOCropViewControllerTransitioning.m in Sources */,
 				22DB4D991B234D07008B8466 /* TOCropScrollView.m in Sources */,
+				94189B9B2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -844,6 +859,7 @@
 				22B68F9D1FFB380700601B1A /* TOCropViewController.m in Sources */,
 				2238CF251FC0269C0081B957 /* ViewController.swift in Sources */,
 				2238CF231FC0269C0081B957 /* AppDelegate.swift in Sources */,
+				94189B9E2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				2238CF361FC029880081B957 /* CropViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -859,6 +875,7 @@
 				22B68FA31FFB3C0800601B1A /* TOCropOverlayView.m in Sources */,
 				22B68FA41FFB3C0800601B1A /* TOCropScrollView.m in Sources */,
 				22B68FA51FFB3C0800601B1A /* TOCropToolbar.m in Sources */,
+				94189B992CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				22B68FA61FFB3C0800601B1A /* TOCropView.m in Sources */,
 				22B68FA71FFB3C0800601B1A /* TOCropViewController.m in Sources */,
 				22DEA39F1FC1293A000FA1CB /* CropViewController.swift in Sources */,
@@ -872,6 +889,7 @@
 				2236AB4A1F595960005C5098 /* ShareViewController.m in Sources */,
 				2F5062EC1F53E31F00AA9F14 /* TOActivityCroppedImageProvider.m in Sources */,
 				2F5062EF1F53E31F00AA9F14 /* TOCropOverlayView.m in Sources */,
+				94189B9A2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				2F5062F21F53E31F00AA9F14 /* TOCropView.m in Sources */,
 				2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */,
 				2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */,

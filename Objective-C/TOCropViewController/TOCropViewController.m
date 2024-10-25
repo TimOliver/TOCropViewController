@@ -25,6 +25,7 @@
 #import "TOCropViewControllerTransitioning.h"
 #import "TOActivityCroppedImageProvider.h"
 #import "UIImage+CropRotate.h"
+#import "UIView+Pixels.h"
 #import "TOCroppedImageAttributes.h"
 
 static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
@@ -358,7 +359,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
     // Work out horizontal position
-    frame.origin.x = ceilf((viewWidth - frame.size.width) * 0.5f);
+    frame.origin.x = [self.view roundToNearestPixel:(viewWidth - frame.size.width) * 0.5f];
     if (!verticalLayout) { frame.origin.x += x; }
 
     // Work out vertical position
