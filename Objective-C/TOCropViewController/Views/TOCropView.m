@@ -1603,11 +1603,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Flip the content size of the scroll view to match the rotated bounds
     self.scrollView.contentSize = self.backgroundContainerView.frame.size;
     
-    //assign the new crop box frame and re-adjust the content to fill it
-    self.cropBoxFrame = newCropFrame;
-    [self moveCroppedContentToCenterAnimated:NO];
-    newCropFrame = self.cropBoxFrame;
-    
     //work out how to line up out point of interest into the middle of the crop box
     cropTargetPoint.x *= scale;
     cropTargetPoint.y *= scale;
@@ -1638,6 +1633,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self matchForegroundToBackground];
     }
     self.scrollView.contentOffset = offset;
+    
+    //assign the new crop box frame and re-adjust the content to fill it
+    self.cropBoxFrame = newCropFrame;
+    [self moveCroppedContentToCenterAnimated:NO];
     
     //If we're animated, play an animation of the snapshot view rotating,
     //then fade it out over the live content
