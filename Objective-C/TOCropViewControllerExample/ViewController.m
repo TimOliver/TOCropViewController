@@ -163,11 +163,11 @@
     if (self.imageView.image == nil)
         return;
     
-    CGFloat padding = 20.0f;
+    CGFloat padding = 20.0;
     
     CGRect viewFrame = self.view.bounds;
-    viewFrame.size.width -= (padding * 2.0f);
-    viewFrame.size.height -= ((padding * 2.0f));
+    viewFrame.size.width -= (padding * 2.0);
+    viewFrame.size.height -= ((padding * 2.0));
     
     CGRect imageFrame = CGRectZero;
     imageFrame.size = self.imageView.image.size;
@@ -178,8 +178,8 @@
         CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
         imageFrame.size.width *= scale;
         imageFrame.size.height *= scale;
-        imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5f;
-        imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5f;
+        imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5;
+        imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5;
         self.imageView.frame = imageFrame;
     }
     else {

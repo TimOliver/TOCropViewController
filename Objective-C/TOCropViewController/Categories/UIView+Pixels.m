@@ -25,11 +25,11 @@
 @implementation UIView (TOPixels)
 
 - (CGFloat)roundToNearestPixel:(CGFloat)val {
-    CGFloat screenScale = 2.0f;
+    CGFloat screenScale = 2.0;
     if (self.window != nil && self.window.screen != nil) {
         screenScale = self.window.screen.scale;
     }
-    return roundf(val * screenScale) / screenScale;
+    return round(val * screenScale) / screenScale;
 }
 
 - (BOOL)pixelCount:(CGFloat)val1 equals:(CGFloat)val2
@@ -38,7 +38,7 @@
         return val1 == val2;
     }
     CGFloat screenScale = self.window.screen.scale;
-    return roundf(val1*screenScale) == roundf(val2*screenScale);
+    return round(val1*screenScale) == round(val2*screenScale);
 }
 
 @end

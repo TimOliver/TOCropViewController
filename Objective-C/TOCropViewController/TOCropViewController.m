@@ -28,8 +28,8 @@
 #import "UIView+Pixels.h"
 #import "TOCroppedImageAttributes.h"
 
-static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
-static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
+static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0;
+static const CGFloat kTOCropViewControllerToolbarHeight = 44.0;
 
 @interface TOCropViewController () <UIActionSheetDelegate, UIViewControllerTransitioningDelegate, TOCropViewDelegate>
 
@@ -166,7 +166,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         [self.cropView setBackgroundImageViewHidden:YES animated:NO];
         
         // The title label will fade
-        self.titleLabel.alpha = animated ? 0.0f : 1.0f;
+        self.titleLabel.alpha = animated ? 0.0 : 1.0;
     }
 
     // If an initial aspect ratio was set before presentation, set it now once the rest of
@@ -192,11 +192,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #if TARGET_OS_IOS
         [self setNeedsStatusBarAppearanceUpdate];
 #endif
-        self.titleLabel.alpha = 1.0f;
+        self.titleLabel.alpha = 1.0;
     };
 
     if (animated) {
-        [UIView animateWithDuration:0.3f animations:updateContentBlock];
+        [UIView animateWithDuration:0.3 animations:updateContentBlock];
     }
     else {
         updateContentBlock();
@@ -220,7 +220,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Set the transition flag again so we can defer the status bar
     self.inTransition = YES;
 #if TARGET_OS_IOS
-    [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+    [UIView animateWithDuration:0.5 animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
 #endif
 
     // Restore the navigation controller to its state before we were presented
@@ -283,12 +283,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
         frame.origin.x = insets.left;
-        frame.origin.y = 0.0f;
+        frame.origin.y = 0.0;
         frame.size.width = kTOCropViewControllerToolbarHeight;
         frame.size.height = CGRectGetHeight(self.view.frame);
     }
     else {
-        frame.origin.x = 0.0f;
+        frame.origin.x = 0.0;
         frame.size.width = CGRectGetWidth(self.view.bounds);
         frame.size.height = kTOCropViewControllerToolbarHeight;
 
@@ -346,7 +346,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     CGRect frame = (CGRect){CGPointZero, size};
     CGFloat viewWidth = self.view.bounds.size.width;
-    CGFloat x = 0.0f; // Additional X offset in landscape mode
+    CGFloat x = 0.0; // Additional X offset in landscape mode
 
     // Adjust for landscape layout
     if (!verticalLayout) {
@@ -359,7 +359,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
     // Work out horizontal position
-    frame.origin.x = [self.view roundToNearestPixel:(viewWidth - frame.size.width) * 0.5f];
+    frame.origin.x = [self.view roundToNearestPixel:(viewWidth - frame.size.width) * 0.5];
     if (!verticalLayout) { frame.origin.x += x; }
 
     // Work out vertical position
@@ -381,14 +381,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
           if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0, 0.0, insets.bottom, 0.0);
           }
           else { // Add padding to the top otherwise
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0, 0.0, 0.0);
           }
         }
         else {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0, 0.0, insets.bottom, 0.0);
         }
 
         return;
@@ -495,7 +495,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.frame = frame;
 
     [self.toolbar layoutIfNeeded];
-    self.toolbar.alpha = 0.0f;
+    self.toolbar.alpha = 0.0;
     
     [self.cropView prepareforRotation];
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:!UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
@@ -515,7 +515,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // On iOS 11, since these layout calls are done multiple times, if we don't aggregate from the
     // current state, the animation breaks.
     [UIView animateWithDuration:duration
-                          delay:0.0f
+                          delay:0.0
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:
     ^{
@@ -524,8 +524,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         [self.cropView performRelayoutForRotation];
     } completion:nil];
 
-    self.toolbarSnapshotView.alpha = 0.0f;
-    self.toolbar.alpha = 1.0f;
+    self.toolbarSnapshotView.alpha = 0.0;
+    self.toolbar.alpha = 1.0;
 }
 
 - (void)_didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -652,25 +652,25 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             aspectRatio = CGSizeZero;
             break;
         case TOCropViewControllerAspectRatioPresetSquare:
-            aspectRatio = CGSizeMake(1.0f, 1.0f);
+            aspectRatio = CGSizeMake(1.0, 1.0);
             break;
         case TOCropViewControllerAspectRatioPreset3x2:
-            aspectRatio = CGSizeMake(3.0f, 2.0f);
+            aspectRatio = CGSizeMake(3.0, 2.0);
             break;
         case TOCropViewControllerAspectRatioPreset5x3:
-            aspectRatio = CGSizeMake(5.0f, 3.0f);
+            aspectRatio = CGSizeMake(5.0, 3.0);
             break;
         case TOCropViewControllerAspectRatioPreset4x3:
-            aspectRatio = CGSizeMake(4.0f, 3.0f);
+            aspectRatio = CGSizeMake(4.0, 3.0);
             break;
         case TOCropViewControllerAspectRatioPreset5x4:
-            aspectRatio = CGSizeMake(5.0f, 4.0f);
+            aspectRatio = CGSizeMake(5.0, 4.0);
             break;
         case TOCropViewControllerAspectRatioPreset7x5:
-            aspectRatio = CGSizeMake(7.0f, 5.0f);
+            aspectRatio = CGSizeMake(7.0, 5.0);
             break;
         case TOCropViewControllerAspectRatioPreset16x9:
-            aspectRatio = CGSizeMake(16.0f, 9.0f);
+            aspectRatio = CGSizeMake(16.0, 9.0);
             break;
         case TOCropViewControllerAspectRatioPresetCustom:
             aspectRatio = self.customAspectRatio;
@@ -995,7 +995,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         UIImage *image = [self.image croppedImageWithFrame:cropFrame angle:angle circularClip:YES];
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isCircularImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
             }
@@ -1017,7 +1017,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         }
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isDidCropToImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
             }
@@ -1293,12 +1293,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (CGFloat)statusBarHeight
 {
-    CGFloat statusBarHeight = 0.0f;
+    CGFloat statusBarHeight = 0.0;
     statusBarHeight = self.view.safeAreaInsets.top;
 
     // We do need to include the status bar height on devices
     // that have a physical hardware inset, like an iPhone X notch
-    BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
+    BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > DBL_EPSILON
                                 && UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
 
     // Always have insetting on Mac Catalyst
@@ -1309,7 +1309,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Unless the status bar is visible, or we need to account
     // for a hardware notch, always treat the status bar height as zero
     if (self.statusBarHidden && !hardwareRelatedInset) {
-        statusBarHeight = 0.0f;
+        statusBarHeight = 0.0;
     }
     
     return statusBarHeight;

@@ -53,7 +53,7 @@
         // If an angle was supplied, rotate the entire canvas + coordinate space to match
         if (angle != 0) {
             // Rotation in radians
-            CGFloat rotation = angle * (M_PI/180.0f);
+            CGFloat rotation = angle * (M_PI/180.0);
 
             // Work out the new bounding size of the canvas after rotation
             CGRect imageBounds = (CGRect){CGPointZero, self.size};
