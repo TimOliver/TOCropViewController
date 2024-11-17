@@ -10,7 +10,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/TimOliver/TOCropViewController/master/LICENSE)
 ![Platform](https://img.shields.io/cocoapods/p/TOCropViewController.svg?style=flat)
 
-`TOCropViewController` is an open-source `UIViewController` subclass to crop out sections of `UIImage` objects, as well as perform basic rotations. It is excellent for things like editing profile pictures, or sharing parts of a photo online. It has been designed with the iOS Photos app editor in mind, and as such, behaves in a way that should already feel familiar to users of iOS.
+`TOCropViewController` is an open-source `UIViewController` subclass to crop out sections of `UIImage` objects, as well as perform basic rotations and mirroring. It is excellent for things like editing profile pictures, or sharing parts of a photo online. It has been designed with the iOS Photos app editor in mind, and as such, behaves in a way that should already feel familiar to users of iOS.
 
 For Swift developers, `CropViewController` is a Swift wrapper that completely encapsulates `TOCropViewController` and provides a much more native, Swiftier interface.
 
@@ -26,6 +26,7 @@ _Looking for something more? If `TOCropViewController` doesn't meet your exact r
 * Crop images by dragging the edges of a grid overlay.
 * Optionally, crop circular copies of images.
 * Rotate images in 90-degree segments.
+* Mirror (flip) images, either horizontally or vertically.
 * Clamp the crop box to a specific aspect ratio.
 * A reset button to completely undo all changes.
 * iOS 7/8 translucency to make it easier to view the cropped region.
@@ -113,7 +114,7 @@ func presentCropViewController() {
   present(cropViewController, animated: true, completion: nil)
 }
 
-func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool) {
         // 'image' is the newly cropped version of the original image
     }
 ```
@@ -129,7 +130,7 @@ func cropViewController(_ cropViewController: CropViewController, didCropToImage
   [self presentViewController:cropViewController animated:YES completion:nil];
 }
 
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
   // 'image' is the newly cropped version of the original image
 }
@@ -150,7 +151,7 @@ func presentCropViewController() {
     self.present(cropViewController, animated: true, completion: nil)
 }
 
-func cropViewController(_ cropViewController: TOCropViewController?, didCropToCircularImage image: UIImage?, with cropRect: CGRect, angle: Int) {
+func cropViewController(_ cropViewController: TOCropViewController?, didCropToCircularImage image: UIImage?, with cropRect: CGRect, angle: Int, flipped: Bool) {
     // 'image' is the newly cropped, circular version of the original image
 }
 ```
@@ -167,7 +168,7 @@ cropViewController.delegate = self;
 [self presentViewController:cropViewController animated:YES completion:nil];
 }
 
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
 // 'image' is the newly cropped, circular version of the original image
 }

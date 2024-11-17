@@ -27,10 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UIView(TOPixels)
 
 ///Round point value to nearest physical pixel
-- (CGFloat)roundToNearestPixel:(CGFloat)val;
+- (CGFloat)roundToNearestPixel:(CGFloat)point NS_SWIFT_NAME(roundToNearestPixel(point:));
 
 ///Check if two CGFloats (points) round to the same number of physical pixels
-- (BOOL)pixelCount:(CGFloat)val1 equals:(CGFloat)val2;
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2;
+
+///Works like CGRectIntegral() but rounds values to the nearest physical pixel
+- (CGRect)CGRectIntegralRetina:(CGRect)rect;
 
 @end
 

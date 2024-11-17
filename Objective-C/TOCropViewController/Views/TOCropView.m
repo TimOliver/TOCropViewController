@@ -55,6 +55,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
 @property (nonatomic, strong) UIView *backgroundContainerView;      /* A view which contains the background image view, to separate its transforms from the scroll view. */
 @property (nonatomic, strong, readwrite) UIView *foregroundContainerView;
+@property (nonatomic, strong) UIView *foregroundMaskView;
 @property (nonatomic, strong) UIImageView *foregroundImageView;     /* A copy of the background image view, placed over the dimming views */
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
@@ -83,7 +84,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
 @property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
-@property (nonatomic, readonly) BOOL hasAspectRatio;  /* True if an aspect ratio was explicitly applied to this crop view */
+@property (nonatomic, readonly) BOOL hasAspectRatio;  /* YES if an aspect ratio was explicitly applied to this crop view */
 
 /* 90-degree rotation state data */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
@@ -206,15 +207,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.translucencyView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.translucencyView];
     
-    // The forground container that holds the foreground image view
+    // The foreground container that holds the foreground image view
     self.foregroundContainerView = [[UIView alloc] initWithFrame:(CGRect){0,0,200,200}];
-    self.foregroundContainerView.clipsToBounds = YES;
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
+    self.foregroundMaskView = [[UIView alloc] initWithFrame:self.foregroundContainerView.bounds];
+    self.foregroundMaskView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.foregroundMaskView.clipsToBounds = YES;
+    self.foregroundMaskView.userInteractionEnabled = NO;
+    [self.foregroundContainerView addSubview:self.foregroundMaskView];
+    
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
     self.foregroundImageView.layer.minificationFilter = kCAFilterTrilinear;
-    [self.foregroundContainerView addSubview:self.foregroundImageView];
+    [self.foregroundMaskView addSubview:self.foregroundImageView];
     
     // Disable colour inversion for the image views
     if (@available(iOS 11.0, *)) {
@@ -703,6 +709,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         _aspectRatio = CGSizeZero;
     }
     
+    //Reset any flips
+    self.isFlippedVertically = NO;
+    self.isFlippedHorizontally = NO;
+    
     if (animated == NO || self.angle != 0) {
         //Reset all of the rotation transforms
         _angle = 0;
@@ -1006,18 +1016,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _cropBoxFrame = cropBoxFrame;
     
-    CGRect pixelRoundedCropBoxFrame = CGRectMake([self roundToNearestPixel:cropBoxFrame.origin.x],
-                                                 [self roundToNearestPixel:cropBoxFrame.origin.y],
-                                                 [self roundToNearestPixel:cropBoxFrame.size.width],
-                                                 [self roundToNearestPixel:cropBoxFrame.size.height]);
-    
+    CGRect pixelRoundedCropBoxFrame = [self CGRectIntegralRetina:cropBoxFrame];
     self.foregroundContainerView.frame = pixelRoundedCropBoxFrame; //set the clipping view to match the new rect
     self.gridOverlayView.frame = pixelRoundedCropBoxFrame; //set the new overlay view to match the same region
     
     // If the mask layer is present, adjust its transform to fit the new container view size
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
-        CGFloat halfWidth = self.foregroundContainerView.frame.size.width * 0.5;
-        self.foregroundContainerView.layer.cornerRadius = halfWidth;
+        CGFloat halfWidth = self.foregroundMaskView.frame.size.width * 0.5;
+        self.foregroundMaskView.layer.cornerRadius = halfWidth;
     }
     
     //reset the scroll view insets to match the region of the new crop rect
@@ -1076,7 +1082,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.size.width = MIN(imageSize.width, frame.size.width);
 
     // Calculate normalized height
-    if ([self pixelCount:cropBoxFrame.size.width equals:cropBoxFrame.size.height]) {
+    if ([self pixelCountOf:cropBoxFrame.size.width equals:cropBoxFrame.size.height]) {
         frame.size.height = frame.size.width;
     } else {
         frame.size.height = cropBoxFrame.size.height * scale;
@@ -1208,13 +1214,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setAngle:(NSInteger)angle
 {
+    // Round to the nearest 90 degrees and sanitize
+    angle = round(angle/90.0) * 90;
+    angle %= 360;
+    
     //The initial layout would not have been performed yet.
     //Save the value and it will be applied when it has
     NSInteger newAngle = angle;
-    if (angle % 90 != 0) {
-        newAngle = 0;
-    }
-    
+
     if (!self.initialSetupPerformed) {
         self.restoreAngle = newAngle;
         return;
@@ -1529,6 +1536,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self captureStateForImageRotation];
     }
     
+    //When canvas is flipped either way (but not both), change rotation direction to compensate
+    clockwise ^= self.isFlippedHorizontally ^ self.isFlippedVertically;
+    
     //Work out the new angle, and wrap around once we exceed 360s
     NSInteger newAngle = self.angle;
     newAngle = clockwise ? newAngle + 90 : newAngle - 90;
@@ -1691,6 +1701,59 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self checkForCanReset];
 }
 
+- (void)flipImageAnimated:(BOOL)animated horizontal:(BOOL)horizontal
+{
+    if (self.rotateAnimationInProgress)
+        return;
+
+    //Stop any inertia first
+    [self.scrollView setContentOffset:self.scrollView.contentOffset animated:NO];
+    
+    [self.resetTimer invalidate];
+    [self setEditing:NO resetCropBox:NO animated:NO];
+
+    //Avoid setter by setting ivar directly, setter is triggered later
+    _isFlippedHorizontally ^= horizontal;
+    _isFlippedVertically ^= !horizontal;
+    [self checkForCanReset];
+    
+    if (!animated) {
+        self.isFlippedHorizontally = self.isFlippedHorizontally; //Setter triggers canvas transform
+    } else {
+        self.rotateAnimationInProgress = YES;
+        self.backgroundContainerView.hidden = YES;
+        self.translucencyView.hidden = YES;
+        self.gridOverlayView.hidden = YES;
+        self.overlayView.hidden = YES;
+        
+        //first animate the flip of the foregroundContainerView
+        self.foregroundContainerView.transform = CGAffineTransformScale(self.foregroundContainerView.transform, horizontal ? -1 : 1, horizontal ? 1 : -1);
+        [UIView transitionWithView: self.foregroundContainerView
+                          duration: 0.45
+                           options: horizontal ? UIViewAnimationOptionTransitionFlipFromRight : UIViewAnimationOptionTransitionFlipFromBottom
+                        animations: nil
+                        completion:^(BOOL finished) {
+            
+            //once flipped unflip it and flip the entire canvas instead
+            self.foregroundContainerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            self.isFlippedHorizontally = self.isFlippedHorizontally; //Setter triggers canvas transform
+            
+            self.backgroundContainerView.hidden = NO;
+            self.translucencyView.hidden = self.translucencyAlwaysHidden;
+            self.gridOverlayView.hidden = NO;
+            self.overlayView.hidden = NO;
+            self.backgroundContainerView.alpha = 0.0;
+            self.gridOverlayView.alpha = 0.0;
+            [UIView animateWithDuration: 0.45 animations:^{
+                self.backgroundContainerView.alpha = 1.0;
+                self.gridOverlayView.alpha = 1.0;
+            } completion:^(BOOL complete) {
+                self.rotateAnimationInProgress = NO;
+            }];
+        }];
+    }
+}
+
 - (void)captureStateForImageRotation
 {
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
@@ -1709,13 +1772,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     else if (self.scrollView.zoomScale > self.scrollView.minimumZoomScale + DBL_EPSILON) { //image has been zoomed in
         canReset = YES;
     }
-    else if (![self pixelCount:self.cropBoxFrame.size.width equals:self.originalCropBoxSize.width] ||
-             ![self pixelCount:self.cropBoxFrame.size.height equals:self.originalCropBoxSize.height])
+    else if (![self pixelCountOf:self.cropBoxFrame.size.width equals:self.originalCropBoxSize.width] ||
+             ![self pixelCountOf:self.cropBoxFrame.size.height equals:self.originalCropBoxSize.height])
     { //crop box has been changed
         canReset = YES;
     }
-    else if (![self pixelCount:self.scrollView.contentOffset.x equals:self.originalContentOffset.x] ||
-             ![self pixelCount:self.scrollView.contentOffset.y equals:self.originalContentOffset.y])
+    else if (![self pixelCountOf:self.scrollView.contentOffset.x equals:self.originalContentOffset.x] ||
+             ![self pixelCountOf:self.scrollView.contentOffset.y equals:self.originalContentOffset.y])
+    {
+        canReset = YES;
+    }
+    else if (self.isFlippedHorizontally || self.isFlippedVertically)
     {
         canReset = YES;
     }
@@ -1723,7 +1790,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.canBeReset = canReset;
 }
 
-#pragma mark - Convienience Methods -
+#pragma mark - Convenience Methods
+- (void)setCropRegionInsets:(UIEdgeInsets)cropRegionInsets
+{
+    _cropRegionInsets = UIEdgeInsetsMake(self.isFlippedVertically   ? cropRegionInsets.bottom : cropRegionInsets.top,
+                                         self.isFlippedHorizontally ? cropRegionInsets.right  : cropRegionInsets.left,
+                                         self.isFlippedVertically   ? cropRegionInsets.top    : cropRegionInsets.bottom,
+                                         self.isFlippedHorizontally ? cropRegionInsets.left   : cropRegionInsets.right);
+}
+
 - (CGRect)contentBounds
 {
     CGRect contentRect = CGRectZero;
@@ -1745,6 +1820,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (BOOL)hasAspectRatio
 {
     return (self.aspectRatio.width > DBL_EPSILON && self.aspectRatio.height > DBL_EPSILON);
+}
+
+- (void)setIsFlippedHorizontally:(BOOL)isFlippedHorizontally {
+    _isFlippedHorizontally = isFlippedHorizontally;
+    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, self.isFlippedHorizontally ? -1 : 1, self.isFlippedVertically ? -1 : 1);
+}
+
+- (void)setIsFlippedVertically:(BOOL)isFlippedVertically {
+    _isFlippedVertically = isFlippedVertically;
+    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, self.isFlippedHorizontally ? -1 : 1, self.isFlippedVertically ? -1 : 1);
 }
 
 @end

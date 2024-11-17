@@ -17,6 +17,7 @@
 @property (nonatomic, assign) TOCropViewCroppingStyle croppingStyle; //The cropping style
 @property (nonatomic, assign) CGRect croppedFrame;
 @property (nonatomic, assign) NSInteger angle;
+@property (nonatomic, assign) BOOL flipped;
 
 @end
 
@@ -34,6 +35,7 @@
 
     // -- Uncomment these if you want to test out restoring to a previous crop setting --
     //cropController.angle = 90; // The initial angle in which the image will be rotated
+    //cropController.flipped = YES; // Whether to initially flip (mirror) the image
     //cropController.imageCropFrame = CGRectMake(0,0,2848,4288); //The initial frame that the crop controller will have visible.
     
     // -- Uncomment the following lines of code to test out the aspect ratio features --
@@ -52,6 +54,9 @@
 
     //cropController.rotateButtonsHidden = YES;
     //cropController.rotateClockwiseButtonHidden = NO;
+    
+    //cropController.flipHorizontalButtonHidden = YES;
+    //cropController.flipVerticalButtonHidden = NO;
 
     //cropController.reverseContentLayout = YES;
 
@@ -112,23 +117,26 @@
                                                    fromView:nil
                                                   fromFrame:viewFrame
                                                       angle:self.angle
+                                                    flipped:self.flipped
                                                toImageFrame:self.croppedFrame
                                                       setup:^{ self.imageView.hidden = YES; }
                                                  completion:nil];
 }
 
 #pragma mark - Cropper Delegate -
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
     self.croppedFrame = cropRect;
     self.angle = angle;
+    self.flipped = flipped;
     [self updateImageViewWithImage:image fromCropViewController:cropViewController];
 }
 
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle flipped:(BOOL)flipped
 {
     self.croppedFrame = cropRect;
     self.angle = angle;
+    self.flipped = flipped;
     [self updateImageViewWithImage:image fromCropViewController:cropViewController];
 }
 

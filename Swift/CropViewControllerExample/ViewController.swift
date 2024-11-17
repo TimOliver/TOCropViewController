@@ -17,6 +17,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     
     private var croppedRect = CGRect.zero
     private var croppedAngle = 0
+    private var croppedFlipped = false
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         guard let image = (info[UIImagePickerController.InfoKey.originalImage] as? UIImage) else { return }
@@ -30,6 +31,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     
         // -- Uncomment these if you want to test out restoring to a previous crop setting --
         //cropController.angle = 90 // The initial angle in which the image will be rotated
+        //cropController.flipped = true // Whether to initially flip (mirror) the image
         //cropController.imageCropFrame = CGRect(x: 0, y: 0, width: 2848, height: 4288) //The initial frame that the crop controller will have visible.
     
         // -- Uncomment the following lines of code to test out the aspect ratio features --
@@ -43,6 +45,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     
         //cropController.rotateButtonsHidden = true
         //cropController.rotateClockwiseButtonHidden = true
+        
+        //cropController.flipHorizontalButtonHidden = true
+        //cropController.flipVerticalButtonHidden = false
     
         //cropController.doneButtonTitle = "Title"
         //cropController.cancelButtonTitle = "Title"
@@ -77,16 +82,18 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             })
         }
     }
-    
-    public func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+
+    public func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool) {
         self.croppedRect = cropRect
         self.croppedAngle = angle
+        self.croppedFlipped = flipped
         updateImageViewWithImage(image, fromCropViewController: cropViewController)
     }
     
-    public func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+    public func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool) {
         self.croppedRect = cropRect
         self.croppedAngle = angle
+        self.croppedFlipped = flipped
         updateImageViewWithImage(image, fromCropViewController: cropViewController)
     }
     
@@ -182,6 +189,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
                                                fromView: nil,
                                                fromFrame: viewFrame,
                                                angle: self.croppedAngle,
+                                               flipped: self.croppedFlipped,
                                                toImageFrame: self.croppedRect,
                                                setup: { self.imageView.isHidden = true },
                                                completion: nil)

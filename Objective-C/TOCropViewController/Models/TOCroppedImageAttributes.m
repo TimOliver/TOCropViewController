@@ -25,6 +25,7 @@
 @interface TOCroppedImageAttributes ()
 
 @property (nonatomic, assign, readwrite) NSInteger angle;
+@property (nonatomic, assign, readwrite) BOOL flipped;
 @property (nonatomic, assign, readwrite) CGRect croppedFrame;
 @property (nonatomic, assign, readwrite) CGSize originalImageSize;
 
@@ -32,10 +33,11 @@
 
 @implementation TOCroppedImageAttributes
 
-- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle originalImageSize:(CGSize)originalSize
+- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle flipped:(BOOL)flipped originalImageSize:(CGSize)originalSize
 {
     if (self = [super init]) {
         _angle = angle;
+        _flipped = flipped;
         _croppedFrame = croppedFrame;
         _originalImageSize = originalSize;
     }

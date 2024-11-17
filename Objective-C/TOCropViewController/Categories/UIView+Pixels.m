@@ -24,21 +24,29 @@
 
 @implementation UIView (TOPixels)
 
-- (CGFloat)roundToNearestPixel:(CGFloat)val {
+- (CGFloat)roundToNearestPixel:(CGFloat)point {
     CGFloat screenScale = 2.0;
     if (self.window != nil && self.window.screen != nil) {
         screenScale = self.window.screen.scale;
     }
-    return round(val * screenScale) / screenScale;
+    return round(point * screenScale) / screenScale;
 }
 
-- (BOOL)pixelCount:(CGFloat)val1 equals:(CGFloat)val2
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2
 {
     if (self.window == nil || self.window.screen == nil) {
-        return val1 == val2;
+        return point1 == point2;
     }
     CGFloat screenScale = self.window.screen.scale;
-    return round(val1*screenScale) == round(val2*screenScale);
+    return round(point1*screenScale) == round(point2*screenScale);
+}
+
+- (CGRect)CGRectIntegralRetina:(CGRect)rect
+{
+    return CGRectMake([self roundToNearestPixel:rect.origin.x],
+                      [self roundToNearestPixel:rect.origin.y],
+                      [self roundToNearestPixel:rect.size.width],
+                      [self roundToNearestPixel:rect.size.height]);
 }
 
 @end
