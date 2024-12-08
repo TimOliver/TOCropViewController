@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Objective-C/TOCropViewController/**/*.{h,m}'
   s.exclude_files = 'Objective-C/TOCropViewController/include/**/*.h'
   s.resource_bundles = {
-    'TOCropViewControllerBundle' => ['Objective-C/TOCropViewController/**/*.{lproj,xcprivacy}']
+    'TOCropViewControllerBundle' => ['Objective-C/TOCropViewController/**/*.{lproj}']
   }
   s.requires_arc = true
 end

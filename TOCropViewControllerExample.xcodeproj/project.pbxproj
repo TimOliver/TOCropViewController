@@ -58,10 +58,6 @@
 		2238CF361FC029880081B957 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
 		2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2238CF441FC02AE00081B957 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
-		22A105B32BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
-		22A105B42BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
-		22A105B52BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
-		22A105B62BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
 		22B68F951FFB380700601B1A /* TOCropViewControllerTransitioning.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D8A1B234D07008B8466 /* TOCropViewControllerTransitioning.m */; };
 		22B68F961FFB380700601B1A /* TOActivityCroppedImageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D9D1B234D4F008B8466 /* TOActivityCroppedImageProvider.m */; };
 		22B68F971FFB380700601B1A /* TOCroppedImageAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF961F1B2CD017009F4785 /* TOCroppedImageAttributes.m */; };
@@ -175,7 +171,6 @@
 		2238CF3F1FC029A90081B957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2238CF441FC02AE00081B957 /* TOCropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCropViewController.h; sourceTree = "<group>"; };
 		223DCEB71FBAA91300F99209 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
-		22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		22A105DC2BC1377A00DB3A80 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		22BF961E1B2CD017009F4785 /* TOCroppedImageAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOCroppedImageAttributes.h; sourceTree = "<group>"; };
 		22BF961F1B2CD017009F4785 /* TOCroppedImageAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOCroppedImageAttributes.m; sourceTree = "<group>"; };
@@ -308,7 +303,6 @@
 		220C8EA021062E6D00A9B25D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */,
 				22C3C5491AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings */,
 			);
 			path = Resources;
@@ -730,7 +724,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22A105B42BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
 				04262D8620F6F1C600024177 /* TOCropViewControllerLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -749,7 +742,6 @@
 				223424791ABBC0CD00BBC2B1 /* Main.storyboard in Resources */,
 				2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */,
 				2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */,
-				22A105B52BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
 				22C3C5471AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -761,7 +753,6 @@
 				2238CF2D1FC0269C0081B957 /* LaunchScreen.storyboard in Resources */,
 				2238CF2A1FC0269C0081B957 /* Assets.xcassets in Resources */,
 				2238CF281FC0269C0081B957 /* Main.storyboard in Resources */,
-				22A105B62BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
 				220C8EA121062EFC00A9B25D /* TOCropViewControllerLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -770,7 +761,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22A105B32BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
 				04262D8720F6F1D600024177 /* TOCropViewControllerLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
