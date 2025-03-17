@@ -24,7 +24,9 @@
 #import "TOCropOverlayView.h"
 #import "TOCropScrollView.h"
 
-#define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.12f alpha:1.0f]
+#define TOCROPVIEW_GRID_HIDDEN_COLOR [UIColor clearColor]
+#define TOCROPVIEW_GRID_COLOR [UIColor colorWithWhite:1.0f alpha:0.15f]
+#define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.95f alpha:1.0f]
 
 static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
@@ -183,14 +185,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Grey transparent overlay view
     self.overlayView = [[UIView alloc] initWithFrame:self.bounds];
     self.overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.overlayView.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0.35f];
+    self.overlayView.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0.05f];
     self.overlayView.hidden = NO;
     self.overlayView.userInteractionEnabled = NO;
     [self addSubview:self.overlayView];
     
     //Translucency View
     if (NSClassFromString(@"UIVisualEffectView")) {
-        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
         self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
         self.translucencyView.frame = self.bounds;
     }
@@ -228,6 +230,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridOverlayView = [[TOCropOverlayView alloc] initWithFrame:self.foregroundContainerView.frame];
     self.gridOverlayView.userInteractionEnabled = NO;
     self.gridOverlayView.gridHidden = YES;
+    self.gridOverlayView.backgroundColor = TOCROPVIEW_GRID_HIDDEN_COLOR;
     [self addSubview:self.gridOverlayView];
     
     // The pan controller to recognize gestures meant to resize the grid view
@@ -1248,11 +1251,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _editing = editing;
 
-    // Toggle the visiblity of the gridlines when not editing
+    // Toggle the visiblity of the gridlines/grid background color when not editing
     BOOL hidden = !_editing;
     if (self.alwaysShowCroppingGrid) { hidden = NO; } // Override this if the user requires
     [self.gridOverlayView setGridHidden:hidden animated:animated];
-    
+    self.gridOverlayView.backgroundColor = hidden ?
+    TOCROPVIEW_GRID_HIDDEN_COLOR : TOCROPVIEW_GRID_COLOR;
+
     if (resetCropbox) {
         [self moveCroppedContentToCenterAnimated:animated];
         [self captureStateForImageRotation];
