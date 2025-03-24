@@ -216,6 +216,7 @@
 		6AE313501C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		72B9DCDC25763340006E160C /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		7914ADD92D91A63600A1CD2C /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		88BBE90E22C206340073D22A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782CF214A55F900CAE7EE /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782D3214A81A200CAE7EE /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
@@ -709,6 +710,7 @@
 				sk,
 				ca,
 				uk,
+				he,
 			);
 			mainGroup = 223424611ABBC0CC00BBC2B1;
 			productRefGroup = 2234246B1ABBC0CD00BBC2B1 /* Products */;
@@ -966,6 +968,7 @@
 				FFD1D3CE24D41D0700E79B71 /* sk */,
 				72B9DCDC25763340006E160C /* ca */,
 				01291601287B3F2000A177C5 /* uk */,
+				7914ADD92D91A63600A1CD2C /* he */,
 			);
 			name = TOCropViewControllerLocalizable.strings;
 			sourceTree = "<group>";
