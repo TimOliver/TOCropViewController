@@ -163,27 +163,9 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     /**
       A choice from one of the pre-defined aspect ratio presets
     */
-    public var aspectRatioPreset: CropViewControllerAspectRatioPreset {
+    public var aspectRatioPreset: CGSize {
         set { toCropViewController.aspectRatioPreset = newValue }
         get { return toCropViewController.aspectRatioPreset }
-    }
-    
-    /**
-     A CGSize value representing a custom aspect ratio, not listed in the presets.
-     E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
-     */
-    public var customAspectRatio: CGSize {
-        set { toCropViewController.customAspectRatio = newValue }
-        get { return toCropViewController.customAspectRatio }
-    }
-    
-    /**
-     If this is set alongside `customAspectRatio`, the custom aspect ratio
-     will be shown as a selectable choice in the list of aspect ratios. (Default is `nil`)
-     */
-    public var customAspectRatioName: String? {
-        set { toCropViewController.customAspectRatioName = newValue }
-        get { return toCropViewController.customAspectRatioName }
     }
     
     /**
@@ -334,8 +316,8 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      aspect ratios the crop view controller may display (Default is nil. All are shown)
      */
     public var allowedAspectRatios: [CropViewControllerAspectRatioPreset]? {
-        set { toCropViewController.allowedAspectRatios = newValue?.map { NSNumber(value: $0.rawValue) } }
-        get { return toCropViewController.allowedAspectRatios?.compactMap { CropViewControllerAspectRatioPreset(rawValue: $0.intValue) } }
+        set { toCropViewController.allowedAspectRatios = newValue }
+        get { return toCropViewController.allowedAspectRatios }
     }
     
     /**
@@ -579,7 +561,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     @param aspectRatioPreset The aspect ratio preset
     @param animated Whether the transition to the aspect ratio is animated
     */
-    public func setAspectRatioPreset(_ aspectRatio: CropViewControllerAspectRatioPreset, animated: Bool) {
+    public func setAspectRatioPreset(_ aspectRatio: CGSize, animated: Bool) {
         toCropViewController.setAspectRatioPreset(aspectRatio, animated: animated)
     }
     
