@@ -888,14 +888,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     bool isDelegateOrCallbackHandled = NO;
 
-    // Check if the delegate method was implemented and call if so
+    // Check if the delegate method/block version was implemented and call if so
     if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
         [self.delegate cropViewController:self didFinishCancelled:YES];
         isDelegateOrCallbackHandled = YES;
-    }
-
-    // Check if the block version was implemented and call if so
-    if (self.onDidFinishCancelled != nil) {
+    } else if (self.onDidFinishCancelled != nil) {
         self.onDidFinishCancelled(YES);
         isDelegateOrCallbackHandled = YES;
     }
@@ -943,12 +940,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             
             bool isCallbackOrDelegateHandled = NO;
             
-            if (self.onDidFinishCancelled != nil) {
-                self.onDidFinishCancelled(NO);
-                isCallbackOrDelegateHandled = YES;
-            }
             if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
                 [self.delegate cropViewController:self didFinishCancelled:NO];
+                isCallbackOrDelegateHandled = YES;
+            } else if (self.onDidFinishCancelled != nil) {
+                self.onDidFinishCancelled(NO);
                 isCallbackOrDelegateHandled = YES;
             }
             
@@ -974,9 +970,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
         [self.delegate cropViewController:self didCropImageToRect:cropFrame angle:angle];
         isCallbackOrDelegateHandled = YES;
-    }
-
-    if (self.onDidCropImageToRect != nil) {
+    } else if (self.onDidCropImageToRect != nil) {
         self.onDidCropImageToRect(cropFrame, angle);
         isCallbackOrDelegateHandled = YES;
     }
@@ -997,8 +991,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isCircularImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToCircularImage:image withRect:cropFrame angle:angle];
-            }
-            if (isCircularImageCallbackAvailable) {
+            } else if (isCircularImageCallbackAvailable) {
                 self.onDidCropToCircleImage(image, cropFrame, angle);
             }
         });
@@ -1019,9 +1012,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (isDidCropToImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
-            }
-
-            if (isDidCropToImageCallbackAvailable) {
+            } else if (isDidCropToImageCallbackAvailable) {
                 self.onDidCropToRect(image, cropFrame, angle);
             }
         });
