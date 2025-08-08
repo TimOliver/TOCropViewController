@@ -110,7 +110,7 @@ func presentCropViewController() {
   
   let cropViewController = CropViewController(image: image)
   cropViewController.delegate = self
-  present(cropViewController, animated: true, completion: nil)
+  self.present(cropViewController, animated: true, completion: nil)
 }
 
 func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
