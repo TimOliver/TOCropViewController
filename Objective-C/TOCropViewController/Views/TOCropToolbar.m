@@ -299,7 +299,20 @@
             CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
             if (horizontally) {
                 origin.x += CGRectGetMinX(containerRect);
-                if (@available(iOS 13.0, *)) {
+                if (@available(iOS 15.0, *)) {
+                    // iOS 15+: Use UIButtonConfiguration
+                    UIButtonConfiguration *config = button.configuration ?: [UIButtonConfiguration plainButtonConfiguration];
+                    
+                    // Position image and text
+                    config.imagePlacement = NSDirectionalRectEdgeLeading;
+                    config.imagePadding = 8;
+                    
+                    UIImage *image = button.imageView.image;
+                    config.contentInsets = NSDirectionalEdgeInsetsMake(0, 0, image.baselineOffsetFromBottom, 0);
+                    
+                    button.configuration = config;
+                    
+                } else if (@available(iOS 13.0, *)) {
                     UIImage *image = button.imageView.image;
                     button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, image.baselineOffsetFromBottom, 0);
                 }
