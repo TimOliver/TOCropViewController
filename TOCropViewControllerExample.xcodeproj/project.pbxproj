@@ -98,6 +98,13 @@
 		2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
 		2F5062F51F53E32D00AA9F14 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223424771ABBC0CD00BBC2B1 /* Main.storyboard */; };
+		39381CBE2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
+		39381CBF2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
+		39381CC02DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h in Headers */ = {isa = PBXBuildFile; fileRef = 39381CBC2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		39381CC12DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
+		39381CC22DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
+		39381CC32DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h in Headers */ = {isa = PBXBuildFile; fileRef = 39381CBC2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		39381CC42DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
 		FE3E0E3A21098448004DAE93 /* TOCropViewConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 220C8E9F21062DD300A9B25D /* TOCropViewConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -212,6 +219,8 @@
 		22F7331B259B71C400956847 /* TOCropViewControllerExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TOCropViewControllerExample.entitlements; sourceTree = "<group>"; };
 		22F7331C259B71C400956847 /* TOCropViewControllerExample-Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TOCropViewControllerExample-Extension.entitlements"; sourceTree = "<group>"; };
 		2F5062DC1F53E2D900AA9F14 /* TOCropViewControllerExample-Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TOCropViewControllerExample-Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		39381CBC2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOCropViewControllerAspectRatioPreset.h; sourceTree = "<group>"; };
+		39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOCropViewControllerAspectRatioPreset.m; sourceTree = "<group>"; };
 		3AADDE231CA5C43400AE0129 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		6AE313501C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
@@ -459,6 +468,8 @@
 		22DB4D881B234D07008B8466 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				39381CBC2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h */,
+				39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */,
 				22DB4D891B234D07008B8466 /* TOCropViewControllerTransitioning.h */,
 				22DB4D8A1B234D07008B8466 /* TOCropViewControllerTransitioning.m */,
 				22DB4D9C1B234D4F008B8466 /* TOActivityCroppedImageProvider.h */,
@@ -492,6 +503,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */,
+				39381CC02DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h in Headers */,
 				144B8CD71D22CD650085D774 /* TOCropToolbar.h in Headers */,
 				220C8EB22106344D00A9B25D /* UIImage+CropRotate.h in Headers */,
 				144B8CD81D22CD650085D774 /* TOCropView.h in Headers */,
@@ -512,6 +524,7 @@
 				04262DA220F6FC4600024177 /* TOCropToolbar.h in Headers */,
 				04262DA320F6FC4600024177 /* TOCropView.h in Headers */,
 				04262DA420F6FC4600024177 /* TOCropViewController.h in Headers */,
+				39381CC32DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h in Headers */,
 				220C8EA82106341600A9B25D /* TOCropViewConstants.h in Headers */,
 				220C8EB12106344D00A9B25D /* UIImage+CropRotate.h in Headers */,
 				04262D9C20F6FC4600024177 /* TOCropViewControllerTransitioning.h in Headers */,
@@ -792,6 +805,7 @@
 			files = (
 				220C8EAD2106344D00A9B25D /* UIImage+CropRotate.m in Sources */,
 				144B8CDA1D22CD730085D774 /* TOCropViewControllerTransitioning.m in Sources */,
+				39381CC12DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				144B8CDB1D22CD730085D774 /* TOActivityCroppedImageProvider.m in Sources */,
 				144B8CDC1D22CD730085D774 /* TOCroppedImageAttributes.m in Sources */,
 				144B8CDE1D22CD730085D774 /* TOCropOverlayView.m in Sources */,
@@ -817,6 +831,7 @@
 				22DB4D9B1B234D07008B8466 /* TOCropView.m in Sources */,
 				223424761ABBC0CD00BBC2B1 /* ViewController.m in Sources */,
 				22BF96201B2CD017009F4785 /* TOCroppedImageAttributes.m in Sources */,
+				39381CBE2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				22DB4D9A1B234D07008B8466 /* TOCropToolbar.m in Sources */,
 				223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */,
 				223424701ABBC0CD00BBC2B1 /* main.m in Sources */,
@@ -836,6 +851,7 @@
 				22B68F951FFB380700601B1A /* TOCropViewControllerTransitioning.m in Sources */,
 				22B68F961FFB380700601B1A /* TOActivityCroppedImageProvider.m in Sources */,
 				22B68F971FFB380700601B1A /* TOCroppedImageAttributes.m in Sources */,
+				39381CC42DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				22B68F991FFB380700601B1A /* TOCropOverlayView.m in Sources */,
 				22B68F9A1FFB380700601B1A /* TOCropScrollView.m in Sources */,
 				22B68F9B1FFB380700601B1A /* TOCropToolbar.m in Sources */,
@@ -858,6 +874,7 @@
 				22B68FA11FFB3C0800601B1A /* TOCroppedImageAttributes.m in Sources */,
 				22B68FA31FFB3C0800601B1A /* TOCropOverlayView.m in Sources */,
 				22B68FA41FFB3C0800601B1A /* TOCropScrollView.m in Sources */,
+				39381CC22DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				22B68FA51FFB3C0800601B1A /* TOCropToolbar.m in Sources */,
 				22B68FA61FFB3C0800601B1A /* TOCropView.m in Sources */,
 				22B68FA71FFB3C0800601B1A /* TOCropViewController.m in Sources */,
@@ -879,6 +896,7 @@
 				2F5062F01F53E31F00AA9F14 /* TOCropScrollView.m in Sources */,
 				2F5062EB1F53E31F00AA9F14 /* TOCropViewControllerTransitioning.m in Sources */,
 				2F5062ED1F53E31F00AA9F14 /* TOCroppedImageAttributes.m in Sources */,
+				39381CBF2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				220C8EB02106344D00A9B25D /* UIImage+CropRotate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -24,10 +24,12 @@
 
 #if !__has_include(<TOCropViewController/TOCropViewConstants.h>)
 #import "TOCropViewConstants.h"
+#import "TOCropViewControllerAspectRatioPreset.h"
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
 #else
 #import <TOCropViewController/TOCropViewConstants.h>
+#import <TOCropViewController/TOCropViewControllerAspectRatioPreset.h>
 #import <TOCropViewController/TOCropView.h>
 #import <TOCropViewController/TOCropToolbar.h>
 #endif
@@ -150,19 +152,7 @@
 /**
  A choice from one of the pre-defined aspect ratio presets
  */
-@property (nonatomic, assign) TOCropViewControllerAspectRatioPreset aspectRatioPreset;
-
-/**
- A CGSize value representing a custom aspect ratio, not listed in the presets.
- E.g. A ratio of 4:3 would be represented as (CGSize){4.0f, 3.0f}
- */
-@property (nonatomic, assign) CGSize customAspectRatio;
-
-/**
- If this is set alongside `customAspectRatio`, the custom aspect ratio
- will be shown as a selectable choice in the list of aspect ratios. (Default is `nil`)
- */
-@property (nullable, nonatomic, copy) NSString *customAspectRatioName;
+@property (nonatomic, assign) CGSize aspectRatioPreset;
 
 /**
  Title label which can be used to show instruction on the top of the crop view controller
@@ -324,7 +314,7 @@
  An array of `TOCropViewControllerAspectRatioPreset` enum values denoting which
  aspect ratios the crop view controller may display (Default is nil. All are shown)
  */
-@property (nullable, nonatomic, strong) NSArray<NSNumber *> *allowedAspectRatios;
+@property (nullable, nonatomic, strong) NSArray<TOCropViewControllerAspectRatioPreset *> *allowedAspectRatios;
 
 /**
  When the user hits cancel, or completes a
@@ -402,7 +392,7 @@
  @param aspectRatioPreset The aspect ratio preset
  @param animated Whether the transition to the aspect ratio is animated
  */
-- (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated NS_SWIFT_NAME(setAspectRatioPreset(_:animated:));
+- (void)setAspectRatioPreset:(CGSize)aspectRatioPreset animated:(BOOL)animated NS_SWIFT_NAME(setAspectRatioPreset(_:animated:));
 
 /**
  Play a custom animation of the target image zooming to its position in
