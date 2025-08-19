@@ -29,6 +29,9 @@
 
 static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
 static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
+#if TARGET_OS_VISION
+static const CGFloat kTOCropViewControllerVisionCornerPadding = 16.0f;
+#endif
 
 @interface TOCropViewController () <UIActionSheetDelegate, UIViewControllerTransitioningDelegate, TOCropViewDelegate>
 
@@ -92,7 +95,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Default initial behaviour
         _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
 
-        #if TARGET_OS_MACCATALYST
+        #if TARGET_OS_MACCATALYST || TARGET_OS_VISION
         _toolbarPosition = TOCropViewControllerToolbarPositionTop;
         #else
         _toolbarPosition = TOCropViewControllerToolbarPositionBottom;
@@ -277,9 +280,22 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (CGRect)frameForToolbarWithVerticalLayout:(BOOL)verticalLayout
 {
-    UIEdgeInsets insets = self.statusBarSafeInsets;
-
     CGRect frame = CGRectZero;
+
+    #if TARGET_OS_VISION
+    frame.origin.x = kTOCropViewControllerVisionCornerPadding;
+    frame.size.width = CGRectGetWidth(self.view.bounds) - kTOCropViewControllerVisionCornerPadding * 2;
+    frame.size.height = kTOCropViewControllerToolbarHeight;
+
+    if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
+        frame.origin.y = CGRectGetHeight(self.view.bounds) - (frame.size.height + kTOCropViewControllerVisionCornerPadding);
+    }
+    else {
+        frame.origin.y = kTOCropViewControllerVisionCornerPadding;
+    }
+    #else
+    UIEdgeInsets insets = self.statusBarSafeInsets;
+    
     if (!verticalLayout) { // In landscape laying out toolbar to the left
         frame.origin.x = insets.left;
         frame.origin.y = 0.0f;
@@ -297,6 +313,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             frame.origin.y = insets.top;
         }
     }
+    #endif
     
     return frame;
 }
@@ -319,6 +336,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGRect bounds = view.bounds;
     CGRect frame = CGRectZero;
 
+    #if TARGET_OS_VISION
+    frame.size.height = CGRectGetHeight(bounds);
+    frame.size.width = CGRectGetWidth(bounds);
+    
+    if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
+        frame.size.height -= (kTOCropViewControllerVisionCornerPadding + kTOCropViewControllerToolbarHeight);
+    } else if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+        frame.origin.y = kTOCropViewControllerToolbarHeight + kTOCropViewControllerVisionCornerPadding;
+        frame.size.height -= frame.origin.y;
+    }
+    #else
     // Horizontal layout (eg landscape)
     if (!verticalLayout) {
         frame.origin.x = kTOCropViewControllerToolbarHeight + insets.left;
@@ -337,6 +365,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             frame.size.height -= frame.origin.y;
         }
     }
+    #endif
     
     return frame;
 }
@@ -409,6 +438,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     UIEdgeInsets insets = UIEdgeInsetsZero;
 
+    #if TARGET_OS_VISION
+    insets.left = kTOCropViewControllerVisionCornerPadding;
+    insets.right = kTOCropViewControllerVisionCornerPadding;
+
+    // Add padding on top if in vertical and tool bar is at the top
+    if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+        insets.top = kTOCropViewControllerVisionCornerPadding;
+    }
+    else { // Add padding to the bottom otherwise
+        insets.bottom = kTOCropViewControllerVisionCornerPadding;
+    }
+    #else
     if (@available(iOS 11.0, *)) {
         // Add padding to the left in landscape mode
         if (!self.verticalLayout) {
@@ -429,6 +470,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             insets.top = self.statusBarHeight;
         }
     }
+    #endif
 
     // Update the toolbar with these properties
     self.toolbar.backgroundViewOutsets = insets;
@@ -1248,7 +1290,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (BOOL)verticalLayout
 {
-#if TARGET_OS_MACCATALYST
+#if TARGET_OS_MACCATALYST || TARGET_OS_VISION
     return YES;
 #endif
 
@@ -1295,14 +1337,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGFloat statusBarHeight = 0.0f;
     statusBarHeight = self.view.safeAreaInsets.top;
 
+    BOOL hardwareRelatedInset;
+
+    // Always have insetting on Mac Catalyst and Apple Vision Pro
+    #if TARGET_OS_MACCATALYST || TARGET_OS_VISION
+    hardwareRelatedInset = YES;
+    #else
     // We do need to include the status bar height on devices
     // that have a physical hardware inset, like an iPhone X notch
-    BOOL hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
-                                && UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
-
-    // Always have insetting on Mac Catalyst
-    #if TARGET_OS_MACCATALYST
-    hardwareRelatedInset = YES;
+    hardwareRelatedInset = self.view.safeAreaInsets.bottom > FLT_EPSILON
+                           && UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
     #endif
 
     // Unless the status bar is visible, or we need to account
