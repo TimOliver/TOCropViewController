@@ -314,6 +314,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         view = self.parentViewController.view;
     }
 
+    // Always make the crop view edge-to-edge on iOS 26 and up
+    if (@available(iOS 26.0, *)) {
+        return view.bounds;
+    }
+
     UIEdgeInsets insets = self.statusBarSafeInsets;
 
     CGRect bounds = view.bounds;
