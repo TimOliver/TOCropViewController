@@ -73,8 +73,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, weak) id<TOCropViewDelegate> delegate;
 
 /**
- If false, the user cannot resize the crop box frame using a pan gesture from a corner.
- Default vaue is YES.
+ If NO, the user cannot resize the crop box frame using a pan gesture from a corner.
+ Default value is YES.
  */
 @property (nonatomic, assign) BOOL cropBoxResizeEnabled;
 
@@ -120,8 +120,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /**
- If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES,
- the crop box will swap it's dimensions depending on portrait or landscape sized images.
+ If YES, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES,
+ the crop box will swap its dimensions depending on portrait or landscape sized images.
  This value also controls whether the dimensions can swap when the image is rotated.
  
  Default is NO.
@@ -135,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL resetAspectRatioEnabled;
 
 /**
- True when the height of the crop box is bigger than the width
+ YES when the height of the crop box is bigger than the width
  */
 @property (nonatomic, readonly) BOOL cropBoxAspectRatioIsPortrait;
 
@@ -143,6 +143,16 @@ NS_ASSUME_NONNULL_BEGIN
  The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
  */
 @property (nonatomic, assign) NSInteger angle;
+
+/**
+ Whether the canvas is flipped horizontally
+ */
+@property (nonatomic, assign) BOOL isFlippedHorizontally;
+
+/**
+ Whether the canvas is flipped vertically
+ */
+@property (nonatomic, assign) BOOL isFlippedVertically;
 
 /**
  Hide all of the crop elements for transition animations 
@@ -160,12 +170,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL gridOverlayHidden;
 
 ///**
-// Paddings of the crop rectangle. Default to 14.0
+// Paddings of the crop rectangle. Defaults to 14.0
 // */
 @property (nonatomic) CGFloat cropViewPadding;
 
 /**
- Delay before crop frame is adjusted according new crop area. Default to 0.8
+ Delay before crop frame is adjusted according new crop area. Defaults to 0.8
  */
 @property (nonatomic) NSTimeInterval cropAdjustingDelay;
 
@@ -177,7 +187,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 
 /**
  The maximum scale that user can apply to image by pinching to zoom. Small values
- are only recomended with aspectRatioLockEnabled set to true. Default to 15.0
+ are only recommended with aspectRatioLockEnabled set to YES. Defaults to 15.0
  */
 @property (nonatomic, assign) CGFloat maximumZoomScale;
 
@@ -274,6 +284,14 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
  */
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
+
+/**
+ Flips (mirrors) the entire canvas
+ 
+ @param animated Whether the transition is animated
+ @param horizontal Whether to flip horizontally (YES) or vertically (NO)
+ */
+- (void)flipImageAnimated:(BOOL)animated horizontal:(BOOL)horizontal;
 
 /**
  Animate the grid overlay graphic to be visible

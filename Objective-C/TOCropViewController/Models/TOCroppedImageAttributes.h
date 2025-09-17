@@ -28,10 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TOCroppedImageAttributes : NSObject
 
 @property (nonatomic, readonly) NSInteger angle;
+@property (nonatomic, readonly) BOOL flipped;
 @property (nonatomic, readonly) CGRect croppedFrame;
 @property (nonatomic, readonly) CGSize originalImageSize;
 
-- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle originalImageSize:(CGSize)originalSize;
+- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle flipped:(BOOL)flipped originalImageSize:(CGSize)originalSize;
 
 @end
 

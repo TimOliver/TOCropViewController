@@ -31,7 +31,7 @@
             alphaInfo == kCGImageAlphaPremultipliedFirst || alphaInfo == kCGImageAlphaPremultipliedLast);
 }
 
-- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular
+- (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle flip:(BOOL)flip circularClip:(BOOL)circular
 {
     UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
     format.opaque = !self.hasAlpha && !circular;
@@ -46,6 +46,10 @@
             CGContextAddEllipseInRect(context, (CGRect){CGPointZero, frame.size});
             CGContextClip(context);
         }
+        
+        // Flip image when applicable
+        CGContextTranslateCTM(context, flip ? frame.size.width : 0,  0);
+        CGContextScaleCTM(context, flip ? -1 : 1, 1);
 
         // Offset the origin (Which is the top left corner) to start where our cropping origin is
         CGContextTranslateCTM(context, -frame.origin.x, -frame.origin.y);
@@ -53,7 +57,7 @@
         // If an angle was supplied, rotate the entire canvas + coordinate space to match
         if (angle != 0) {
             // Rotation in radians
-            CGFloat rotation = angle * (M_PI/180.0f);
+            CGFloat rotation = angle * (M_PI/180.0);
 
             // Work out the new bounding size of the canvas after rotation
             CGRect imageBounds = (CGRect){CGPointZero, self.size};

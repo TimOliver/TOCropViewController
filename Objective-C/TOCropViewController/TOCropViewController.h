@@ -45,33 +45,57 @@
  Called when the user has committed the crop action, and provides 
  just the cropping rectangle.
 
- @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+ @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+        didCropImageToRect:(CGRect)cropRect
+                     angle:(NSInteger)angle
+                   flipped:(BOOL)flipped;
+
+/// Deprecated, use method with 'flipped' argument instead.
+/// - Warning: Deprecated, add arg 'flipped: (BOOL) flipped' to this method.
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
         didCropImageToRect:(CGRect)cropRect
                      angle:(NSInteger)angle;
 
 /**
  Called when the user has committed the crop action, and provides 
- both the original image with crop co-ordinates.
+ both the original image with crop coordinates.
  
  @param image The newly cropped image.
- @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+ @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+            didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
+                     angle:(NSInteger)angle
+                   flipped:(BOOL)flipped;
+
+/// Deprecated, use method with 'flipped' argument instead.
+/// - Warning: Deprecated, add arg 'flipped: (BOOL) flipped' to this method.
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
             didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
                      angle:(NSInteger)angle;
 
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
- image, as well as it's cropping co-ordinates
+ image, as well as its cropping coordinates
  
  @param image The newly cropped image, clipped to a circle shape
- @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+ @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+    didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
+                     angle:(NSInteger)angle
+                    flipped:(BOOL)flipped;
+
+/// Deprecated, use method with 'flipped' argument instead.
+/// - Warning: Deprecated, add arg 'flipped: (BOOL) flipped' to this method.
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
     didCropToCircularImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
                      angle:(NSInteger)angle;
@@ -109,7 +133,7 @@
 @property (nullable, nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
 
 /**
- If true, when the user hits 'Done', a UIActivityController will appear
+ If YES, when the user hits 'Done', a UIActivityController will appear
  before the view controller ends.
  */
 @property (nonatomic, assign) BOOL showActivitySheetOnDone;
@@ -136,6 +160,18 @@
  the image 'restored' to a previous cropping layout.
  */
 @property (nonatomic, assign) NSInteger angle;
+
+/**
+ Use this and the ``angle`` property to flip (mirror) the image.
+ For horizontal flip set flipped to YES and angle to 0.
+ For vertical flip set flipped to YES and angle to 180.
+ For both horizontal and vertical flip set flipped to NO and angle to 180.
+ 
+ This property can be set before the controller is presented to have
+ the image 'restored' to a previous cropping layout.
+ */
+@property (nonatomic, assign) BOOL flipped;
+@property (nonatomic, assign) BOOL mirrored __attribute((unavailable("Use 'flipped' instead.")));
 
 /**
  The toolbar view managed by this view controller.
@@ -182,7 +218,7 @@
 @property (nullable, nonatomic, copy) NSString *cancelButtonTitle;
 
 /**
- If true, button icons are visible in portairt instead button text.
+ If YES, button icons are visible in portairt instead button text.
 
  Default is NO.
  */
@@ -207,8 +243,8 @@
 @property (nonatomic, assign) BOOL showCancelConfirmationDialog;
 
 /**
- If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box
- will swap it's dimensions depending on portrait or landscape sized images.
+ If YES, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES, the crop box
+ will swap its dimensions depending on portrait or landscape sized images.
  This value also controls whether the dimensions can swap when the image is rotated.
  
  Default is NO.
@@ -216,7 +252,7 @@
 @property (nonatomic, assign) BOOL aspectRatioLockDimensionSwapEnabled;
 
 /**
- If true, while it can still be resized, the crop box will be locked to its current aspect ratio.
+ If YES, while it can still be resized, the crop box will be locked to its current aspect ratio.
  
  If this is set to YES, and `resetAspectRatioEnabled` is set to NO, then the aspect ratio
  button will automatically be hidden from the toolbar.
@@ -226,7 +262,7 @@
 @property (nonatomic, assign) BOOL aspectRatioLockEnabled;
 
 /** 
- If true, tapping the reset button will also reset the aspect ratio back to the image
+ If YES, tapping the reset button will also reset the aspect ratio back to the image
  default ratio. Otherwise, the reset will just zoom out to the current aspect ratio.
  
  If this is set to NO, and `aspectRatioLockEnabled` is set to YES, then the aspect ratio
@@ -249,9 +285,23 @@
  */
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 
+/**
+ When enabled, hides the flip horizontal button on the toolbar.
+ 
+ Default is NO.
+ */
+@property (nonatomic, assign) BOOL flipHorizontalButtonHidden;
+
+/**
+ When enabled, hides the flip vertical button on the toolbar.
+ 
+ Default is YES.
+ */
+@property (nonatomic, assign) BOOL flipVerticalButtonHidden;
+
 /*
  If this controller is embedded in UINavigationController its navigation bar
- is hidden by default. Set this property to false to show the navigation bar.
+ is hidden by default. Set this property to NO to show the navigation bar.
  This must be set before this controller is presented.
  */
 @property (nonatomic, assign) BOOL hidesNavigationBar;
@@ -296,26 +346,25 @@
 
  Default is NO.
  */
-@property (nonatomic, assign) BOOL reverseContentLayout
-;
+@property (nonatomic, assign) BOOL reverseContentLayout;
 
 /** 
- If `showActivitySheetOnDone` is true, then these activity items will 
- be supplied to that UIActivityViewController in addition to the 
+ If `showActivitySheetOnDone` is YES, then these activity items will
+ be supplied to that UIActivityViewController in addition to the
  `TOActivityCroppedImageProvider` object.
  */
 @property (nullable, nonatomic, strong) NSArray *activityItems;
 
 /**
- If `showActivitySheetOnDone` is true, then you may specify any 
- custom activities your app implements in this array. If your activity requires 
+ If `showActivitySheetOnDone` is YES, then you may specify any
+ custom activities your app implements in this array. If your activity requires
  access to the cropping information, it can be accessed in the supplied 
  `TOActivityCroppedImageProvider` object
  */
 @property (nullable, nonatomic, strong) NSArray<UIActivity *> *applicationActivities;
 
 /**
- If `showActivitySheetOnDone` is true, then you may expliclty 
+ If `showActivitySheetOnDone` is YES, then you may expliclty 
  set activities that won't appear in the share sheet here.
  */
 @property (nullable, nonatomic, strong) NSArray<UIActivityType> *excludedActivityTypes;
@@ -338,32 +387,35 @@
  just the cropping rectangle.
  
  @param cropRect A rectangle indicating the crop region of the image the user chose
-                    (In the original image's local co-ordinate space)
+                    (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropImageToRect)(CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropImageToRect)(CGRect cropRect, NSInteger angle, BOOL flipped);
 
 /**
  Called when the user has committed the crop action, and provides
- both the cropped image with crop co-ordinates.
+ both the cropped image with crop coordinates.
  
  @param image The newly cropped image.
  @param cropRect A rectangle indicating the crop region of the image the user chose
-                    (In the original image's local co-ordinate space)
+                    (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropToRect)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropToRect)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL flipped);
 
 /**
  If the cropping style is set to circular, this block will return a circle-cropped version of the selected
- image, as well as it's cropping co-ordinates
+ image, as well as its cropping coordinates
  
  @param image The newly cropped image, clipped to a circle shape
  @param cropRect A rectangle indicating the crop region of the image the user chose
-                    (In the original image's local co-ordinate space)
+                    (In the original image's local coordinate space)
  @param angle The angle of the image when it was cropped
+ @param flipped Whether the image was flipped (mirrored) when it was cropped
  */
-@property (nullable, nonatomic, strong) void (^onDidCropToCircleImage)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle);
+@property (nullable, nonatomic, strong) void (^onDidCropToCircleImage)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL flipped);
 
 
 ///------------------------------------------------
@@ -432,6 +484,7 @@
  @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
  @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
  @param angle The rotation angle in which the image was rotated when it was originally cropped.
+ @param flipped Whether the image was flipped (mirrored) when it was originally cropped.
  @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop
  @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
  @param completion A block that is called once the transition animation is completed.
@@ -441,9 +494,10 @@
                                        fromView:(nullable UIView *)fromView
                                       fromFrame:(CGRect)fromFrame
                                           angle:(NSInteger)angle
+                                        flipped:(BOOL)flipped
                                    toImageFrame:(CGRect)toFrame
                                           setup:(nullable void (^)(void))setup
-                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:fromImage:fromView:fromFrame:angle:toFrame:setup:completion:));
+                                     completion:(nullable void (^)(void))completion NS_SWIFT_NAME(presentAnimatedFrom(_:fromImage:fromView:fromFrame:angle:flipped:toFrame:setup:completion:));
 
 /**
  Play a custom animation of the supplied cropped image zooming out from

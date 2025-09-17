@@ -1,7 +1,7 @@
 //
-//  TOCroppedImageAttributes.m
+//  UIView+Pixels.m
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2024 Jan de Vries. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,29 +20,33 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TOCroppedImageAttributes.h"
+#import "UIView+Pixels.h"
 
-@interface TOCroppedImageAttributes ()
+@implementation UIView (TOPixels)
 
-@property (nonatomic, assign, readwrite) NSInteger angle;
-@property (nonatomic, assign, readwrite) BOOL flipped;
-@property (nonatomic, assign, readwrite) CGRect croppedFrame;
-@property (nonatomic, assign, readwrite) CGSize originalImageSize;
-
-@end
-
-@implementation TOCroppedImageAttributes
-
-- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle flipped:(BOOL)flipped originalImageSize:(CGSize)originalSize
-{
-    if (self = [super init]) {
-        _angle = angle;
-        _flipped = flipped;
-        _croppedFrame = croppedFrame;
-        _originalImageSize = originalSize;
+- (CGFloat)roundToNearestPixel:(CGFloat)point {
+    CGFloat screenScale = 2.0;
+    if (self.window != nil && self.window.screen != nil) {
+        screenScale = self.window.screen.scale;
     }
-    
-    return self;
+    return round(point * screenScale) / screenScale;
+}
+
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2
+{
+    if (self.window == nil || self.window.screen == nil) {
+        return point1 == point2;
+    }
+    CGFloat screenScale = self.window.screen.scale;
+    return round(point1*screenScale) == round(point2*screenScale);
+}
+
+- (CGRect)CGRectIntegralRetina:(CGRect)rect
+{
+    return CGRectMake([self roundToNearestPixel:rect.origin.x],
+                      [self roundToNearestPixel:rect.origin.y],
+                      [self roundToNearestPixel:rect.size.width],
+                      [self roundToNearestPixel:rect.size.height]);
 }
 
 @end

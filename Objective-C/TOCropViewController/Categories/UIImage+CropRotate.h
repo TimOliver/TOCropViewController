@@ -29,9 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// Crops a portion of an existing image object and returns it as a new image
 /// @param frame The region inside the image (In image pixel space) to crop
 /// @param angle If any, the angle the image is rotated at as well
+/// @param flip Whether to flip (mirror) the image
 /// @param circular Whether the resulting image is returned as a square or a circle
 - (nonnull UIImage *)croppedImageWithFrame:(CGRect)frame
                                      angle:(NSInteger)angle
+                                      flip:(BOOL)flip
                               circularClip:(BOOL)circular;
 
 @end

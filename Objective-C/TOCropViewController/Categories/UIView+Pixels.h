@@ -1,7 +1,7 @@
 //
-//  TOCroppedImageAttributes.m
+//  UIView+Pixels.h
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2024 Jan de Vries. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,29 +20,22 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TOCroppedImageAttributes.h"
+#import <UIKit/UIKit.h>
 
-@interface TOCroppedImageAttributes ()
+NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic, assign, readwrite) NSInteger angle;
-@property (nonatomic, assign, readwrite) BOOL flipped;
-@property (nonatomic, assign, readwrite) CGRect croppedFrame;
-@property (nonatomic, assign, readwrite) CGSize originalImageSize;
+@interface UIView(TOPixels)
 
-@end
+///Round point value to nearest physical pixel
+- (CGFloat)roundToNearestPixel:(CGFloat)point NS_SWIFT_NAME(roundToNearestPixel(point:));
 
-@implementation TOCroppedImageAttributes
+///Check if two CGFloats (points) round to the same number of physical pixels
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2;
 
-- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle flipped:(BOOL)flipped originalImageSize:(CGSize)originalSize
-{
-    if (self = [super init]) {
-        _angle = angle;
-        _flipped = flipped;
-        _croppedFrame = croppedFrame;
-        _originalImageSize = originalSize;
-    }
-    
-    return self;
-}
+///Works like CGRectIntegral() but rounds values to the nearest physical pixel
+- (CGRect)CGRectIntegralRetina:(CGRect)rect;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

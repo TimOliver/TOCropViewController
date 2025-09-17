@@ -60,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly)  UIButton *resetButton;
 @property (nonatomic, strong, readonly)  UIButton *clampButton;
 @property (nullable, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
+@property (nonatomic, strong, readonly) UIButton *flipHorizontalButton;
+@property (nonatomic, strong, readonly) UIButton *flipVerticalButton;
 
 @property (nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
@@ -70,6 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) void (^rotateClockwiseButtonTapped)(void);
 @property (nullable, nonatomic, copy) void (^clampButtonTapped)(void);
 @property (nullable, nonatomic, copy) void (^resetButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^flipHorizontalButtonTapped)(void);
+@property (nullable, nonatomic, copy) void (^flipVerticalButtonTapped)(void);
 
 /* State management for the 'clamp' button */
 @property (nonatomic, assign) BOOL clampButtonGlowing;
@@ -79,6 +83,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL clampButtonHidden;
 @property (nonatomic, assign) BOOL rotateCounterclockwiseButtonHidden;
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
+@property (nonatomic, assign) BOOL flipHorizontalButtonHidden;
+@property (nonatomic, assign) BOOL flipVerticalButtonHidden;
 @property (nonatomic, assign) BOOL resetButtonHidden;
 @property (nonatomic, assign) BOOL doneButtonHidden;
 @property (nonatomic, assign) BOOL cancelButtonHidden;
