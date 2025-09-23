@@ -505,11 +505,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     open override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge {
-        if #available(iOS 11.0, *) {
-            return toCropViewController.preferredScreenEdgesDeferringSystemGestures
-        }
-        
-        return UIRectEdge.all
+        return toCropViewController.preferredScreenEdgesDeferringSystemGestures
     }
     
     // ------------------------------------------------

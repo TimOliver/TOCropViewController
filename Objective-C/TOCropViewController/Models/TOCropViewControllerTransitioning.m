@@ -79,11 +79,8 @@
     if ((self.isDismissing && !CGRectIsEmpty(self.toFrame)) || (!self.isDismissing && !CGRectIsEmpty(self.fromFrame))) {
         imageView = [[UIImageView alloc] initWithImage:self.image];
         imageView.frame = self.fromFrame;
+        imageView.accessibilityIgnoresInvertColors = YES;
         [containerView addSubview:imageView];
-        
-        if (@available(iOS 11.0, *)) {
-            imageView.accessibilityIgnoresInvertColors = YES;
-        }
     }
     
     cropViewController.view.alpha = (self.isDismissing ? 1.0f : 0.0f);

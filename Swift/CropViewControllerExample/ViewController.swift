@@ -123,9 +123,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         
         imageView.isUserInteractionEnabled = true
         imageView.contentMode = .scaleAspectFit
-        if #available(iOS 11.0, *) {
-            imageView.accessibilityIgnoresInvertColors = true
-        }
+        imageView.accessibilityIgnoresInvertColors = true
         view.addSubview(imageView)
         
         let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(didTapImageView))
