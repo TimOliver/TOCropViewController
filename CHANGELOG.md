@@ -1,6 +1,17 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+2.8.0 Release Notes (2025-09-23)
+=============================================================
+
+## Added
+
+- Deprecated iOS 11 as it no longer supported in Xcode 26.
+
+## Fixed
+
+- A bug in iOS 26 where the toolbar buttons would appear misaligned.
+
 2.7.4 Release Notes (2024-05-08)
 =============================================================
 
