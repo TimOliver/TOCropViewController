@@ -496,7 +496,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         [sublayer removeAllAnimations];
     }
 
-    // On iOS 11, since these layout calls are done multiple times, if we don't aggregate from the
+    // On iOS 11 and up, since these layout calls are done multiple times, if we don't aggregate from the
     // current state, the animation breaks.
     [UIView animateWithDuration:duration
                           delay:0.0f
