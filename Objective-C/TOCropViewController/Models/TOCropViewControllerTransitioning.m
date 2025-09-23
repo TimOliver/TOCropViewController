@@ -1,7 +1,7 @@
 //
 //  TOCropViewControllerTransitioning.m
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -79,11 +79,8 @@
     if ((self.isDismissing && !CGRectIsEmpty(self.toFrame)) || (!self.isDismissing && !CGRectIsEmpty(self.fromFrame))) {
         imageView = [[UIImageView alloc] initWithImage:self.image];
         imageView.frame = self.fromFrame;
+        imageView.accessibilityIgnoresInvertColors = YES;
         [containerView addSubview:imageView];
-        
-        if (@available(iOS 11.0, *)) {
-            imageView.accessibilityIgnoresInvertColors = YES;
-        }
     }
     
     cropViewController.view.alpha = (self.isDismissing ? 1.0f : 0.0f);

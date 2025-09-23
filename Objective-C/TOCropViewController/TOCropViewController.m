@@ -1,7 +1,7 @@
 //
 //  TOCropViewController.m
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -350,10 +350,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Adjust for landscape layout
     if (!verticalLayout) {
         x = kTOCropViewControllerTitleTopPadding;
-        if (@available(iOS 11.0, *)) {
-            x += self.view.safeAreaInsets.left;
-        }
-
+        x += self.view.safeAreaInsets.left;
         viewWidth -= x;
     }
 
@@ -362,12 +359,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (!verticalLayout) { frame.origin.x += x; }
 
     // Work out vertical position
-    if (@available(iOS 11.0, *)) {
-        frame.origin.y = self.view.safeAreaInsets.top + kTOCropViewControllerTitleTopPadding;
-    }
-    else {
-        frame.origin.y = self.statusBarHeight + kTOCropViewControllerTitleTopPadding;
-    }
+    frame.origin.y = self.view.safeAreaInsets.top + kTOCropViewControllerTitleTopPadding;
 
     return frame;
 }
@@ -409,24 +401,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     UIEdgeInsets insets = UIEdgeInsetsZero;
 
-    if (@available(iOS 11.0, *)) {
-        // Add padding to the left in landscape mode
-        if (!self.verticalLayout) {
-            insets.left = self.view.safeAreaInsets.left;
-        }
-        else {
-            // Add padding on top if in vertical and tool bar is at the top
-            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-                insets.top = self.view.safeAreaInsets.top;
-            }
-            else { // Add padding to the bottom otherwise
-                insets.bottom = self.view.safeAreaInsets.bottom;
-            }
-        }
+    // Add padding to the left in landscape mode
+    if (!self.verticalLayout) {
+        insets.left = self.view.safeAreaInsets.left;
     }
-    else { // iOS <= 10
-        if (!self.statusBarHidden && self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-            insets.top = self.statusBarHeight;
+    else {
+        // Add padding on top if in vertical and tool bar is at the top
+        if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+            insets.top = self.view.safeAreaInsets.top;
+        }
+        else { // Add padding to the bottom otherwise
+            insets.bottom = self.view.safeAreaInsets.bottom;
         }
     }
 
@@ -511,7 +496,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         [sublayer removeAllAnimations];
     }
 
-    // On iOS 11, since these layout calls are done multiple times, if we don't aggregate from the
+    // On iOS 11 and up, since these layout calls are done multiple times, if we don't aggregate from the
     // current state, the animation breaks.
     [UIView animateWithDuration:duration
                           delay:0.0f

@@ -35,7 +35,7 @@ _Looking for something more? If `TOCropViewController` doesn't meet your exact r
 * Localized in 28 languages.
 
 ## System Requirements
-iOS 11.0 or above
+iOS 12.0 or above
 
 ## Installation
 

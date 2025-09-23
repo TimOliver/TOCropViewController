@@ -1,7 +1,7 @@
 //
 //  TOCropToolbar.h
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -57,14 +57,9 @@
     self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
     [self addSubview:self.backgroundView];
     
-    // On iOS 9, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
-    if (@available(iOS 9.0, *)) {
-        _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
-    }
-    else {
-        _reverseContentLayout = [[[NSLocale preferredLanguages] objectAtIndex:0] hasPrefix:@"ar"];
-    }
-    
+    // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
+    _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
+
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
     
@@ -294,7 +289,7 @@
         
         for (NSInteger i = 0; i < count; i++) {
             UIButton *button = buttons[i];
-            CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-44.0f) : fabs(CGRectGetWidth(containerRect)-CGRectGetWidth(button.bounds));
+            CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-44.0f) : fabs(CGRectGetWidth(containerRect)-size.width);
             CGFloat diffOffset = padding + i * (fixedSize + padding);
             CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
             if (horizontally) {

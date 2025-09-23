@@ -1,7 +1,7 @@
 //
 //  TOCropView.m
 //
-//  Copyright 2015-2024 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -163,11 +163,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
 
-    // Disable smart inset behavior in iOS 11
-    if (@available(iOS 11.0, *)) {
-        self.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    }
-
+    self.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.scrollView.touchesBegan = ^{ [weakSelf startEditing]; };
     self.scrollView.touchesEnded = ^{ [weakSelf startResetTimer]; };
     
@@ -216,11 +212,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
     // Disable colour inversion for the image views
-    if (@available(iOS 11.0, *)) {
-        self.foregroundImageView.accessibilityIgnoresInvertColors = YES;
-        self.backgroundImageView.accessibilityIgnoresInvertColors = YES;
-    }
-    
+    self.foregroundImageView.accessibilityIgnoresInvertColors = YES;
+    self.backgroundImageView.accessibilityIgnoresInvertColors = YES;
+
     // The following setup isn't needed during circular cropping
     if (circularMode) { return; }
     
