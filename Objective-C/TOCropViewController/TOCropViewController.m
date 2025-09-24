@@ -373,18 +373,25 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     UIEdgeInsets insets = self.statusBarSafeInsets;
 
+    CGFloat leadingInset = 0.0f;
+    if (!self.verticalLayout) {
+        if (@available(iOS 26.0, *)) {
+            leadingInset = CGRectGetMaxX(self.toolbar.frame);
+        }
+    }
+
     // If there is no title text, inset the top of the content as high as possible
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
-          if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
-          }
-          else { // Add padding to the top otherwise
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
-          }
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+                self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            }
+            else { // Add padding to the top otherwise
+                self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
+            }
         }
         else {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, leadingInset, insets.bottom, 0.0f);
         }
 
         return;
@@ -399,7 +406,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGFloat verticalInset = self.statusBarHeight;
     verticalInset += kTOCropViewControllerTitleTopPadding;
     verticalInset += self.titleLabel.frame.size.height;
-    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, 0, insets.bottom, 0);
+    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, leadingInset, insets.bottom, 0);
 }
 
 - (void)adjustToolbarInsets
