@@ -63,6 +63,7 @@
         glassEffect.interactive = YES;
         _glassView = [[UIVisualEffectView alloc] initWithEffect:glassEffect];
         _glassView.cornerConfiguration = [UICornerConfiguration capsuleConfiguration];
+        _glassView.userInteractionEnabled = YES;
         [self addSubview:_glassView];
 
         containerView = _glassView.contentView;
@@ -312,7 +313,7 @@
 }
 
 // The convenience method for calculating button's frame inside of the container rect
-- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
+- (void)layoutToolbarButtons:(NSArray<UIButton *> *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
 {
     if (!buttons.count) {
         return;
@@ -322,8 +323,26 @@
 
     if (@available(iOS 26.0, *)) {
         CGFloat minPadding = 8.0f;
-        CGFloat maxExtent = buttons.count * buttonSize;
+        CGFloat maxExtent = buttons.count * buttonSize + (minPadding * (buttons.count - 1));
 
+        CGRect glassFrame = CGRectZero;
+        glassFrame.size.width = horizontally ? MIN(containerRect.size.width - (minPadding * 2.0f), maxExtent) : buttonSize;
+        glassFrame.size.height = horizontally ? buttonSize : MIN(containerRect.size.height - (minPadding * 2.0f), maxExtent);
+        glassFrame.origin.x = horizontally ? CGRectGetMidX(containerRect) - (glassFrame.size.width / 2.0f) : 0.0f;
+        glassFrame.origin.y = horizontally ? 0.0f : CGRectGetMidY(containerRect) - (glassFrame.size.height / 2.0f);
+        _glassView.frame = glassFrame;
+
+        CGFloat position = 0.0f;
+        for (UIButton *button in buttons) {
+            CGRect buttonFrame = CGRectMake(0.0, 0.0, buttonSize, buttonSize);
+            if (horizontally) {
+                buttonFrame.origin.x = position;
+            } else {
+                buttonFrame.origin.y = position;
+            }
+            button.frame = buttonFrame;
+            position += buttonSize + minPadding;
+        }
     } else {
         NSInteger count = buttons.count;
         CGFloat fixedSize = horizontally ? size.width : size.height;
