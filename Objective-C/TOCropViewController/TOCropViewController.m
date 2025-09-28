@@ -297,7 +297,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
         if (@available(iOS 26.0, *)) {
             if (insets.bottom > 0.0f) {
-                insets.bottom = 16.0f;
+                insets.bottom = 24.0f;
             } else {
                 insets.bottom = 8.0f;
             }
