@@ -131,7 +131,7 @@
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     if (@available(iOS 26.0, *)) {
-        _cancelIconButton.configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
+        _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
     }
     [self addSubview:_cancelIconButton];
     
