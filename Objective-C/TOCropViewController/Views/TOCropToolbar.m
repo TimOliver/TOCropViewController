@@ -767,4 +767,14 @@
     return self.cancelTextButton;
 }
 
+- (void)setDisableRotationButtons:(BOOL)disableRotationButtons
+{
+    if (_disableRotationButtons == disableRotationButtons) {
+        return;
+    }
+    _disableRotationButtons = disableRotationButtons;
+    _rotateClockwiseButton.enabled = !disableRotationButtons;
+    _rotateCounterclockwiseButton.enabled = !disableRotationButtons;
+}
+
 @end

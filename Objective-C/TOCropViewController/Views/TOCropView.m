@@ -1218,12 +1218,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // on direction
     if (newAngle >= 0) {
         while (labs(self.angle) != labs(newAngle)) {
-            [self rotateImageNinetyDegreesAnimated:NO clockwise:YES];
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:YES completion:nil];
         }
     }
     else {
         while (-labs(self.angle) != -labs(newAngle)) {
-            [self rotateImageNinetyDegreesAnimated:NO clockwise:NO];
+            [self rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
         }
     }
 }
@@ -1503,12 +1503,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                      completion:nil];
 }
 
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated completion:(void(^)(BOOL completed))completionHandler
 {
-    [self rotateImageNinetyDegreesAnimated:animated clockwise:NO];
+    [self rotateImageNinetyDegreesAnimated:animated clockwise:NO completion:completionHandler];
 }
 
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise completion:(void(^)(BOOL completed))completionHandler
 {
     //Only allow one rotation animation at a time
     if (self.rotateAnimationInProgress)
@@ -1666,7 +1666,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             } completion:^(BOOL complete) {
                 self.rotateAnimationInProgress = NO;
                 [snapshotView removeFromSuperview];
-                
+
                 // If the aspect ratio lock is not enabled, allow a swap
                 // If the aspect ratio lock is on, allow a aspect ratio swap
                 // only if the allowDimensionSwap option is specified.
@@ -1676,6 +1676,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 if (!aspectRatioCanSwapDimensions) {
                     //This will animate the aspect ratio back to the desired locked ratio after the image is rotated.
                     [self setAspectRatio:self.aspectRatio animated:animated];
+                }
+
+                if (completionHandler) {
+                    completionHandler(complete);
                 }
             }];
         }];

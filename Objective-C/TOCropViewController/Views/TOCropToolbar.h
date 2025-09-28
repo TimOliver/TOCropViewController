@@ -62,6 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly)  UIButton *clampButton;
 @property (nullable, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
+/* Set the rotation buttons to be disabled while rotating is in progress */
+@property (nonatomic, assign) BOOL disableRotationButtons;
+
 @property (nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
