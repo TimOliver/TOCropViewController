@@ -67,13 +67,10 @@
         [self addSubview:_glassView];
 
         containerView = _glassView.contentView;
+        _showOnlyIcons = YES;
     } else {
         self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
-    }
-    [self addSubview:self.backgroundView];
-
-    if (@available(iOS 26.0, *)) {
-        _showOnlyIcons = YES;
+        [self addSubview:self.backgroundView];
     }
 
     // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
@@ -322,8 +319,9 @@
     const CGFloat buttonSize = 44.0f;
 
     if (@available(iOS 26.0, *)) {
+        CGFloat glassPadding = 4.0f;
         CGFloat minPadding = 8.0f;
-        CGFloat maxExtent = buttons.count * buttonSize + (minPadding * (buttons.count - 1));
+        CGFloat maxExtent = buttons.count * buttonSize + (minPadding * (buttons.count - 1)) + (glassPadding * 2.0f);
 
         CGRect glassFrame = CGRectZero;
         glassFrame.size.width = horizontally ? MIN(containerRect.size.width - (minPadding * 2.0f), maxExtent) : buttonSize;
@@ -332,7 +330,7 @@
         glassFrame.origin.y = horizontally ? 0.0f : CGRectGetMidY(containerRect) - (glassFrame.size.height / 2.0f);
         _glassView.frame = glassFrame;
 
-        CGFloat position = 0.0f;
+        CGFloat position = glassPadding;
         for (UIButton *button in buttons) {
             CGRect buttonFrame = CGRectMake(0.0, 0.0, buttonSize, buttonSize);
             if (horizontally) {
