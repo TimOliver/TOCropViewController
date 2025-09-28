@@ -90,7 +90,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
 
         // Default initial behaviour
-        _aspectRatioPreset = TOCropViewControllerAspectRatioPresetOriginal;
+        _aspectRatioPreset = CGSizeZero;
 
         #if TARGET_OS_MACCATALYST
         _toolbarPosition = TOCropViewControllerToolbarPositionTop;
@@ -170,7 +170,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     // If an initial aspect ratio was set before presentation, set it now once the rest of
     // the setup will have been done
-    if (self.aspectRatioPreset != TOCropViewControllerAspectRatioPresetOriginal) {
+    if (!CGSizeEqualToSize(self.aspectRatioPreset, CGSizeZero)) {
         [self setAspectRatioPreset:self.aspectRatioPreset animated:NO];
     }
 }
@@ -571,50 +571,28 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     
     //Prepare the localized options
 	NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-	NSString *originalButtonTitle = NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil);
-	NSString *squareButtonTitle = NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil);
     
     //Prepare the list that will be fed to the alert view/controller
-    
-    // Ratio titles according to the order of enum TOCropViewControllerAspectRatioPreset
-    NSArray<NSString *> *portraitRatioTitles = @[originalButtonTitle, squareButtonTitle, @"2:3", @"3:5", @"3:4", @"4:5", @"5:7", @"9:16"];
-    NSArray<NSString *> *landscapeRatioTitles = @[originalButtonTitle, squareButtonTitle, @"3:2", @"5:3", @"4:3", @"5:4", @"7:5", @"16:9"];
 
-    NSMutableArray *ratioValues = [NSMutableArray array];
-    NSMutableArray *itemStrings = [NSMutableArray array];
+    NSArray<TOCropViewControllerAspectRatioPreset *> *presets;
 
     if (self.allowedAspectRatios == nil) {
-        for (NSInteger i = 0; i < TOCropViewControllerAspectRatioPresetCustom; i++) {
-            NSString *itemTitle = verticalCropBox ? portraitRatioTitles[i] : landscapeRatioTitles[i];
-            [itemStrings addObject:itemTitle];
-            [ratioValues addObject:@(i)];
-        }
+        presets = verticalCropBox ? [TOCropViewControllerAspectRatioPreset portraitPresets] : [TOCropViewControllerAspectRatioPreset landscapePresets];
     }
     else {
-        for (NSNumber *allowedRatio in self.allowedAspectRatios) {
-            TOCropViewControllerAspectRatioPreset ratio = allowedRatio.integerValue;
-            NSString *itemTitle = verticalCropBox ? portraitRatioTitles[ratio] : landscapeRatioTitles[ratio];
-            [itemStrings addObject:itemTitle];
-            [ratioValues addObject:allowedRatio];
-        }
-    }
-    
-    // If a custom aspect ratio is provided, and a custom name has been given to it, add it as a visible choice
-    if (self.customAspectRatioName.length > 0 && !CGSizeEqualToSize(CGSizeZero, self.customAspectRatio)) {
-        [itemStrings addObject:self.customAspectRatioName];
-        [ratioValues addObject:@(TOCropViewControllerAspectRatioPresetCustom)];
+        presets = self.allowedAspectRatios;
     }
 
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
 
     //Add each item to the alert controller
-    for (NSInteger i = 0; i < itemStrings.count; i++) {
+    for (NSInteger i = 0; i < presets.count; i++) {
         id handlerBlock = ^(UIAlertAction *action) {
-            [self setAspectRatioPreset:[ratioValues[i] integerValue] animated:YES];
+            [self setAspectRatioPreset:presets[i].size animated:YES];
             self.aspectRatioLockEnabled = YES;
         };
-        UIAlertAction *action = [UIAlertAction actionWithTitle:itemStrings[i] style:UIAlertActionStyleDefault handler:handlerBlock];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:presets[i].title style:UIAlertActionStyleDefault handler:handlerBlock];
         [alertController addAction:action];
     }
 
@@ -625,58 +603,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)setAspectRatioPreset:(TOCropViewControllerAspectRatioPreset)aspectRatioPreset animated:(BOOL)animated
+- (void)setAspectRatioPreset:(CGSize)aspectRatioPreset animated:(BOOL)animated
 {
-    CGSize aspectRatio = CGSizeZero;
-    
     _aspectRatioPreset = aspectRatioPreset;
-    
-    switch (aspectRatioPreset) {
-        case TOCropViewControllerAspectRatioPresetOriginal:
-            aspectRatio = CGSizeZero;
-            break;
-        case TOCropViewControllerAspectRatioPresetSquare:
-            aspectRatio = CGSizeMake(1.0f, 1.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset3x2:
-            aspectRatio = CGSizeMake(3.0f, 2.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset5x3:
-            aspectRatio = CGSizeMake(5.0f, 3.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset4x3:
-            aspectRatio = CGSizeMake(4.0f, 3.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset5x4:
-            aspectRatio = CGSizeMake(5.0f, 4.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset7x5:
-            aspectRatio = CGSizeMake(7.0f, 5.0f);
-            break;
-        case TOCropViewControllerAspectRatioPreset16x9:
-            aspectRatio = CGSizeMake(16.0f, 9.0f);
-            break;
-        case TOCropViewControllerAspectRatioPresetCustom:
-            aspectRatio = self.customAspectRatio;
-            break;
-    }
-    
-    // If the aspect ratio lock is not enabled, allow a swap
-    // If the aspect ratio lock is on, allow a aspect ratio swap
-    // only if the allowDimensionSwap option is specified.
-    BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled ||
-                                (self.aspectRatioLockEnabled && self.aspectRatioLockDimensionSwapEnabled);
-    
-    //If the image is a portrait shape, flip the aspect ratio to match
-    if (self.cropView.cropBoxAspectRatioIsPortrait &&
-        aspectRatioCanSwapDimensions)
-    {
-        CGFloat width = aspectRatio.width;
-        aspectRatio.width = aspectRatio.height;
-        aspectRatio.height = width;
-    }
-    
-    [self.cropView setAspectRatio:aspectRatio animated:animated];
+    [self.cropView setAspectRatio:aspectRatioPreset animated:animated];
 }
 
 - (void)rotateCropViewClockwise
@@ -1198,12 +1128,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     if (!self.aspectRatioPickerButtonHidden) {
         self.aspectRatioPickerButtonHidden = (resetAspectRatioEnabled == NO && self.aspectRatioLockEnabled);
     }
-}
-
-- (void)setCustomAspectRatio:(CGSize)customAspectRatio
-{
-    _customAspectRatio = customAspectRatio;
-    [self setAspectRatioPreset:TOCropViewControllerAspectRatioPresetCustom animated:NO];
 }
 
 - (BOOL)resetAspectRatioEnabled
