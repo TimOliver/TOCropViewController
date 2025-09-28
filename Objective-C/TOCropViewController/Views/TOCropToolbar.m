@@ -57,55 +57,71 @@
     if (@available(iOS 26.0, *)) {}
     else { self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f]; }
     [self addSubview:self.backgroundView];
-    
+
+    if (@available(iOS 26.0, *)) {
+        _showOnlyIcons = YES;
+    }
+
     // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
 
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
-    
-    _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [_doneTextButton setTitle: _doneTextButtonTitle ?
-        _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
-																  @"TOCropViewControllerLocalizable",
-																  resourceBundle,
-                                                                  nil)
-                     forState:UIControlStateNormal];
-    [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-    if (@available(iOS 13.0, *)) {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
-    } else {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+
+    if (@available(iOS 26.0, *)) {}
+    else {
+        _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [_doneTextButton setTitle: _doneTextButtonTitle ?
+            _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
+                                                                      @"TOCropViewControllerLocalizable",
+                                                                      resourceBundle,
+                                                                      nil)
+                         forState:UIControlStateNormal];
+        [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
+        if (@available(iOS 13.0, *)) {
+            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
+        } else {
+            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+        }
+        [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [_doneTextButton sizeToFit];
+        [self addSubview:_doneTextButton];
     }
-    [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_doneTextButton sizeToFit];
-    [self addSubview:_doneTextButton];
-    
+
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    if (@available(iOS 26.0, *)) {
+        _doneIconButton.configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
+    }
     [self addSubview:_doneIconButton];
 
     // Set the default color for the done buttons
     self.doneButtonColor = nil;
 
-    _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    
-    [_cancelTextButton setTitle: _cancelTextButtonTitle ?
-        _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
-																	@"TOCropViewControllerLocalizable",
-																	resourceBundle,
-                                                                    nil)
-                       forState:UIControlStateNormal];
-    [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
-    [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_cancelTextButton sizeToFit];
-    [self addSubview:_cancelTextButton];
-    
+    if (@available(iOS 26.0, *)) {}
+    else {
+        _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+
+        [_cancelTextButton setTitle: _cancelTextButtonTitle ?
+            _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
+                                                                        @"TOCropViewControllerLocalizable",
+                                                                        resourceBundle,
+                                                                        nil)
+                           forState:UIControlStateNormal];
+        [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+        [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [_cancelTextButton sizeToFit];
+        [self addSubview:_cancelTextButton];
+    }
+
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    if (@available(iOS 26.0, *)) {
+        _cancelIconButton.configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
+    }
     [self addSubview:_cancelIconButton];
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -148,7 +164,7 @@
     
     BOOL verticalLayout = (CGRectGetWidth(self.bounds) < CGRectGetHeight(self.bounds));
     CGSize boundsSize = self.bounds.size;
-    
+
     self.cancelIconButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
     self.cancelTextButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? true : verticalLayout);
     self.doneIconButton.hidden   = self.doneButtonHidden || (_showOnlyIcons ? false : !verticalLayout);

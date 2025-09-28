@@ -53,7 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *cancelTextButtonTitle;
 @property (nullable, nonatomic, copy) UIColor *cancelButtonColor;
 
-@property (nonatomic, assign) BOOL showOnlyIcons;
+/* Show the tick and cross buttons instead of 'Done' and 'Cancel'. */
+@property (nonatomic, assign) BOOL showOnlyIcons API_DEPRECATED("iOS 26 uses icons only", ios(7.0, 18.0));
 
 /* The cropper control buttons */
 @property (nonatomic, strong, readonly)  UIButton *rotateCounterclockwiseButton;
