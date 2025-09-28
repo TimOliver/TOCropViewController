@@ -281,10 +281,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
-        frame.origin.x = insets.left;
-        frame.origin.y = 0.0f;
-        frame.size.width = kTOCropViewControllerToolbarHeight;
-        frame.size.height = CGRectGetHeight(self.view.frame);
+        if (@available(iOS 26.0, *)) {
+            CGFloat minPadding = 8.0f;
+            frame.origin.x = insets.left + minPadding;
+            frame.origin.y = minPadding;
+            frame.size.width = kTOCropViewControllerToolbarHeight;
+            frame.size.height = CGRectGetHeight(self.view.frame) - (minPadding * 2.0f);
+        } else {
+            frame.origin.x = insets.left;
+            frame.origin.y = 0.0f;
+            frame.size.width = kTOCropViewControllerToolbarHeight;
+            frame.size.height = CGRectGetHeight(self.view.frame);
+        }
     }
     else {
         // On iOS 26, the safe area insets values are the same, however the default bottom value is so
@@ -297,7 +305,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
         if (@available(iOS 26.0, *)) {
             if (insets.bottom > 0.0f) {
-                insets.bottom = 24.0f;
+                insets.bottom = 20.0f;
             } else {
                 insets.bottom = 8.0f;
             }
