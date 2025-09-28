@@ -191,7 +191,10 @@
     
     if (verticalLayout == NO) {
         CGFloat insetPadding = 10.0f;
-        
+        if (@available(iOS 26.0, *)) {
+            insetPadding = 0.0f;
+        }
+
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;

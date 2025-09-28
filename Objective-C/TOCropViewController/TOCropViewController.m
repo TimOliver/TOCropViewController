@@ -287,17 +287,29 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         frame.size.height = CGRectGetHeight(self.view.frame);
     }
     else {
-        // On iOS 26, the safe area insets values are the same, however the home indicator
-        // is now hidden, making the default inset look too high. It looks like Apple is
-        // just ignoring that value and manually positioning the toolbar/tab bars above the indicator.
-        // Let's do the same for now.
+        // On iOS 26, the safe area insets values are the same, however the default bottom value is so
+        // high that the buttons look incorrectly set. While you can try and hardcode a value lower to
+        // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
+        // devices is also difficult.
+
+        // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
+        // the toolbar with the device's rounded corners.
+        // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
         if (@available(iOS 26.0, *)) {
             if (insets.bottom > 0.0f) {
-                insets.bottom = 12.0f;
+                insets.bottom = 16.0f;
             } else {
                 insets.bottom = 8.0f;
             }
-            frame.size.width = CGRectGetWidth(self.view.bounds) - (self.view.layoutMargins.left * 2.0f);
+
+            const char* components[] = {"Radius", "Corner", "display", "_"};
+            NSString *selectorName = @"";
+            for (NSInteger i = 3; i >= 0; i--) {
+                selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
+                                                                                        encoding:NSUTF8StringEncoding]];
+            }
+            const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+            frame.size.width = CGRectGetWidth(self.view.bounds) - MAX(cornerRadius, insets.bottom * 2.0f);
         } else {
             frame.size.width = CGRectGetWidth(self.view.bounds);
         }
