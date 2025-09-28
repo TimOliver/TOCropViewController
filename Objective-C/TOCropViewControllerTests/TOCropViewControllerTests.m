@@ -19,7 +19,7 @@
 
 - (void)testViewControllerInstance {
     //Create a basic image
-    UIGraphicsBeginImageContextWithOptions((CGSize){10, 10}, NO, 1.0f);
+    UIGraphicsBeginImageContextWithOptions((CGSize){10, 10}, NO, 1.0);
     CGContextFillRect(UIGraphicsGetCurrentContext(), (CGRect){0,0,10,10});
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();

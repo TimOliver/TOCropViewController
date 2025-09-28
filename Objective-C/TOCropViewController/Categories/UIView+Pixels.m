@@ -1,7 +1,7 @@
 //
-//  TOActivityCroppedImageProvider.h
+//  UIView+Pixels.m
 //
-//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
+//  Copyright 2024 Jan de Vries. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,20 +20,33 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import "UIView+Pixels.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation UIView (TOPixels)
 
-@interface TOActivityCroppedImageProvider : UIActivityItemProvider
+- (CGFloat)roundToNearestPixel:(CGFloat)point {
+    CGFloat screenScale = 2.0;
+    if (self.window != nil && self.window.screen != nil) {
+        screenScale = self.window.screen.scale;
+    }
+    return round(point * screenScale) / screenScale;
+}
 
-@property (nonnull, nonatomic, readonly) UIImage *image;
-@property (nonatomic, readonly) CGRect cropFrame;
-@property (nonatomic, readonly) NSInteger angle;
-@property (nonatomic, readonly) BOOL flipped;
-@property (nonatomic, readonly) BOOL circular;
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2
+{
+    if (self.window == nil || self.window.screen == nil) {
+        return point1 == point2;
+    }
+    CGFloat screenScale = self.window.screen.scale;
+    return round(point1*screenScale) == round(point2*screenScale);
+}
 
-- (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle flipped:(BOOL)flipped circular:(BOOL)circular;
+- (CGRect)CGRectIntegralRetina:(CGRect)rect
+{
+    return CGRectMake([self roundToNearestPixel:rect.origin.x],
+                      [self roundToNearestPixel:rect.origin.y],
+                      [self roundToNearestPixel:rect.size.width],
+                      [self roundToNearestPixel:rect.size.height]);
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

@@ -48,29 +48,44 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      Called when the user has committed the crop action, and provides
      just the cropping rectangle.
      
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect cropRect: CGRect, angle: Int, flipped: Bool)
+    
+    /// Deprecated, use method with 'flipped' argument instead.
+    /// - Warning: Deprecated, add arg 'flipped: Bool' to this method.
     @objc optional func cropViewController(_ cropViewController: CropViewController, didCropImageToRect cropRect: CGRect, angle: Int)
     
     /**
      Called when the user has committed the crop action, and provides
-     both the original image with crop co-ordinates.
+     both the original image with crop coordinates.
      
      @param image The newly cropped image.
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool)
+    
+    /// Deprecated, use method with 'flipped' argument instead.
+    /// - Warning: Deprecated, add arg 'flipped: Bool' to this method.
     @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int)
     
     /**
      If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
-     image, as well as it's cropping co-ordinates
+     image, as well as its cropping coordinates
      
      @param image The newly cropped image, clipped to a circle shape
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int, flipped: Bool)
+    
+    /// Deprecated, use method with 'flipped' argument instead.
+    /// - Warning: Deprecated, add arg 'flipped: Bool' to this method.
     @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int)
     
     /**
@@ -154,6 +169,27 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
+     Use this and the ``angle`` property to flip (mirror) the image.
+     For horizontal flip set flipped to true and angle to 0.
+     For vertical flip set flipped to true and angle to 180.
+     For both horizontal and vertical flip set flipped to false and angle to 180.
+     
+     This property can be set before the controller is presented to have
+     the image 'restored' to a previous cropping layout.
+     */
+    public var flipped: Bool {
+        set { toCropViewController.flipped = newValue }
+        get { return toCropViewController.flipped }
+    }
+    
+    
+    @available(*, deprecated, message: "Use 'flipped' instead.")
+    public var mirrored: Bool {
+        set { flipped = newValue }
+        get { return flipped }
+    }
+    
+    /**
      The cropping style of this particular crop view controller
      */
     public var croppingStyle: CropViewCroppingStyle {
@@ -207,7 +243,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     }
     
     /**
-     If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to true, the crop box will swap it's dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
+     If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to true, the crop box will swap its dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
      
      Default is false.
      */
@@ -259,6 +295,31 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.rotateButtonsHidden = newValue }
         get { return toCropViewController.rotateButtonsHidden }
     }
+    
+    /**
+     When enabled, hides the flip horizontal button on the toolbar.
+     
+     Default is false.
+     */
+    public var flipHorizontalButtonHidden: Bool {
+        set {
+            toCropViewController.flipHorizontalButtonHidden = newValue
+        }
+        get { return toCropViewController.flipHorizontalButtonHidden }
+    }
+    
+    /**
+     When enabled, hides the flip vertical button on the toolbar.
+     
+     Default is true.
+     */
+    public var flipVerticalButtonHidden: Bool {
+        set {
+            toCropViewController.flipVerticalButtonHidden = newValue
+        }
+        get { return toCropViewController.flipVerticalButtonHidden }
+    }
+    
     /**
      When enabled, hides the 'Reset' button on the toolbar.
 
@@ -352,36 +413,39 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      Called when the user has committed the crop action, and provides
      just the cropping rectangle.
      
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
-    public var onDidCropImageToRect: ((CGRect, Int) -> (Void))? {
+    public var onDidCropImageToRect: ((CGRect, NSInteger, Bool) -> (Void))? {
         set { toCropViewController.onDidCropImageToRect = newValue }
         get { return toCropViewController.onDidCropImageToRect }
     }
     
     /**
      Called when the user has committed the crop action, and provides
-     both the cropped image with crop co-ordinates.
+     both the cropped image with crop coordinates.
      
      @param image The newly cropped image.
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
-    public var onDidCropToRect: ((UIImage, CGRect, NSInteger) -> (Void))? {
+    public var onDidCropToRect: ((UIImage, CGRect, NSInteger, Bool) -> (Void))? {
         set { toCropViewController.onDidCropToRect = newValue }
         get { return toCropViewController.onDidCropToRect }
     }
     
     /**
      If the cropping style is set to circular, this block will return a circle-cropped version of the selected
-     image, as well as it's cropping co-ordinates
+     image, as well as its cropping coordinates
      
      @param image The newly cropped image, clipped to a circle shape
-     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local co-ordinate space)
+     @param cropRect A rectangle indicating the crop region of the image the user chose (In the original image's local coordinate space)
      @param angle The angle of the image when it was cropped
+     @param flipped Whether the image was flipped (mirrored) when it was cropped
      */
-    public var onDidCropToCircleImage: ((UIImage, CGRect, NSInteger) -> (Void))? {
+    public var onDidCropToCircleImage: ((UIImage, CGRect, NSInteger, Bool) -> (Void))? {
         set { toCropViewController.onDidCropToCircleImage = newValue }
         get { return toCropViewController.onDidCropToCircleImage }
     }
@@ -607,16 +671,17 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
      @param fromView A view that's frame will be used as the origin for this animation. Optional if `fromFrame` has a value.
      @param fromFrame In the screen's coordinate space, the frame from which the image should animate from.
      @param angle The rotation angle in which the image was rotated when it was originally cropped.
+     @param flipped Whether the image was flipped (mirrored) when it was originally cropped.
      @param toFrame In the image's coordinate space, the previous crop frame that created the previous crop
      @param setup A block that is called just before the transition starts. Recommended for hiding any necessary image views.
      @param completion A block that is called once the transition animation is completed.
     */
     public func presentAnimatedFrom(_ viewController: UIViewController, fromImage image: UIImage?,
-                                    fromView: UIView?, fromFrame: CGRect, angle: Int, toImageFrame toFrame: CGRect,
+                                    fromView: UIView?, fromFrame: CGRect, angle: Int, flipped: Bool, toImageFrame toFrame: CGRect,
                                     setup: (() -> (Void))?, completion:(() -> (Void))?)
     {
         toCropViewController.presentAnimatedFrom(viewController, fromImage: image, fromView: fromView,
-                                                 fromFrame: fromFrame, angle: angle, toFrame: toFrame,
+                                                 fromFrame: fromFrame, angle: angle, flipped: flipped, toFrame: toFrame,
                                                  setup: setup, completion: completion)
     }
     
@@ -674,25 +739,46 @@ extension CropViewController {
             onDidFinishCancelled = nil
             return
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropImageToRect:angle:))) {
-            self.onDidCropImageToRect = {[weak self] rect, angle in
+            crashWhenFresh()
+            self.onDidCropImageToRect = {[weak self] rect, angle, flipped in
                 guard let strongSelf = self else { return }
                 delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle)
             }
         }
+        if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropImageToRect:angle:flipped:))) {
+            self.onDidCropImageToRect = {[weak self] rect, angle, flipped in
+                guard let strongSelf = self else { return }
+                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle, flipped: flipped)
+            }
+        }
         
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToImage:withRect:angle:))) {
-            self.onDidCropToRect = {[weak self] image, rect, angle in
+            crashWhenFresh()
+            self.onDidCropToRect = {[weak self] image, rect, angle, flipped in
                 guard let strongSelf = self else { return }
                 delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
             }
         }
-        
+        if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToImage:withRect:angle:flipped:))) {
+            self.onDidCropToRect = {[weak self] image, rect, angle, flipped in
+                guard let strongSelf = self else { return }
+                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle, flipped: flipped)
+            }
+        }
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToCircularImage:withRect:angle:))) {
-            self.onDidCropToCircleImage = {[weak self] image, rect, angle in
+            crashWhenFresh()
+            self.onDidCropToCircleImage = {[weak self] image, rect, angle, flipped in
                 guard let strongSelf = self else { return }
                 delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
+            }
+        }
+        if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToCircularImage:withRect:angle:flipped:))) {
+            self.onDidCropToCircleImage = {[weak self] image, rect, angle, flipped in
+                guard let strongSelf = self else { return }
+                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle, flipped: flipped)
             }
         }
         
@@ -700,6 +786,20 @@ extension CropViewController {
             self.onDidFinishCancelled = {[weak self] finished in
                 guard let strongSelf = self else { return }
                 delegate.cropViewController!(strongSelf, didFinishCancelled: finished)
+            }
+        }
+    }
+
+    //Fresh builds that are less than 2 hours old require you to update your delegate method implementations with the 'flipped' arg.
+    //This should make sure end users won't experience crashes but you will be motivated to update the delegate methods.
+    private func crashWhenFresh() {
+        let bundleName = Bundle.main.infoDictionary!["CFBundleExecutable"] as? String ?? "Info.plist"
+
+        if let infoPath = Bundle.main.path(forResource: bundleName, ofType: nil),
+            let infoAttr = try? FileManager.default.attributesOfItem(atPath: infoPath),
+            let infoDate = infoAttr[FileAttributeKey.creationDate] as? Date {
+            if infoDate.timeIntervalSinceNow > -7200 {
+                fatalError("Please add arg 'flipped: Bool' your didCrop delegate method implementations.")
             }
         }
     }

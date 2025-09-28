@@ -27,7 +27,7 @@
 
 - (NSTimeInterval)transitionDuration:(id <UIViewControllerContextTransitioning>)transitionContext
 {
-    return 0.45f;
+    return 0.45;
 }
 
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext
@@ -83,13 +83,13 @@
         [containerView addSubview:imageView];
     }
     
-    cropViewController.view.alpha = (self.isDismissing ? 1.0f : 0.0f);
+    cropViewController.view.alpha = (self.isDismissing ? 1.0 : 0.0);
     if (imageView) {
-        [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
+        [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 usingSpringWithDamping:1.0 initialSpringVelocity:0.7 options:0 animations:^{
             imageView.frame = self.toFrame;
         } completion:^(BOOL complete) {
-            [UIView animateWithDuration:0.25f animations:^{
-                imageView.alpha = 0.0f;
+            [UIView animateWithDuration:0.25 animations:^{
+                imageView.alpha = 0.0;
             }completion:^(BOOL complete) {
                 [imageView removeFromSuperview];
             }];
@@ -97,7 +97,7 @@
     }
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        cropViewController.view.alpha = (self.isDismissing ? 0.0f : 1.0f);
+        cropViewController.view.alpha = (self.isDismissing ? 0.0 : 1.0);
     } completion:^(BOOL complete) {
         [self reset];
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];

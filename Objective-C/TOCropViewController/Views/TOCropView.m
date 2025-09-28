@@ -23,13 +23,14 @@
 #import "TOCropView.h"
 #import "TOCropOverlayView.h"
 #import "TOCropScrollView.h"
+#import "UIView+Pixels.h"
 
-#define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.12f alpha:1.0f]
+#define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.12 alpha:1.0]
 
-static const CGFloat kTOCropViewPadding = 14.0f;
-static const NSTimeInterval kTOCropTimerDuration = 0.8f;
-static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
-static const CGFloat kTOMaximumZoomScale = 15.0f;
+static const CGFloat kTOCropViewPadding = 14.0;
+static const NSTimeInterval kTOCropTimerDuration = 0.8;
+static const CGFloat kTOCropViewMinimumBoxSize = 42.0;
+static const CGFloat kTOMaximumZoomScale = 15.0;
 
 /* When the user taps down to resize the box, this state is used
  to determine where they tapped and how to manipulate the box */
@@ -54,6 +55,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
 @property (nonatomic, strong) UIView *backgroundContainerView;      /* A view which contains the background image view, to separate its transforms from the scroll view. */
 @property (nonatomic, strong, readwrite) UIView *foregroundContainerView;
+@property (nonatomic, strong) UIView *foregroundMaskView;
 @property (nonatomic, strong) UIImageView *foregroundImageView;     /* A copy of the background image view, placed over the dimming views */
 @property (nonatomic, strong) TOCropScrollView *scrollView;         /* The scroll view in charge of panning/zooming the image. */
 @property (nonatomic, strong) UIView *overlayView;                  /* A semi-transparent grey view, overlaid on top of the background image */
@@ -82,7 +84,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* View State information */
 @property (nonatomic, readonly) CGRect contentBounds; /* Give the current screen real-estate, the frame that the scroll view is allowed to use */
 @property (nonatomic, readonly) CGSize imageSize;     /* Given the current rotation of the image, the size of the image */
-@property (nonatomic, readonly) BOOL hasAspectRatio;  /* True if an aspect ratio was explicitly applied to this crop view */
+@property (nonatomic, readonly) BOOL hasAspectRatio;  /* YES if an aspect ratio was explicitly applied to this crop view */
 
 /* 90-degree rotation state data */
 @property (nonatomic, assign) CGSize cropBoxLastEditedSize; /* When performing 90-degree rotations, remember what our last manual size was to use that as a base */
@@ -141,7 +143,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.applyInitialCroppedImageFrame = NO;
     self.editing = NO;
     self.cropBoxResizeEnabled = !circularMode;
-    self.aspectRatio = circularMode ? (CGSize){1.0f, 1.0f} : CGSizeZero;
+    self.aspectRatio = circularMode ? (CGSize){1.0, 1.0} : CGSizeZero;
     self.resetAspectRatioEnabled = !circularMode;
     self.restoreImageCropFrame = CGRectZero;
     self.restoreAngle = 0;
@@ -179,7 +181,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Grey transparent overlay view
     self.overlayView = [[UIView alloc] initWithFrame:self.bounds];
     self.overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.overlayView.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0.35f];
+    self.overlayView.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0.35];
     self.overlayView.hidden = NO;
     self.overlayView.userInteractionEnabled = NO;
     [self addSubview:self.overlayView];
@@ -194,22 +196,27 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         UIToolbar *toolbar = [[UIToolbar alloc] init];
         toolbar.barStyle = UIBarStyleBlack;
         self.translucencyView = toolbar;
-        self.translucencyView.frame = CGRectInset(self.bounds, -1.0f, -1.0f);
+        self.translucencyView.frame = CGRectInset(self.bounds, -1.0, -1.0);
     }
     self.translucencyView.hidden = self.translucencyAlwaysHidden;
     self.translucencyView.userInteractionEnabled = NO;
     self.translucencyView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.translucencyView];
     
-    // The forground container that holds the foreground image view
+    // The foreground container that holds the foreground image view
     self.foregroundContainerView = [[UIView alloc] initWithFrame:(CGRect){0,0,200,200}];
-    self.foregroundContainerView.clipsToBounds = YES;
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
+    self.foregroundMaskView = [[UIView alloc] initWithFrame:self.foregroundContainerView.bounds];
+    self.foregroundMaskView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.foregroundMaskView.clipsToBounds = YES;
+    self.foregroundMaskView.userInteractionEnabled = NO;
+    [self.foregroundContainerView addSubview:self.foregroundMaskView];
+    
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
     self.foregroundImageView.layer.minificationFilter = kCAFilterTrilinear;
-    [self.foregroundContainerView addSubview:self.foregroundImageView];
+    [self.foregroundMaskView addSubview:self.foregroundImageView];
     
     // Disable colour inversion for the image views
     self.foregroundImageView.accessibilityIgnoresInvertColors = YES;
@@ -276,11 +283,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGSize boundsSize = bounds.size;
 
     //work out the minimum scale of the object
-    CGFloat scale = 0.0f;
+    CGFloat scale = 0.0;
     
     // Work out the size of the image to fit into the content bounds
     scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
-    CGSize scaledImageSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
+    CGSize scaledImageSize = (CGSize){imageSize.width * scale, imageSize.height * scale};
     
     // If an aspect ratio was pre-applied to the crop view, use that to work out the minimum scale the image needs to be to fit
     CGSize cropBoxSize = CGSizeZero;
@@ -294,7 +301,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     //Whether aspect ratio, or original, the final image size we'll base the rest of the calculations off
-    CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
+    CGSize scaledSize = (CGSize){imageSize.width * scale, imageSize.height * scale};
     
     // Configure the scroll view
     self.scrollView.minimumZoomScale = scale;
@@ -303,8 +310,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Set the crop box to the size we calculated and align in the middle of the screen
     CGRect frame = CGRectZero;
     frame.size = self.hasAspectRatio ? cropBoxSize : scaledSize;
-    frame.origin.x = floorf(bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f));
-    frame.origin.y = floorf(bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f));
+    frame.origin.x = bounds.origin.x + (CGRectGetWidth(bounds) - frame.size.width) * 0.5;
+    frame.origin.y = bounds.origin.y + (CGRectGetHeight(bounds) - frame.size.height) * 0.5;
     self.cropBoxFrame = frame;
     
     //set the fully zoomed out state initially
@@ -313,10 +320,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // If we ended up with a smaller crop box than the content, line up the content so its center
     // is in the center of the cropbox
-    if (frame.size.width < scaledSize.width - FLT_EPSILON || frame.size.height < scaledSize.height - FLT_EPSILON) {
+    if (frame.size.width < scaledSize.width - DBL_EPSILON || frame.size.height < scaledSize.height - DBL_EPSILON) {
         CGPoint offset = CGPointZero;
-        offset.x = -floorf(CGRectGetMidX(bounds) - (scaledSize.width * 0.5f));
-        offset.y = -floorf(CGRectGetMidY(bounds) - (scaledSize.height * 0.5f));
+        offset.x = -(CGRectGetMidX(bounds) - (scaledSize.width * 0.5));
+        offset.y = -(CGRectGetMidY(bounds) - (scaledSize.height * 0.5));
         self.scrollView.contentOffset = offset;
     }
 
@@ -349,10 +356,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.zoomScale *= scale;
     
     //Work out the centered, upscaled version of the crop rectangle
-    cropFrame.size.width  = floorf(cropFrame.size.width * scale);
-    cropFrame.size.height = floorf(cropFrame.size.height * scale);
-    cropFrame.origin.x    = floorf(contentFrame.origin.x + ((contentFrame.size.width - cropFrame.size.width) * 0.5f));
-    cropFrame.origin.y    = floorf(contentFrame.origin.y + ((contentFrame.size.height - cropFrame.size.height) * 0.5f));
+    cropFrame.size.width  = cropFrame.size.width * scale;
+    cropFrame.size.height = cropFrame.size.height * scale;
+    cropFrame.origin.x    = contentFrame.origin.x + ((contentFrame.size.width - cropFrame.size.width) * 0.5);
+    cropFrame.origin.y    = contentFrame.origin.y + ((contentFrame.size.height - cropFrame.size.height) * 0.5);
     self.cropBoxFrame = cropFrame;
     
     [self captureStateForImageRotation];
@@ -374,8 +381,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     translatedContentOffset.y = self.scrollView.contentSize.height * normalizedCenter.y;
     
     CGPoint offset = CGPointZero;
-    offset.x = floorf(translatedContentOffset.x - newMidPoint.x);
-    offset.y = floorf(translatedContentOffset.y - newMidPoint.y);
+    offset.x = translatedContentOffset.x - newMidPoint.x;
+    offset.y = translatedContentOffset.y - newMidPoint.y;
     
     //Make sure it doesn't overshoot the top left corner of the crop box
     offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
@@ -414,8 +421,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     point.y = MAX(contentFrame.origin.y - self.cropViewPadding, point.y);
     
     //The delta between where we first tapped, and where our finger is now
-    CGFloat xDelta = ceilf(point.x - self.panOriginPoint.x);
-    CGFloat yDelta = ceilf(point.y - self.panOriginPoint.y);
+    CGFloat xDelta = point.x - self.panOriginPoint.x;
+    CGFloat yDelta = point.y - self.panOriginPoint.y;
 
     //Current aspect ratio of the crop box in case we need to clamp it
     CGFloat aspectRatio = (originFrame.size.width / originFrame.size.height);
@@ -435,7 +442,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 xDelta = MAX(xDelta, 0);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMaxX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
-                frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5f);
+                frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5);
             }
             CGFloat newWidth = originFrame.size.width - xDelta;
             CGFloat newHeight = originFrame.size.height;
@@ -452,7 +459,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectHorizontal = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMinX(originFrame), CGRectGetMidY(originFrame)};
                 frame.size.height = frame.size.width / aspectRatio;
-                frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5f);
+                frame.origin.y = scaleOrigin.y - (frame.size.height * 0.5);
                 frame.size.width = originFrame.size.width + xDelta;
                 frame.size.width = MIN(frame.size.width, contentFrame.size.height * aspectRatio);
             }
@@ -470,7 +477,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 aspectVertical = YES;
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMinY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
-                frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5f);
+                frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5);
                 frame.size.height = originFrame.size.height + yDelta;
                 frame.size.height = MIN(frame.size.height, contentFrame.size.width / aspectRatio);
             }
@@ -489,7 +496,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 yDelta = MAX(0,yDelta);
                 CGPoint scaleOrigin = (CGPoint){CGRectGetMidX(originFrame), CGRectGetMaxY(originFrame)};
                 frame.size.width = frame.size.height * aspectRatio;
-                frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5f);
+                frame.origin.x = scaleOrigin.x - (frame.size.width * 0.5);
                 frame.origin.y    = originFrame.origin.y + yDelta;
                 frame.size.height = originFrame.size.height - yDelta;
             }
@@ -512,13 +519,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 yDelta = MAX(yDelta, 0);
                 
                 CGPoint distance;
-                distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
-                distance.y = 1.0f - (yDelta / CGRectGetHeight(originFrame));
+                distance.x = 1.0 - (xDelta / CGRectGetWidth(originFrame));
+                distance.y = 1.0 - (yDelta / CGRectGetHeight(originFrame));
                 
-                CGFloat scale = (distance.x + distance.y) * 0.5f;
+                CGFloat scale = (distance.x + distance.y) * 0.5;
                 
-                frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
-                frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
+                frame.size.width = CGRectGetWidth(originFrame) * scale;
+                frame.size.height = CGRectGetHeight(originFrame) * scale;
                 frame.origin.x = originFrame.origin.x + (CGRectGetWidth(originFrame) - frame.size.width);
                 frame.origin.y = originFrame.origin.y + (CGRectGetHeight(originFrame) - frame.size.height);
                 
@@ -547,13 +554,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                 yDelta = MAX(yDelta, 0);
                 
                 CGPoint distance;
-                distance.x = 1.0f - ((-xDelta) / CGRectGetWidth(originFrame));
-                distance.y = 1.0f - ((yDelta) / CGRectGetHeight(originFrame));
+                distance.x = 1.0 - ((-xDelta) / CGRectGetWidth(originFrame));
+                distance.y = 1.0 - ((yDelta) / CGRectGetHeight(originFrame));
                 
-                CGFloat scale = (distance.x + distance.y) * 0.5f;
+                CGFloat scale = (distance.x + distance.y) * 0.5;
                 
-                frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
-                frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
+                frame.size.width = CGRectGetWidth(originFrame) * scale;
+                frame.size.height = CGRectGetHeight(originFrame) * scale;
                 frame.origin.y = originFrame.origin.y + (CGRectGetHeight(originFrame) - frame.size.height);
                 
                 aspectVertical = YES;
@@ -576,13 +583,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         case TOCropViewOverlayEdgeBottomLeft:
             if (self.aspectRatioLockEnabled) {
                 CGPoint distance;
-                distance.x = 1.0f - (xDelta / CGRectGetWidth(originFrame));
-                distance.y = 1.0f - (-yDelta / CGRectGetHeight(originFrame));
+                distance.x = 1.0 - (xDelta / CGRectGetWidth(originFrame));
+                distance.y = 1.0 - (-yDelta / CGRectGetHeight(originFrame));
                 
-                CGFloat scale = (distance.x + distance.y) * 0.5f;
+                CGFloat scale = (distance.x + distance.y) * 0.5;
                 
-                frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
-                frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
+                frame.size.width = CGRectGetWidth(originFrame) * scale;
+                frame.size.height = CGRectGetHeight(originFrame) * scale;
                 frame.origin.x = CGRectGetMaxX(originFrame) - frame.size.width;
                 
                 aspectVertical = YES;
@@ -606,13 +613,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             if (self.aspectRatioLockEnabled) {
                 
                 CGPoint distance;
-                distance.x = 1.0f - ((-1 * xDelta) / CGRectGetWidth(originFrame));
-                distance.y = 1.0f - ((-1 * yDelta) / CGRectGetHeight(originFrame));
+                distance.x = 1.0 - ((-1 * xDelta) / CGRectGetWidth(originFrame));
+                distance.y = 1.0 - ((-1 * yDelta) / CGRectGetHeight(originFrame));
                 
-                CGFloat scale = (distance.x + distance.y) * 0.5f;
+                CGFloat scale = (distance.x + distance.y) * 0.5;
                 
-                frame.size.width = ceilf(CGRectGetWidth(originFrame) * scale);
-                frame.size.height = ceilf(CGRectGetHeight(originFrame) * scale);
+                frame.size.width = CGRectGetWidth(originFrame) * scale;
+                frame.size.height = CGRectGetHeight(originFrame) * scale;
                 
                 aspectVertical = YES;
                 aspectHorizontal = YES;
@@ -673,12 +680,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = MIN(frame.origin.y, CGRectGetMaxY(contentFrame) - minSize.height);
     
     //Once the box is completely shrunk, clamp its ability to move
-    if (clampMinFromLeft && frame.size.width <= minSize.width + FLT_EPSILON) {
+    if (clampMinFromLeft && frame.size.width <= minSize.width + DBL_EPSILON) {
         frame.origin.x = CGRectGetMaxX(originFrame) - minSize.width;
     }
     
     //Once the box is completely shrunk, clamp its ability to move
-    if (clampMinFromTop && frame.size.height <= minSize.height + FLT_EPSILON) {
+    if (clampMinFromTop && frame.size.height <= minSize.height + DBL_EPSILON) {
         frame.origin.y = CGRectGetMaxY(originFrame) - minSize.height;
     }
     
@@ -696,12 +703,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         _aspectRatio = CGSizeZero;
     }
     
+    //Reset any flips
+    self.isFlippedVertically = NO;
+    self.isFlippedHorizontally = NO;
+    
     if (animated == NO || self.angle != 0) {
         //Reset all of the rotation transforms
         _angle = 0;
 
         //Set the scroll to 1.0f to reset the transform scale
-        self.scrollView.zoomScale = 1.0f;
+        self.scrollView.zoomScale = 1.0;
         
         CGRect imageRect = (CGRect){CGPointZero, self.image.size};
         
@@ -734,8 +745,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self setSimpleRenderMode:YES animated:NO];
     
     //Perform an animation of the image zooming back out to its original size
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:1.0 initialSpringVelocity:1.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             [self layoutInitialImage];
         } completion:^(BOOL complete) {
             [self setSimpleRenderMode:NO animated:YES];
@@ -746,7 +757,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)toggleTranslucencyViewVisible:(BOOL)visible
 {
     if (self.dynamicBlurEffect == NO) {
-        self.translucencyView.alpha = visible ? 1.0f : 0.0f;
+        self.translucencyView.alpha = visible ? 1.0 : 0.0;
     }
     else {
         [(UIVisualEffectView *)self.translucencyView setEffect:visible ? self.translucencyEffect : nil];
@@ -768,21 +779,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.zoomScale = self.scrollView.minimumZoomScale * scale;
 
     CGSize contentSize = self.scrollView.contentSize;
-    self.scrollView.contentSize = CGSizeMake(floorf(contentSize.width), floorf(contentSize.height));
+    self.scrollView.contentSize = CGSizeMake(contentSize.width, contentSize.height);
 
     // Work out the size and offset of the upscaled crop box
     CGRect frame = CGRectZero;
-    frame.size = (CGSize){floorf(scaledCropSize.width * scale), floorf(scaledCropSize.height * scale)};
+    frame.size = (CGSize){scaledCropSize.width * scale, scaledCropSize.height * scale};
     
     //set the crop box
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
-    cropBoxFrame.origin.x = floorf(CGRectGetMidX(bounds) - (frame.size.width * 0.5f));
-    cropBoxFrame.origin.y = floorf(CGRectGetMidY(bounds) - (frame.size.height * 0.5f));
+    cropBoxFrame.origin.x = CGRectGetMidX(bounds) - (frame.size.width * 0.5);
+    cropBoxFrame.origin.y = CGRectGetMidY(bounds) - (frame.size.height * 0.5);
     self.cropBoxFrame = cropBoxFrame;
     
-    frame.origin.x = ceilf((scaledOffset.x * scale) - self.scrollView.contentInset.left);
-    frame.origin.y = ceilf((scaledOffset.y * scale) - self.scrollView.contentInset.top);
+    frame.origin.x = (scaledOffset.x * scale) - self.scrollView.contentInset.left;
+    frame.origin.y = (scaledOffset.y * scale) - self.scrollView.contentInset.top;
     self.scrollView.contentOffset = frame.origin;
 }
 
@@ -822,8 +833,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint tapPoint = [gestureRecognizer locationInView:self];
     
     CGRect frame = self.gridOverlayView.frame;
-    CGRect innerFrame = CGRectInset(frame, 22.0f, 22.0f);
-    CGRect outerFrame = CGRectInset(frame, -22.0f, -22.0f);
+    CGRect innerFrame = CGRectInset(frame, 22.0, 22.0);
+    CGRect outerFrame = CGRectInset(frame, -22.0, -22.0);
     
     if (CGRectContainsPoint(innerFrame, tapPoint) || !CGRectContainsPoint(outerFrame, tapPoint))
         return NO;
@@ -866,20 +877,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = self.cropBoxFrame;
     
     //account for padding around the box
-    frame = CGRectInset(frame, -32.0f, -32.0f);
+    frame = CGRectInset(frame, -32.0, -32.0);
     
     //Make sure the corners take priority
-    CGRect topLeftRect = (CGRect){frame.origin, {64,64}};
+    CGRect topLeftRect = (CGRect){frame.origin, {64.0,64.0}};
     if (CGRectContainsPoint(topLeftRect, point))
         return TOCropViewOverlayEdgeTopLeft;
     
     CGRect topRightRect = topLeftRect;
-    topRightRect.origin.x = CGRectGetMaxX(frame) - 64.0f;
+    topRightRect.origin.x = CGRectGetMaxX(frame) - 64.0;
     if (CGRectContainsPoint(topRightRect, point))
         return TOCropViewOverlayEdgeTopRight;
     
     CGRect bottomLeftRect = topLeftRect;
-    bottomLeftRect.origin.y = CGRectGetMaxY(frame) - 64.0f;
+    bottomLeftRect.origin.y = CGRectGetMaxY(frame) - 64.0;
     if (CGRectContainsPoint(bottomLeftRect, point))
         return TOCropViewOverlayEdgeBottomLeft;
     
@@ -889,21 +900,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return TOCropViewOverlayEdgeBottomRight;
     
     //Check for edges
-    CGRect topRect = (CGRect){frame.origin, {CGRectGetWidth(frame), 64.0f}};
+    CGRect topRect = (CGRect){frame.origin, {CGRectGetWidth(frame), 64.0}};
     if (CGRectContainsPoint(topRect, point))
         return TOCropViewOverlayEdgeTop;
     
     CGRect bottomRect = topRect;
-    bottomRect.origin.y = CGRectGetMaxY(frame) - 64.0f;
+    bottomRect.origin.y = CGRectGetMaxY(frame) - 64.0;
     if (CGRectContainsPoint(bottomRect, point))
         return TOCropViewOverlayEdgeBottom;
     
-    CGRect leftRect = (CGRect){frame.origin, {64.0f, CGRectGetHeight(frame)}};
+    CGRect leftRect = (CGRect){frame.origin, {64.0, CGRectGetHeight(frame)}};
     if (CGRectContainsPoint(leftRect, point))
         return TOCropViewOverlayEdgeLeft;
     
     CGRect rightRect = leftRect;
-    rightRect.origin.x = CGRectGetMaxX(frame) - 64.0f;
+    rightRect.origin.x = CGRectGetMaxX(frame) - 64.0;
     if (CGRectContainsPoint(rightRect, point))
         return TOCropViewOverlayEdgeRight;
     
@@ -969,29 +980,29 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // Upon init, sometimes the box size is still 0 (or NaN), which can result in CALayer issues
     CGSize frameSize = cropBoxFrame.size;
-    if (frameSize.width < FLT_EPSILON || frameSize.height < FLT_EPSILON) { return; }
+    if (frameSize.width < DBL_EPSILON || frameSize.height < DBL_EPSILON) { return; }
     if (isnan(frameSize.width) || isnan(frameSize.height)) { return; }
 
     //clamp the cropping region to the inset boundaries of the screen
     CGRect contentFrame = self.contentBounds;
-    CGFloat xOrigin = ceilf(contentFrame.origin.x);
+    CGFloat xOrigin = contentFrame.origin.x;
     CGFloat xDelta = cropBoxFrame.origin.x - xOrigin;
-    cropBoxFrame.origin.x = floorf(MAX(cropBoxFrame.origin.x, xOrigin));
-    if (xDelta < -FLT_EPSILON) //If we clamp the x value, ensure we compensate for the subsequent delta generated in the width (Or else, the box will keep growing)
+    cropBoxFrame.origin.x = MAX(cropBoxFrame.origin.x, xOrigin);
+    if (xDelta < -DBL_EPSILON) //If we clamp the x value, ensure we compensate for the subsequent delta generated in the width (Or else, the box will keep growing)
         cropBoxFrame.size.width += xDelta;
     
-    CGFloat yOrigin = ceilf(contentFrame.origin.y);
+    CGFloat yOrigin = contentFrame.origin.y;
     CGFloat yDelta = cropBoxFrame.origin.y - yOrigin;
-    cropBoxFrame.origin.y = floorf(MAX(cropBoxFrame.origin.y, yOrigin));
-    if (yDelta < -FLT_EPSILON)
+    cropBoxFrame.origin.y = MAX(cropBoxFrame.origin.y, yOrigin);
+    if (yDelta < -DBL_EPSILON)
         cropBoxFrame.size.height += yDelta;
     
     //given the clamped X/Y values, make sure we can't extend the crop box beyond the edge of the screen in the current state
     CGFloat maxWidth = (contentFrame.size.width + contentFrame.origin.x) - cropBoxFrame.origin.x;
-    cropBoxFrame.size.width = floorf(MIN(cropBoxFrame.size.width, maxWidth));
+    cropBoxFrame.size.width = MIN(cropBoxFrame.size.width, maxWidth);
     
     CGFloat maxHeight = (contentFrame.size.height + contentFrame.origin.y) - cropBoxFrame.origin.y;
-    cropBoxFrame.size.height = floorf(MIN(cropBoxFrame.size.height, maxHeight));
+    cropBoxFrame.size.height = MIN(cropBoxFrame.size.height, maxHeight);
     
     //Make sure we can't make the crop box too small
     cropBoxFrame.size.width  = MAX(cropBoxFrame.size.width, kTOCropViewMinimumBoxSize);
@@ -999,13 +1010,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     _cropBoxFrame = cropBoxFrame;
     
-    self.foregroundContainerView.frame = _cropBoxFrame; //set the clipping view to match the new rect
-    self.gridOverlayView.frame = _cropBoxFrame; //set the new overlay view to match the same region
+    CGRect pixelRoundedCropBoxFrame = [self CGRectIntegralRetina:cropBoxFrame];
+    self.foregroundContainerView.frame = pixelRoundedCropBoxFrame; //set the clipping view to match the new rect
+    self.gridOverlayView.frame = pixelRoundedCropBoxFrame; //set the new overlay view to match the same region
     
     // If the mask layer is present, adjust its transform to fit the new container view size
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
-        CGFloat halfWidth = self.foregroundContainerView.frame.size.width * 0.5f;
-        self.foregroundContainerView.layer.cornerRadius = halfWidth;
+        CGFloat halfWidth = self.foregroundMaskView.frame.size.width * 0.5;
+        self.foregroundMaskView.layer.cornerRadius = halfWidth;
     }
     
     //reset the scroll view insets to match the region of the new crop rect
@@ -1018,12 +1030,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGSize imageSize = self.backgroundContainerView.bounds.size;
     CGFloat scale = MAX(cropBoxFrame.size.height/imageSize.height, cropBoxFrame.size.width/imageSize.width);
     self.scrollView.minimumZoomScale = scale;
-    
-    //make sure content isn't smaller than the crop box
-    CGSize size = self.scrollView.contentSize;
-    size.width = floorf(size.width);
-    size.height = floorf(size.height);
-    self.scrollView.contentSize = size;
     
     //IMPORTANT: Force the scroll view to update its content after changing the zoom scale
     self.scrollView.zoomScale = self.scrollView.zoomScale;
@@ -1059,21 +1065,21 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = CGRectZero;
     
     // Calculate the normalized origin
-    frame.origin.x = floorf((floorf(contentOffset.x) + edgeInsets.left) * (imageSize.width / contentSize.width));
+    frame.origin.x = (contentOffset.x + edgeInsets.left) * (imageSize.width / contentSize.width);
     frame.origin.x = MAX(0, frame.origin.x);
     
-    frame.origin.y = floorf((floorf(contentOffset.y) + edgeInsets.top) * (imageSize.height / contentSize.height));
+    frame.origin.y = (contentOffset.y + edgeInsets.top) * (imageSize.height / contentSize.height);
     frame.origin.y = MAX(0, frame.origin.y);
     
     // Calculate the normalized width
-    frame.size.width = ceilf(cropBoxFrame.size.width * scale);
+    frame.size.width = cropBoxFrame.size.width * scale;
     frame.size.width = MIN(imageSize.width, frame.size.width);
 
     // Calculate normalized height
-    if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
+    if ([self pixelCountOf:cropBoxFrame.size.width equals:cropBoxFrame.size.height]) {
         frame.size.height = frame.size.width;
     } else {
-        frame.size.height = ceilf(cropBoxFrame.size.height * scale);
+        frame.size.height = cropBoxFrame.size.height * scale;
     }
     frame.size.height = MIN(imageSize.height, frame.size.height);
 
@@ -1102,7 +1108,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
     _croppingViewsHidden = hidden;
     
-    CGFloat alpha = hidden ? 0.0f : 1.0f;
+    CGFloat alpha = hidden ? 0.0 : 1.0;
     
     if (animated == NO) {
         self.backgroundImageView.alpha = alpha;
@@ -1117,7 +1123,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.alpha = alpha;
     self.backgroundImageView.alpha = alpha;
     
-    [UIView animateWithDuration:0.4f animations:^{
+    [UIView animateWithDuration:0.4 animations:^{
         [self toggleTranslucencyViewVisible:!hidden];
         self.gridOverlayView.alpha = alpha;
     }];
@@ -1130,12 +1136,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    CGFloat beforeAlpha = hidden ? 1.0f : 0.0f;
-    CGFloat toAlpha = hidden ? 0.0f : 1.0f;
+    CGFloat beforeAlpha = hidden ? 1.0 : 0.0;
+    CGFloat toAlpha = hidden ? 0.0 : 1.0;
     
     self.backgroundImageView.hidden = NO;
     self.backgroundImageView.alpha = beforeAlpha;
-    [UIView animateWithDuration:0.5f animations:^{
+    [UIView animateWithDuration:0.5 animations:^{
         self.backgroundImageView.alpha = toAlpha;
     }completion:^(BOOL complete) {
         if (hidden) {
@@ -1166,10 +1172,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
 {
     _gridOverlayHidden = gridOverlayHidden;
-    self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
+    self.gridOverlayView.alpha = gridOverlayHidden ? 1.0 : 0.0;
     
-    [UIView animateWithDuration:0.4f animations:^{
-        self.gridOverlayView.alpha = gridOverlayHidden ? 0.0f : 1.0f;
+    [UIView animateWithDuration:0.4 animations:^{
+        self.gridOverlayView.alpha = gridOverlayHidden ? 0.0 : 1.0;
     }];
 }
 
@@ -1202,13 +1208,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setAngle:(NSInteger)angle
 {
+    // Round to the nearest 90 degrees and sanitize
+    angle = round(angle/90.0) * 90;
+    angle %= 360;
+    
     //The initial layout would not have been performed yet.
     //Save the value and it will be applied when it has
     NSInteger newAngle = angle;
-    if (angle % 90 != 0) {
-        newAngle = 0;
-    }
-    
+
     if (!self.initialSetupPerformed) {
         self.restoreAngle = newAngle;
         return;
@@ -1258,8 +1265,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    CGFloat duration = editing ? 0.05f : 0.35f;
-    CGFloat delay = editing? 0.0f : 0.35f;
+    CGFloat duration = editing ? 0.05 : 0.35;
+    CGFloat delay = editing? 0.0 : 0.35;
     
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
         delay = 0.0f;
@@ -1279,7 +1286,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropFrame = self.cropBoxFrame;
     
     // Ensure we only proceed after the crop frame has been setup for the first time
-    if (cropFrame.size.width < FLT_EPSILON || cropFrame.size.height < FLT_EPSILON) {
+    if (cropFrame.size.width < DBL_EPSILON || cropFrame.size.height < DBL_EPSILON) {
         return;
     }
     
@@ -1289,10 +1296,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint focusPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
     CGPoint midPoint = (CGPoint){CGRectGetMidX(contentRect), CGRectGetMidY(contentRect)};
     
-    cropFrame.size.width = ceilf(cropFrame.size.width * scale);
-    cropFrame.size.height = ceilf(cropFrame.size.height * scale);
-    cropFrame.origin.x = contentRect.origin.x + ceilf((contentRect.size.width - cropFrame.size.width) * 0.5f);
-    cropFrame.origin.y = contentRect.origin.y + ceilf((contentRect.size.height - cropFrame.size.height) * 0.5f);
+    cropFrame.size.width = cropFrame.size.width * scale;
+    cropFrame.size.height = cropFrame.size.height * scale;
+    cropFrame.origin.x = contentRect.origin.x + (contentRect.size.width - cropFrame.size.width) * 0.5;
+    cropFrame.origin.y = contentRect.origin.y + (contentRect.size.height - cropFrame.size.height) * 0.5;
     
     //Work out the point on the scroll content that the focusPoint is aiming at
     CGPoint contentTargetPoint = CGPointZero;
@@ -1324,14 +1331,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             // in order for the crop view to resize itself during iPad split screen events.
             // On the first run, even though scale is exactly 1.0f, performing this multiplication introduces
             // a floating point noise that zooms the image in by about 5 pixels. This fixes that issue.
-            if (scale < 1.0f - FLT_EPSILON || scale > 1.0f + FLT_EPSILON) {
+            if (scale < 1.0 - DBL_EPSILON || scale > 1.0 + DBL_EPSILON) {
                 strongSelf.scrollView.zoomScale *= scale;
                 strongSelf.scrollView.zoomScale = MIN(strongSelf.scrollView.maximumZoomScale, strongSelf.scrollView.zoomScale);
             }
 
-            // If it turns out the zoom operation would have exceeded the minizum zoom scale, don't apply
+            // If it turns out the zoom operation would have exceeded the minimum zoom scale, don't apply
             // the content offset
-            if (strongSelf.scrollView.zoomScale < strongSelf.scrollView.maximumZoomScale - FLT_EPSILON) {
+            if (strongSelf.scrollView.zoomScale < strongSelf.scrollView.maximumZoomScale - DBL_EPSILON) {
                 offset.x = MIN(-CGRectGetMaxX(cropFrame)+strongSelf.scrollView.contentSize.width, offset.x);
                 offset.y = MIN(-CGRectGetMaxY(cropFrame)+strongSelf.scrollView.contentSize.height, offset.y);
                 strongSelf.scrollView.contentOffset = offset;
@@ -1352,11 +1359,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     [self matchForegroundToBackground];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.5f
-                              delay:0.0f
-             usingSpringWithDamping:1.0f
-              initialSpringVelocity:1.0f
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.5
+                              delay:0.0
+             usingSpringWithDamping:1.0
+              initialSpringVelocity:1.0
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:translateBlock
                          completion:nil];
@@ -1378,7 +1385,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:0.25f animations:^{
+    [UIView animateWithDuration:0.25 animations:^{
         [self toggleTranslucencyViewVisible:!simpleMode];
     }];
 }
@@ -1400,7 +1407,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     BOOL zoomOut = NO;
 
     // Passing in an empty size will revert back to the image aspect ratio
-    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON) {
+    if (aspectRatio.width < DBL_EPSILON && aspectRatio.height < DBL_EPSILON) {
         aspectRatio = (CGSize){self.imageSize.width, self.imageSize.height};
         zoomOut = YES; // Prevent from steadily zooming in when cycling between alternate aspectRatios and original
     }
@@ -1410,18 +1417,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGPoint offset = self.scrollView.contentOffset;
     
     BOOL cropBoxIsPortrait = NO;
-    if ((NSInteger)aspectRatio.width == 1 && (NSInteger)aspectRatio.height == 1)
+    if (aspectRatio.width == aspectRatio.height)
         cropBoxIsPortrait = self.image.size.width > self.image.size.height;
     else
         cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
 
     if (cropBoxIsPortrait) {
-        CGFloat newWidth = floorf(cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height));
+        CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
-        offset.x += (delta * 0.5f);
+        offset.x += (delta * 0.5);
 
-        if (delta < FLT_EPSILON) {
+        if (delta < DBL_EPSILON) {
             cropBoxFrame.origin.x = self.contentBounds.origin.x; //set to 0 to avoid accidental clamping by the crop frame sanitizer
         }
 
@@ -1437,7 +1444,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             cropBoxFrame.size.height = newHeight;
 
             // Offset the Y position so it stays in the middle
-            offset.y += (delta * 0.5f);
+            offset.y += (delta * 0.5);
 
             // Clamp the width to the bounds width
             cropBoxFrame.size.width = boundsWidth;
@@ -1445,12 +1452,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         }
     }
     else {
-        CGFloat newHeight = floorf(cropBoxFrame.size.width * (aspectRatio.height/aspectRatio.width));
+        CGFloat newHeight = cropBoxFrame.size.width * (aspectRatio.height/aspectRatio.width);
         CGFloat delta = cropBoxFrame.size.height - newHeight;
         cropBoxFrame.size.height = newHeight;
-        offset.y += (delta * 0.5f);
+        offset.y += (delta * 0.5);
 
-        if (delta < FLT_EPSILON) {
+        if (delta < DBL_EPSILON) {
             cropBoxFrame.origin.y = self.contentBounds.origin.y;
         }
 
@@ -1466,7 +1473,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             cropBoxFrame.size.width = newWidth;
 
             // Offset the Y position so it stays in the middle
-            offset.x += (delta * 0.5f);
+            offset.x += (delta * 0.5);
 
             // Clamp the width to the bounds height
             cropBoxFrame.size.height = boundsHeight;
@@ -1494,10 +1501,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    [UIView animateWithDuration:0.5f
+    [UIView animateWithDuration:0.5
                           delay:0.0
-         usingSpringWithDamping:1.0f
-          initialSpringVelocity:0.7f
+         usingSpringWithDamping:1.0
+          initialSpringVelocity:0.7
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:translateBlock
                      completion:nil];
@@ -1523,6 +1530,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self captureStateForImageRotation];
     }
     
+    //When canvas is flipped either way (but not both), change rotation direction to compensate
+    clockwise ^= self.isFlippedHorizontally ^ self.isFlippedVertically;
+    
     //Work out the new angle, and wrap around once we exceed 360s
     NSInteger newAngle = self.angle;
     newAngle = clockwise ? newAngle + 90 : newAngle - 90;
@@ -1533,7 +1543,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     _angle = newAngle;
     
     //Convert the new angle to radians
-    CGFloat angleInRadians = 0.0f;
+    CGFloat angleInRadians = 0.0;
     switch (newAngle) {
         case 90:    angleInRadians = M_PI_2;            break;
         case -90:   angleInRadians = -M_PI_2;           break;
@@ -1565,15 +1575,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.zoomScale = self.cropBoxLastEditedZoomScale;
     }
     else {
-        newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
+        newCropFrame.size = (CGSize){self.cropBoxFrame.size.height * scale, self.cropBoxFrame.size.width * scale};
         
         //Re-adjust the scrolling dimensions of the scroll view to match the new size
         self.scrollView.minimumZoomScale *= scale;
         self.scrollView.zoomScale *= scale;
     }
     
-    newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
-    newCropFrame.origin.y = floorf(CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5f));
+    newCropFrame.origin.x = CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5);
+    newCropFrame.origin.y = CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5);
     
     //If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = nil;
@@ -1596,7 +1606,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Flip the content size of the scroll view to match the rotated bounds
     self.scrollView.contentSize = self.backgroundContainerView.frame.size;
-    
+        
     //assign the new crop box frame and re-adjust the content to fill it
     self.cropBoxFrame = newCropFrame;
     [self moveCroppedContentToCenterAnimated:NO];
@@ -1619,8 +1629,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //reapply the translated scroll offset to the scroll view
     CGPoint midPoint = {CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
     CGPoint offset = CGPointZero;
-    offset.x = floorf(-midPoint.x + cropTargetPoint.x);
-    offset.y = floorf(-midPoint.y + cropTargetPoint.y);
+    offset.x = -midPoint.x + cropTargetPoint.x;
+    offset.y = -midPoint.y + cropTargetPoint.y;
     offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
     offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
     offset.x = MIN(self.scrollView.contentSize.width - (newCropFrame.size.width - self.scrollView.contentInset.right), offset.x);
@@ -1628,10 +1638,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
     //so we should call the method manually to update the foregroundImageView's frame
-    if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && scale == 1) {
+    if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && scale == 1.0) {
         [self matchForegroundToBackground];
     }
     self.scrollView.contentOffset = offset;
+    [self moveCroppedContentToCenterAnimated:NO]; //Prevents uncropped rotation sometimes causing a black line on the edge.
     
     //If we're animated, play an animation of the snapshot view rotating,
     //then fade it out over the live content
@@ -1644,7 +1655,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.translucencyView.hidden = YES;
         self.gridOverlayView.hidden = YES;
         
-        [UIView animateWithDuration:0.45f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.8f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        [UIView animateWithDuration:0.45 delay:0.0 usingSpringWithDamping:1.0 initialSpringVelocity:0.8 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             CGAffineTransform transform = CGAffineTransformRotate(CGAffineTransformIdentity, clockwise ? M_PI_2 : -M_PI_2);
             transform = CGAffineTransformScale(transform, scale, scale);
             snapshotView.transform = transform;
@@ -1654,15 +1665,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             self.translucencyView.hidden = self.translucencyAlwaysHidden;
             self.gridOverlayView.hidden = NO;
             
-            self.backgroundContainerView.alpha = 0.0f;
-            self.gridOverlayView.alpha = 0.0f;
+            self.backgroundContainerView.alpha = 0.0;
+            self.gridOverlayView.alpha = 0.0;
             
-            self.translucencyView.alpha = 1.0f;
+            self.translucencyView.alpha = 1.0;
             
-            [UIView animateWithDuration:0.45f animations:^{
-                snapshotView.alpha = 0.0f;
-                self.backgroundContainerView.alpha = 1.0f;
-                self.gridOverlayView.alpha = 1.0f;
+            [UIView animateWithDuration:0.45 animations:^{
+                snapshotView.alpha = 0.0;
+                self.backgroundContainerView.alpha = 1.0;
+                self.gridOverlayView.alpha = 1.0;
             } completion:^(BOOL complete) {
                 self.rotateAnimationInProgress = NO;
                 [snapshotView removeFromSuperview];
@@ -1684,6 +1695,59 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self checkForCanReset];
 }
 
+- (void)flipImageAnimated:(BOOL)animated horizontal:(BOOL)horizontal
+{
+    if (self.rotateAnimationInProgress)
+        return;
+
+    //Stop any inertia first
+    [self.scrollView setContentOffset:self.scrollView.contentOffset animated:NO];
+    
+    [self.resetTimer invalidate];
+    [self setEditing:NO resetCropBox:NO animated:NO];
+
+    //Avoid setter by setting ivar directly, setter is triggered later
+    _isFlippedHorizontally ^= horizontal;
+    _isFlippedVertically ^= !horizontal;
+    [self checkForCanReset];
+    
+    if (!animated) {
+        self.isFlippedHorizontally = self.isFlippedHorizontally; //Setter triggers canvas transform
+    } else {
+        self.rotateAnimationInProgress = YES;
+        self.backgroundContainerView.hidden = YES;
+        self.translucencyView.hidden = YES;
+        self.gridOverlayView.hidden = YES;
+        self.overlayView.hidden = YES;
+        
+        //first animate the flip of the foregroundContainerView
+        self.foregroundContainerView.transform = CGAffineTransformScale(self.foregroundContainerView.transform, horizontal ? -1 : 1, horizontal ? 1 : -1);
+        [UIView transitionWithView: self.foregroundContainerView
+                          duration: 0.45
+                           options: horizontal ? UIViewAnimationOptionTransitionFlipFromRight : UIViewAnimationOptionTransitionFlipFromBottom
+                        animations: nil
+                        completion:^(BOOL finished) {
+            
+            //once flipped unflip it and flip the entire canvas instead
+            self.foregroundContainerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+            self.isFlippedHorizontally = self.isFlippedHorizontally; //Setter triggers canvas transform
+            
+            self.backgroundContainerView.hidden = NO;
+            self.translucencyView.hidden = self.translucencyAlwaysHidden;
+            self.gridOverlayView.hidden = NO;
+            self.overlayView.hidden = NO;
+            self.backgroundContainerView.alpha = 0.0;
+            self.gridOverlayView.alpha = 0.0;
+            [UIView animateWithDuration: 0.45 animations:^{
+                self.backgroundContainerView.alpha = 1.0;
+                self.gridOverlayView.alpha = 1.0;
+            } completion:^(BOOL complete) {
+                self.rotateAnimationInProgress = NO;
+            }];
+        }];
+    }
+}
+
 - (void)captureStateForImageRotation
 {
     self.cropBoxLastEditedSize = self.cropBoxFrame.size;
@@ -1699,16 +1763,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.angle != 0) { //Image has been rotated
         canReset = YES;
     }
-    else if (self.scrollView.zoomScale > self.scrollView.minimumZoomScale + FLT_EPSILON) { //image has been zoomed in
+    else if (self.scrollView.zoomScale > self.scrollView.minimumZoomScale + DBL_EPSILON) { //image has been zoomed in
         canReset = YES;
     }
-    else if ((NSInteger)floorf(self.cropBoxFrame.size.width) != (NSInteger)floorf(self.originalCropBoxSize.width) ||
-             (NSInteger)floorf(self.cropBoxFrame.size.height) != (NSInteger)floorf(self.originalCropBoxSize.height))
+    else if (![self pixelCountOf:self.cropBoxFrame.size.width equals:self.originalCropBoxSize.width] ||
+             ![self pixelCountOf:self.cropBoxFrame.size.height equals:self.originalCropBoxSize.height])
     { //crop box has been changed
         canReset = YES;
     }
-    else if ((NSInteger)floorf(self.scrollView.contentOffset.x) != (NSInteger)floorf(self.originalContentOffset.x) ||
-             (NSInteger)floorf(self.scrollView.contentOffset.y) != (NSInteger)floorf(self.originalContentOffset.y))
+    else if (![self pixelCountOf:self.scrollView.contentOffset.x equals:self.originalContentOffset.x] ||
+             ![self pixelCountOf:self.scrollView.contentOffset.y equals:self.originalContentOffset.y])
+    {
+        canReset = YES;
+    }
+    else if (self.isFlippedHorizontally || self.isFlippedVertically)
     {
         canReset = YES;
     }
@@ -1716,14 +1784,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.canBeReset = canReset;
 }
 
-#pragma mark - Convienience Methods -
+#pragma mark - Convenience Methods
+- (void)setCropRegionInsets:(UIEdgeInsets)cropRegionInsets
+{
+    _cropRegionInsets = UIEdgeInsetsMake(self.isFlippedVertically   ? cropRegionInsets.bottom : cropRegionInsets.top,
+                                         self.isFlippedHorizontally ? cropRegionInsets.right  : cropRegionInsets.left,
+                                         self.isFlippedVertically   ? cropRegionInsets.top    : cropRegionInsets.bottom,
+                                         self.isFlippedHorizontally ? cropRegionInsets.left   : cropRegionInsets.right);
+}
+
 - (CGRect)contentBounds
 {
     CGRect contentRect = CGRectZero;
     contentRect.origin.x = self.cropViewPadding + self.cropRegionInsets.left;
     contentRect.origin.y = self.cropViewPadding + self.cropRegionInsets.top;
-    contentRect.size.width = CGRectGetWidth(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
-    contentRect.size.height = CGRectGetHeight(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
+    contentRect.size.width = CGRectGetWidth(self.bounds) - ((self.cropViewPadding * 2.0) + self.cropRegionInsets.left + self.cropRegionInsets.right);
+    contentRect.size.height = CGRectGetHeight(self.bounds) - ((self.cropViewPadding * 2.0) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
     return contentRect;
 }
 
@@ -1737,7 +1813,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (BOOL)hasAspectRatio
 {
-    return (self.aspectRatio.width > FLT_EPSILON && self.aspectRatio.height > FLT_EPSILON);
+    return (self.aspectRatio.width > DBL_EPSILON && self.aspectRatio.height > DBL_EPSILON);
+}
+
+- (void)setIsFlippedHorizontally:(BOOL)isFlippedHorizontally {
+    _isFlippedHorizontally = isFlippedHorizontally;
+    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, self.isFlippedHorizontally ? -1 : 1, self.isFlippedVertically ? -1 : 1);
+}
+
+- (void)setIsFlippedVertically:(BOOL)isFlippedVertically {
+    _isFlippedVertically = isFlippedVertically;
+    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, self.isFlippedHorizontally ? -1 : 1, self.isFlippedVertically ? -1 : 1);
 }
 
 @end

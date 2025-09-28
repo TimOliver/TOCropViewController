@@ -1,7 +1,7 @@
 //
-//  TOActivityCroppedImageProvider.h
+//  UIView+Pixels.h
 //
-//  Copyright 2015-2025 Timothy Oliver. All rights reserved.
+//  Copyright 2024 Jan de Vries. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -24,16 +24,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TOActivityCroppedImageProvider : UIActivityItemProvider
+@interface UIView(TOPixels)
 
-@property (nonnull, nonatomic, readonly) UIImage *image;
-@property (nonatomic, readonly) CGRect cropFrame;
-@property (nonatomic, readonly) NSInteger angle;
-@property (nonatomic, readonly) BOOL flipped;
-@property (nonatomic, readonly) BOOL circular;
+///Round point value to nearest physical pixel
+- (CGFloat)roundToNearestPixel:(CGFloat)point NS_SWIFT_NAME(roundToNearestPixel(point:));
 
-- (nonnull instancetype)initWithImage:(nonnull UIImage *)image cropFrame:(CGRect)cropFrame angle:(NSInteger)angle flipped:(BOOL)flipped circular:(BOOL)circular;
+///Check if two CGFloats (points) round to the same number of physical pixels
+- (BOOL)pixelCountOf:(CGFloat)point1 equals:(CGFloat)point2;
+
+///Works like CGRectIntegral() but rounds values to the nearest physical pixel
+- (CGRect)CGRectIntegralRetina:(CGRect)rect;
 
 @end
 
 NS_ASSUME_NONNULL_END
+

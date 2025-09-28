@@ -98,6 +98,45 @@
 		2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
 		2F5062F51F53E32D00AA9F14 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223424771ABBC0CD00BBC2B1 /* Main.storyboard */; };
+		94189B992CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9A2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9B2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9D2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94189B9E2CC92BAA000C5263 /* UIView+Pixels.m in Sources */ = {isa = PBXBuildFile; fileRef = 94189B972CC92BAA000C5263 /* UIView+Pixels.m */; };
+		94776A0A2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */; };
+		94776A0B2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */; };
+		94776A0C2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */; };
+		94776A0D2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */; };
+		94776A0F2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */; };
+		94776A102CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */; };
+		94776A112CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */; };
+		94776A122CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */; };
+		94776A142CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */; };
+		94776A152CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */; };
+		94776A162CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */; };
+		94776A172CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */; };
+		94776A192CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */; };
+		94776A1A2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */; };
+		94776A1B2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */; };
+		94776A1C2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */; };
+		94776A1E2CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */; };
+		94776A1F2CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */; };
+		94776A202CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */; };
+		94776A212CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */; };
+		94776A232CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */; };
+		94776A242CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */; };
+		94776A252CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */; };
+		94776A262CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */; };
+		94776A282CD508EE009566B1 /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A272CD508EE009566B1 /* checkmark@2x.png */; };
+		94776A292CD508EE009566B1 /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A272CD508EE009566B1 /* checkmark@2x.png */; };
+		94776A2A2CD508EE009566B1 /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A272CD508EE009566B1 /* checkmark@2x.png */; };
+		94776A2B2CD508EE009566B1 /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A272CD508EE009566B1 /* checkmark@2x.png */; };
+		94776A2D2CD509BB009566B1 /* xmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A2C2CD509BB009566B1 /* xmark@2x.png */; };
+		94776A2E2CD509BB009566B1 /* xmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A2C2CD509BB009566B1 /* xmark@2x.png */; };
+		94776A2F2CD509BB009566B1 /* xmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A2C2CD509BB009566B1 /* xmark@2x.png */; };
+		94776A302CD509BB009566B1 /* xmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 94776A2C2CD509BB009566B1 /* xmark@2x.png */; };
+		947A472E2CE7A905005A9628 /* UIView+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = 94189B962CC92BAA000C5263 /* UIView+Pixels.h */; };
+		947A472F2CE7A905005A9628 /* UIView+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = 94189B962CC92BAA000C5263 /* UIView+Pixels.h */; };
 		FE3E0E3A21098448004DAE93 /* TOCropViewConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 220C8E9F21062DD300A9B25D /* TOCropViewConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -217,6 +256,16 @@
 		6AE313511C47DAA200894C5B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		72B9DCDC25763340006E160C /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		88BBE90E22C206340073D22A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		94189B962CC92BAA000C5263 /* UIView+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Pixels.h"; sourceTree = "<group>"; };
+		94189B972CC92BAA000C5263 /* UIView+Pixels.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Pixels.m"; sourceTree = "<group>"; };
+		94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png"; sourceTree = "<group>"; };
+		94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png"; sourceTree = "<group>"; };
+		94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rotate.right.fill@2x.png"; sourceTree = "<group>"; };
+		94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rotate.left.fill@2x.png"; sourceTree = "<group>"; };
+		94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrow.counterclockwise@2x.png"; sourceTree = "<group>"; };
+		94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "aspectratio.fill@2x.png"; sourceTree = "<group>"; };
+		94776A272CD508EE009566B1 /* checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "checkmark@2x.png"; sourceTree = "<group>"; };
+		94776A2C2CD509BB009566B1 /* xmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "xmark@2x.png"; sourceTree = "<group>"; };
 		A93782CF214A55F900CAE7EE /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782D3214A81A200CAE7EE /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
@@ -308,6 +357,14 @@
 		220C8EA021062E6D00A9B25D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				94776A0E2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png */,
+				94776A092CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png */,
+				94776A132CD4F3C6009566B1 /* rotate.right.fill@2x.png */,
+				94776A182CD4F492009566B1 /* rotate.left.fill@2x.png */,
+				94776A1D2CD5020D009566B1 /* arrow.counterclockwise@2x.png */,
+				94776A222CD5042B009566B1 /* aspectratio.fill@2x.png */,
+				94776A272CD508EE009566B1 /* checkmark@2x.png */,
+				94776A2C2CD509BB009566B1 /* xmark@2x.png */,
 				22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */,
 				22C3C5491AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings */,
 			);
@@ -335,6 +392,8 @@
 			children = (
 				220C8EAB2106344D00A9B25D /* UIImage+CropRotate.h */,
 				220C8EAA2106344D00A9B25D /* UIImage+CropRotate.m */,
+				94189B962CC92BAA000C5263 /* UIView+Pixels.h */,
+				94189B972CC92BAA000C5263 /* UIView+Pixels.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -494,6 +553,7 @@
 				2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */,
 				144B8CD71D22CD650085D774 /* TOCropToolbar.h in Headers */,
 				220C8EB22106344D00A9B25D /* UIImage+CropRotate.h in Headers */,
+				947A472F2CE7A905005A9628 /* UIView+Pixels.h in Headers */,
 				144B8CD81D22CD650085D774 /* TOCropView.h in Headers */,
 				144B8CD11D22CD650085D774 /* TOCropViewControllerTransitioning.h in Headers */,
 				144B8CD21D22CD650085D774 /* TOActivityCroppedImageProvider.h in Headers */,
@@ -510,6 +570,7 @@
 			files = (
 				04262DA520F6FD1000024177 /* CropViewController.h in Headers */,
 				04262DA220F6FC4600024177 /* TOCropToolbar.h in Headers */,
+				947A472E2CE7A905005A9628 /* UIView+Pixels.h in Headers */,
 				04262DA320F6FC4600024177 /* TOCropView.h in Headers */,
 				04262DA420F6FC4600024177 /* TOCropViewController.h in Headers */,
 				220C8EA82106341600A9B25D /* TOCropViewConstants.h in Headers */,
@@ -730,8 +791,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94776A262CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */,
+				94776A292CD508EE009566B1 /* checkmark@2x.png in Resources */,
+				94776A162CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */,
+				94776A122CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */,
 				22A105B42BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
+				94776A212CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */,
 				04262D8620F6F1C600024177 /* TOCropViewControllerLocalizable.strings in Resources */,
+				94776A0D2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */,
+				94776A2E2CD509BB009566B1 /* xmark@2x.png in Resources */,
+				94776A1C2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -750,7 +819,15 @@
 				2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */,
 				2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */,
 				22A105B52BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
+				94776A232CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */,
 				22C3C5471AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings in Resources */,
+				94776A202CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */,
+				94776A192CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */,
+				94776A142CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */,
+				94776A2F2CD509BB009566B1 /* xmark@2x.png in Resources */,
+				94776A102CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */,
+				94776A2A2CD508EE009566B1 /* checkmark@2x.png in Resources */,
+				94776A0A2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,7 +839,15 @@
 				2238CF2A1FC0269C0081B957 /* Assets.xcassets in Resources */,
 				2238CF281FC0269C0081B957 /* Main.storyboard in Resources */,
 				22A105B62BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
+				94776A252CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */,
 				220C8EA121062EFC00A9B25D /* TOCropViewControllerLocalizable.strings in Resources */,
+				94776A1F2CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */,
+				94776A1A2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */,
+				94776A152CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */,
+				94776A302CD509BB009566B1 /* xmark@2x.png in Resources */,
+				94776A112CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */,
+				94776A2B2CD508EE009566B1 /* checkmark@2x.png in Resources */,
+				94776A0C2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -770,8 +855,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94776A242CD5042B009566B1 /* aspectratio.fill@2x.png in Resources */,
+				94776A282CD508EE009566B1 /* checkmark@2x.png in Resources */,
+				94776A172CD4F3C6009566B1 /* rotate.right.fill@2x.png in Resources */,
+				94776A0F2CD4F28E009566B1 /* arrow.trianglehead.up.and.down.righttriangle.up.righttriangle.down.fill@2x.png in Resources */,
 				22A105B32BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
+				94776A1E2CD5020D009566B1 /* arrow.counterclockwise@2x.png in Resources */,
 				04262D8720F6F1D600024177 /* TOCropViewControllerLocalizable.strings in Resources */,
+				94776A0B2CD4F185009566B1 /* arrow.trianglehead.left.and.right.righttriangle.left.righttriangle.right.fill@2x.png in Resources */,
+				94776A2D2CD509BB009566B1 /* xmark@2x.png in Resources */,
+				94776A1B2CD4F492009566B1 /* rotate.left.fill@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -799,6 +892,7 @@
 				144B8CE01D22CD730085D774 /* TOCropToolbar.m in Sources */,
 				144B8CE11D22CD730085D774 /* TOCropView.m in Sources */,
 				144B8CE21D22CD730085D774 /* TOCropViewController.m in Sources */,
+				94189B9D2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,6 +919,7 @@
 				22DB4D9E1B234D4F008B8466 /* TOActivityCroppedImageProvider.m in Sources */,
 				22DB4D961B234D07008B8466 /* TOCropViewControllerTransitioning.m in Sources */,
 				22DB4D991B234D07008B8466 /* TOCropScrollView.m in Sources */,
+				94189B9B2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -844,6 +939,7 @@
 				22B68F9D1FFB380700601B1A /* TOCropViewController.m in Sources */,
 				2238CF251FC0269C0081B957 /* ViewController.swift in Sources */,
 				2238CF231FC0269C0081B957 /* AppDelegate.swift in Sources */,
+				94189B9E2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				2238CF361FC029880081B957 /* CropViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -853,6 +949,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				220C8EAC2106344D00A9B25D /* UIImage+CropRotate.m in Sources */,
+				94189B992CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				22B68F9F1FFB3C0800601B1A /* TOCropViewControllerTransitioning.m in Sources */,
 				22B68FA01FFB3C0800601B1A /* TOActivityCroppedImageProvider.m in Sources */,
 				22B68FA11FFB3C0800601B1A /* TOCroppedImageAttributes.m in Sources */,
@@ -872,6 +969,7 @@
 				2236AB4A1F595960005C5098 /* ShareViewController.m in Sources */,
 				2F5062EC1F53E31F00AA9F14 /* TOActivityCroppedImageProvider.m in Sources */,
 				2F5062EF1F53E31F00AA9F14 /* TOCropOverlayView.m in Sources */,
+				94189B9A2CC92BAA000C5263 /* UIView+Pixels.m in Sources */,
 				2F5062F21F53E31F00AA9F14 /* TOCropView.m in Sources */,
 				2F5062F41F53E32800AA9F14 /* ViewController.m in Sources */,
 				2F5062F31F53E31F00AA9F14 /* TOCropViewController.m in Sources */,
