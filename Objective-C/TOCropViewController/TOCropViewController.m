@@ -301,8 +301,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     else {
         // On iOS 26, the safe area insets values are the same, however the default bottom value is so
         // high that the buttons look incorrectly set. While you can try and hardcode a value lower to
-        // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
-        // devices is also difficult.
+        // the bottom of the screen, the next challenge is determining the appropriate width so the
+        // toolbar looks concentric within the rounded corners of the device.
 
         // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
         // the toolbar with the device's rounded corners.
