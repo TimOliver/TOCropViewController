@@ -265,7 +265,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  
  @param animated Whether the transition is animated
  */
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated;
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated completion:(nullable void(^)(BOOL completed))completionHandler;
 
 /**
  Rotates the entire canvas to a 90-degree angle
@@ -273,7 +273,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  @param animated Whether the transition is animated
  @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
  */
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise;
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise completion:(nullable void(^)(BOOL completed))completionHandler;
 
 /**
  Animate the grid overlay graphic to be visible

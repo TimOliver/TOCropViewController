@@ -80,7 +80,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         // Init parameters
         _image = image;
         _croppingStyle = style;
-        
+
+        if (@available(iOS 13.0, *)) {
+            self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+        }
+
         // Set up base view controller behaviour
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -281,14 +285,48 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
-        frame.origin.x = insets.left;
-        frame.origin.y = 0.0f;
-        frame.size.width = kTOCropViewControllerToolbarHeight;
-        frame.size.height = CGRectGetHeight(self.view.frame);
+        if (@available(iOS 26.0, *)) {
+            CGFloat minPadding = 8.0f;
+            frame.origin.x = insets.left + minPadding;
+            frame.origin.y = minPadding;
+            frame.size.width = kTOCropViewControllerToolbarHeight;
+            frame.size.height = CGRectGetHeight(self.view.frame) - (minPadding * 2.0f);
+        } else {
+            frame.origin.x = insets.left;
+            frame.origin.y = 0.0f;
+            frame.size.width = kTOCropViewControllerToolbarHeight;
+            frame.size.height = CGRectGetHeight(self.view.frame);
+        }
     }
     else {
-        frame.origin.x = 0.0f;
-        frame.size.width = CGRectGetWidth(self.view.bounds);
+        // On iOS 26, the safe area insets values are the same, however the default bottom value is so
+        // high that the buttons look incorrectly set. While you can try and hardcode a value lower to
+        // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
+        // devices is also difficult.
+
+        // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
+        // the toolbar with the device's rounded corners.
+        // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
+        if (@available(iOS 26.0, *)) {
+            if (insets.bottom > 0.0f) {
+                insets.bottom = 20.0f;
+            } else {
+                insets.bottom = 8.0f;
+            }
+
+            const char* components[] = {"Radius", "Corner", "display", "_"};
+            NSString *selectorName = @"";
+            for (NSInteger i = 3; i >= 0; i--) {
+                selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
+                                                                                        encoding:NSUTF8StringEncoding]];
+            }
+            const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+            frame.size.width = CGRectGetWidth(self.view.bounds) - MAX(cornerRadius, insets.bottom * 2.0f);
+        } else {
+            frame.size.width = CGRectGetWidth(self.view.bounds);
+        }
+
+        frame.origin.x = (CGRectGetWidth(self.view.bounds) - frame.size.width) / 2.0f;
         frame.size.height = kTOCropViewControllerToolbarHeight;
 
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
@@ -312,6 +350,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
     else {
         view = self.parentViewController.view;
+    }
+
+    // Always make the crop view edge-to-edge on iOS 26 and up
+    if (@available(iOS 26.0, *)) {
+        return view.bounds;
     }
 
     UIEdgeInsets insets = self.statusBarSafeInsets;
@@ -368,18 +411,26 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     UIEdgeInsets insets = self.statusBarSafeInsets;
 
+    if (@available(iOS 26.0, *)) {
+        if (!self.verticalLayout) {
+            insets.left = CGRectGetMaxX(self.toolbar.frame);
+        } else {
+            insets.bottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(self.toolbar.frame);
+        }
+    }
+
     // If there is no title text, inset the top of the content as high as possible
     if (!self.titleLabel.text.length) {
         if (self.verticalLayout) {
-          if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
-          }
-          else { // Add padding to the top otherwise
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, 0.0, 0.0f);
-          }
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+                self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            }
+            else { // Add padding to the top otherwise
+                self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, insets.bottom, 0.0f);
+            }
         }
         else {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
+            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, insets.left, insets.bottom, 0.0f);
         }
 
         return;
@@ -394,7 +445,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGFloat verticalInset = self.statusBarHeight;
     verticalInset += kTOCropViewControllerTitleTopPadding;
     verticalInset += self.titleLabel.frame.size.height;
-    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, 0, insets.bottom, 0);
+    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, insets.left, insets.bottom, 0);
 }
 
 - (void)adjustToolbarInsets
@@ -611,12 +662,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)rotateCropViewClockwise
 {
-    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES];
+    self.toolbar.disableRotationButtons = YES;
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES completion:^(BOOL success) {
+        self.toolbar.disableRotationButtons = NO;
+    }];
 }
 
 - (void)rotateCropViewCounterclockwise
 {
-    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
+    self.toolbar.disableRotationButtons = YES;
+    [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO completion:^(BOOL success) {
+        self.toolbar.disableRotationButtons = NO;
+    }];
 }
 
 #pragma mark - Crop View Delegates -
@@ -1002,7 +1059,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self.view addSubview:_cropView];
+        [self.view insertSubview:_cropView atIndex:0];
     }
     return _cropView;
 }

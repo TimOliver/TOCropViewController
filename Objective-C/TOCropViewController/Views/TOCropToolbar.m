@@ -39,6 +39,8 @@
 
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
+@property (nonatomic, strong) UIVisualEffectView *glassView;
+
 @end
 
 @implementation TOCropToolbar
@@ -54,57 +56,85 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
-    [self addSubview:self.backgroundView];
-    
+
+    UIView *containerView = self;
+    if (@available(iOS 26.0, *)) {
+        UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
+        glassEffect.interactive = YES;
+        _glassView = [[UIVisualEffectView alloc] initWithEffect:glassEffect];
+        _glassView.cornerConfiguration = [UICornerConfiguration capsuleConfiguration];
+        _glassView.userInteractionEnabled = YES;
+        [self addSubview:_glassView];
+
+        containerView = _glassView.contentView;
+        _showOnlyIcons = YES;
+    } else {
+        self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+        [self addSubview:self.backgroundView];
+    }
+
     // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
 
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
-    
-    _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [_doneTextButton setTitle: _doneTextButtonTitle ?
-        _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
-																  @"TOCropViewControllerLocalizable",
-																  resourceBundle,
-                                                                  nil)
-                     forState:UIControlStateNormal];
-    [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-    if (@available(iOS 13.0, *)) {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
-    } else {
-        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+
+    if (@available(iOS 26.0, *)) {}
+    else {
+        _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [_doneTextButton setTitle: _doneTextButtonTitle ?
+            _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
+                                                                      @"TOCropViewControllerLocalizable",
+                                                                      resourceBundle,
+                                                                      nil)
+                         forState:UIControlStateNormal];
+        [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
+        if (@available(iOS 13.0, *)) {
+            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
+        } else {
+            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+        }
+        [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [_doneTextButton sizeToFit];
+        [self addSubview:_doneTextButton];
     }
-    [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_doneTextButton sizeToFit];
-    [self addSubview:_doneTextButton];
-    
+
     _doneIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    if (@available(iOS 26.0, *)) {
+        UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
+        configuration.baseForegroundColor = [UIColor blackColor];
+        _doneIconButton.configuration = configuration;
+    }
     [self addSubview:_doneIconButton];
 
     // Set the default color for the done buttons
     self.doneButtonColor = nil;
 
-    _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    
-    [_cancelTextButton setTitle: _cancelTextButtonTitle ?
-        _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
-																	@"TOCropViewControllerLocalizable",
-																	resourceBundle,
-                                                                    nil)
-                       forState:UIControlStateNormal];
-    [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
-    [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [_cancelTextButton sizeToFit];
-    [self addSubview:_cancelTextButton];
-    
+    if (@available(iOS 26.0, *)) {}
+    else {
+        _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+
+        [_cancelTextButton setTitle: _cancelTextButtonTitle ?
+            _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
+                                                                        @"TOCropViewControllerLocalizable",
+                                                                        resourceBundle,
+                                                                        nil)
+                           forState:UIControlStateNormal];
+        [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
+        [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [_cancelTextButton sizeToFit];
+        [self addSubview:_cancelTextButton];
+    }
+
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    if (@available(iOS 26.0, *)) {
+        _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
+    }
     [self addSubview:_cancelIconButton];
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -112,22 +142,22 @@
     _clampButton.tintColor = [UIColor whiteColor];
     [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_clampButton];
-    
+    [containerView addSubview:_clampButton];
+
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateCounterclockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateCounterclockwiseButton];
-    
+    [containerView addSubview:_rotateCounterclockwiseButton];
+
     _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateClockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateClockwiseButton];
-    
+    [containerView addSubview:_rotateClockwiseButton];
+
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
     _resetButton.tintColor = [UIColor whiteColor];
@@ -138,7 +168,7 @@
                                                                          @"TOCropViewControllerLocalizable",
                                                                          resourceBundle,
                                                                          nil);
-    [self addSubview:_resetButton];
+    [containerView addSubview:_resetButton];
 }
 
 - (void)layoutSubviews
@@ -147,7 +177,7 @@
     
     BOOL verticalLayout = (CGRectGetWidth(self.bounds) < CGRectGetHeight(self.bounds));
     CGSize boundsSize = self.bounds.size;
-    
+
     self.cancelIconButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
     self.cancelTextButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? true : verticalLayout);
     self.doneIconButton.hidden   = self.doneButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
@@ -174,7 +204,10 @@
     
     if (verticalLayout == NO) {
         CGFloat insetPadding = 10.0f;
-        
+        if (@available(iOS 26.0, *)) {
+            insetPadding = 0.0f;
+        }
+
         // Work out the cancel button frame
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;
@@ -279,14 +312,54 @@
 }
 
 // The convenience method for calculating button's frame inside of the container rect
-- (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
+- (void)layoutToolbarButtons:(NSArray<UIButton *> *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
 {
-    if (buttons.count > 0){
+    if (!buttons.count) {
+        return;
+    }
+
+    const CGFloat buttonSize = 44.0f;
+
+    if (@available(iOS 26.0, *)) {
+        CGFloat glassPadding = 6.0f;
+        CGFloat minSpacing = 16.0f;
+        CGFloat minPadding = 12.0f;
+        CGFloat maxExtent = 0.0f;
+
+        // On iPad, we'll align in the middle. On iPhone, we'll stretch between Done and Cancel.
+        if (self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassCompact ||
+            self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+            CGFloat containerExtent = horizontally ? containerRect.size.width : containerRect.size.height;
+            maxExtent = containerExtent - (minSpacing * 2.0f);
+        } else {
+            maxExtent = buttons.count * buttonSize + (minPadding * (buttons.count - 1)) + (glassPadding * 2.0f);
+        }
+
+        CGRect glassFrame = CGRectZero;
+        glassFrame.size.width = horizontally ? maxExtent : buttonSize;
+        glassFrame.size.height = horizontally ? buttonSize : maxExtent;
+        glassFrame.origin.x = horizontally ? CGRectGetMidX(containerRect) - (glassFrame.size.width / 2.0f) : 0.0f;
+        glassFrame.origin.y = horizontally ? 0.0f : CGRectGetMidY(containerRect) - (glassFrame.size.height / 2.0f);
+        _glassView.frame = glassFrame;
+
+        CGFloat buttonPadding = (maxExtent - (glassPadding * 2.0f) - (buttons.count * buttonSize)) / (buttons.count - 1);
+        CGFloat position = glassPadding;
+        for (UIButton *button in buttons) {
+            CGRect buttonFrame = CGRectMake(0.0, 0.0, buttonSize, buttonSize);
+            if (horizontally) {
+                buttonFrame.origin.x = position;
+            } else {
+                buttonFrame.origin.y = position;
+            }
+            button.frame = buttonFrame;
+            position += buttonSize + buttonPadding;
+        }
+    } else {
         NSInteger count = buttons.count;
         CGFloat fixedSize = horizontally ? size.width : size.height;
         CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
         CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
-        
+
         for (NSInteger i = 0; i < count; i++) {
             UIButton *button = buttons[i];
             CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-44.0f) : fabs(CGRectGetWidth(containerRect)-size.width);
@@ -692,6 +765,16 @@
     }
 
     return self.cancelTextButton;
+}
+
+- (void)setDisableRotationButtons:(BOOL)disableRotationButtons
+{
+    if (_disableRotationButtons == disableRotationButtons) {
+        return;
+    }
+    _disableRotationButtons = disableRotationButtons;
+    _rotateClockwiseButton.enabled = !disableRotationButtons;
+    _rotateCounterclockwiseButton.enabled = !disableRotationButtons;
 }
 
 @end
