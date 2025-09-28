@@ -39,6 +39,8 @@
 
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
+@property (nonatomic, strong) UIVisualEffectView *glassView;
+
 @end
 
 @implementation TOCropToolbar
@@ -54,8 +56,19 @@
 
 - (void)setup {
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    if (@available(iOS 26.0, *)) {}
-    else { self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f]; }
+
+    UIView *containerView = self;
+    if (@available(iOS 26.0, *)) {
+        UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
+        glassEffect.interactive = YES;
+        _glassView = [[UIVisualEffectView alloc] initWithEffect:glassEffect];
+        _glassView.cornerConfiguration = [UICornerConfiguration capsuleConfiguration];
+        [self addSubview:_glassView];
+
+        containerView = _glassView.contentView;
+    } else {
+        self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    }
     [self addSubview:self.backgroundView];
 
     if (@available(iOS 26.0, *)) {
@@ -129,22 +142,22 @@
     _clampButton.tintColor = [UIColor whiteColor];
     [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_clampButton];
-    
+    [containerView addSubview:_clampButton];
+
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateCounterclockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateCounterclockwiseButton setImage:[TOCropToolbar rotateCCWImage] forState:UIControlStateNormal];
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateCounterclockwiseButton];
-    
+    [containerView addSubview:_rotateCounterclockwiseButton];
+
     _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateClockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:_rotateClockwiseButton];
-    
+    [containerView addSubview:_rotateClockwiseButton];
+
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
     _resetButton.tintColor = [UIColor whiteColor];
@@ -155,7 +168,7 @@
                                                                          @"TOCropViewControllerLocalizable",
                                                                          resourceBundle,
                                                                          nil);
-    [self addSubview:_resetButton];
+    [containerView addSubview:_resetButton];
 }
 
 - (void)layoutSubviews
@@ -301,12 +314,22 @@
 // The convenience method for calculating button's frame inside of the container rect
 - (void)layoutToolbarButtons:(NSArray *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
 {
-    if (buttons.count > 0){
+    if (!buttons.count) {
+        return;
+    }
+
+    const CGFloat buttonSize = 44.0f;
+
+    if (@available(iOS 26.0, *)) {
+        CGFloat minPadding = 8.0f;
+        CGFloat maxExtent = buttons.count * buttonSize;
+
+    } else {
         NSInteger count = buttons.count;
         CGFloat fixedSize = horizontally ? size.width : size.height;
         CGFloat maxLength = horizontally ? CGRectGetWidth(containerRect) : CGRectGetHeight(containerRect);
         CGFloat padding = (maxLength - fixedSize * count) / (count + 1);
-        
+
         for (NSInteger i = 0; i < count; i++) {
             UIButton *button = buttons[i];
             CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-44.0f) : fabs(CGRectGetWidth(containerRect)-size.width);
