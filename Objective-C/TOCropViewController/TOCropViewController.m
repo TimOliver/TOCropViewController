@@ -287,8 +287,22 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         frame.size.height = CGRectGetHeight(self.view.frame);
     }
     else {
-        frame.origin.x = 0.0f;
-        frame.size.width = CGRectGetWidth(self.view.bounds);
+        // On iOS 26, the safe area insets values are the same, however the home indicator
+        // is now hidden, making the default inset look too high. It looks like Apple is
+        // just ignoring that value and manually positioning the toolbar/tab bars above the indicator.
+        // Let's do the same for now.
+        if (@available(iOS 26.0, *)) {
+            if (insets.bottom > 0.0f) {
+                insets.bottom = 12.0f;
+            } else {
+                insets.bottom = 8.0f;
+            }
+            frame.size.width = CGRectGetWidth(self.view.bounds) - (self.view.layoutMargins.left * 2.0f);
+        } else {
+            frame.size.width = CGRectGetWidth(self.view.bounds);
+        }
+
+        frame.origin.x = (CGRectGetWidth(self.view.bounds) - frame.size.width) / 2.0f;
         frame.size.height = kTOCropViewControllerToolbarHeight;
 
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
@@ -1015,7 +1029,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         _cropView = [[TOCropView alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
         _cropView.delegate = self;
         _cropView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self.view addSubview:_cropView];
+        [self.view insertSubview:_cropView atIndex:0];
     }
     return _cropView;
 }
