@@ -53,7 +53,9 @@
     if (self.isDismissing == NO) {
         [containerView addSubview:cropViewController.view];
 
-        //Force a relayout now that the view is in the view hierarchy (so things like the safe area insets are now valid)
+        //Force a relayout now that the view is in the view hierarchy (so things like the safe area insets are now valid)]
+        [cropViewController.view setNeedsLayout];
+        [cropViewController.view layoutIfNeeded];
         [cropViewController viewDidLayoutSubviews];
     }
     else {
