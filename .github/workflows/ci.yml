@@ -9,7 +9,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1.0'
+        bundler-cache: false
       run: 'bundle install && bundle exec fastlane test'
       env:
         TEST_SCHEME: "TOCropViewControllerTests"
