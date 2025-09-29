@@ -13,6 +13,6 @@ jobs:
       with:
         ruby-version: '3.1.0'
         bundler-cache: false
-      run: 'bundle install && bundle exec fastlane test'
+    - run: 'bundle install && bundle exec fastlane test'
       env:
         TEST_SCHEME: "TOCropViewControllerTests"
