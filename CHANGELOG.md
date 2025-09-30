@@ -1,6 +1,23 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+3.0.0 Release Notes (2025-09-30)
+=============================================================
+
+## Added
+
+- A new Liquid Glass design for iOS 26. 🎉 ([#619](https://github.com/TimOliver/TOCropViewController/pull/619))
+- Configurable lists of available aspect ratios. ([#608](https://github.com/TimOliver/TOCropViewController/pull/608))
+
+## Enhancements
+
+- Updated Xcode project for Xcode 26. ([#618](https://github.com/TimOliver/TOCropViewController/pull/618))
+
+## Fixed
+
+- Deprecated `imageEdgeInsets` for iOS 15 and above. ([#618](https://github.com/TimOliver/TOCropViewController/pull/614))
+
+
 2.8.0 Release Notes (2025-09-23)
 =============================================================
 
