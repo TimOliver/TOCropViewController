@@ -58,10 +58,18 @@
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
 
     UIView *containerView = self;
+#ifdef __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
+        UIVisualEffect *effect = nil;
+#if !TARGET_OS_VISION
         UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
         glassEffect.interactive = YES;
-        _glassView = [[UIVisualEffectView alloc] initWithEffect:glassEffect];
+        effect = glassEffect;
+#else
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleProminent];
+        effect = blurEffect;
+#endif
+        _glassView = [[UIVisualEffectView alloc] initWithEffect:effect];
         _glassView.cornerConfiguration = [UICornerConfiguration capsuleConfiguration];
         _glassView.userInteractionEnabled = YES;
         [self addSubview:_glassView];
@@ -72,6 +80,10 @@
         self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
         [self addSubview:self.backgroundView];
     }
+#else
+    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    [self addSubview:self.backgroundView];
+#endif
 
     // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
@@ -103,11 +115,17 @@
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
+#if !TARGET_OS_VISION
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
         configuration.baseForegroundColor = [UIColor blackColor];
+#else
+        UIButtonConfiguration *configuration = [UIButtonConfiguration filledButtonConfiguration];
+#endif
         _doneIconButton.configuration = configuration;
     }
+#endif
     [self addSubview:_doneIconButton];
 
     // Set the default color for the done buttons
@@ -132,9 +150,15 @@
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
+#if !TARGET_OS_VISION
         _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
+#else
+        _cancelIconButton.configuration = [UIButtonConfiguration filledButtonConfiguration];
+#endif
     }
+#endif
     [self addSubview:_cancelIconButton];
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
