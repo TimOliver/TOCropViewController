@@ -58,6 +58,7 @@
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
 
     UIView *containerView = self;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
         glassEffect.interactive = YES;
@@ -72,6 +73,10 @@
         self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
         [self addSubview:self.backgroundView];
     }
+#else
+    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0.12f alpha:1.0f];
+    [self addSubview:self.backgroundView];
+#endif
 
     // On iOS 9 and up, we can use the new layout features to determine whether we're in an 'Arabic' style language mode
     _reverseContentLayout = ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft);
@@ -103,11 +108,13 @@
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
         configuration.baseForegroundColor = [UIColor blackColor];
         _doneIconButton.configuration = configuration;
     }
+#endif
     [self addSubview:_doneIconButton];
 
     // Set the default color for the done buttons
@@ -132,9 +139,11 @@
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
     }
+#endif
     [self addSubview:_cancelIconButton];
     
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
