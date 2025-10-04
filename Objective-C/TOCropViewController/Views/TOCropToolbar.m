@@ -58,7 +58,7 @@
     self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
 
     UIView *containerView = self;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
+#ifdef __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
         glassEffect.interactive = YES;
@@ -108,7 +108,7 @@
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
+#ifdef __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
         configuration.baseForegroundColor = [UIColor blackColor];
@@ -139,7 +139,7 @@
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_26_0
+#ifdef __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
         _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
     }
