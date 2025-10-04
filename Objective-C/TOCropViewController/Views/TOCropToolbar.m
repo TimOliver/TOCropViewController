@@ -60,9 +60,16 @@
     UIView *containerView = self;
 #ifdef __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
+        UIVisualEffect *effect = nil;
+#if !TARGET_OS_VISION
         UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
         glassEffect.interactive = YES;
-        _glassView = [[UIVisualEffectView alloc] initWithEffect:glassEffect];
+        effect = glassEffect;
+#else
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleProminent];
+        effect = blurEffect;
+#endif
+        _glassView = [[UIVisualEffectView alloc] initWithEffect:effect];
         _glassView.cornerConfiguration = [UICornerConfiguration capsuleConfiguration];
         _glassView.userInteractionEnabled = YES;
         [self addSubview:_glassView];
@@ -108,10 +115,14 @@
     [_doneIconButton setImage:[TOCropToolbar doneImage] forState:UIControlStateNormal];
     [_doneIconButton setTintColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f]];
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-#ifdef __IPHONE_26_0
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
+#if !TARGET_OS_VISION
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
         configuration.baseForegroundColor = [UIColor blackColor];
+#else
+        UIButtonConfiguration *configuration = [UIButtonConfiguration filledButtonConfiguration];
+#endif
         _doneIconButton.configuration = configuration;
     }
 #endif
@@ -139,9 +150,13 @@
     _cancelIconButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelIconButton setImage:[TOCropToolbar cancelImage] forState:UIControlStateNormal];
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
-#ifdef __IPHONE_26_0
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
+#if !TARGET_OS_VISION
         _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
+#else
+        _cancelIconButton.configuration = [UIButtonConfiguration filledButtonConfiguration];
+#endif
     }
 #endif
     [self addSubview:_cancelIconButton];

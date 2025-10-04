@@ -286,7 +286,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
         if (@available(iOS 26.0, *)) {
+#if !TARGET_OS_VISION
             CGFloat minPadding = 8.0f;
+#else
+            CGFloat minPadding = 16.0f;
+#endif
             frame.origin.x = insets.left + minPadding;
             frame.origin.y = minPadding;
             frame.size.width = kTOCropViewControllerToolbarHeight;
@@ -314,6 +318,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 insets.bottom = 8.0f;
             }
 
+#if !TARGET_OS_VISION
             const char* components[] = {"Radius", "Corner", "display", "_"};
             NSString *selectorName = @"";
             for (NSInteger i = 3; i >= 0; i--) {
@@ -321,6 +326,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                                                                                         encoding:NSUTF8StringEncoding]];
             }
             const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+#else
+            const CGFloat cornerRadius = 64.0f;
+#endif
             frame.size.width = CGRectGetWidth(self.view.bounds) - MAX(cornerRadius, insets.bottom * 2.0f);
         } else {
             frame.size.width = CGRectGetWidth(self.view.bounds);
