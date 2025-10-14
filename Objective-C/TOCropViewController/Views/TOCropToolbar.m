@@ -346,27 +346,16 @@
 
     if (@available(iOS 26.0, *)) {
         CGFloat glassPadding = 6.0f;
-        CGFloat minSpacing = 16.0f;
-        CGFloat minPadding = 12.0f;
-        CGFloat maxExtent = 0.0f;
-
-        // On iPad, we'll align in the middle. On iPhone, we'll stretch between Done and Cancel.
-        if (self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassCompact ||
-            self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
-            CGFloat containerExtent = horizontally ? containerRect.size.width : containerRect.size.height;
-            maxExtent = containerExtent - (minSpacing * 2.0f);
-        } else {
-            maxExtent = buttons.count * buttonSize + (minPadding * (buttons.count - 1)) + (glassPadding * 2.0f);
-        }
-
+        CGFloat buttonPadding = 12.0f;
+        CGFloat maxExtent = buttons.count * buttonSize + (buttonPadding * (buttons.count - 1)) + (glassPadding * 2.0f);
+        
         CGRect glassFrame = CGRectZero;
         glassFrame.size.width = horizontally ? maxExtent : buttonSize;
         glassFrame.size.height = horizontally ? buttonSize : maxExtent;
         glassFrame.origin.x = horizontally ? CGRectGetMidX(containerRect) - (glassFrame.size.width / 2.0f) : 0.0f;
         glassFrame.origin.y = horizontally ? 0.0f : CGRectGetMidY(containerRect) - (glassFrame.size.height / 2.0f);
         _glassView.frame = glassFrame;
-
-        CGFloat buttonPadding = (maxExtent - (glassPadding * 2.0f) - (buttons.count * buttonSize)) / (buttons.count - 1);
+        
         CGFloat position = glassPadding;
         for (UIButton *button in buttons) {
             CGRect buttonFrame = CGRectMake(0.0, 0.0, buttonSize, buttonSize);
