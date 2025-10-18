@@ -1,6 +1,15 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+3.1.0 Release Notes (2025-09-30)
+=============================================================
+
+## Fixed
+
+- The cropping region being scaled to its minimum size when the toolbar position was set to top. ([#626](https://github.com/TimOliver/TOCropViewController/pull/626))
+- Gated out the iOS 26 code so the code is still buildable in Xcode 16.0. ([#620](https://github.com/TimOliver/TOCropViewController/pull/620))
+- The sizing code of the middle toolbar so it doesn't look overstreteched with fewer icons. ([#624](https://github.com/TimOliver/TOCropViewController/pull/624))
+
 3.0.0 Release Notes (2025-09-30)
 =============================================================
 
