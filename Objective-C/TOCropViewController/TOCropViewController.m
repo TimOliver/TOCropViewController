@@ -423,7 +423,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         if (!self.verticalLayout) {
             insets.left = CGRectGetMaxX(self.toolbar.frame);
         } else {
-            insets.bottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(self.toolbar.frame);
+            if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+                insets.top = CGRectGetMinY(self.toolbar.frame);
+            } else {
+                insets.bottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(self.toolbar.frame);
+            }
         }
     }
 
