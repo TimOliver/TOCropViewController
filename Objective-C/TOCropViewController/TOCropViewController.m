@@ -340,6 +340,16 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
             frame.origin.y = CGRectGetHeight(self.view.bounds) - (frame.size.height + insets.bottom);
         } else {
+            if (self.titleLabel.text.length) {
+                // Work out the size of the title label based on the crop view size
+                CGRect frame = self.titleLabel.frame;
+                frame.size = [self.titleLabel sizeThatFits:self.cropView.frame.size];
+                self.titleLabel.frame = frame;
+
+                // Set out the appropriate inset for that
+                insets.top = CGRectGetMaxY(self.titleLabel.frame);
+                insets.top += kTOCropViewControllerTitleTopPadding;
+            }
             frame.origin.y = insets.top;
         }
     }
@@ -365,27 +375,24 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         return view.bounds;
     }
 
-    UIEdgeInsets insets = self.statusBarSafeInsets;
-
     CGRect bounds = view.bounds;
     CGRect frame = CGRectZero;
 
     // Horizontal layout (eg landscape)
     if (!verticalLayout) {
-        frame.origin.x = kTOCropViewControllerToolbarHeight + insets.left;
+        frame.origin.x = CGRectGetMaxX(self.toolbar.frame);
         frame.size.width = CGRectGetWidth(bounds) - frame.origin.x;
-		frame.size.height = CGRectGetHeight(bounds);
+        frame.size.height = CGRectGetHeight(bounds);
     }
     else { // Vertical layout
-        frame.size.height = CGRectGetHeight(bounds);
         frame.size.width = CGRectGetWidth(bounds);
 
         // Set Y and adjust for height
-        if (self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
-            frame.size.height -= (insets.bottom + kTOCropViewControllerToolbarHeight);
-        } else if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-			frame.origin.y = kTOCropViewControllerToolbarHeight + insets.top;
-            frame.size.height -= frame.origin.y;
+        if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
+            frame.origin.y = CGRectGetMaxY(self.toolbar.frame);
+            frame.size.height = CGRectGetHeight(bounds) - frame.origin.y;
+        } else {
+            frame.size.height = CGRectGetMinY(self.toolbar.frame);
         }
     }
     
@@ -424,40 +431,37 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             insets.left = CGRectGetMaxX(self.toolbar.frame);
         } else {
             if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-                insets.top = CGRectGetMinY(self.toolbar.frame);
+                insets.top = CGRectGetMaxY(self.toolbar.frame);
             } else {
                 insets.bottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(self.toolbar.frame);
             }
         }
-    }
-
-    // If there is no title text, inset the top of the content as high as possible
-    if (!self.titleLabel.text.length) {
-        if (self.verticalLayout) {
+    } else {
+        if (!self.verticalLayout) {
+            insets.left = 0.0f;
+        } else {
             if (self.toolbarPosition == TOCropViewControllerToolbarPositionTop) {
-                self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, 0.0f, insets.bottom, 0.0f);
-            }
-            else { // Add padding to the top otherwise
-                self.cropView.cropRegionInsets = UIEdgeInsetsMake(insets.top, 0.0f, insets.bottom, 0.0f);
+                insets.top = 0.0f;
+            } else {
+                insets.bottom = 0.0f;
             }
         }
-        else {
-            self.cropView.cropRegionInsets = UIEdgeInsetsMake(0.0f, insets.left, insets.bottom, 0.0f);
-        }
-
-        return;
     }
 
-    // Work out the size of the title label based on the crop view size
-    CGRect frame = self.titleLabel.frame;
-    frame.size = [self.titleLabel sizeThatFits:self.cropView.frame.size];
-    self.titleLabel.frame = frame;
+    if (!self.verticalLayout || self.toolbarPosition == TOCropViewControllerToolbarPositionBottom) {
+        if (self.titleLabel.text.length) {
+            // Work out the size of the title label based on the crop view size
+            CGRect frame = self.titleLabel.frame;
+            frame.size = [self.titleLabel sizeThatFits:self.cropView.frame.size];
+            self.titleLabel.frame = frame;
 
-    // Set out the appropriate inset for that
-    CGFloat verticalInset = self.statusBarHeight;
-    verticalInset += kTOCropViewControllerTitleTopPadding;
-    verticalInset += self.titleLabel.frame.size.height;
-    self.cropView.cropRegionInsets = UIEdgeInsetsMake(verticalInset, insets.left, insets.bottom, 0);
+            // Set out the appropriate inset for that
+            insets.top += self.titleLabel.frame.size.height;
+            insets.top += kTOCropViewControllerTitleTopPadding;
+        }
+    }
+
+    self.cropView.cropRegionInsets = insets;
 }
 
 - (void)adjustToolbarInsets
@@ -1100,7 +1104,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     _titleLabel.textAlignment = NSTextAlignmentCenter;
     _titleLabel.text = self.title;
 
-    [self.view insertSubview:self.titleLabel aboveSubview:self.cropView];
+    [self.view insertSubview:self.titleLabel aboveSubview:self.toolbar];
 
     return _titleLabel;
 }
