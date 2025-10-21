@@ -595,12 +595,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // If the size doesn't change (e.g, we did a 180 degree device rotation), don't bother doing a relayout
     if (CGSizeEqualToSize(size, self.view.bounds.size)) { return; }
     
+#if !TARGET_OS_VISION
     UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
     CGSize currentSize = self.view.bounds.size;
     if (currentSize.width < size.width) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     }
-    
+#else
+    // On visionOS, this method is called on presentation with size=(0,0),
+    // which would set orientation incorrectly causing views to be misplaced.
+    UIInterfaceOrientation orientation = UIInterfaceOrientationLandscapeLeft;
+#endif
+
     [self _willRotateToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self _willAnimateRotationToInterfaceOrientation:orientation duration:coordinator.transitionDuration];
