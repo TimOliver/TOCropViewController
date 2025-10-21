@@ -57,15 +57,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL showOnlyIcons API_DEPRECATED("iOS 26 uses icons only", ios(7.0, 18.0));
 
 /* The cropper control buttons */
-@property (nonatomic, strong, readonly)  UIButton *rotateCounterclockwiseButton;
-@property (nonatomic, strong, readonly)  UIButton *resetButton;
-@property (nonatomic, strong, readonly)  UIButton *clampButton;
+@property (nonatomic, strong, readonly) UIButton *rotateCounterclockwiseButton;
+@property (nonatomic, strong, readonly) UIButton *resetButton;
+@property (nonatomic, strong, readonly) UIButton *clampButton;
 @property (nullable, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
 /* Set the rotation buttons to be disabled while rotating is in progress */
 @property (nonatomic, assign) BOOL disableRotationButtons;
 
-@property (nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
+@property (nonatomic, readonly) UIButton *rotateButton;  // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
 @property (nullable, nonatomic, copy) void (^cancelButtonTapped)(void);

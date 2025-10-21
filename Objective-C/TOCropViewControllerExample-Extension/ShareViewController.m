@@ -7,11 +7,12 @@
 //
 
 #import "ShareViewController.h"
+
 #import "ViewController.h"
 
 @implementation ShareViewController
 
-- (void) viewDidLoad {
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     // Instantiate and create the initial view controller from the main example app
@@ -20,8 +21,7 @@
     [self presentViewController:viewController animated:YES completion:nil];
 }
 
-- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
-{
+- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
     [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
     [super dismissViewControllerAnimated:flag completion:completion];
 }

@@ -37,8 +37,7 @@
 
 @implementation TOCropViewControllerAspectRatioPreset
 
-- (instancetype)initWithSize:(CGSize)size title:(NSString *)title
-{
+- (instancetype)initWithSize:(CGSize)size title:(NSString *)title {
     self = [super init];
     if (self) {
         _size = size;
@@ -58,37 +57,49 @@
     return CGSizeEqualToSize(self.size, other.size) && [self.title isEqualToString:other.title];
 }
 
-+ (NSArray<TOCropViewControllerAspectRatioPreset *> *)portraitPresets
-{
++ (NSArray<TOCropViewControllerAspectRatioPreset *> *)portraitPresets {
     TOCropViewControllerAspectRatioPreset *object = [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero title:@"Original"];
-	NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(object);
+    NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(object);
     return @[
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero title:NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(1.0f, 1.0f) title:NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(2.0f, 3.0f) title:@"2:3"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 5.0f) title:@"3:5"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 4.0f) title:@"3:4"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(4.0f, 5.0f) title:@"4:5"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 7.0f) title:@"5:7"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(9.0f, 16.0f) title:@"9:16"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero
+                                                              title:NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(1.0f, 1.0f)
+                                                              title:NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(2.0f, 3.0f)
+                                                              title:@"2:3"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 5.0f)
+                                                              title:@"3:5"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 4.0f)
+                                                              title:@"3:4"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(4.0f, 5.0f)
+                                                              title:@"4:5"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 7.0f)
+                                                              title:@"5:7"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(9.0f, 16.0f)
+                                                              title:@"9:16"],
     ];
 }
 
-+ (NSArray<TOCropViewControllerAspectRatioPreset *> *)landscapePresets
-{
++ (NSArray<TOCropViewControllerAspectRatioPreset *> *)landscapePresets {
     TOCropViewControllerAspectRatioPreset *object = [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero title:@"Original"];
-	NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(object);
+    NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(object);
     return @[
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero title:NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(1.0f, 1.0f) title:NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 2.0f) title:@"3:2"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 3.0f) title:@"5:3"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(4.0f, 3.0f) title:@"4:3"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 4.0f) title:@"5:4"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(7.0f, 5.0f) title:@"7:5"],
-        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(16.0f, 9.0f) title:@"16:9"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero
+                                                              title:NSLocalizedStringFromTableInBundle(@"Original", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(1.0f, 1.0f)
+                                                              title:NSLocalizedStringFromTableInBundle(@"Square", @"TOCropViewControllerLocalizable", resourceBundle, nil)],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(3.0f, 2.0f)
+                                                              title:@"3:2"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 3.0f)
+                                                              title:@"5:3"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(4.0f, 3.0f)
+                                                              title:@"4:3"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(5.0f, 4.0f)
+                                                              title:@"5:4"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(7.0f, 5.0f)
+                                                              title:@"7:5"],
+        [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeMake(16.0f, 9.0f)
+                                                              title:@"16:9"],
     ];
 }
 @end
-
-
