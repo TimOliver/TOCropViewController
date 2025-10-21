@@ -32,14 +32,13 @@
 
 @implementation TOCroppedImageAttributes
 
-- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle originalImageSize:(CGSize)originalSize
-{
+- (instancetype)initWithCroppedFrame:(CGRect)croppedFrame angle:(NSInteger)angle originalImageSize:(CGSize)originalSize {
     if (self = [super init]) {
         _angle = angle;
         _croppedFrame = croppedFrame;
         _originalImageSize = originalSize;
     }
-    
+
     return self;
 }
 

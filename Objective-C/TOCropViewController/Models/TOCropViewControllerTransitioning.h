@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TOCropViewControllerTransitioning : NSObject <UIViewControllerAnimatedTransitioning>
 
 /* State Tracking */
-@property (nonatomic, assign) BOOL isDismissing; // Whether this animation is presenting or dismissing
-@property (nullable, nonatomic, strong) UIImage *image;    // The image that will be used in this animation
+@property (nonatomic, assign) BOOL isDismissing;         // Whether this animation is presenting or dismissing
+@property (nullable, nonatomic, strong) UIImage *image;  // The image that will be used in this animation
 
 /* Destination/Origin points */
 @property (nullable, nonatomic, strong) UIView *fromView;  // The origin view who's frame the image will be animated from

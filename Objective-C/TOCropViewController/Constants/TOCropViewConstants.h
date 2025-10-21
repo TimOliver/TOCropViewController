@@ -26,8 +26,8 @@
  The shape of the cropping region of this crop view controller
  */
 typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
-    TOCropViewCroppingStyleDefault,     // The regular, rectangular crop box
-    TOCropViewCroppingStyleCircular     // A fixed, circular crop box
+    TOCropViewCroppingStyleDefault,  // The regular, rectangular crop box
+    TOCropViewCroppingStyleCircular  // A fixed, circular crop box
 };
 
 /**
@@ -35,27 +35,27 @@ typedef NS_ENUM(NSInteger, TOCropViewCroppingStyle) {
  */
 typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
     TOCropViewControllerToolbarPositionBottom,  // Bar is placed along the bottom in portrait
-    TOCropViewControllerToolbarPositionTop     // Bar is placed along the top in portrait (Respects the status bar)
+    TOCropViewControllerToolbarPositionTop      // Bar is placed along the top in portrait (Respects the status bar)
 };
 
 static inline NSBundle *TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(NSObject *object) {
 #if SWIFT_PACKAGE
-	// SPM is supposed to support the keyword SWIFTPM_MODULE_BUNDLE
-	// but I can't figure out how to make it work, so doing it manually
-   	NSString *bundleName = @"TOCropViewController_TOCropViewController";
+    // SPM is supposed to support the keyword SWIFTPM_MODULE_BUNDLE
+    // but I can't figure out how to make it work, so doing it manually
+    NSString *bundleName = @"TOCropViewController_TOCropViewController";
 #else
-	NSString *bundleName = @"TOCropViewControllerBundle";
+    NSString *bundleName = @"TOCropViewControllerBundle";
 #endif
     NSBundle *resourceBundle = nil;
     NSBundle *classBundle = [NSBundle bundleForClass:object.class];
     NSURL *resourceBundleURL = [classBundle URLForResource:bundleName withExtension:@"bundle"];
     if (resourceBundleURL) {
         resourceBundle = [[NSBundle alloc] initWithURL:resourceBundleURL];
-		#ifndef NDEBUG
-		if (resourceBundle == nil) {
-		    @throw [[NSException alloc] initWithName:@"BundleAccessor" reason:[NSString stringWithFormat:@"unable to find bundle named %@", bundleName] userInfo:nil];
-		}
-		#endif
+#ifndef NDEBUG
+        if (resourceBundle == nil) {
+            @throw [[NSException alloc] initWithName:@"BundleAccessor" reason:[NSString stringWithFormat:@"unable to find bundle named %@", bundleName] userInfo:nil];
+        }
+#endif
     } else {
         resourceBundle = classBundle;
     }

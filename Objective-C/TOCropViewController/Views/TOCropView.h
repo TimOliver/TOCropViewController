@@ -33,7 +33,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol TOCropViewDelegate<NSObject>
+@protocol TOCropViewDelegate <NSObject>
 
 - (void)cropViewDidBecomeResettable:(nonnull TOCropView *)cropView;
 - (void)cropViewDidBecomeNonResettable:(nonnull TOCropView *)cropView;
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL canBeReset;
 
-/** 
+/**
  The frame of the cropping box in the coordinate space of the crop view
  */
 @property (nonatomic, readonly) CGRect cropBoxFrame;
@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
  If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to YES,
  the crop box will swap it's dimensions depending on portrait or landscape sized images.
  This value also controls whether the dimensions can swap when the image is rotated.
- 
+
  Default is NO.
  */
 @property (nonatomic, assign) BOOL aspectRatioLockDimensionSwapEnabled;
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger angle;
 
 /**
- Hide all of the crop elements for transition animations 
+ Hide all of the crop elements for transition animations
  */
 @property (nonatomic, assign) BOOL croppingViewsHidden;
 
@@ -206,7 +206,6 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 // */
 //- (void)setTranslucencyOff:(BOOL)disableTranslucency;
 
-
 /**
  Create a default instance of the crop view with the supplied image
  */
@@ -226,14 +225,14 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 /**
  When performing large size transitions (eg, orientation rotation),
  set simple mode to YES to temporarily graphically heavy effects like translucency.
- 
+
  @param simpleMode Whether simple mode is enabled or not
- 
+
  */
 - (void)setSimpleRenderMode:(BOOL)simpleMode animated:(BOOL)animated;
 
 /**
- When performing a screen rotation that will change the size of the scroll view, this takes 
+ When performing a screen rotation that will change the size of the scroll view, this takes
  a snapshot of all of the scroll view data before it gets manipulated by iOS.
  Please call this in your view controller, before the rotation animation block is committed.
  */
@@ -247,14 +246,14 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 
 /**
  Reset the crop box and zoom scale back to the initial layout
- 
+
  @param animated The reset is animated
  */
 - (void)resetLayoutToDefaultAnimated:(BOOL)animated;
 
 /**
  Changes the aspect ratio of the crop box to match the one specified
- 
+
  @param aspectRatio The aspect ratio (For example 16:9 is 16.0f/9.0f). 'CGSizeZero' will reset it to the image's own ratio
  @param animated Whether the locking effect is animated
  */
@@ -262,18 +261,18 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 
 /**
  Rotates the entire canvas to a 90-degree angle. The default rotation is counterclockwise.
- 
+
  @param animated Whether the transition is animated
  */
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated completion:(nullable void(^)(BOOL completed))completionHandler;
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated completion:(nullable void (^)(BOOL completed))completionHandler;
 
 /**
  Rotates the entire canvas to a 90-degree angle
- 
+
  @param animated Whether the transition is animated
  @param clockwise Whether the rotation is clockwise. Passing 'NO' means counterclockwise
  */
-- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise completion:(nullable void(^)(BOOL completed))completionHandler;
+- (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise completion:(nullable void (^)(BOOL completed))completionHandler;
 
 /**
  Animate the grid overlay graphic to be visible

@@ -22,9 +22,9 @@
 
 #import "TOCropToolbar.h"
 
-#define TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT 0   // convenience debug toggle
+#define TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT 0  // convenience debug toggle
 
-@interface TOCropToolbar()
+@interface TOCropToolbar ()
 
 @property (nonatomic, strong) UIView *backgroundView;
 
@@ -37,7 +37,7 @@
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 
-@property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
+@property (nonatomic, strong) UIButton *rotateButton;  // defaults to counterclockwise button for legacy compatibility
 
 @property (nonatomic, strong) UIVisualEffectView *glassView;
 
@@ -45,12 +45,11 @@
 
 @implementation TOCropToolbar
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         [self setup];
     }
-    
+
     return self;
 }
 
@@ -91,14 +90,10 @@
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
 
-    if (@available(iOS 26.0, *)) {}
-    else {
+    if (@available(iOS 26.0, *)) {
+    } else {
         _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        [_doneTextButton setTitle: _doneTextButtonTitle ?
-            _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
-                                                                      @"TOCropViewControllerLocalizable",
-                                                                      resourceBundle,
-                                                                      nil)
+        [_doneTextButton setTitle:_doneTextButtonTitle ? _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done", @"TOCropViewControllerLocalizable", resourceBundle, nil)
                          forState:UIControlStateNormal];
         [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
         if (@available(iOS 13.0, *)) {
@@ -131,15 +126,11 @@
     // Set the default color for the done buttons
     self.doneButtonColor = nil;
 
-    if (@available(iOS 26.0, *)) {}
-    else {
+    if (@available(iOS 26.0, *)) {
+    } else {
         _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
 
-        [_cancelTextButton setTitle: _cancelTextButtonTitle ?
-            _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
-                                                                        @"TOCropViewControllerLocalizable",
-                                                                        resourceBundle,
-                                                                        nil)
+        [_cancelTextButton setTitle:_cancelTextButtonTitle ? _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil)
                            forState:UIControlStateNormal];
         [_cancelTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
         [_cancelTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -160,7 +151,7 @@
     }
 #endif
     [self addSubview:_cancelIconButton];
-    
+
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _clampButton.contentMode = UIViewContentModeCenter;
     _clampButton.tintColor = [UIColor whiteColor];
@@ -195,17 +186,16 @@
     [containerView addSubview:_resetButton];
 }
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
-    
+
     BOOL verticalLayout = (CGRectGetWidth(self.bounds) < CGRectGetHeight(self.bounds));
     CGSize boundsSize = self.bounds.size;
 
     self.cancelIconButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
     self.cancelTextButton.hidden = self.cancelButtonHidden || (_showOnlyIcons ? true : verticalLayout);
-    self.doneIconButton.hidden   = self.doneButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
-    self.doneTextButton.hidden   = self.doneButtonHidden || (_showOnlyIcons ? true : verticalLayout);
+    self.doneIconButton.hidden = self.doneButtonHidden || (_showOnlyIcons ? false : !verticalLayout);
+    self.doneTextButton.hidden = self.doneButtonHidden || (_showOnlyIcons ? true : verticalLayout);
 
     CGRect frame = self.bounds;
     frame.origin.x -= self.backgroundViewOutsets.left;
@@ -215,7 +205,7 @@
     frame.size.height += self.backgroundViewOutsets.top;
     frame.size.height += self.backgroundViewOutsets.bottom;
     self.backgroundView.frame = frame;
-    
+
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
     static UIView *containerView = nil;
     if (!containerView) {
@@ -225,7 +215,7 @@
         [self addSubview:containerView];
     }
 #endif
-    
+
     if (verticalLayout == NO) {
         CGFloat insetPadding = 10.0f;
         if (@available(iOS 26.0, *)) {
@@ -237,107 +227,102 @@
         frame.size.height = 44.0f;
         frame.size.width = _showOnlyIcons ? 44.0f : MIN(self.frame.size.width / 3.0, self.cancelTextButton.frame.size.width);
 
-        //If normal layout, place on the left side, else place on the right
+        // If normal layout, place on the left side, else place on the right
         if (self.reverseContentLayout == NO) {
             frame.origin.x = insetPadding;
-        }
-        else {
+        } else {
             frame.origin.x = boundsSize.width - (frame.size.width + insetPadding);
         }
         (_showOnlyIcons ? self.cancelIconButton : self.cancelTextButton).frame = frame;
-        
+
         // Work out the Done button frame
         frame.size.width = _showOnlyIcons ? 44.0f : MIN(self.frame.size.width / 3.0, self.doneTextButton.frame.size.width);
-        
+
         if (self.reverseContentLayout == NO) {
             frame.origin.x = boundsSize.width - (frame.size.width + insetPadding);
-        }
-        else {
+        } else {
             frame.origin.x = insetPadding;
         }
         (_showOnlyIcons ? self.doneIconButton : self.doneTextButton).frame = frame;
-        
+
         // Work out the frame between the two buttons where we can layout our action buttons
         CGFloat x = self.reverseContentLayout ? CGRectGetMaxX((_showOnlyIcons ? self.doneIconButton : self.doneTextButton).frame) : CGRectGetMaxX((_showOnlyIcons ? self.cancelIconButton : self.cancelTextButton).frame);
         CGFloat width = 0.0f;
-        
+
         if (self.reverseContentLayout == NO) {
             width = CGRectGetMinX((_showOnlyIcons ? self.doneIconButton : self.doneTextButton).frame) - CGRectGetMaxX((_showOnlyIcons ? self.cancelIconButton : self.cancelTextButton).frame);
-        }
-        else {
+        } else {
             width = CGRectGetMinX((_showOnlyIcons ? self.cancelIconButton : self.cancelTextButton).frame) - CGRectGetMaxX((_showOnlyIcons ? self.doneIconButton : self.doneTextButton).frame);
         }
-        
-        CGRect containerRect = CGRectIntegral((CGRect){x,frame.origin.y,width,44.0f});
+
+        CGRect containerRect = CGRectIntegral((CGRect){x, frame.origin.y, width, 44.0f});
 
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
 #endif
-        
-        CGSize buttonSize = (CGSize){44.0f,44.0f};
-        
+
+        CGSize buttonSize = (CGSize){44.0f, 44.0f};
+
         NSMutableArray *buttonsInOrderHorizontally = [NSMutableArray new];
         if (!self.rotateCounterclockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateCounterclockwiseButton];
         }
-        
+
         if (!self.resetButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.resetButton];
         }
-        
+
         if (!self.clampButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.clampButton];
         }
-        
+
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.rotateClockwiseButton];
         }
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
-    }
-    else {
+    } else {
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;
         frame.size.width = 44.0f;
         frame.origin.y = CGRectGetHeight(self.bounds) - 44.0f;
         self.cancelIconButton.frame = frame;
-        
+
         frame.origin.y = self.statusBarHeightInset;
         frame.size.width = 44.0f;
         frame.size.height = 44.0f;
         self.doneIconButton.frame = frame;
-        
-        CGRect containerRect = (CGRect){0,CGRectGetMaxY(self.doneIconButton.frame),44.0f,CGRectGetMinY(self.cancelIconButton.frame)-CGRectGetMaxY(self.doneIconButton.frame)};
-        
+
+        CGRect containerRect = (CGRect){0, CGRectGetMaxY(self.doneIconButton.frame), 44.0f, CGRectGetMinY(self.cancelIconButton.frame) - CGRectGetMaxY(self.doneIconButton.frame)};
+
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
 #endif
-        
-        CGSize buttonSize = (CGSize){44.0f,44.0f};
-        
+
+        CGSize buttonSize = (CGSize){44.0f, 44.0f};
+
         NSMutableArray *buttonsInOrderVertically = [NSMutableArray new];
         if (!self.rotateCounterclockwiseButtonHidden) {
             [buttonsInOrderVertically addObject:self.rotateCounterclockwiseButton];
         }
-        
+
         if (!self.resetButtonHidden) {
             [buttonsInOrderVertically addObject:self.resetButton];
         }
-        
+
         if (!self.clampButtonHidden) {
             [buttonsInOrderVertically addObject:self.clampButton];
         }
-        
+
         if (!self.rotateClockwiseButtonHidden) {
             [buttonsInOrderVertically addObject:self.rotateClockwiseButton];
         }
-        
+
         [self layoutToolbarButtons:buttonsInOrderVertically withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:NO];
     }
 }
 
 // The convenience method for calculating button's frame inside of the container rect
-- (void)layoutToolbarButtons:(NSArray<UIButton *> *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally
-{
+- (void)layoutToolbarButtons:(NSArray<UIButton *> *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally {
     if (!buttons.count) {
         return;
     }
@@ -348,14 +333,14 @@
         CGFloat glassPadding = 6.0f;
         CGFloat buttonPadding = 12.0f;
         CGFloat maxExtent = buttons.count * buttonSize + (buttonPadding * (buttons.count - 1)) + (glassPadding * 2.0f);
-        
+
         CGRect glassFrame = CGRectZero;
         glassFrame.size.width = horizontally ? maxExtent : buttonSize;
         glassFrame.size.height = horizontally ? buttonSize : maxExtent;
         glassFrame.origin.x = horizontally ? CGRectGetMidX(containerRect) - (glassFrame.size.width / 2.0f) : 0.0f;
         glassFrame.origin.y = horizontally ? 0.0f : CGRectGetMidY(containerRect) - (glassFrame.size.height / 2.0f);
         _glassView.frame = glassFrame;
-        
+
         CGFloat position = glassPadding;
         for (UIButton *button in buttons) {
             CGRect buttonFrame = CGRectMake(0.0, 0.0, buttonSize, buttonSize);
@@ -375,7 +360,7 @@
 
         for (NSInteger i = 0; i < count; i++) {
             UIButton *button = buttons[i];
-            CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect)-44.0f) : fabs(CGRectGetWidth(containerRect)-size.width);
+            CGFloat sameOffset = horizontally ? fabs(CGRectGetHeight(containerRect) - 44.0f) : fabs(CGRectGetWidth(containerRect) - size.width);
             CGFloat diffOffset = padding + i * (fixedSize + padding);
             CGPoint origin = horizontally ? CGPointMake(diffOffset, sameOffset) : CGPointMake(sameOffset, diffOffset);
             if (horizontally) {
@@ -383,16 +368,16 @@
                 if (@available(iOS 15.0, *)) {
                     // iOS 15+: Use UIButtonConfiguration
                     UIButtonConfiguration *config = button.configuration ?: [UIButtonConfiguration plainButtonConfiguration];
-                    
+
                     // Position image and text
                     config.imagePlacement = NSDirectionalRectEdgeLeading;
                     config.imagePadding = 8;
-                    
+
                     UIImage *image = button.imageView.image;
                     config.contentInsets = NSDirectionalEdgeInsetsMake(0, 0, image.baselineOffsetFromBottom, 0);
-                    
+
                     button.configuration = config;
-                    
+
                 } else if (@available(iOS 13.0, *)) {
                     UIImage *image = button.imageView.image;
                     button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, image.baselineOffsetFromBottom, 0);
@@ -405,33 +390,26 @@
     }
 }
 
-- (void)buttonTapped:(id)button
-{
+- (void)buttonTapped:(id)button {
     if (button == self.cancelTextButton || button == self.cancelIconButton) {
         if (self.cancelButtonTapped)
             self.cancelButtonTapped();
-    }
-    else if (button == self.doneTextButton || button == self.doneIconButton) {
+    } else if (button == self.doneTextButton || button == self.doneIconButton) {
         if (self.doneButtonTapped)
             self.doneButtonTapped();
-    }
-    else if (button == self.resetButton && self.resetButtonTapped) {
+    } else if (button == self.resetButton && self.resetButtonTapped) {
         self.resetButtonTapped();
-    }
-    else if (button == self.rotateCounterclockwiseButton && self.rotateCounterclockwiseButtonTapped) {
+    } else if (button == self.rotateCounterclockwiseButton && self.rotateCounterclockwiseButtonTapped) {
         self.rotateCounterclockwiseButtonTapped();
-    }
-    else if (button == self.rotateClockwiseButton && self.rotateClockwiseButtonTapped) {
+    } else if (button == self.rotateClockwiseButton && self.rotateClockwiseButtonTapped) {
         self.rotateClockwiseButtonTapped();
-    }
-    else if (button == self.clampButton && self.clampButtonTapped) {
+    } else if (button == self.clampButton && self.clampButtonTapped) {
         self.clampButtonTapped();
         return;
     }
 }
 
-- (CGRect)clampButtonFrame
-{
+- (CGRect)clampButtonFrame {
     return self.clampButton.frame;
 }
 
@@ -446,47 +424,43 @@
 - (void)setClampButtonHidden:(BOOL)clampButtonHidden {
     if (_clampButtonHidden == clampButtonHidden)
         return;
-    
+
     _clampButtonHidden = clampButtonHidden;
     [self setNeedsLayout];
 }
 
-- (void)setClampButtonGlowing:(BOOL)clampButtonGlowing
-{
+- (void)setClampButtonGlowing:(BOOL)clampButtonGlowing {
     if (_clampButtonGlowing == clampButtonGlowing)
         return;
-    
+
     _clampButtonGlowing = clampButtonGlowing;
-    
+
     if (_clampButtonGlowing)
         self.clampButton.tintColor = nil;
     else
         self.clampButton.tintColor = [UIColor whiteColor];
 }
 
-- (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden
-{
+- (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden {
     if (_rotateCounterclockwiseButtonHidden == rotateButtonHidden)
         return;
-    
+
     _rotateCounterclockwiseButtonHidden = rotateButtonHidden;
     [self setNeedsLayout];
 }
 
-- (BOOL)resetButtonEnabled
-{
+- (BOOL)resetButtonEnabled {
     return self.resetButton.enabled;
 }
 
-- (void)setResetButtonEnabled:(BOOL)resetButtonEnabled
-{
+- (void)setResetButtonEnabled:(BOOL)resetButtonEnabled {
     self.resetButton.enabled = resetButtonEnabled;
 }
 
 - (void)setDoneButtonHidden:(BOOL)doneButtonHidden {
     if (_doneButtonHidden == doneButtonHidden)
         return;
-    
+
     _doneButtonHidden = doneButtonHidden;
     [self setNeedsLayout];
 }
@@ -494,16 +468,15 @@
 - (void)setCancelButtonHidden:(BOOL)cancelButtonHidden {
     if (_cancelButtonHidden == cancelButtonHidden)
         return;
-    
+
     _cancelButtonHidden = cancelButtonHidden;
     [self setNeedsLayout];
 }
 
-- (CGRect)doneButtonFrame
-{
+- (CGRect)doneButtonFrame {
     if (self.doneIconButton.hidden == NO)
         return self.doneIconButton.frame;
-    
+
     return self.doneTextButton.frame;
 }
 
@@ -531,7 +504,9 @@
 
 - (void)setCancelButtonColor:(UIColor *)cancelButtonColor {
     // Default color is app tint color
-    if (cancelButtonColor == _cancelButtonColor) { return; }
+    if (cancelButtonColor == _cancelButtonColor) {
+        return;
+    }
     _cancelButtonColor = cancelButtonColor;
     [_cancelTextButton setTitleColor:_cancelButtonColor forState:UIControlStateNormal];
     [_cancelIconButton setTintColor:_cancelButtonColor];
@@ -544,7 +519,9 @@
         doneButtonColor = [UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f];
     }
 
-    if (doneButtonColor == _doneButtonColor) { return; }
+    if (doneButtonColor == _doneButtonColor) {
+        return;
+    }
 
     _doneButtonColor = doneButtonColor;
     [_doneTextButton setTitleColor:_doneButtonColor forState:UIControlStateNormal];
@@ -553,80 +530,77 @@
 }
 
 #pragma mark - Image Generation -
-+ (UIImage *)doneImage
-{
++ (UIImage *)doneImage {
     if (@available(iOS 13.0, *)) {
         return [UIImage systemImageNamed:@"checkmark"
                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
     }
 
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){17,14}];
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){17, 14}];
     UIImage *doneImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
-        UIBezierPath* rectanglePath = UIBezierPath.bezierPath;
-        [rectanglePath moveToPoint: CGPointMake(1, 7)];
-        [rectanglePath addLineToPoint: CGPointMake(6, 12)];
-        [rectanglePath addLineToPoint: CGPointMake(16, 1)];
+        UIBezierPath *rectanglePath = UIBezierPath.bezierPath;
+        [rectanglePath moveToPoint:CGPointMake(1, 7)];
+        [rectanglePath addLineToPoint:CGPointMake(6, 12)];
+        [rectanglePath addLineToPoint:CGPointMake(16, 1)];
         [UIColor.whiteColor setStroke];
         rectanglePath.lineWidth = 2;
         [rectanglePath stroke];
     }];
-    
+
     return doneImage;
 }
 
-+ (UIImage *)cancelImage
-{
++ (UIImage *)cancelImage {
     if (@available(iOS 13.0, *)) {
         return [UIImage systemImageNamed:@"xmark"
                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]];
     }
 
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){16,16}];
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){16, 16}];
     UIImage *cancelImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
-        UIBezierPath* bezierPath = UIBezierPath.bezierPath;
-        [bezierPath moveToPoint: CGPointMake(15, 15)];
-        [bezierPath addLineToPoint: CGPointMake(1, 1)];
+        UIBezierPath *bezierPath = UIBezierPath.bezierPath;
+        [bezierPath moveToPoint:CGPointMake(15, 15)];
+        [bezierPath addLineToPoint:CGPointMake(1, 1)];
         [UIColor.whiteColor setStroke];
         bezierPath.lineWidth = 2;
         [bezierPath stroke];
 
-        UIBezierPath* bezier2Path = UIBezierPath.bezierPath;
-        [bezier2Path moveToPoint: CGPointMake(1, 15)];
-        [bezier2Path addLineToPoint: CGPointMake(15, 1)];
+        UIBezierPath *bezier2Path = UIBezierPath.bezierPath;
+        [bezier2Path moveToPoint:CGPointMake(1, 15)];
+        [bezier2Path addLineToPoint:CGPointMake(15, 1)];
         [UIColor.whiteColor setStroke];
         bezier2Path.lineWidth = 2;
         [bezier2Path stroke];
     }];
-    
+
     return cancelImage;
 }
 
-+ (UIImage *)rotateCCWImage
-{
++ (UIImage *)rotateCCWImage {
     if (@available(iOS 13.0, *)) {
         return [[UIImage systemImageNamed:@"rotate.left.fill"
                         withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
-                imageWithBaselineOffsetFromBottom:4];
+            imageWithBaselineOffsetFromBottom:4];
     }
 
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){18,21}];
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){18, 21}];
     UIImage *rotateImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
-        UIBezierPath* rectangle2Path = [UIBezierPath bezierPathWithRect: CGRectMake(0, 9, 12, 12)];
+        UIBezierPath *rectangle2Path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 9, 12, 12)];
         [UIColor.whiteColor setFill];
         [rectangle2Path fill];
 
-        UIBezierPath* rectangle3Path = UIBezierPath.bezierPath;
-        [rectangle3Path moveToPoint: CGPointMake(5, 3)];
-        [rectangle3Path addLineToPoint: CGPointMake(10, 6)];
-        [rectangle3Path addLineToPoint: CGPointMake(10, 0)];
-        [rectangle3Path addLineToPoint: CGPointMake(5, 3)];
+        UIBezierPath *rectangle3Path = UIBezierPath.bezierPath;
+        [rectangle3Path moveToPoint:CGPointMake(5, 3)];
+        [rectangle3Path addLineToPoint:CGPointMake(10, 6)];
+        [rectangle3Path addLineToPoint:CGPointMake(10, 0)];
+        [rectangle3Path addLineToPoint:CGPointMake(5, 3)];
         [rectangle3Path closePath];
         [UIColor.whiteColor setFill];
         [rectangle3Path fill];
 
-        UIBezierPath* bezierPath = UIBezierPath.bezierPath;
-        [bezierPath moveToPoint: CGPointMake(10, 3)];
-        [bezierPath addCurveToPoint: CGPointMake(17.5, 11) controlPoint1: CGPointMake(15, 3) controlPoint2: CGPointMake(17.5, 5.91)];
+        UIBezierPath *bezierPath = UIBezierPath.bezierPath;
+        [bezierPath moveToPoint:CGPointMake(10, 3)];
+        [bezierPath addCurveToPoint:CGPointMake(17.5, 11) controlPoint1:CGPointMake(15, 3) controlPoint2:CGPointMake(17.5, 5.91)];
         [UIColor.whiteColor setStroke];
         bezierPath.lineWidth = 1;
         [bezierPath stroke];
@@ -635,12 +609,11 @@
     return rotateImage;
 }
 
-+ (UIImage *)rotateCWImage
-{
++ (UIImage *)rotateCWImage {
     if (@available(iOS 13.0, *)) {
         return [[UIImage systemImageNamed:@"rotate.right.fill"
                         withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
-                imageWithBaselineOffsetFromBottom:4];
+            imageWithBaselineOffsetFromBottom:4];
     }
 
     UIImage *rotateCCWImage = [self.class rotateCCWImage];
@@ -649,87 +622,85 @@
         CGContextRef context = rendererContext.CGContext;
         CGContextTranslateCTM(context, rotateCCWImage.size.width, rotateCCWImage.size.height);
         CGContextRotateCTM(context, M_PI);
-        CGContextDrawImage(context,CGRectMake(0,0,rotateCCWImage.size.width,rotateCCWImage.size.height),rotateCCWImage.CGImage);
+        CGContextDrawImage(context, CGRectMake(0, 0, rotateCCWImage.size.width, rotateCCWImage.size.height), rotateCCWImage.CGImage);
     }];
 
     return rotateCWImage;
 }
 
-+ (UIImage *)resetImage
-{
++ (UIImage *)resetImage {
     if (@available(iOS 13.0, *)) {
         return [[UIImage systemImageNamed:@"arrow.counterclockwise"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
-                imageWithBaselineOffsetFromBottom:0];;
+                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+            imageWithBaselineOffsetFromBottom:0];
+        ;
     }
 
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22,18}];
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22, 18}];
     UIImage *resetImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
-        UIBezierPath* bezier2Path = UIBezierPath.bezierPath;
-        [bezier2Path moveToPoint: CGPointMake(22, 9)];
-        [bezier2Path addCurveToPoint: CGPointMake(13, 18) controlPoint1: CGPointMake(22, 13.97) controlPoint2: CGPointMake(17.97, 18)];
-        [bezier2Path addCurveToPoint: CGPointMake(13, 16) controlPoint1: CGPointMake(13, 17.35) controlPoint2: CGPointMake(13, 16.68)];
-        [bezier2Path addCurveToPoint: CGPointMake(20, 9) controlPoint1: CGPointMake(16.87, 16) controlPoint2: CGPointMake(20, 12.87)];
-        [bezier2Path addCurveToPoint: CGPointMake(13, 2) controlPoint1: CGPointMake(20, 5.13) controlPoint2: CGPointMake(16.87, 2)];
-        [bezier2Path addCurveToPoint: CGPointMake(6.55, 6.27) controlPoint1: CGPointMake(10.1, 2) controlPoint2: CGPointMake(7.62, 3.76)];
-        [bezier2Path addCurveToPoint: CGPointMake(6, 9) controlPoint1: CGPointMake(6.2, 7.11) controlPoint2: CGPointMake(6, 8.03)];
-        [bezier2Path addLineToPoint: CGPointMake(4, 9)];
-        [bezier2Path addCurveToPoint: CGPointMake(4.65, 5.63) controlPoint1: CGPointMake(4, 7.81) controlPoint2: CGPointMake(4.23, 6.67)];
-        [bezier2Path addCurveToPoint: CGPointMake(7.65, 1.76) controlPoint1: CGPointMake(5.28, 4.08) controlPoint2: CGPointMake(6.32, 2.74)];
-        [bezier2Path addCurveToPoint: CGPointMake(13, 0) controlPoint1: CGPointMake(9.15, 0.65) controlPoint2: CGPointMake(11, 0)];
-        [bezier2Path addCurveToPoint: CGPointMake(22, 9) controlPoint1: CGPointMake(17.97, 0) controlPoint2: CGPointMake(22, 4.03)];
+        UIBezierPath *bezier2Path = UIBezierPath.bezierPath;
+        [bezier2Path moveToPoint:CGPointMake(22, 9)];
+        [bezier2Path addCurveToPoint:CGPointMake(13, 18) controlPoint1:CGPointMake(22, 13.97) controlPoint2:CGPointMake(17.97, 18)];
+        [bezier2Path addCurveToPoint:CGPointMake(13, 16) controlPoint1:CGPointMake(13, 17.35) controlPoint2:CGPointMake(13, 16.68)];
+        [bezier2Path addCurveToPoint:CGPointMake(20, 9) controlPoint1:CGPointMake(16.87, 16) controlPoint2:CGPointMake(20, 12.87)];
+        [bezier2Path addCurveToPoint:CGPointMake(13, 2) controlPoint1:CGPointMake(20, 5.13) controlPoint2:CGPointMake(16.87, 2)];
+        [bezier2Path addCurveToPoint:CGPointMake(6.55, 6.27) controlPoint1:CGPointMake(10.1, 2) controlPoint2:CGPointMake(7.62, 3.76)];
+        [bezier2Path addCurveToPoint:CGPointMake(6, 9) controlPoint1:CGPointMake(6.2, 7.11) controlPoint2:CGPointMake(6, 8.03)];
+        [bezier2Path addLineToPoint:CGPointMake(4, 9)];
+        [bezier2Path addCurveToPoint:CGPointMake(4.65, 5.63) controlPoint1:CGPointMake(4, 7.81) controlPoint2:CGPointMake(4.23, 6.67)];
+        [bezier2Path addCurveToPoint:CGPointMake(7.65, 1.76) controlPoint1:CGPointMake(5.28, 4.08) controlPoint2:CGPointMake(6.32, 2.74)];
+        [bezier2Path addCurveToPoint:CGPointMake(13, 0) controlPoint1:CGPointMake(9.15, 0.65) controlPoint2:CGPointMake(11, 0)];
+        [bezier2Path addCurveToPoint:CGPointMake(22, 9) controlPoint1:CGPointMake(17.97, 0) controlPoint2:CGPointMake(22, 4.03)];
         [bezier2Path closePath];
         [UIColor.whiteColor setFill];
         [bezier2Path fill];
 
-        UIBezierPath* polygonPath = UIBezierPath.bezierPath;
-        [polygonPath moveToPoint: CGPointMake(5, 15)];
-        [polygonPath addLineToPoint: CGPointMake(10, 9)];
-        [polygonPath addLineToPoint: CGPointMake(0, 9)];
-        [polygonPath addLineToPoint: CGPointMake(5, 15)];
+        UIBezierPath *polygonPath = UIBezierPath.bezierPath;
+        [polygonPath moveToPoint:CGPointMake(5, 15)];
+        [polygonPath addLineToPoint:CGPointMake(10, 9)];
+        [polygonPath addLineToPoint:CGPointMake(0, 9)];
+        [polygonPath addLineToPoint:CGPointMake(5, 15)];
         [polygonPath closePath];
         [UIColor.whiteColor setFill];
         [polygonPath fill];
     }];
-    
+
     return resetImage;
 }
 
-+ (UIImage *)clampImage
-{
++ (UIImage *)clampImage {
     if (@available(iOS 13.0, *)) {
         return [[UIImage systemImageNamed:@"aspectratio.fill"
-                       withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
-                imageWithBaselineOffsetFromBottom:0];
+                        withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
+            imageWithBaselineOffsetFromBottom:0];
     }
-    
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22,16}];
+
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22, 16}];
     UIImage *clampImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
         //// Color Declarations
-        UIColor* outerBox = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 0.553];
-        UIColor* innerBox = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 0.773];
+        UIColor *outerBox = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.553];
+        UIColor *innerBox = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.773];
 
         //// Rectangle Drawing
-        UIBezierPath* rectanglePath = [UIBezierPath bezierPathWithRect: CGRectMake(0, 3, 13, 13)];
+        UIBezierPath *rectanglePath = [UIBezierPath bezierPathWithRect:CGRectMake(0, 3, 13, 13)];
         [UIColor.whiteColor setFill];
         [rectanglePath fill];
 
         //// Outer
         {
             //// Top Drawing
-            UIBezierPath* topPath = [UIBezierPath bezierPathWithRect: CGRectMake(0, 0, 22, 2)];
+            UIBezierPath *topPath = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, 22, 2)];
             [outerBox setFill];
             [topPath fill];
 
-
             //// Side Drawing
-            UIBezierPath* sidePath = [UIBezierPath bezierPathWithRect: CGRectMake(19, 2, 3, 14)];
+            UIBezierPath *sidePath = [UIBezierPath bezierPathWithRect:CGRectMake(19, 2, 3, 14)];
             [outerBox setFill];
             [sidePath fill];
         }
 
         //// Rectangle 2 Drawing
-        UIBezierPath* rectangle2Path = [UIBezierPath bezierPathWithRect: CGRectMake(14, 3, 4, 13)];
+        UIBezierPath *rectangle2Path = [UIBezierPath bezierPathWithRect:CGRectMake(14, 3, 4, 13)];
         [innerBox setFill];
         [rectangle2Path fill];
     }];
@@ -739,40 +710,35 @@
 
 #pragma mark - Accessors -
 
-- (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden
-{
+- (void)setRotateClockwiseButtonHidden:(BOOL)rotateClockwiseButtonHidden {
     if (_rotateClockwiseButtonHidden == rotateClockwiseButtonHidden) {
         return;
     }
-    
+
     _rotateClockwiseButtonHidden = rotateClockwiseButtonHidden;
-    
+
     [self setNeedsLayout];
 }
 
-- (void)setResetButtonHidden:(BOOL)resetButtonHidden
-{
+- (void)setResetButtonHidden:(BOOL)resetButtonHidden {
     if (_resetButtonHidden == resetButtonHidden) {
         return;
     }
-    
+
     _resetButtonHidden = resetButtonHidden;
-    
+
     [self setNeedsLayout];
 }
-- (UIButton *)rotateButton
-{
+- (UIButton *)rotateButton {
     return self.rotateCounterclockwiseButton;
 }
 
-- (void)setStatusBarHeightInset:(CGFloat)statusBarHeightInset
-{
+- (void)setStatusBarHeightInset:(CGFloat)statusBarHeightInset {
     _statusBarHeightInset = statusBarHeightInset;
     [self setNeedsLayout];
 }
 
-- (UIView *)visibleCancelButton
-{
+- (UIView *)visibleCancelButton {
     if (self.cancelIconButton.hidden == NO) {
         return self.cancelIconButton;
     }
@@ -780,8 +746,7 @@
     return self.cancelTextButton;
 }
 
-- (void)setDisableRotationButtons:(BOOL)disableRotationButtons
-{
+- (void)setDisableRotationButtons:(BOOL)disableRotationButtons {
     if (_disableRotationButtons == disableRotationButtons) {
         return;
     }

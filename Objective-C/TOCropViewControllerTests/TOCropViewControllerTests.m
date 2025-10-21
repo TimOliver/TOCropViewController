@@ -18,13 +18,13 @@
 @implementation TOCropViewControllerTests
 
 - (void)testViewControllerInstance {
-    //Create a basic image
+    // Create a basic image
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(10, 10)];
-    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull context) {
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *_Nonnull context) {
         [context fillRect:CGRectMake(0, 0, 10, 10)];
     }];
 
-    //Perform test
+    // Perform test
     TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:image];
     UIView *view = controller.view;
     XCTAssertNotNil(view);
