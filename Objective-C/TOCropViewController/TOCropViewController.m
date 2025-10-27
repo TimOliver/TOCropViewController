@@ -282,6 +282,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (CGRect)frameForToolbarWithVerticalLayout:(BOOL)verticalLayout
 {
     UIEdgeInsets insets = self.statusBarSafeInsets;
+  
+    // fix: On iOS 26, overlay with iPadOS windowingControl area.
+    if (@available(iOS 26.0, *)) {
+      if (!verticalLayout) {
+        UIViewLayoutRegion *layoutRegion = [UIViewLayoutRegion safeAreaLayoutRegionWithCornerAdaptation: UIViewLayoutRegionAdaptivityAxisVertical];
+        UIEdgeInsets edgeInsets = [self.view edgeInsetsForLayoutRegion:layoutRegion];
+        insets.top = edgeInsets.top;
+        insets.left = edgeInsets.left;
+        insets.bottom = edgeInsets.bottom;
+      }
+    }
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) { // In landscape laying out toolbar to the left
@@ -291,10 +302,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #else
             CGFloat minPadding = 16.0f;
 #endif
-            frame.origin.x = insets.left + minPadding;
-            frame.origin.y = minPadding;
+            frame.origin.x = insets.left;
+            frame.origin.y = minPadding + insets.top;
             frame.size.width = kTOCropViewControllerToolbarHeight;
-            frame.size.height = CGRectGetHeight(self.view.frame) - (minPadding * 2.0f);
+            frame.size.height = CGRectGetHeight(self.view.frame) - (minPadding * 2.0f) - insets.top - insets.bottom;
         } else {
             frame.origin.x = insets.left;
             frame.origin.y = 0.0f;
