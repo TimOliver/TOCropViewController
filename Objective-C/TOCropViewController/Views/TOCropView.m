@@ -1709,8 +1709,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect contentRect = CGRectZero;
     contentRect.origin.x = self.cropViewPadding + self.cropRegionInsets.left;
     contentRect.origin.y = self.cropViewPadding + self.cropRegionInsets.top;
-    contentRect.size.width = CGRectGetWidth(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
-    contentRect.size.height = CGRectGetHeight(self.bounds) - ((self.cropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
+    contentRect.size.width = CGRectGetWidth(self.frame) - ((self.cropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
+    contentRect.size.height = CGRectGetHeight(self.frame) - ((self.cropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
     return contentRect;
 }
 
