@@ -8,6 +8,7 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 - A crash occurring on (allegedly) certain older beta version of iOS 26.0. ([#635](https://github.com/TimOliver/TOCropViewController/pull/635))
 - A UI layout issue where the Done button would be obscured by the iPadOS title bar buttons when in windowed mode. ([#631](https://github.com/TimOliver/TOCropViewController/pull/631))
+- Fixed a rotation animation issue occuring on iOS 26. ([#636](https://github.com/TimOliver/TOCropViewController/pull/636))
 
 3.1.0 Release Notes (2025-10-18)
 =============================================================
