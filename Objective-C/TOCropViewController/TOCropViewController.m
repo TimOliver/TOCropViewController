@@ -290,7 +290,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #else
             CGFloat minPadding = 16.0f;
 #endif
-            frame.origin.x = insets.left;
+            frame.origin.x = minPadding + insets.left;
             frame.origin.y = minPadding + insets.top;
             frame.size.width = kTOCropViewControllerToolbarHeight;
             frame.size.height = CGRectGetHeight(self.view.frame) - (minPadding * 2.0f) - insets.top - insets.bottom;
