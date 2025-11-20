@@ -489,6 +489,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
 
+    [UIView performWithoutAnimation:^{
+        self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
+        [self adjustToolbarInsets];
+        [self.toolbar setNeedsLayout];
+    }];
+
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self adjustCropViewInsets];
     [self.cropView moveCroppedContentToCenterAnimated:NO];
@@ -502,12 +508,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
         [self.cropView moveCroppedContentToCenterAnimated:NO];
     }
-
-    [UIView performWithoutAnimation:^{
-        self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
-        [self adjustToolbarInsets];
-        [self.toolbar setNeedsLayout];
-    }];
 }
 
 #pragma mark - Rotation Handling -
