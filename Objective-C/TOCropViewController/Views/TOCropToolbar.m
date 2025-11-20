@@ -61,7 +61,19 @@
     if (@available(iOS 26.0, *)) {
         UIVisualEffect *effect = nil;
 #if !TARGET_OS_VISION
-        UIGlassEffect *glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
+        // We've been getting reports that some devices have been crashing with the error message
+        // that `effectWithStyle` was unrecognized. The ONLY way this seems to be possible
+        // is if there are users out there using the beta versions of iOS 26.0 before this method
+        // was introduced. Either way, we're going to need to manually confirm the selector exists
+        // in order to fix these crashes.
+
+        UIGlassEffect *glassEffect = nil;
+        SEL effectSelector = NSSelectorFromString(@"effectWithStyle:");
+        if ([[UIGlassEffect class] respondsToSelector:effectSelector]) {
+            glassEffect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleClear];
+        } else {
+            glassEffect = [UIGlassEffect new];
+        }
         glassEffect.interactive = YES;
         effect = glassEffect;
 #else
