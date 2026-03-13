@@ -318,6 +318,11 @@
 @property (nullable, nonatomic, strong) NSArray<TOCropViewControllerAspectRatioPreset *> *allowedAspectRatios;
 
 /**
+ Called when the user hits the Done button.
+*/
+@property (nullable, nonatomic, copy) void (^onDidTapDone)(void);
+
+/**
  When the user hits cancel, or completes a
  UIActivityViewController operation, this block will be called,
  giving you a chance to manually dismiss the view controller

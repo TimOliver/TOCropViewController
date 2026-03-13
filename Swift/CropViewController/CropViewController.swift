@@ -45,6 +45,11 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
 
 @MainActor @objc public protocol CropViewControllerDelegate: NSObjectProtocol {
     /**
+     Called when the user hits the Done button.
+     */
+    @objc optional func cropViewControllerDidTapDone(_ cropViewController: CropViewController)
+
+    /**
      Called when the user has committed the crop action, and provides
      just the cropping rectangle.
      
@@ -319,7 +324,15 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         set { toCropViewController.allowedAspectRatios = newValue }
         get { return toCropViewController.allowedAspectRatios }
     }
-    
+
+    /**
+     Called when the user hits the Done button.
+     */
+     public var onDidTapDone: (() -> Void)? {
+        set { toCropViewController.onDidTapDone = newValue }
+        get { return toCropViewController.onDidTapDone }
+    }
+
     /**
      When the user hits cancel, or completes a
      UIActivityViewController operation, this block will be called,
@@ -650,13 +663,21 @@ extension CropViewController {
     
     fileprivate func setUpDelegateHandlers() {
         guard let delegate = self.delegate else {
+            onDidTapDone = nil
             onDidCropToRect = nil
             onDidCropImageToRect = nil
             onDidCropToCircleImage = nil
             onDidFinishCancelled = nil
             return
         }
-        
+
+        if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewControllerDidTapDone(_:))) {
+            self.onDidTapDone = { [weak self] in
+                guard let self else { return }
+                delegate.cropViewControllerDidTapDone?(self)
+            }
+        }
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropImageToRect:angle:))) {
             self.onDidCropImageToRect = {[weak self] rect, angle in
                 guard let strongSelf = self else { return }
