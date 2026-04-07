@@ -126,7 +126,7 @@
     if (@available(iOS 26.0, *)) {
 #if !TARGET_OS_VISION
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
-        configuration.baseForegroundColor = [UIColor blackColor];
+        configuration.baseForegroundColor = [UIColor labelColor];
 #else
         UIButtonConfiguration *configuration = [UIButtonConfiguration filledButtonConfiguration];
 #endif
@@ -156,7 +156,9 @@
 #if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
 #if !TARGET_OS_VISION
-        _cancelIconButton.configuration = [UIButtonConfiguration clearGlassButtonConfiguration];
+        UIButtonConfiguration *cancelConfiguration = [UIButtonConfiguration clearGlassButtonConfiguration];
+        cancelConfiguration.baseForegroundColor = [UIColor labelColor];
+        _cancelIconButton.configuration = cancelConfiguration;
 #else
         _cancelIconButton.configuration = [UIButtonConfiguration filledButtonConfiguration];
 #endif

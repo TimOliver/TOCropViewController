@@ -274,11 +274,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // fix: On iOS 26, overlay with iPadOS windowingControl area.
     if (@available(iOS 26.0, *)) {
       if (!verticalLayout) {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 180000
         UIViewLayoutRegion *layoutRegion = [UIViewLayoutRegion safeAreaLayoutRegionWithCornerAdaptation: UIViewLayoutRegionAdaptivityAxisVertical];
         UIEdgeInsets edgeInsets = [self.view edgeInsetsForLayoutRegion:layoutRegion];
         insets.top = edgeInsets.top;
         insets.left = edgeInsets.left;
         insets.bottom = edgeInsets.bottom;
+#endif
       }
     }
 
