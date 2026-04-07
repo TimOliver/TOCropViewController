@@ -1,6 +1,18 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+3.1.2 Release Notes (2026-04-07)
+
+## Enhancements
+
+* Added callback closure for when the user taps the 'Done' button. [#643](https://github.com/TimOliver/TOCropViewController/pull/643)
+
+## Fixed
+
+* Restored some pre-defined aspect ratio values when enabling aspect ratio clamping. [#646](https://github.com/TimOliver/TOCropViewController/pull/646))
+* Restored source compatibility with Xcode 16. [#645](https://github.com/TimOliver/TOCropViewController/pull/645)
+
+
 3.1.1 Release Notes (2025-11-20)
 =============================================================
 
