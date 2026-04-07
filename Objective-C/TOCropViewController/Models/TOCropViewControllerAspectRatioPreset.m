@@ -37,6 +37,15 @@
 
 @implementation TOCropViewControllerAspectRatioPreset
 
++ (CGSize)original { return CGSizeZero; }
++ (CGSize)square { return CGSizeMake(1.0f, 1.0f); }
++ (CGSize)ratio3x2 { return CGSizeMake(3.0f, 2.0f); }
++ (CGSize)ratio5x3 { return CGSizeMake(5.0f, 3.0f); }
++ (CGSize)ratio4x3 { return CGSizeMake(4.0f, 3.0f); }
++ (CGSize)ratio5x4 { return CGSizeMake(5.0f, 4.0f); }
++ (CGSize)ratio7x5 { return CGSizeMake(7.0f, 5.0f); }
++ (CGSize)ratio16x9 { return CGSizeMake(16.0f, 9.0f); }
+
 - (instancetype)initWithSize:(CGSize)size title:(NSString *)title {
     self = [super init];
     if (self) {
