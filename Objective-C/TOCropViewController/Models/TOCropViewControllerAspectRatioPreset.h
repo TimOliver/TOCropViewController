@@ -30,6 +30,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) CGSize size;
 @property (nonatomic, readonly) NSString *title;
 
+/// The original aspect ratio of the image (CGSizeZero)
+@property (class, nonatomic, readonly) CGSize original;
+
+/// A square aspect ratio (1:1)
+@property (class, nonatomic, readonly) CGSize square;
+
+/// A 3:2 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio3x2;
+
+/// A 5:3 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio5x3;
+
+/// A 4:3 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio4x3;
+
+/// A 5:4 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio5x4;
+
+/// A 7:5 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio7x5;
+
+/// A 16:9 aspect ratio
+@property (class, nonatomic, readonly) CGSize ratio16x9;
+
 + (NSArray<TOCropViewControllerAspectRatioPreset *> *)portraitPresets;
 + (NSArray<TOCropViewControllerAspectRatioPreset *> *)landscapePresets;
 
