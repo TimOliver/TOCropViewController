@@ -149,7 +149,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         
         let profileAction = UIAlertAction(title: "Make Profile Picture", style: .default) { (action) in
             self.croppingStyle = .circular
-            
+
             let imagePicker = UIImagePickerController()
             imagePicker.modalPresentationStyle = .popover
             imagePicker.popoverPresentationController?.barButtonItem = (sender as! UIBarButtonItem)
@@ -159,9 +159,22 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             imagePicker.delegate = self
             self.present(imagePicker, animated: true, completion: nil)
         }
-        
+
+        let cropAction = UIAlertAction(title: "Show Crop in Sheet", style: .default) { (action) in
+
+            let cropViewController = CropViewController(croppingStyle: self.croppingStyle, image: self.image!)
+            cropViewController.modalTransitionStyle = .coverVertical
+            if #available(iOS 13.0, *) {
+                cropViewController.modalPresentationStyle = .automatic
+            }
+            let navigationController = UINavigationController(rootViewController: cropViewController)
+            self.present(navigationController, animated: true, completion: nil)
+        }
+        cropAction.isEnabled = image != nil
+
         alertController.addAction(defaultAction)
         alertController.addAction(profileAction)
+        alertController.addAction(cropAction)
         alertController.modalPresentationStyle = .popover
         
         let presentationController = alertController.popoverPresentationController
