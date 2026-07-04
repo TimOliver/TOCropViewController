@@ -490,17 +490,13 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     open override var childForStatusBarHidden: UIViewController? {
         return toCropViewController
     }
-    
-    open override var prefersStatusBarHidden: Bool {
-        return false
-    }
-    
-    open override var preferredStatusBarStyle: UIStatusBarStyle {
-        return toCropViewController.preferredStatusBarStyle
-    }
-    
-    open override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge {
-        return toCropViewController.preferredScreenEdgesDeferringSystemGestures
+
+    /**
+     Forward screen edges deferring system gestures changes to the crop view controller
+     :nodoc:
+     */
+    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? {
+        return toCropViewController
     }
     
     // ------------------------------------------------

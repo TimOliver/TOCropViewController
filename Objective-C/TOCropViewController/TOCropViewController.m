@@ -265,6 +265,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 }
 
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
+    if (self.navigationController) {
+        return super.preferredScreenEdgesDeferringSystemGestures;
+    }
     return UIRectEdgeAll;
 }
 
@@ -303,33 +306,46 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             frame.size.height = CGRectGetHeight(self.view.frame);
         }
     } else {
-        // On iOS 26, the safe area insets values are the same, however the default bottom value is so
-        // high that the buttons look incorrectly set. While you can try and hardcode a value lower to
-        // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
-        // devices is also difficult.
-
-        // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
-        // the toolbar with the device's rounded corners.
-        // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
         if (@available(iOS 26.0, *)) {
-            if (insets.bottom > 0.0f) {
-                insets.bottom = 20.0f;
-            } else {
-                insets.bottom = 8.0f;
+            CGRect frameInWindow = [self.view convertRect:self.view.bounds toView:nil];
+            BOOL isFullscreen = true;
+            if (self.view.window) {
+                isFullscreen = CGRectEqualToRect(frameInWindow, self.view.window.bounds);
             }
+            if (isFullscreen) {
+                // On iOS 26, the safe area insets values are the same, however the default bottom value is so
+                // high that the buttons look incorrectly set. While you can try and hardcode a value lower to
+                // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
+                // devices is also difficult.
+
+                // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
+                // the toolbar with the device's rounded corners.
+                // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
+                if (insets.bottom > 0.0f) {
+                    insets.bottom = 20.0f;
+                } else {
+                    insets.bottom = 8.0f;
+                }
 
 #if !TARGET_OS_VISION
-            const char *components[] = {"Radius", "Corner", "display", "_"};
-            NSString *selectorName = @"";
-            for (NSInteger i = 3; i >= 0; i--) {
-                selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
-                                                                                        encoding:NSUTF8StringEncoding]];
-            }
-            const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+                const char *components[] = {"Radius", "Corner", "display", "_"};
+                NSString *selectorName = @"";
+                for (NSInteger i = 3; i >= 0; i--) {
+                    selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
+                                                                                            encoding:NSUTF8StringEncoding]];
+                }
+                const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
 #else
-            const CGFloat cornerRadius = 64.0f;
+                const CGFloat cornerRadius = 64.0f;
 #endif
-            frame.size.width = CGRectGetWidth(self.view.bounds) - MAX(cornerRadius, insets.bottom * 2.0f);
+                frame.size.width = CGRectGetWidth(self.view.bounds) - MAX(cornerRadius, insets.bottom * 2.0f);
+            } else {
+                // Match system toolbar insets
+                insets.left += self.view.layoutMargins.left + 12;
+                insets.right += self.view.layoutMargins.right + 12;
+                insets.bottom = MAX(0, insets.bottom - 6);
+                frame.size.width = CGRectGetWidth(self.view.bounds) - insets.left - insets.right;
+            }
         } else {
             frame.size.width = CGRectGetWidth(self.view.bounds);
         }

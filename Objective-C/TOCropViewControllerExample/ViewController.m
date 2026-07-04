@@ -211,8 +211,23 @@
                                                               [self presentViewController:profilePicker animated:YES completion:nil];
                                                           }];
 
+    UIAlertAction *cropAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Crop in Sheet", @"")
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction *action) {
+
+                                                              TOCropViewController *cropController = [[TOCropViewController alloc] initWithCroppingStyle:self.croppingStyle image:self.image];
+                                                              cropController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+                                                              if (@available(iOS 13.0, *)) {
+                                                                  cropController.modalPresentationStyle = UIModalPresentationAutomatic;
+                                                              }
+                                                              UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:cropController];
+                                                              [self presentViewController:navigationController animated:YES completion:nil];
+                                                          }];
+    [cropAction setEnabled:self.image != nil];
+
     [alertController addAction:defaultAction];
     [alertController addAction:profileAction];
+    [alertController addAction:cropAction];
     [alertController setModalPresentationStyle:UIModalPresentationPopover];
 
     UIPopoverPresentationController *popPresenter = [alertController popoverPresentationController];
