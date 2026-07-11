@@ -12,6 +12,7 @@
 
 #import "TOCropScrollView.h"
 #import "TOCropViewController.h"
+#import "UIImage+CropRotate.h"
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
 // rotation, and drive the scroll view's touch hooks
@@ -162,6 +163,20 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
     cropView.scrollView.touchesBegan();
     cropView.scrollView.touchesCancelled();
     XCTAssertNotNil(cropView.resetTimer, @"an interrupted idle touch must arm the reset timer");
+}
+
+- (void)testCroppedImageWithFrame {
+    UIImage *image = [self testImageWithSize:(CGSize){40, 20}];
+
+    UIImage *cropped = [image croppedImageWithFrame:(CGRect){10, 5, 20, 10} angle:0 circularClip:NO];
+    XCTAssertEqualWithAccuracy(cropped.size.width, 20.0, FLT_EPSILON);
+    XCTAssertEqualWithAccuracy(cropped.size.height, 10.0, FLT_EPSILON);
+    XCTAssertEqual(cropped.imageOrientation, UIImageOrientationUp);
+
+    // A 90-degree rotation swaps the axes the crop frame is expressed in
+    UIImage *rotated = [image croppedImageWithFrame:(CGRect){0, 0, 20, 40} angle:90 circularClip:NO];
+    XCTAssertEqualWithAccuracy(rotated.size.width, 20.0, FLT_EPSILON);
+    XCTAssertEqualWithAccuracy(rotated.size.height, 40.0, FLT_EPSILON);
 }
 
 - (void)testCropViewIsReleasedWithPendingResetTimer {
