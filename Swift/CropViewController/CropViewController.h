@@ -22,12 +22,21 @@
 
 #import <UIKit/UIKit.h>
 
+#if __has_include(<CropViewController/TOCropViewController.h>)
+#import <CropViewController/TOCropToolbar.h>
+#import <CropViewController/TOCropView.h>
+#import <CropViewController/TOCropViewConstants.h>
+#import <CropViewController/TOCropViewController.h>
+#import <CropViewController/TOCropViewControllerAspectRatioPreset.h>
+#import <CropViewController/UIImage+CropRotate.h>
+#else
 #import "TOCropToolbar.h"
 #import "TOCropView.h"
 #import "TOCropViewConstants.h"
 #import "TOCropViewController.h"
 #import "TOCropViewControllerAspectRatioPreset.h"
 #import "UIImage+CropRotate.h"
+#endif
 
 FOUNDATION_EXPORT double CropViewControllerVersionNumber;
 FOUNDATION_EXPORT const unsigned char CropViewControllerVersionString[];
