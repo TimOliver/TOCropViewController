@@ -66,6 +66,10 @@
     return CGSizeEqualToSize(self.size, other.size) && [self.title isEqualToString:other.title];
 }
 
+- (NSUInteger)hash {
+    return @(self.size.width).hash ^ @(self.size.height).hash ^ self.title.hash;
+}
+
 + (NSArray<TOCropViewControllerAspectRatioPreset *> *)portraitPresets {
     TOCropViewControllerAspectRatioPreset *object = [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:CGSizeZero title:@"Original"];
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(object);

@@ -189,6 +189,31 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
     XCTAssertNil(weakCropView);
 }
 
+- (void)testControllerPropertiesReadBack {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+    controller.doneButtonTitle = @"Save";
+    XCTAssertEqualObjects(controller.doneButtonTitle, @"Save");
+    controller.cancelButtonTitle = @"Back";
+    XCTAssertEqualObjects(controller.cancelButtonTitle, @"Back");
+    controller.showOnlyIcons = YES;
+    XCTAssertTrue(controller.showOnlyIcons);
+    controller.doneButtonColor = UIColor.systemPinkColor;
+    XCTAssertEqualObjects(controller.doneButtonColor, UIColor.systemPinkColor);
+    controller.cancelButtonColor = UIColor.systemTealColor;
+    XCTAssertEqualObjects(controller.cancelButtonColor, UIColor.systemTealColor);
+    controller.resetButtonHidden = YES;
+    XCTAssertTrue(controller.resetButtonHidden);
+}
+
+- (void)testAspectRatioPresetEqualityAndHashing {
+    TOCropViewControllerAspectRatioPreset *first = [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:(CGSize){16, 9} title:@"16:9"];
+    TOCropViewControllerAspectRatioPreset *second = [[TOCropViewControllerAspectRatioPreset alloc] initWithSize:(CGSize){16, 9} title:@"16:9"];
+    XCTAssertEqualObjects(first, second);
+    XCTAssertEqual(first.hash, second.hash);
+    NSSet *presets = [NSSet setWithArray:@[first, second]];
+    XCTAssertEqual(presets.count, 1u);
+}
+
 - (void)testViewControllerInstance {
     // Create a basic image
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(10, 10)];

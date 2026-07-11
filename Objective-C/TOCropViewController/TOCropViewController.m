@@ -614,11 +614,14 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
 #if !TARGET_OS_VISION
+    // Derive the layout from the aspect of the size we're transitioning to,
+    // matching the logic in -verticalLayout
     UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
-    CGSize currentSize = self.view.bounds.size;
-    if (currentSize.width < size.width) {
+#if !TARGET_OS_MACCATALYST
+    if (size.width > size.height) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     }
+#endif
 #else
     // On visionOS, this method is called on presentation with size=(0,0),
     // which would set orientation incorrectly causing views to be misplaced.
@@ -755,7 +758,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.transitionController.fromView = fromView;
     self.prepareForTransitionHandler = setup;
 
-    if (self.angle != 0 || !CGRectIsEmpty(toFrame)) {
+    if (angle != 0 || !CGRectIsEmpty(toFrame)) {
         self.angle = angle;
         self.imageCropFrame = toFrame;
     }
@@ -1075,20 +1078,40 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.doneTextButtonTitle = title;
 }
 
+- (NSString *)doneButtonTitle {
+    return self.toolbar.doneTextButtonTitle;
+}
+
 - (void)setCancelButtonTitle:(NSString *)title {
     self.toolbar.cancelTextButtonTitle = title;
+}
+
+- (NSString *)cancelButtonTitle {
+    return self.toolbar.cancelTextButtonTitle;
 }
 
 - (void)setShowOnlyIcons:(BOOL)showOnlyIcons {
     self.toolbar.showOnlyIcons = showOnlyIcons;
 }
 
+- (BOOL)showOnlyIcons {
+    return self.toolbar.showOnlyIcons;
+}
+
 - (void)setDoneButtonColor:(UIColor *)color {
     self.toolbar.doneButtonColor = color;
 }
 
+- (UIColor *)doneButtonColor {
+    return self.toolbar.doneButtonColor;
+}
+
 - (void)setCancelButtonColor:(UIColor *)color {
     self.toolbar.cancelButtonColor = color;
+}
+
+- (UIColor *)cancelButtonColor {
+    return self.toolbar.cancelButtonColor;
 }
 
 - (TOCropView *)cropView {
@@ -1158,6 +1181,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)setResetButtonHidden:(BOOL)resetButtonHidden {
     self.toolbar.resetButtonHidden = resetButtonHidden;
+}
+
+- (BOOL)resetButtonHidden {
+    return self.toolbar.resetButtonHidden;
 }
 
 - (BOOL)rotateButtonsHidden {

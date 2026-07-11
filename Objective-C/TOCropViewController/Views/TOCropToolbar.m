@@ -430,7 +430,8 @@
 }
 
 - (CGRect)clampButtonFrame {
-    return self.clampButton.frame;
+    // Convert into the toolbar's space; on iOS 26 the button lives inside the glass container
+    return [self convertRect:self.clampButton.bounds fromView:self.clampButton];
 }
 
 - (void)setReverseContentLayout:(BOOL)reverseContentLayout {
