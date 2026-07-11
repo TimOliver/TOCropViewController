@@ -667,39 +667,54 @@ extension CropViewController {
             return
         }
 
+        // Resolve the delegate through `self` at call time rather than capturing it here.
+        // Capturing it would strongly retain an object the `weak` delegate property
+        // promises not to retain (and would keep delivering callbacks to a replaced
+        // delegate). Closures for selectors the new delegate doesn't implement are
+        // cleared so the Objective-C layer's dismissal logic stays consistent.
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewControllerDidTapDone(_:))) {
-            self.onDidTapDone = { [weak self] in
-                guard let self else { return }
-                delegate.cropViewControllerDidTapDone?(self)
+            self.onDidTapDone = {[weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.delegate?.cropViewControllerDidTapDone?(strongSelf)
             }
+        } else {
+            self.onDidTapDone = nil
         }
 
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropImageToRect:angle:))) {
             self.onDidCropImageToRect = {[weak self] rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle)
+                strongSelf.delegate?.cropViewController?(strongSelf, didCropImageToRect: rect, angle: angle)
             }
+        } else {
+            self.onDidCropImageToRect = nil
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToImage:withRect:angle:))) {
             self.onDidCropToRect = {[weak self] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
+                strongSelf.delegate?.cropViewController?(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
             }
+        } else {
+            self.onDidCropToRect = nil
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToCircularImage:withRect:angle:))) {
             self.onDidCropToCircleImage = {[weak self] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
+                strongSelf.delegate?.cropViewController?(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
             }
+        } else {
+            self.onDidCropToCircleImage = nil
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didFinishCancelled:))) {
             self.onDidFinishCancelled = {[weak self] finished in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didFinishCancelled: finished)
+                strongSelf.delegate?.cropViewController?(strongSelf, didFinishCancelled: finished)
             }
+        } else {
+            self.onDidFinishCancelled = nil
         }
     }
 }
