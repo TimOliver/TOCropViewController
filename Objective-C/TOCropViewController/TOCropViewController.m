@@ -275,6 +275,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIEdgeInsets insets = self.statusBarSafeInsets;
   
     // fix: On iOS 26, overlay with iPadOS windowingControl area.
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
       if (!verticalLayout) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED < 180000
@@ -286,6 +287,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #endif
       }
     }
+#endif
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) {  // In landscape laying out toolbar to the left
@@ -328,13 +330,18 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 }
 
 #if !TARGET_OS_VISION
+                // Fall back to a radius matching current-generation devices in case
+                // the private key is ever renamed or removed
+                CGFloat cornerRadius = 44.0f;
                 const char *components[] = {"Radius", "Corner", "display", "_"};
                 NSString *selectorName = @"";
                 for (NSInteger i = 3; i >= 0; i--) {
                     selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
                                                                                             encoding:NSUTF8StringEncoding]];
                 }
-                const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+                @try {
+                    cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+                } @catch (NSException *exception) { }
 #else
                 const CGFloat cornerRadius = 64.0f;
 #endif
