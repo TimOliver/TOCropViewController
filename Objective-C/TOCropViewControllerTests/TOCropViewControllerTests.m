@@ -62,6 +62,19 @@
     XCTAssertEqual(cropView.angle, -90);
 }
 
+- (void)testNinetyDegreeRotationRoundTrip {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    for (NSInteger i = 0; i < 4; i++) {
+        [cropView rotateImageNinetyDegreesAnimated:NO clockwise:YES completion:nil];
+    }
+    XCTAssertEqual(cropView.angle, 0);
+
+    // A full revolution should land back on the whole image
+    CGRect cropFrame = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(cropFrame.size.width, 40.0, 2.0);
+    XCTAssertEqualWithAccuracy(cropFrame.size.height, 20.0, 2.0);
+}
+
 - (void)testZeroSizeImageDoesNotCrash {
     TOCropView *cropView = [[TOCropView alloc] initWithImage:[UIImage new]];
     cropView.frame = (CGRect){0, 0, 320, 480};
