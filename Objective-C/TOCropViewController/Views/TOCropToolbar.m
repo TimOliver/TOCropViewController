@@ -108,11 +108,7 @@
         [_doneTextButton setTitle:_doneTextButtonTitle ? _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done", @"TOCropViewControllerLocalizable", resourceBundle, nil)
                          forState:UIControlStateNormal];
         [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-        if (@available(iOS 13.0, *)) {
-            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
-        } else {
-            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
-        }
+        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
         [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [_doneTextButton sizeToFit];
         [self addSubview:_doneTextButton];
