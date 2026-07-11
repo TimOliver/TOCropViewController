@@ -8,10 +8,10 @@ jobs:
     runs-on: macos-26
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1.0'
+        ruby-version: '3.4'
         bundler-cache: false
     - run: 'bundle install && bundle exec fastlane test'
       env:
