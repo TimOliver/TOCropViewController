@@ -979,7 +979,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
         return;
     } else {
-        self.toolbar.doneTextButton.enabled = false;
+        // Disable both variants; only the icon button exists on iOS 26,
+        // and it's also the visible one in landscape/icon-only mode
+        self.toolbar.doneTextButton.enabled = NO;
+        self.toolbar.doneIconButton.enabled = NO;
     }
 
     BOOL isCallbackOrDelegateHandled = NO;
