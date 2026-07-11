@@ -267,6 +267,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)layoutInitialImage {
     CGSize imageSize = self.imageSize;
+    // A zero-sized image would produce NaN geometry below, which crashes CALayer
+    if (imageSize.width < FLT_EPSILON || imageSize.height < FLT_EPSILON) {
+        return;
+    }
     self.scrollView.contentSize = imageSize;
 
     CGRect bounds = self.contentBounds;
@@ -1138,13 +1142,18 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden {
-    [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
+    [self setGridOverlayHidden:gridOverlayHidden animated:NO];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated {
     _gridOverlayHidden = gridOverlayHidden;
-    self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
 
+    if (!animated) {
+        self.gridOverlayView.alpha = gridOverlayHidden ? 0.0f : 1.0f;
+        return;
+    }
+
+    self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     [UIView animateWithDuration:0.4f
                      animations:^{
                          self.gridOverlayView.alpha = gridOverlayHidden ? 0.0f : 1.0f;
@@ -1176,26 +1185,31 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)setAngle:(NSInteger)angle {
-    // The initial layout would not have been performed yet.
-    // Save the value and it will be applied when it has
+    // Only multiples of 90 degrees are supported
     NSInteger newAngle = angle;
     if (angle % 90 != 0) {
         newAngle = 0;
     }
 
+    // Normalize to the (-360, 360) range the rotation logic produces
+    // (eg, 360 wraps back around to 0), preserving direction
+    newAngle %= 360;
+
+    // The initial layout would not have been performed yet.
+    // Save the value and it will be applied when it has
     if (!self.initialSetupPerformed) {
         self.restoreAngle = newAngle;
         return;
     }
 
     // Negative values are allowed, so rotate clockwise or counter clockwise depending
-    // on direction
+    // on direction. Compare the signed values since +90 and -90 are distinct states.
     if (newAngle >= 0) {
-        while (labs(self.angle) != labs(newAngle)) {
+        while (self.angle != newAngle) {
             [self rotateImageNinetyDegreesAnimated:NO clockwise:YES completion:nil];
         }
     } else {
-        while (-labs(self.angle) != -labs(newAngle)) {
+        while (self.angle != newAngle) {
             [self rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
         }
     }
@@ -1373,8 +1387,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     BOOL zoomOut = NO;
 
-    // Passing in an empty size will revert back to the image aspect ratio
-    if (aspectRatio.width < FLT_EPSILON && aspectRatio.height < FLT_EPSILON) {
+    // Passing in an empty size (or one with a zero component) will revert back to the image aspect ratio
+    if (aspectRatio.width < FLT_EPSILON || aspectRatio.height < FLT_EPSILON) {
         aspectRatio = (CGSize){self.imageSize.width, self.imageSize.height};
         zoomOut = YES;  // Prevent from steadily zooming in when cycling between alternate aspectRatios and original
     }
