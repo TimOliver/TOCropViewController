@@ -91,6 +91,16 @@
     XCTAssertEqualWithAccuracy(before.size.width, after.size.width, 1.0);
 }
 
+- (void)testImageCropFrameStaysWithinImageBounds {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){403, 301}];
+    for (NSInteger x = 150; x <= 203; x += 13) {
+        [cropView setImageCropFrame:(CGRect){x, 51, 403 - x, 250}];
+        CGRect frame = cropView.imageCropFrame;
+        XCTAssertLessThanOrEqual(CGRectGetMaxX(frame), 403.0);
+        XCTAssertLessThanOrEqual(CGRectGetMaxY(frame), 301.0);
+    }
+}
+
 - (void)testViewControllerInstance {
     // Create a basic image
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(10, 10)];

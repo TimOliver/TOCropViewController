@@ -1049,9 +1049,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.origin.y = floorf((floorf(contentOffset.y) + edgeInsets.top) * (imageSize.height / contentSize.height));
     frame.origin.y = MAX(0, frame.origin.y);
 
-    // Calculate the normalized width
+    // Calculate the normalized width, clamped so the rect never extends past the image
     frame.size.width = ceilf(cropBoxFrame.size.width * scale);
-    frame.size.width = MIN(imageSize.width, frame.size.width);
+    frame.size.width = MIN(imageSize.width - frame.origin.x, frame.size.width);
 
     // Calculate normalized height
     if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
@@ -1059,7 +1059,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     } else {
         frame.size.height = ceilf(cropBoxFrame.size.height * scale);
     }
-    frame.size.height = MIN(imageSize.height, frame.size.height);
+    frame.size.height = MIN(imageSize.height - frame.origin.y, frame.size.height);
 
     return frame;
 }
