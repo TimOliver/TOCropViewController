@@ -11,6 +11,11 @@
 
 #import "TOCropViewController.h"
 
+// Expose private state so the test can simulate an in-flight rotation
+@interface TOCropView (UnitTests)
+@property (nonatomic, assign) BOOL rotateAnimationInProgress;
+@end
+
 @interface TOCropViewControllerTests : XCTestCase
 
 @end
@@ -73,6 +78,14 @@
     CGRect cropFrame = cropView.imageCropFrame;
     XCTAssertEqualWithAccuracy(cropFrame.size.width, 40.0, 2.0);
     XCTAssertEqualWithAccuracy(cropFrame.size.height, 20.0, 2.0);
+}
+
+- (void)testSetAngleBailsOutDuringAnimatedRotation {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    cropView.rotateAnimationInProgress = YES;
+    cropView.angle = 90;  // spun forever before the no-progress guard
+    XCTAssertEqual(cropView.angle, 0);
+    cropView.rotateAnimationInProgress = NO;
 }
 
 - (void)testZeroSizeImageDoesNotCrash {
