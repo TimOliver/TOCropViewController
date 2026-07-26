@@ -2,7 +2,8 @@ default_platform(:ios)
 
 desc "Runs the unit tests to ensure the build is working"
 lane :test do
-  scan(scheme: ENV["TEST_SCHEME"], devices: ["iPhone 16 Pro"], clean: true)
+  # Allow CI to override the simulator model as runner images rotate their device sets
+  scan(scheme: ENV["TEST_SCHEME"], devices: [ENV["TEST_DEVICE"] || "iPhone 17 Pro"], clean: true)
 end
 
 desc "Cuts a new release and distributes it on CocoaPods and Carthage"
@@ -57,15 +58,16 @@ lane :release do
 
   UI.message "Bumping framework version"
 
-  # Update and push framework version number if the current version doesn't match
-  ENV["FRAMEWORK_PLIST_PATHS"].split(",").each do |framework_path|
-    framework_version = get_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString")
-    if framework_version != latest_version
-      UI.message "Framework version was #{framework_version}. Updating framework version"
-      set_info_plist_value(path: "./#{framework_path}", key: "CFBundleShortVersionString", value: latest_version)
-      commit = commit_file(file_path: "#{framework_path}", commit_message: "Bumped Framework Version to v#{latest_version} [skip ci]")
-      commit_sha = commit[:json]["commit"]["sha"]
-    end
+  # The framework Info.plists reference $(MARKETING_VERSION), so the version
+  # number lives in the Xcode project itself
+  pbxproj_path = "TOCropViewControllerExample.xcodeproj/project.pbxproj"
+  pbxproj_contents = File.read("../#{pbxproj_path}")
+  updated_contents = pbxproj_contents.gsub(/MARKETING_VERSION = \d+(\.\d+)*;/, "MARKETING_VERSION = #{latest_version};")
+  if updated_contents != pbxproj_contents
+    UI.message "Updating MARKETING_VERSION to #{latest_version}"
+    File.write("../#{pbxproj_path}", updated_contents)
+    commit = commit_file(file_path: pbxproj_path, commit_message: "Bumped Framework Version to v#{latest_version} [skip ci]")
+    commit_sha = commit[:json]["commit"]["sha"]
   end
 
   UI.message "Framework version bumped!"

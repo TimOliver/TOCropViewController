@@ -22,6 +22,10 @@
 
 #import <UIKit/UIKit.h>
 
+// The Objective-C headers ship in both the TOCropViewController and CropViewController
+// frameworks, so they can only use framework-relative imports here, where the framework
+// name is unambiguous. The shared headers themselves keep quoted imports, with the
+// module verifier's quoted-include diagnostic disabled on the framework targets.
 #if __has_include(<CropViewController/TOCropViewController.h>)
 #import <CropViewController/TOCropToolbar.h>
 #import <CropViewController/TOCropView.h>
