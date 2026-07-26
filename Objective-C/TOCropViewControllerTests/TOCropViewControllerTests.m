@@ -215,16 +215,98 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
 }
 
 - (void)testViewControllerInstance {
-    // Create a basic image
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(10, 10)];
-    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *_Nonnull context) {
-        [context fillRect:CGRectMake(0, 0, 10, 10)];
-    }];
-
-    // Perform test
-    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:image];
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){10, 10}]];
     UIView *view = controller.view;
     XCTAssertNotNil(view);
+}
+
+- (void)testRotationCompletionFiresWhenNotAnimated {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    __block NSInteger callCount = 0;
+    __block BOOL reportedCompleted = NO;
+    [cropView rotateImageNinetyDegreesAnimated:NO
+                                     clockwise:YES
+                                    completion:^(BOOL completed) {
+                                        callCount++;
+                                        reportedCompleted = completed;
+                                    }];
+    XCTAssertEqual(cropView.angle, 90);
+    XCTAssertEqual(callCount, 1);
+    XCTAssertTrue(reportedCompleted);
+}
+
+- (void)testRotationCompletionFiresWhenRotationIsRejected {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    cropView.rotateAnimationInProgress = YES;
+
+    __block NSInteger callCount = 0;
+    __block BOOL reportedCompleted = YES;
+    [cropView rotateImageNinetyDegreesAnimated:YES
+                                     clockwise:YES
+                                    completion:^(BOOL completed) {
+                                        callCount++;
+                                        reportedCompleted = completed;
+                                    }];
+    cropView.rotateAnimationInProgress = NO;
+
+    // The rotation was dropped, but the handler must still run so callers gating
+    // UI on it (such as the toolbar's rotation buttons) don't stay disabled
+    XCTAssertEqual(cropView.angle, 0);
+    XCTAssertEqual(callCount, 1);
+    XCTAssertFalse(reportedCompleted);
+}
+
+- (void)testCircularCropViewHasNoGridOverlay {
+    TOCropView *cropView = [[TOCropView alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular
+                                                               image:[self testImageWithSize:(CGSize){40, 20}]];
+    cropView.frame = (CGRect){0, 0, 320, 480};
+    XCTAssertNoThrow([cropView performInitialSetup]);
+
+    // Circular cropping has no rectangular grid, so the property is nullable
+    XCTAssertNil(cropView.gridOverlayView);
+    XCTAssertNoThrow([cropView setGridOverlayHidden:NO animated:NO]);
+}
+
+- (void)testHidingRotationButtonsRelaysOutTheToolbar {
+    // Buttons flow in the order [counterclockwise, reset, clamp, clockwise], so hiding
+    // the counterclockwise button must slide the reset button into the leading slot.
+    // If the property invalidates layout, an implicit and a forced layout agree.
+    TOCropToolbar *toolbar = [[TOCropToolbar alloc] initWithFrame:(CGRect){0, 0, 375, 44}];
+    [toolbar layoutIfNeeded];
+
+    toolbar.rotateCounterclockwiseButtonHidden = YES;
+    [toolbar layoutIfNeeded];
+    CGRect implicitFrame = toolbar.resetButton.frame;
+
+    [toolbar setNeedsLayout];
+    [toolbar layoutIfNeeded];
+    XCTAssertTrue(CGRectEqualToRect(implicitFrame, toolbar.resetButton.frame));
+
+    // And the same for its clockwise counterpart
+    TOCropToolbar *other = [[TOCropToolbar alloc] initWithFrame:(CGRect){0, 0, 375, 44}];
+    [other layoutIfNeeded];
+
+    other.rotateClockwiseButtonHidden = YES;
+    [other layoutIfNeeded];
+    CGRect otherImplicitFrame = other.clampButton.frame;
+
+    [other setNeedsLayout];
+    [other layoutIfNeeded];
+    XCTAssertTrue(CGRectEqualToRect(otherImplicitFrame, other.clampButton.frame));
+}
+
+- (void)testDoneAndCancelButtonsRemainReachable {
+    TOCropToolbar *toolbar = [[TOCropToolbar alloc] initWithFrame:(CGRect){0, 0, 375, 44}];
+
+    // On iOS 26 the text buttons are never built, so turning this off must not be
+    // honoured, or the toolbar would be left with no way to commit or cancel
+    toolbar.showOnlyIcons = NO;
+    [toolbar layoutIfNeeded];
+
+    XCTAssertTrue(toolbar.doneTextButton != nil || toolbar.doneIconButton.hidden == NO);
+    XCTAssertTrue(toolbar.cancelTextButton != nil || toolbar.cancelIconButton.hidden == NO);
+    XCTAssertNotNil(toolbar.visibleCancelButton);
+    XCTAssertFalse(CGRectIsEmpty(toolbar.doneButtonFrame));
 }
 
 @end

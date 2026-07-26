@@ -458,7 +458,7 @@
         self.clampButton.tintColor = [UIColor whiteColor];
 }
 
-- (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden {
+- (void)setRotateCounterclockwiseButtonHidden:(BOOL)rotateButtonHidden {
     if (_rotateCounterclockwiseButtonHidden == rotateButtonHidden)
         return;
 

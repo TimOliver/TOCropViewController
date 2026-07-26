@@ -618,7 +618,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // matching the logic in -verticalLayout
     UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
 #if !TARGET_OS_MACCATALYST
-    if (size.width > size.height) {
+    // >= so a square size agrees with -verticalLayout (width < height)
+    if (size.width >= size.height) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     }
 #endif
@@ -984,11 +985,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     } else {
         // Disable both variants; only the icon button exists on iOS 26,
         // and it's also the visible one in landscape/icon-only mode
-        self.toolbar.doneTextButton.enabled = NO;
-        self.toolbar.doneIconButton.enabled = NO;
+        [self setDoneButtonsEnabled:NO];
     }
 
     BOOL isCallbackOrDelegateHandled = NO;
+    BOOL willRestoreDoneButtonsAfterCallback = NO;
 
     // If the delegate/block that only supplies crop data is provided, call it
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
@@ -1021,9 +1022,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             if (isCircularImageCallbackAvailable) {
                 self.onDidCropToCircleImage(image, cropFrame, angle);
             }
+
+            // Let hosts that keep the controller on screen commit again
+            [self setDoneButtonsEnabled:YES];
         });
 
         isCallbackOrDelegateHandled = YES;
+        willRestoreDoneButtonsAfterCallback = YES;
     }
     // If the delegate/block that requires the specific cropped image is provided, call it
     else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
@@ -1043,14 +1048,26 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             if (isDidCropToImageCallbackAvailable) {
                 self.onDidCropToRect(image, cropFrame, angle);
             }
+
+            // Let hosts that keep the controller on screen commit again
+            [self setDoneButtonsEnabled:YES];
         });
 
         isCallbackOrDelegateHandled = YES;
+        willRestoreDoneButtonsAfterCallback = YES;
     }
 
     if (!isCallbackOrDelegateHandled) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    } else if (!willRestoreDoneButtonsAfterCallback) {
+        // Only the synchronous crop-data callbacks ran; re-enable immediately
+        [self setDoneButtonsEnabled:YES];
     }
+}
+
+- (void)setDoneButtonsEnabled:(BOOL)enabled {
+    self.toolbar.doneTextButton.enabled = enabled;
+    self.toolbar.doneIconButton.enabled = enabled;
 }
 
 - (void)commitCurrentCrop {

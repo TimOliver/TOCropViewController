@@ -201,10 +201,8 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
         self.horizontalGridLines = @[];
     }
 
-    // Match the current grid visibility and lay the new lines out immediately
-    for (UIView *lineView in self.horizontalGridLines) {
-        lineView.alpha = self.gridHidden ? 0.0f : 1.0f;
-    }
+    // Re-apply the current visibility to the rebuilt lines and lay them out
+    [self setGridHidden:_gridHidden animated:NO];
     [self layoutLines];
 }
 
@@ -221,10 +219,8 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
         self.verticalGridLines = @[];
     }
 
-    // Match the current grid visibility and lay the new lines out immediately
-    for (UIView *lineView in self.verticalGridLines) {
-        lineView.alpha = self.gridHidden ? 0.0f : 1.0f;
-    }
+    // Re-apply the current visibility to the rebuilt lines and lay them out
+    [self setGridHidden:_gridHidden animated:NO];
     [self layoutLines];
 }
 
