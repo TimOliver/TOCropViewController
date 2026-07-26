@@ -56,6 +56,8 @@
 		2238CF2A1FC0269C0081B957 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF291FC0269C0081B957 /* Assets.xcassets */; };
 		2238CF2D1FC0269C0081B957 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF2B1FC0269C0081B957 /* LaunchScreen.storyboard */; };
 		2238CF361FC029880081B957 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
+		CAFE0000000000000000B001 /* CropViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0000000000000000A001 /* CropViewControllerTests.swift */; };
+		CAFE0000000000000000B002 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
 		2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2238CF441FC02AE00081B957 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		22A105B32BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
@@ -177,6 +179,8 @@
 		2238CF2C1FC0269C0081B957 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2238CF2E1FC0269C0081B957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2238CF351FC029880081B957 /* CropViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropViewController.swift; sourceTree = "<group>"; };
+		CAFE0000000000000000A001 /* CropViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropViewControllerTests.swift; sourceTree = "<group>"; };
+		CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CropViewControllerTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		2238CF3C1FC029A90081B957 /* CropViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CropViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2238CF3E1FC029A90081B957 /* CropViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CropViewController.h; sourceTree = "<group>"; };
 		2238CF3F1FC029A90081B957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -441,9 +445,19 @@
 			isa = PBXGroup;
 			children = (
 				2238CF341FC027550081B957 /* CropViewController */,
+				CAFE0000000000000000A003 /* CropViewControllerTests */,
 				2238CF211FC0269C0081B957 /* CropViewControllerExample */,
 			);
 			path = Swift;
+			sourceTree = "<group>";
+		};
+		CAFE0000000000000000A003 /* CropViewControllerTests */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE0000000000000000A001 /* CropViewControllerTests.swift */,
+				CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */,
+			);
+			path = CropViewControllerTests;
 			sourceTree = "<group>";
 		};
 		2238CF341FC027550081B957 /* CropViewController */ = {
@@ -820,6 +834,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAFE0000000000000000B002 /* CropViewController.swift in Sources */,
+				CAFE0000000000000000B001 /* CropViewControllerTests.swift in Sources */,
 				2206119C1B2E6777001A467B /* TOCropViewControllerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1092,6 +1108,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Swift/CropViewControllerTests/CropViewControllerTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOCropViewControllerExample.app/TOCropViewControllerExample";
 			};
@@ -1114,6 +1132,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Swift/CropViewControllerTests/CropViewControllerTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOCropViewControllerExample.app/TOCropViewControllerExample";
 			};
