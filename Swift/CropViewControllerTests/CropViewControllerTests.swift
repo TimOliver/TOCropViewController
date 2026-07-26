@@ -281,6 +281,9 @@ final class CropViewControllerTests: XCTestCase {
         let circularController = CropViewController(croppingStyle: .circular, image: image)
         XCTAssertEqual(circularController.croppingStyle, .circular)
         XCTAssertEqual(circularController.cropView.croppingStyle, .circular)
+
+        // Circular cropping has no rectangular grid overlay
+        XCTAssertNil(circularController.cropView.gridOverlayView)
     }
 
     func testChildViewControllerRelationshipIsEstablished() {

@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 /* The 'Done' buttons to commit the crop. The text button is displayed
  in portrait mode and the icon one, in landscape.
  The text button is nil on iOS 26 and up, where the toolbar is always icon-only. */
-@property (nonatomic, strong, readonly) UIButton *doneTextButton;
+@property (nullable, nonatomic, strong, readonly) UIButton *doneTextButton;
 @property (nonatomic, strong, readonly) UIButton *doneIconButton;
 @property (nonatomic, copy) NSString *doneTextButtonTitle;
 @property (null_resettable, nonatomic, copy) UIColor *doneButtonColor;
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 /* The 'Cancel' buttons to cancel the crop. The text button is displayed
  in portrait mode and the icon one, in landscape.
  The text button is nil on iOS 26 and up, where the toolbar is always icon-only. */
-@property (nonatomic, strong, readonly) UIButton *cancelTextButton;
+@property (nullable, nonatomic, strong, readonly) UIButton *cancelTextButton;
 @property (nonatomic, strong, readonly) UIButton *cancelIconButton;
 @property (nonatomic, readonly) UIView *visibleCancelButton;
 @property (nonatomic, copy) NSString *cancelTextButtonTitle;

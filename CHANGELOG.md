@@ -29,6 +29,10 @@ x.y.z Release Notes (yyyy-MM-dd)
 - Toggling `displayHorizontalGridLines`/`displayVerticalGridLines` at runtime now lays out and hides the new grid lines correctly.
 - Setting `rotateCounterclockwiseButtonHidden` didn't lay the toolbar out again, so the hidden button stayed on screen until something else triggered a layout pass. Its setter had been misspelled, and therefore dead, since 2016.
 
+## Changed
+
+- `TOCropView.gridOverlayView` is now annotated `nullable`, matching that circular cropping has no rectangular grid, as are `TOCropToolbar.doneTextButton` and `cancelTextButton`, which don't exist on iOS 26. Swift callers accessing these directly will need to unwrap them.
+
 3.1.2 Release Notes (2026-04-07)
 
 ## Enhancements
