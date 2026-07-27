@@ -16,6 +16,10 @@ x.y.z Release Notes (yyyy-MM-dd)
 - Touch cancellation from incoming calls or system alerts left the crop view stuck in its editing appearance.
 - Swift: replacing the `delegate` left the previous delegate receiving callbacks, and clearing it discarded closures the host had assigned directly.
 - Swift: the `cropViewControllerDidTapDone` bridge added in 3.1.2 captured the delegate strongly, the same retain cycle as the other callbacks.
+- iOS 26-only layout symbols are compiled out on older SDKs, restoring Xcode 16 buildability.
+- The private display-corner-radius lookup on iOS 26 now fails gracefully if the key ever disappears.
+- Setting `showOnlyIcons` to false on iOS 26 hid the icon buttons without creating any text ones, leaving no way to commit or cancel the crop. The property is now ignored where the toolbar is icon-only.
+- On iOS 26, hiding every toolbar action button left an empty glass capsule stranded on screen.
 
 3.1.2 Release Notes (2026-04-07)
 
