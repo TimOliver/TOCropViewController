@@ -20,6 +20,14 @@ x.y.z Release Notes (yyyy-MM-dd)
 - The private display-corner-radius lookup on iOS 26 now fails gracefully if the key ever disappears.
 - Setting `showOnlyIcons` to false on iOS 26 hid the icon buttons without creating any text ones, leaving no way to commit or cancel the crop. The property is now ignored where the toolbar is icon-only.
 - On iOS 26, hiding every toolbar action button left an empty glass capsule stranded on screen.
+- The Done button could be tapped twice in icon-only layouts (including all of iOS 26), delivering the crop callbacks twice.
+- Cropping an HDR image silently tone-mapped it down to SDR (now preserved on iOS 17 and above).
+- `doneButtonTitle`, `cancelButtonTitle`, `showOnlyIcons`, `doneButtonColor`, `cancelButtonColor` and `resetButtonHidden` always read back as their default values.
+- The `angle` parameter of `presentAnimatedFromParentViewController` was ignored when no target crop frame was supplied.
+- The aspect ratio popover anchored to the wrong position on iPad on iOS 26.
+- Mac Catalyst window resizes and iPad split view changes could briefly animate the toolbar into the wrong layout.
+- Toggling `displayHorizontalGridLines`/`displayVerticalGridLines` at runtime now lays out and hides the new grid lines correctly.
+- Setting `rotateCounterclockwiseButtonHidden` didn't lay the toolbar out again, so the hidden button stayed on screen until something else triggered a layout pass. Its setter had been misspelled, and therefore dead, since 2016.
 
 3.1.2 Release Notes (2026-04-07)
 
