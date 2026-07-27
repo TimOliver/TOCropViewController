@@ -1,6 +1,10 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+## Fixed
+
+- The Swift `CropViewController` framework failing to build under Xcode 26's module verifier.
+
 3.1.2 Release Notes (2026-04-07)
 
 ## Enhancements
