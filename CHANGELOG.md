@@ -4,6 +4,13 @@ x.y.z Release Notes (yyyy-MM-dd)
 ## Fixed
 
 - The Swift `CropViewController` framework failing to build under Xcode 26's module verifier.
+- Setting `angle` to ±360 or beyond hung the app in an infinite loop, and direction changes such as 90° to -90° were silently ignored.
+- The `gridOverlayHidden` property setter had no effect, and its animated variant ignored its animation flag.
+- Content offset math when rotating 90° with a previously edited crop state, which could shift the view away from the focal region and leave blank space inside the crop box.
+- The reported crop rectangle could overhang the image bounds by a point, exporting a black hairline column on opaque images.
+- Zero-sized images and aspect ratios with a zero component no longer produce broken layout geometry.
+- `rotateImageNinetyDegreesAnimated:clockwise:completion:` never called its completion handler when `animated` was NO, or when the call was dropped because a rotation was already playing. The latter could leave the toolbar's rotation buttons permanently disabled.
+- The crop view was briefly assigned the frame for the opposite layout at the start of a device rotation, so the rotation animation interpolated from the wrong geometry (iOS 25 and below).
 
 3.1.2 Release Notes (2026-04-07)
 
