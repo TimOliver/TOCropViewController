@@ -614,11 +614,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     }
 
 #if !TARGET_OS_VISION
+    // Derive the layout from the aspect of the size we're transitioning to,
+    // matching the logic in -verticalLayout
     UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
-    CGSize currentSize = self.view.bounds.size;
-    if (currentSize.width < size.width) {
+#if !TARGET_OS_MACCATALYST
+    // >= so a square size agrees with -verticalLayout (width < height)
+    if (size.width >= size.height) {
         orientation = UIInterfaceOrientationLandscapeLeft;
     }
+#endif
 #else
     // On visionOS, this method is called on presentation with size=(0,0),
     // which would set orientation incorrectly causing views to be misplaced.
@@ -755,7 +759,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.transitionController.fromView = fromView;
     self.prepareForTransitionHandler = setup;
 
-    if (self.angle != 0 || !CGRectIsEmpty(toFrame)) {
+    if (angle != 0 || !CGRectIsEmpty(toFrame)) {
         self.angle = angle;
         self.imageCropFrame = toFrame;
     }
@@ -979,10 +983,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
         return;
     } else {
-        self.toolbar.doneTextButton.enabled = false;
+        // Disable both variants; only the icon button exists on iOS 26,
+        // and it's also the visible one in landscape/icon-only mode
+        [self setDoneButtonsEnabled:NO];
     }
 
     BOOL isCallbackOrDelegateHandled = NO;
+    BOOL willRestoreDoneButtonsAfterCallback = NO;
 
     // If the delegate/block that only supplies crop data is provided, call it
     if ([self.delegate respondsToSelector:@selector(cropViewController:didCropImageToRect:angle:)]) {
@@ -1015,9 +1022,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             if (isCircularImageCallbackAvailable) {
                 self.onDidCropToCircleImage(image, cropFrame, angle);
             }
+
+            // Let hosts that keep the controller on screen commit again
+            [self setDoneButtonsEnabled:YES];
         });
 
         isCallbackOrDelegateHandled = YES;
+        willRestoreDoneButtonsAfterCallback = YES;
     }
     // If the delegate/block that requires the specific cropped image is provided, call it
     else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
@@ -1037,14 +1048,26 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
             if (isDidCropToImageCallbackAvailable) {
                 self.onDidCropToRect(image, cropFrame, angle);
             }
+
+            // Let hosts that keep the controller on screen commit again
+            [self setDoneButtonsEnabled:YES];
         });
 
         isCallbackOrDelegateHandled = YES;
+        willRestoreDoneButtonsAfterCallback = YES;
     }
 
     if (!isCallbackOrDelegateHandled) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    } else if (!willRestoreDoneButtonsAfterCallback) {
+        // Only the synchronous crop-data callbacks ran; re-enable immediately
+        [self setDoneButtonsEnabled:YES];
     }
+}
+
+- (void)setDoneButtonsEnabled:(BOOL)enabled {
+    self.toolbar.doneTextButton.enabled = enabled;
+    self.toolbar.doneIconButton.enabled = enabled;
 }
 
 - (void)commitCurrentCrop {
@@ -1072,20 +1095,40 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.doneTextButtonTitle = title;
 }
 
+- (NSString *)doneButtonTitle {
+    return self.toolbar.doneTextButtonTitle;
+}
+
 - (void)setCancelButtonTitle:(NSString *)title {
     self.toolbar.cancelTextButtonTitle = title;
+}
+
+- (NSString *)cancelButtonTitle {
+    return self.toolbar.cancelTextButtonTitle;
 }
 
 - (void)setShowOnlyIcons:(BOOL)showOnlyIcons {
     self.toolbar.showOnlyIcons = showOnlyIcons;
 }
 
+- (BOOL)showOnlyIcons {
+    return self.toolbar.showOnlyIcons;
+}
+
 - (void)setDoneButtonColor:(UIColor *)color {
     self.toolbar.doneButtonColor = color;
 }
 
+- (UIColor *)doneButtonColor {
+    return self.toolbar.doneButtonColor;
+}
+
 - (void)setCancelButtonColor:(UIColor *)color {
     self.toolbar.cancelButtonColor = color;
+}
+
+- (UIColor *)cancelButtonColor {
+    return self.toolbar.cancelButtonColor;
 }
 
 - (TOCropView *)cropView {
@@ -1155,6 +1198,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)setResetButtonHidden:(BOOL)resetButtonHidden {
     self.toolbar.resetButtonHidden = resetButtonHidden;
+}
+
+- (BOOL)resetButtonHidden {
+    return self.toolbar.resetButtonHidden;
 }
 
 - (BOOL)rotateButtonsHidden {

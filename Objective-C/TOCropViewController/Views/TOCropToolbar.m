@@ -108,11 +108,7 @@
         [_doneTextButton setTitle:_doneTextButtonTitle ? _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done", @"TOCropViewControllerLocalizable", resourceBundle, nil)
                          forState:UIControlStateNormal];
         [_doneTextButton setTitleColor:[UIColor colorWithRed:1.0f green:0.8f blue:0.0f alpha:1.0f] forState:UIControlStateNormal];
-        if (@available(iOS 13.0, *)) {
-            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
-        } else {
-            [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f]];
-        }
+        [_doneTextButton.titleLabel setFont:[UIFont systemFontOfSize:17.0f weight:UIFontWeightMedium]];
         [_doneTextButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [_doneTextButton sizeToFit];
         [self addSubview:_doneTextButton];
@@ -430,7 +426,8 @@
 }
 
 - (CGRect)clampButtonFrame {
-    return self.clampButton.frame;
+    // Convert into the toolbar's space; on iOS 26 the button lives inside the glass container
+    return [self convertRect:self.clampButton.bounds fromView:self.clampButton];
 }
 
 - (void)setReverseContentLayout:(BOOL)reverseContentLayout {
@@ -461,7 +458,7 @@
         self.clampButton.tintColor = [UIColor whiteColor];
 }
 
-- (void)setRotateCounterClockwiseButtonHidden:(BOOL)rotateButtonHidden {
+- (void)setRotateCounterclockwiseButtonHidden:(BOOL)rotateButtonHidden {
     if (_rotateCounterclockwiseButtonHidden == rotateButtonHidden)
         return;
 

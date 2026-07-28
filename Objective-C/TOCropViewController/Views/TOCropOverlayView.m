@@ -135,7 +135,8 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     }
 
     // grid lines - horizontal
-    CGFloat thickness = 1.0f / self.traitCollection.displayScale;
+    // (displayScale can be 0 before the view joins a window)
+    CGFloat thickness = 1.0f / MAX(1.0f, self.traitCollection.displayScale);
     NSInteger numberOfLines = self.horizontalGridLines.count;
     CGFloat padding = (CGRectGetHeight(self.bounds) - (thickness * numberOfLines)) / (numberOfLines + 1);
     for (NSInteger i = 0; i < numberOfLines; i++) {
@@ -199,7 +200,10 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     } else {
         self.horizontalGridLines = @[];
     }
-    [self setNeedsDisplay];
+
+    // Re-apply the current visibility to the rebuilt lines and lay them out
+    [self setGridHidden:_gridHidden animated:NO];
+    [self layoutLines];
 }
 
 - (void)setDisplayVerticalGridLines:(BOOL)displayVerticalGridLines {
@@ -214,7 +218,10 @@ static const CGFloat kTOCropOverLayerCornerWidth = 20.0f;
     } else {
         self.verticalGridLines = @[];
     }
-    [self setNeedsDisplay];
+
+    // Re-apply the current visibility to the rebuilt lines and lay them out
+    [self setGridHidden:_gridHidden animated:NO];
+    [self layoutLines];
 }
 
 - (void)setGridHidden:(BOOL)gridHidden {

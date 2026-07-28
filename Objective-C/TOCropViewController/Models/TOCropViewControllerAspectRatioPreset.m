@@ -29,8 +29,6 @@
 
 @interface TOCropViewControllerAspectRatioPreset ()
 
-@property (nonatomic, assign, readwrite) CGFloat width;
-@property (nonatomic, assign, readwrite) CGFloat height;
 @property (nonatomic, strong, readwrite) NSString *title;
 
 @end
@@ -64,6 +62,15 @@
     }
     TOCropViewControllerAspectRatioPreset *other = (TOCropViewControllerAspectRatioPreset *)object;
     return CGSizeEqualToSize(self.size, other.size) && [self.title isEqualToString:other.title];
+}
+
+- (NSUInteger)hash {
+    // Mix rather than XOR so symmetric sizes (eg 1:1, or 16:9 vs 9:16) don't collide
+    NSUInteger hash = 17;
+    hash = (hash * 31) + @(self.size.width).hash;
+    hash = (hash * 31) + @(self.size.height).hash;
+    hash = (hash * 31) + self.title.hash;
+    return hash;
 }
 
 + (NSArray<TOCropViewControllerAspectRatioPreset *> *)portraitPresets {

@@ -189,6 +189,77 @@ final class CropViewControllerTests: XCTestCase {
 
     // MARK: - Property Forwarding -
 
+    func testValuesForwardToTheUnderlyingController() {
+        let controller = makeController()
+        let inner = controller.toCropViewController!
+
+        controller.aspectRatioPreset = CGSize(width: 16, height: 9)
+        XCTAssertTrue(controller.aspectRatioPreset == CGSize(width: 16, height: 9))
+        XCTAssertTrue(inner.aspectRatioPreset == CGSize(width: 16, height: 9))
+
+        controller.aspectRatioLockEnabled = true
+        XCTAssertTrue(inner.aspectRatioLockEnabled)
+
+        controller.aspectRatioLockDimensionSwapEnabled = true
+        XCTAssertTrue(inner.aspectRatioLockDimensionSwapEnabled)
+
+        controller.resetAspectRatioEnabled = false
+        XCTAssertFalse(inner.resetAspectRatioEnabled)
+
+        controller.toolbarPosition = .top
+        XCTAssertEqual(inner.toolbarPosition, .top)
+
+        controller.rotateClockwiseButtonHidden = true
+        XCTAssertTrue(inner.rotateClockwiseButtonHidden)
+
+        controller.rotateButtonsHidden = true
+        XCTAssertTrue(inner.rotateButtonsHidden)
+
+        controller.resetButtonHidden = true
+        XCTAssertTrue(inner.resetButtonHidden)
+
+        controller.doneButtonHidden = true
+        XCTAssertTrue(inner.doneButtonHidden)
+
+        controller.cancelButtonHidden = true
+        XCTAssertTrue(inner.cancelButtonHidden)
+
+        controller.doneButtonTitle = "Save"
+        XCTAssertEqual(inner.doneButtonTitle, "Save")
+
+        controller.cancelButtonTitle = "Back"
+        XCTAssertEqual(inner.cancelButtonTitle, "Back")
+
+        controller.doneButtonColor = .systemPink
+        XCTAssertEqual(inner.doneButtonColor, .systemPink)
+
+        controller.cancelButtonColor = .systemTeal
+        XCTAssertEqual(inner.cancelButtonColor, .systemTeal)
+
+        controller.minimumAspectRatio = 0.5
+        XCTAssertEqual(inner.minimumAspectRatio, 0.5)
+
+        controller.hidesNavigationBar = false
+        XCTAssertFalse(inner.hidesNavigationBar)
+
+        controller.showActivitySheetOnDone = true
+        XCTAssertTrue(inner.showActivitySheetOnDone)
+
+        controller.showCancelConfirmationDialog = true
+        XCTAssertTrue(inner.showCancelConfirmationDialog)
+
+        controller.reverseContentLayout = true
+        XCTAssertTrue(inner.reverseContentLayout)
+
+        controller.aspectRatioPickerButtonHidden = true
+        XCTAssertTrue(inner.aspectRatioPickerButtonHidden)
+
+        // Not asserted against the value that was set: the toolbar is permanently
+        // icon-only from iOS 26 on, so this only has to agree with what it wraps
+        controller.showOnlyIcons = true
+        XCTAssertEqual(controller.showOnlyIcons, inner.showOnlyIcons)
+    }
+
     func testTitleForwardsToTheUnderlyingController() {
         let controller = makeController()
         XCTAssertNil(controller.titleLabel)
@@ -210,6 +281,9 @@ final class CropViewControllerTests: XCTestCase {
         let circularController = CropViewController(croppingStyle: .circular, image: image)
         XCTAssertEqual(circularController.croppingStyle, .circular)
         XCTAssertEqual(circularController.cropView.croppingStyle, .circular)
+
+        // Circular cropping has no rectangular grid overlay
+        XCTAssertNil(circularController.cropView.gridOverlayView)
     }
 
     func testChildViewControllerRelationshipIsEstablished() {

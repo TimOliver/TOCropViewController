@@ -59,8 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A grid view overlaid on top of the foreground image view's container.
+ This is nil when the cropping style is circular, which has no rectangular grid.
  */
-@property (nonnull, nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
+@property (nullable, nonatomic, strong, readonly) TOCropOverlayView *gridOverlayView;
 
 /**
  A container view that clips the a copy of the image so it appears over the dimming view

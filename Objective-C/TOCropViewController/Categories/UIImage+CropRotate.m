@@ -22,7 +22,7 @@
 
 #import "UIImage+CropRotate.h"
 
-@implementation UIImage (CropRotate)
+@implementation UIImage (TOCropRotate)
 
 - (BOOL)hasAlpha {
     CGImageAlphaInfo alphaInfo = CGImageGetAlphaInfo(self.CGImage);
@@ -32,6 +32,22 @@
 
 - (UIImage *)croppedImageWithFrame:(CGRect)frame angle:(NSInteger)angle circularClip:(BOOL)circular {
     UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
+
+#if defined(__IPHONE_17_0)
+    // When the source image is HDR, request an HDR-capable rendering format so its
+    // highlights aren't silently tone-mapped down to SDR. Falls back to the default
+    // format wherever HDR rendering isn't supported.
+    if (@available(iOS 17.0, *)) {
+        if (self.isHighDynamicRange) {
+            UITraitCollection *hdrTraits = [UITraitCollection traitCollectionWithImageDynamicRange:UIImageDynamicRangeHigh];
+            UIGraphicsImageRendererFormat *hdrFormat = [UIGraphicsImageRendererFormat formatForTraitCollection:hdrTraits];
+            if (hdrFormat.supportsHighDynamicRange) {
+                format = hdrFormat;
+            }
+        }
+    }
+#endif
+
     format.opaque = !self.hasAlpha && !circular;
     format.scale = self.scale;
 
