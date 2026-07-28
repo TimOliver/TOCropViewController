@@ -2,7 +2,7 @@
 //  CropViewControllerTests.swift
 //  CropViewControllerTests
 //
-//  Copyright 2017-2025 Timothy Oliver. All rights reserved.
+//  Copyright 2017-2026 Timothy Oliver. All rights reserved.
 //
 
 import XCTest
