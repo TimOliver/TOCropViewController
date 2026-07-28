@@ -28,7 +28,15 @@
 #import <TOCropViewController/TOCropViewConstants.h>
 #endif
 
-@class TOCropOverlayView;
+// Imported rather than forward-declared so that `gridOverlayView` has a complete type.
+// Swift omits properties whose class it only knows as a forward declaration, which made
+// the grid overlay unreachable from Swift in every configuration.
+#if !__has_include(<TOCropViewController/TOCropOverlayView.h>)
+#import "TOCropOverlayView.h"
+#else
+#import <TOCropViewController/TOCropOverlayView.h>
+#endif
+
 @class TOCropView;
 
 NS_ASSUME_NONNULL_BEGIN
