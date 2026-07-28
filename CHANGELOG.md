@@ -1,39 +1,42 @@
-x.y.z Release Notes (yyyy-MM-dd)
+3.2.0 Release Notes (2026-07-28)
 =============================================================
 
 ## Fixed
 
+- A rotation animation snapping issue occurring on iOS 26. ([#636](https://github.com/TimOliver/TOCropViewController/pull/636))
+- The vertical toolbar missing its minimum edge padding in landscape on iOS 26. ([#636](https://github.com/TimOliver/TOCropViewController/pull/636))
 - The Swift `CropViewController` framework failing to build under Xcode 26's module verifier.
-- Setting `angle` to ±360 or beyond hung the app in an infinite loop, and direction changes such as 90° to -90° were silently ignored.
-- The `gridOverlayHidden` property setter had no effect, and its animated variant ignored its animation flag.
-- Content offset math when rotating 90° with a previously edited crop state, which could shift the view away from the focal region and leave blank space inside the crop box.
-- The reported crop rectangle could overhang the image bounds by a point, exporting a black hairline column on opaque images.
-- Zero-sized images and aspect ratios with a zero component no longer produce broken layout geometry.
-- `rotateImageNinetyDegreesAnimated:clockwise:completion:` never called its completion handler when `animated` was NO, or when the call was dropped because a rotation was already playing. The latter could leave the toolbar's rotation buttons permanently disabled.
-- The crop view was briefly assigned the frame for the opposite layout at the start of a device rotation, so the rotation animation interpolated from the wrong geometry (iOS 25 and below).
-- The Swift `CropViewController`'s closure bridge strongly retained the nominally weak `delegate`, leaking the controller and image when the delegate owned the controller, and kept delivering callbacks to a replaced delegate.
-- The crop adjustment reset timer retained the crop view (and its images) after dismissal mid-adjustment.
-- Touch cancellation from incoming calls or system alerts left the crop view stuck in its editing appearance.
-- Swift: replacing the `delegate` left the previous delegate receiving callbacks, and clearing it discarded closures the host had assigned directly.
-- Swift: the `cropViewControllerDidTapDone` bridge added in 3.1.2 captured the delegate strongly, the same retain cycle as the other callbacks.
-- iOS 26-only layout symbols are compiled out on older SDKs, restoring Xcode 16 buildability.
-- The private display-corner-radius lookup on iOS 26 now fails gracefully if the key ever disappears.
-- Setting `showOnlyIcons` to false on iOS 26 hid the icon buttons without creating any text ones, leaving no way to commit or cancel the crop. The property is now ignored where the toolbar is icon-only.
-- On iOS 26, hiding every toolbar action button left an empty glass capsule stranded on screen.
-- The Done button could be tapped twice in icon-only layouts (including all of iOS 26), delivering the crop callbacks twice.
-- Cropping an HDR image silently tone-mapped it down to SDR (now preserved on iOS 17 and above).
-- `doneButtonTitle`, `cancelButtonTitle`, `showOnlyIcons`, `doneButtonColor`, `cancelButtonColor` and `resetButtonHidden` always read back as their default values.
-- The `angle` parameter of `presentAnimatedFromParentViewController` was ignored when no target crop frame was supplied.
-- The aspect ratio popover anchored to the wrong position on iPad on iOS 26.
-- Mac Catalyst window resizes and iPad split view changes could briefly animate the toolbar into the wrong layout.
-- Toggling `displayHorizontalGridLines`/`displayVerticalGridLines` at runtime now lays out and hides the new grid lines correctly.
-- Setting `rotateCounterclockwiseButtonHidden` didn't lay the toolbar out again, so the hidden button stayed on screen until something else triggered a layout pass. Its setter had been misspelled, and therefore dead, since 2016.
+- Setting `angle` to ±360 or beyond hung the app in an infinite loop, and direction changes such as 90° to -90° were silently ignored. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- The `gridOverlayHidden` property setter had no effect, and its animated variant ignored its animation flag. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- Content offset math when rotating 90° with a previously edited crop state, which could shift the view away from the focal region and leave blank space inside the crop box. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- The reported crop rectangle could overhang the image bounds by a point, exporting a black hairline column on opaque images. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- Zero-sized images and aspect ratios with a zero component no longer produce broken layout geometry. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- `rotateImageNinetyDegreesAnimated:clockwise:completion:` never called its completion handler when `animated` was NO, or when the call was dropped because a rotation was already playing. The latter could leave the toolbar's rotation buttons permanently disabled. ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- The crop view was briefly assigned the frame for the opposite layout at the start of a device rotation, so the rotation animation interpolated from the wrong geometry (iOS 25 and below). ([#648](https://github.com/TimOliver/TOCropViewController/pull/648))
+- The Swift `CropViewController`'s closure bridge strongly retained the nominally weak `delegate`, leaking the controller and image when the delegate owned the controller, and kept delivering callbacks to a replaced delegate. ([#649](https://github.com/TimOliver/TOCropViewController/pull/649))
+- The crop adjustment reset timer retained the crop view (and its images) after dismissal mid-adjustment. ([#649](https://github.com/TimOliver/TOCropViewController/pull/649))
+- Touch cancellation from incoming calls or system alerts left the crop view stuck in its editing appearance. ([#649](https://github.com/TimOliver/TOCropViewController/pull/649))
+- Swift: replacing the `delegate` left the previous delegate receiving callbacks, and clearing it discarded closures the host had assigned directly. ([#649](https://github.com/TimOliver/TOCropViewController/pull/649))
+- Swift: the `cropViewControllerDidTapDone` bridge added in 3.1.2 captured the delegate strongly, the same retain cycle as the other callbacks. ([#649](https://github.com/TimOliver/TOCropViewController/pull/649))
+- iOS 26-only layout symbols are compiled out on older SDKs, restoring Xcode 16 buildability. ([#650](https://github.com/TimOliver/TOCropViewController/pull/650))
+- The private display-corner-radius lookup on iOS 26 now fails gracefully if the key ever disappears. ([#650](https://github.com/TimOliver/TOCropViewController/pull/650))
+- Setting `showOnlyIcons` to false on iOS 26 hid the icon buttons without creating any text ones, leaving no way to commit or cancel the crop. The property is now ignored where the toolbar is icon-only. ([#650](https://github.com/TimOliver/TOCropViewController/pull/650))
+- On iOS 26, hiding every toolbar action button left an empty glass capsule stranded on screen. ([#650](https://github.com/TimOliver/TOCropViewController/pull/650))
+- The Done button could be tapped twice in icon-only layouts (including all of iOS 26), delivering the crop callbacks twice. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- Cropping an HDR image silently tone-mapped it down to SDR (now preserved on iOS 17 and above). ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- `doneButtonTitle`, `cancelButtonTitle`, `showOnlyIcons`, `doneButtonColor`, `cancelButtonColor` and `resetButtonHidden` always read back as their default values. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- The `angle` parameter of `presentAnimatedFromParentViewController` was ignored when no target crop frame was supplied. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- The aspect ratio popover anchored to the wrong position on iPad on iOS 26. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- Mac Catalyst window resizes and iPad split view changes could briefly animate the toolbar into the wrong layout. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- Toggling `displayHorizontalGridLines`/`displayVerticalGridLines` at runtime now lays out and hides the new grid lines correctly. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- Setting `rotateCounterclockwiseButtonHidden` didn't lay the toolbar out again, so the hidden button stayed on screen until something else triggered a layout pass. Its setter had been misspelled, and therefore dead, since 2016. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
 
 ## Changed
 
-- `TOCropView.gridOverlayView` is now annotated `nullable`, matching that circular cropping has no rectangular grid, as are `TOCropToolbar.doneTextButton` and `cancelTextButton`, which don't exist on iOS 26. Swift callers accessing these directly will need to unwrap them.
+- `TOCropView.gridOverlayView` is now annotated `nullable`, matching that circular cropping has no rectangular grid, as are `TOCropToolbar.doneTextButton` and `cancelTextButton`, which don't exist on iOS 26. Swift callers accessing these directly will need to unwrap them. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
 
 3.1.2 Release Notes (2026-04-07)
+=============================================================
 
 ## Enhancements
 
@@ -52,7 +55,6 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 - A crash occurring on (allegedly) certain older beta version of iOS 26.0. ([#635](https://github.com/TimOliver/TOCropViewController/pull/635))
 - A UI layout issue where the Done button would be obscured by the iPadOS title bar buttons when in windowed mode. ([#631](https://github.com/TimOliver/TOCropViewController/pull/631))
-- Fixed a rotation animation issue occuring on iOS 26. ([#636](https://github.com/TimOliver/TOCropViewController/pull/636))
 
 3.1.0 Release Notes (2025-10-18)
 =============================================================
