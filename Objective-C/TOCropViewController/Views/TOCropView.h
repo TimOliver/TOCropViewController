@@ -140,7 +140,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL cropBoxAspectRatioIsPortrait;
 
 /**
- The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
+ The rotation angle of the crop view, in multiples of 90 degrees. Counter-clockwise
+ rotations are negative and clockwise ones positive, so the value is in the
+ range (-360, 360). Values that aren't a multiple of 90 are treated as 0.
  */
 @property (nonatomic, assign) NSInteger angle;
 
