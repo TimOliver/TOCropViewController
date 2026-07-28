@@ -10,7 +10,3 @@
 //
 
 #import "TOCropViewController.h"
-
-// TOCropView.h only forward-declares TOCropOverlayView, and Swift drops properties
-// whose class is incomplete, so `cropView.gridOverlayView` is invisible without this.
-#import "TOCropOverlayView.h"

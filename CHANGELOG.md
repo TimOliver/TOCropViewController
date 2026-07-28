@@ -30,6 +30,7 @@
 - Mac Catalyst window resizes and iPad split view changes could briefly animate the toolbar into the wrong layout. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
 - Toggling `displayHorizontalGridLines`/`displayVerticalGridLines` at runtime now lays out and hides the new grid lines correctly. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
 - Setting `rotateCounterclockwiseButtonHidden` didn't lay the toolbar out again, so the hidden button stayed on screen until something else triggered a layout pass. Its setter had been misspelled, and therefore dead, since 2016. ([#651](https://github.com/TimOliver/TOCropViewController/pull/651))
+- `TOCropView.gridOverlayView` was invisible to Swift: `TOCropView.h` only forward-declared `TOCropOverlayView`, and Swift omits properties whose class it knows only as a forward declaration. `TOCropOverlayView.h` is now a public header of both frameworks and is imported rather than forward-declared, so the grid overlay (and its `displayHorizontalGridLines` / `displayVerticalGridLines` settings) can be reached from Swift. ([#653](https://github.com/TimOliver/TOCropViewController/pull/653))
 
 ## Changed
 
