@@ -166,6 +166,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.scrollView.touchesBegan = ^{ [weakSelf startEditing]; };
     self.scrollView.touchesEnded = ^{ [weakSelf startResetTimer]; };
+    self.scrollView.touchesCancelled = ^{ [weakSelf handleScrollViewTouchCancellation]; };
 
     // Background Image View
     self.backgroundImageView = [[UIImageView alloc] initWithImage:self.image];
@@ -230,6 +231,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridPanGestureRecognizer.delegate = self;
     [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
     [self addGestureRecognizer:self.gridPanGestureRecognizer];
+}
+
+- (void)dealloc {
+    [_resetTimer invalidate];
 }
 
 #pragma mark - View Layout -
@@ -797,7 +802,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.tappedEdge = [self cropEdgeForPoint:self.panOriginPoint];
     }
 
-    if (recognizer.state == UIGestureRecognizerStateEnded) {
+    if (recognizer.state == UIGestureRecognizerStateEnded ||
+        recognizer.state == UIGestureRecognizerStateCancelled ||
+        recognizer.state == UIGestureRecognizerStateFailed) {
         [self startResetTimer];
     }
 
@@ -840,7 +847,29 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (self.resetTimer)
         return;
 
-    self.resetTimer = [NSTimer scheduledTimerWithTimeInterval:self.cropAdjustingDelay target:self selector:@selector(timerTriggered) userInfo:nil repeats:NO];
+    // Use a block-based timer so a pending reset doesn't retain this view
+    // beyond its natural lifetime (eg, when dismissed mid-adjustment)
+    __weak typeof(self) weakSelf = self;
+    self.resetTimer = [NSTimer scheduledTimerWithTimeInterval:self.cropAdjustingDelay
+                                                      repeats:NO
+                                                        block:^(NSTimer *timer) {
+                                                            [weakSelf timerTriggered];
+                                                        }];
+}
+
+// A cancelled touch doesn't imply the interaction is over: the scroll view cancels the
+// touches it delivered as a normal part of its own pan or pinch recognizer taking over,
+// which happens with the user's finger still down. While one of those is underway the
+// scroll view's delegate arms the timer for us once it finishes, so arming it here as
+// well would trigger a reset mid-gesture. What's left is a touch cancelled while nothing
+// is scrolling - an incoming call or system alert - which would otherwise leave the crop
+// view stuck in its editing appearance.
+- (void)handleScrollViewTouchCancellation {
+    if (self.scrollView.isDragging || self.scrollView.isZooming || self.scrollView.isDecelerating) {
+        return;
+    }
+
+    [self startResetTimer];
 }
 
 - (void)timerTriggered {

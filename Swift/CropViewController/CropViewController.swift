@@ -116,7 +116,18 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public weak var delegate: (any CropViewControllerDelegate)? {
         didSet { self.setUpDelegateHandlers() }
     }
-    
+
+    /**
+     The callback slots that currently hold a delegate-bridging closure, so that
+     replacing the delegate can tear down its bridges without clobbering closures
+     the host assigned directly.
+     :nodoc:
+     */
+    private enum BridgedCallback {
+        case didTapDone, didCropImageToRect, didCropToRect, didCropToCircleImage, didFinishCancelled
+    }
+    private var bridgedCallbacks: Set<BridgedCallback> = []
+
     /**
      Set the title text that appears at the top of the view controller
     */
@@ -424,7 +435,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     /**
     If true, button icons are visible in portairt instead button text.
 
-    Default is NO.
+    Default is NO. Has no effect on iOS 26 and up, where the toolbar is always icon-only.
     */
     public var showOnlyIcons: Bool {
         set { toCropViewController.showOnlyIcons = newValue }
@@ -658,48 +669,77 @@ extension CropViewController {
     }
     
     fileprivate func setUpDelegateHandlers() {
-        guard let delegate = self.delegate else {
-            onDidTapDone = nil
-            onDidCropToRect = nil
-            onDidCropImageToRect = nil
-            onDidCropToCircleImage = nil
-            onDidFinishCancelled = nil
-            return
-        }
+        // Tear down the bridges installed for the previous delegate, so that a delegate
+        // which has since been replaced stops receiving callbacks. Slots the host
+        // assigned a closure to directly were never ours, so they're left alone.
+        if bridgedCallbacks.contains(.didTapDone) { onDidTapDone = nil }
+        if bridgedCallbacks.contains(.didCropImageToRect) { onDidCropImageToRect = nil }
+        if bridgedCallbacks.contains(.didCropToRect) { onDidCropToRect = nil }
+        if bridgedCallbacks.contains(.didCropToCircleImage) { onDidCropToCircleImage = nil }
+        if bridgedCallbacks.contains(.didFinishCancelled) { onDidFinishCancelled = nil }
+        bridgedCallbacks.removeAll()
 
+        guard let delegate = self.delegate else { return }
+
+        // Install a bridging closure only for the selectors this delegate implements,
+        // leaving directly-assigned closures on the other slots untouched. The delegate
+        // is captured weakly to honor the `weak` contract of the delegate property; if
+        // it has been deallocated by the time a closure fires, fall back to the default
+        // dismissal so the controller can't be left stranded on screen.
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewControllerDidTapDone(_:))) {
-            self.onDidTapDone = { [weak self] in
-                guard let self else { return }
-                delegate.cropViewControllerDidTapDone?(self)
+            bridgedCallbacks.insert(.didTapDone)
+            // No dismissal fallback for this one: it's fired alongside the crop
+            // callbacks rather than instead of them, so they own the dismissal.
+            self.onDidTapDone = {[weak self, weak delegate] in
+                guard let strongSelf = self, let delegate = delegate else { return }
+                delegate.cropViewControllerDidTapDone?(strongSelf)
             }
         }
 
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropImageToRect:angle:))) {
-            self.onDidCropImageToRect = {[weak self] rect, angle in
+            bridgedCallbacks.insert(.didCropImageToRect)
+            self.onDidCropImageToRect = {[weak self, weak delegate] rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropImageToRect: rect, angle: angle)
+                guard let delegate = delegate else { strongSelf.performDefaultDismissal(); return }
+                delegate.cropViewController?(strongSelf, didCropImageToRect: rect, angle: angle)
             }
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToImage:withRect:angle:))) {
-            self.onDidCropToRect = {[weak self] image, rect, angle in
+            bridgedCallbacks.insert(.didCropToRect)
+            self.onDidCropToRect = {[weak self, weak delegate] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
+                guard let delegate = delegate else { strongSelf.performDefaultDismissal(); return }
+                delegate.cropViewController?(strongSelf, didCropToImage: image, withRect: rect, angle: angle)
             }
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didCropToCircularImage:withRect:angle:))) {
-            self.onDidCropToCircleImage = {[weak self] image, rect, angle in
+            bridgedCallbacks.insert(.didCropToCircleImage)
+            self.onDidCropToCircleImage = {[weak self, weak delegate] image, rect, angle in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
+                guard let delegate = delegate else { strongSelf.performDefaultDismissal(); return }
+                delegate.cropViewController?(strongSelf, didCropToCircularImage: image, withRect: rect, angle: angle)
             }
         }
-        
+
         if delegate.responds(to: #selector((any CropViewControllerDelegate).cropViewController(_:didFinishCancelled:))) {
-            self.onDidFinishCancelled = {[weak self] finished in
+            bridgedCallbacks.insert(.didFinishCancelled)
+            self.onDidFinishCancelled = {[weak self, weak delegate] finished in
                 guard let strongSelf = self else { return }
-                delegate.cropViewController!(strongSelf, didFinishCancelled: finished)
+                guard let delegate = delegate else { strongSelf.performDefaultDismissal(); return }
+                delegate.cropViewController?(strongSelf, didFinishCancelled: finished)
             }
+        }
+    }
+
+    /// Mirrors the Objective-C layer's default dismissal behavior, for when a bridged
+    /// delegate callback fires after the delegate itself has gone away.
+    fileprivate func performDefaultDismissal() {
+        if let navigationController = self.navigationController, navigationController.viewControllers.count > 1 {
+            navigationController.popViewController(animated: true)
+        } else {
+            presentingViewController?.dismiss(animated: true)
         }
     }
 }

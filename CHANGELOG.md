@@ -11,6 +11,11 @@ x.y.z Release Notes (yyyy-MM-dd)
 - Zero-sized images and aspect ratios with a zero component no longer produce broken layout geometry.
 - `rotateImageNinetyDegreesAnimated:clockwise:completion:` never called its completion handler when `animated` was NO, or when the call was dropped because a rotation was already playing. The latter could leave the toolbar's rotation buttons permanently disabled.
 - The crop view was briefly assigned the frame for the opposite layout at the start of a device rotation, so the rotation animation interpolated from the wrong geometry (iOS 25 and below).
+- The Swift `CropViewController`'s closure bridge strongly retained the nominally weak `delegate`, leaking the controller and image when the delegate owned the controller, and kept delivering callbacks to a replaced delegate.
+- The crop adjustment reset timer retained the crop view (and its images) after dismissal mid-adjustment.
+- Touch cancellation from incoming calls or system alerts left the crop view stuck in its editing appearance.
+- Swift: replacing the `delegate` left the previous delegate receiving callbacks, and clearing it discarded closures the host had assigned directly.
+- Swift: the `cropViewControllerDidTapDone` bridge added in 3.1.2 captured the delegate strongly, the same retain cycle as the other callbacks.
 
 3.1.2 Release Notes (2026-04-07)
 
