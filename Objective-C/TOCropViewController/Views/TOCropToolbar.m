@@ -337,6 +337,12 @@
 
 // The convenience method for calculating button's frame inside of the container rect
 - (void)layoutToolbarButtons:(NSArray<UIButton *> *)buttons withSameButtonSize:(CGSize)size inContainerRect:(CGRect)containerRect horizontally:(BOOL)horizontally {
+    // With no buttons to hold, collapse the glass container instead of leaving an
+    // empty capsule stranded at the frame it had when the last button was visible
+    if (@available(iOS 26.0, *)) {
+        _glassView.hidden = (buttons.count == 0);
+    }
+
     if (!buttons.count) {
         return;
     }
@@ -495,6 +501,14 @@
 }
 
 - (void)setShowOnlyIcons:(BOOL)showOnlyIcons {
+    // The text variants of the Done and Cancel buttons aren't created at all on iOS 26
+    // and up, where the toolbar is permanently icon-only. Honouring a NO in that case
+    // would hide the icon buttons with nothing to replace them, leaving no way to
+    // commit or cancel the crop at all.
+    if (_doneTextButton == nil || _cancelTextButton == nil) {
+        return;
+    }
+
     if (_showOnlyIcons == showOnlyIcons)
         return;
 

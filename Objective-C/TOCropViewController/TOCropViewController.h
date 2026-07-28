@@ -176,7 +176,7 @@
 /**
  If true, button icons are visible in portairt instead button text.
 
- Default is NO.
+ Default is NO. Has no effect on iOS 26 and up, where the toolbar is always icon-only.
  */
 @property (nonatomic, assign) BOOL showOnlyIcons;
 

@@ -275,6 +275,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     UIEdgeInsets insets = self.statusBarSafeInsets;
   
     // fix: On iOS 26, overlay with iPadOS windowingControl area.
+#if defined(__IPHONE_26_0)
     if (@available(iOS 26.0, *)) {
       if (!verticalLayout) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED < 180000
@@ -286,6 +287,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 #endif
       }
     }
+#endif
 
     CGRect frame = CGRectZero;
     if (!verticalLayout) {  // In landscape laying out toolbar to the left
@@ -328,13 +330,24 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 }
 
 #if !TARGET_OS_VISION
-                const char *components[] = {"Radius", "Corner", "display", "_"};
-                NSString *selectorName = @"";
-                for (NSInteger i = 3; i >= 0; i--) {
-                    selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
-                                                                                            encoding:NSUTF8StringEncoding]];
-                }
-                const CGFloat cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+                // Look the value up only once since it can't change for the life of the
+                // process, and fall back to a radius matching current-generation devices
+                // in case the private key is ever renamed or removed
+                static CGFloat cornerRadius = 44.0f;
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    const char *components[] = {"Radius", "Corner", "display", "_"};
+                    NSString *selectorName = @"";
+                    for (NSInteger i = 3; i >= 0; i--) {
+                        selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
+                                                                                                encoding:NSUTF8StringEncoding]];
+                    }
+                    @try {
+                        cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
+                    } @catch (NSException *exception) {
+                        NSLog(@"TOCropViewController: Unable to read the display corner radius. Falling back to a default value.");
+                    }
+                });
 #else
                 const CGFloat cornerRadius = 64.0f;
 #endif
