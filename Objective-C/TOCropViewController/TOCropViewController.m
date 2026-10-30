@@ -1361,16 +1361,18 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 }
 
 - (BOOL)sideToolbarPreferredForSize:(CGSize)size {
-    // Portrait phone displays that are nearly as wide as they are tall (eg, the outer
-    // screen of a folding phone) don't have the height to spare for a bottom toolbar,
-    // so the toolbar is laid out along the trailing edge instead
+    // Phone displays that are nearly as wide as they are tall (eg, the outer screen
+    // of a folding phone) don't have the height to spare for a bottom toolbar, so in
+    // either orientation the toolbar is laid out along the trailing edge instead,
+    // matching where the system stacks its own bar items on those displays
     if (self.traitCollection.userInterfaceIdiom != UIUserInterfaceIdiomPhone) {
         return NO;
     }
-    if (size.width >= size.height || size.height < FLT_EPSILON) {
+    CGFloat longSide = MAX(size.width, size.height);
+    if (longSide < FLT_EPSILON) {
         return NO;
     }
-    return (size.width / size.height) > kTOCropViewControllerSideToolbarAspectRatio;
+    return (MIN(size.width, size.height) / longSide) > kTOCropViewControllerSideToolbarAspectRatio;
 }
 
 - (BOOL)toolbarOnRightEdge {

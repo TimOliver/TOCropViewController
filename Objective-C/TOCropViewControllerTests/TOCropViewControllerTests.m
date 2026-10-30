@@ -26,6 +26,11 @@
 @property (nonatomic, assign) CGPoint gridPanInitialPoint;
 @end
 
+// Expose the controller's layout decision so tests can drive it with display sizes
+@interface TOCropViewController (UnitTests)
+@property (nonatomic, readonly) BOOL toolbarOnRightEdge;
+@end
+
 // UIScrollView won't report itself as dragging without a real touch sequence, so
 // stand in for one while a block runs
 @interface UIScrollView (TOCropTestDragging)
@@ -176,6 +181,20 @@ static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
         cropView.scrollView.touchesCancelled();
     });
     XCTAssertNil(cropView.resetTimer, @"a pan taking over the touch must not arm the reset timer");
+}
+
+- (void)testSideToolbarHugsTheTrailingEdgeOnSquatDisplays {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    // A folding phone's cover display earns the trailing edge toolbar in both orientations
+    controller.view.frame = (CGRect){0, 0, 466, 678};
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat portrait display must use the trailing edge toolbar");
+    controller.view.frame = (CGRect){0, 0, 678, 466};
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat landscape display must use the trailing edge toolbar");
+
+    // While regular phones keep the strip on the leading edge in landscape
+    controller.view.frame = (CGRect){0, 0, 874, 402};
+    XCTAssertFalse(controller.toolbarOnRightEdge, @"a regular landscape phone keeps the leading edge toolbar");
 }
 
 - (void)testCropBoxPanJudgesTheTouchDownPointNotTheDriftedOne {
