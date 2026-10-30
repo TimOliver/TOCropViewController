@@ -1352,8 +1352,11 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     return YES;
 #endif
 
-    // Squat displays always use the side toolbar layout, even in portrait
-    if ([self sideToolbarPreferredForSize:size]) {
+    // Squat displays use the side toolbar layout even in portrait, unless there's
+    // iPad-like room to work with (eg, a folding phone's unfolded inner display),
+    // where the regular bottom toolbar layout fits more naturally
+    BOOL compactWidth = self.traitCollection.horizontalSizeClass != UIUserInterfaceSizeClassRegular;
+    if (compactWidth && [self sideToolbarPreferredForSize:size]) {
         return NO;
     }
 

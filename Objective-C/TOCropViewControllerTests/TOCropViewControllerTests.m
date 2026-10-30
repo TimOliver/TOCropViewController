@@ -27,9 +27,10 @@
 @property (nonatomic, readonly) CGRect cropBoxFrame;
 @end
 
-// Expose the controller's layout decision so tests can drive it with display sizes
+// Expose the controller's layout decisions so tests can drive them with display sizes
 @interface TOCropViewController (UnitTests)
 @property (nonatomic, readonly) BOOL toolbarOnRightEdge;
+@property (nonatomic, readonly) BOOL verticalLayout;
 @end
 
 // UIScrollView won't report itself as dragging without a real touch sequence, so
@@ -246,6 +247,26 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     // While regular phones keep the strip on the leading edge in landscape
     controller.view.frame = (CGRect){0, 0, 874, 402};
     XCTAssertFalse(controller.toolbarOnRightEdge, @"a regular landscape phone keeps the leading edge toolbar");
+}
+
+- (void)testRegularWidthPortraitReturnsToTheBottomToolbar {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    // The unfolded inner display in portrait has iPad-like room (regular width),
+    // so the toolbar returns to the bottom like the iPad layout
+    controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassRegular;
+    controller.view.frame = (CGRect){0, 0, 669, 951};
+    XCTAssertTrue(controller.verticalLayout, @"a regular width squat portrait layout must use the bottom toolbar");
+
+    // While its landscape orientation keeps the trailing edge strip
+    controller.view.frame = (CGRect){0, 0, 951, 669};
+    XCTAssertFalse(controller.verticalLayout, @"landscape must keep the side toolbar");
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat landscape display must keep the trailing edge toolbar");
+
+    // And the compact cover display keeps the side toolbar even in portrait
+    controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
+    controller.view.frame = (CGRect){0, 0, 466, 678};
+    XCTAssertFalse(controller.verticalLayout, @"a compact squat portrait display must keep the side toolbar");
 }
 
 - (void)testCropBoxPanJudgesTheTouchDownPointNotTheDriftedOne {
