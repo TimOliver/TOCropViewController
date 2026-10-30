@@ -43,6 +43,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 @property (nonatomic, strong, readwrite) TOCropView *cropView;
 @property (nonatomic, strong) UIView *toolbarSnapshotView;
 @property (nonatomic, strong, readwrite) UILabel *titleLabel;
+#if defined(__IPHONE_26_0)
+/* An invisible view hugging the root view that adopts concentric corner rounding,
+ letting us read back the corner radius the system resolved for our hosting context. */
+@property (nonatomic, strong) UIView *concentricAnchorView API_AVAILABLE(ios(26.0));
+#endif
 
 /* Transition animation controller */
 @property (nonatomic, copy) void (^prepareForTransitionHandler)(void);
@@ -115,6 +120,22 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // Set up view controller properties
     self.transitioningDelegate = self;
     self.view.backgroundColor = self.cropView.backgroundColor;
+
+#if defined(__IPHONE_26_0)
+    // Install an invisible anchor view that hugs our bounds and adopts concentric corner
+    // rounding. UIKit resolves its radius against the hosting context, which lets the
+    // toolbar layout read back the real corner radius of the current display without
+    // relying on a private UIScreen property.
+    if (@available(iOS 26.0, *)) {
+        if (TOCropViewUsesGlassDesign()) {
+            self.concentricAnchorView = [[UIView alloc] initWithFrame:self.view.bounds];
+            self.concentricAnchorView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            self.concentricAnchorView.userInteractionEnabled = NO;
+            self.concentricAnchorView.cornerConfiguration = [UICornerConfiguration configurationWithRadius:[UICornerRadius containerConcentricRadius]];
+            [self.view insertSubview:self.concentricAnchorView atIndex:0];
+        }
+    }
+#endif
 
     BOOL circularMode = (self.croppingStyle == TOCropViewCroppingStyleCircular);
 
@@ -318,9 +339,6 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 // the bottom of the screen, trying to align the width with all the varied corner radii of modern iOS
                 // devices is also difficult.
 
-                // For now, I've decided to use a private API to fetch the corner radius of the device so we can properly align
-                // the toolbar with the device's rounded corners.
-                // I've filed FB20413789 with Apple hoping that this can become a real solution in future.
                 if (insets.bottom > 0.0f) {
                     insets.bottom = 20.0f;
                 } else {
@@ -328,24 +346,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
                 }
 
 #if !TARGET_OS_VISION
-                // Look the value up only once since it can't change for the life of the
-                // process, and fall back to a radius matching current-generation devices
-                // in case the private key is ever renamed or removed
-                static CGFloat cornerRadius = 44.0f;
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    const char *components[] = {"Radius", "Corner", "display", "_"};
-                    NSString *selectorName = @"";
-                    for (NSInteger i = 3; i >= 0; i--) {
-                        selectorName = [selectorName stringByAppendingString:[NSString stringWithCString:components[i]
-                                                                                                encoding:NSUTF8StringEncoding]];
-                    }
-                    @try {
-                        cornerRadius = [[UIScreen.mainScreen valueForKey:selectorName] floatValue];
-                    } @catch (NSException *exception) {
-                        NSLog(@"TOCropViewController: Unable to read the display corner radius. Falling back to a default value.");
-                    }
-                });
+                // Sample the corner radius that UIKit resolved for the concentric anchor view
+                // pinned to our bounds, so the toolbar clears the rounded corners of whatever
+                // is hosting us (the display when full screen). Reading it during a layout
+                // pass registers for automatic invalidation, so the toolbar is laid out again
+                // whenever the resolved radius changes (eg, moving to a different display).
+                CGFloat cornerRadius = 0.0f;
+#if defined(__IPHONE_26_0)
+                if (@available(iOS 26.0, *)) {
+                    cornerRadius = [self.concentricAnchorView effectiveRadiusForCorner:UIRectCornerBottomLeft | UIRectCornerBottomRight];
+                }
+#endif
 #else
                 const CGFloat cornerRadius = 64.0f;
 #endif

@@ -207,7 +207,7 @@
                                                               profilePicker.allowsEditing = NO;
                                                               profilePicker.delegate = self;
                                                               profilePicker.preferredContentSize = CGSizeMake(512, 512);
-                                                              profilePicker.popoverPresentationController.barButtonItem = self.navigationItem.leftBarButtonItem;
+                                                              profilePicker.popoverPresentationController.sourceItem = self.navigationItem.leftBarButtonItem;
                                                               [self presentViewController:profilePicker animated:YES completion:nil];
                                                           }];
 
@@ -231,7 +231,7 @@
     [alertController setModalPresentationStyle:UIModalPresentationPopover];
 
     UIPopoverPresentationController *popPresenter = [alertController popoverPresentationController];
-    popPresenter.barButtonItem = self.navigationItem.leftBarButtonItem;
+    popPresenter.sourceItem = self.navigationItem.leftBarButtonItem;
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
@@ -241,7 +241,7 @@
 
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[self.imageView.image] applicationActivities:nil];
     activityController.modalPresentationStyle = UIModalPresentationPopover;
-    activityController.popoverPresentationController.barButtonItem = sender;
+    activityController.popoverPresentationController.sourceItem = sender;
     [self presentViewController:activityController animated:YES completion:nil];
 }
 
