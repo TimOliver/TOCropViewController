@@ -121,7 +121,9 @@
     if (@available(iOS 26.0, *)) {
 #if !TARGET_OS_VISION
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
-        configuration.baseForegroundColor = [UIColor labelColor];
+        // The prominent glass capsule takes on the done button's bright accent color,
+        // so keep the icon black for contrast instead of following the label color
+        configuration.baseForegroundColor = [UIColor blackColor];
 #else
         UIButtonConfiguration *configuration = [UIButtonConfiguration filledButtonConfiguration];
 #endif
