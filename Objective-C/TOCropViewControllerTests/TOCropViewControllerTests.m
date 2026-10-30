@@ -24,6 +24,7 @@
 @property (nonatomic, strong, readonly) NSTimer *resetTimer;
 @property (nonatomic, strong, readonly) UIPanGestureRecognizer *gridPanGestureRecognizer;
 @property (nonatomic, assign) CGPoint gridPanInitialPoint;
+@property (nonatomic, readonly) CGRect cropBoxFrame;
 @end
 
 // Expose the controller's layout decision so tests can drive it with display sizes
@@ -66,6 +67,26 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
 static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
     Method real = class_getInstanceMethod([UIGestureRecognizer class], @selector(state));
     Method stub = class_getInstanceMethod([UIGestureRecognizer class], @selector(to_test_alwaysChangedState));
+    method_exchangeImplementations(real, stub);
+    block();
+    method_exchangeImplementations(real, stub);
+}
+
+// A view only reports safe area insets once it's in a window, so stand in for the
+// home indicator inset of an edge-to-edge layout while a block runs
+@interface UIView (TOCropTestSafeArea)
+- (UIEdgeInsets)to_test_homeIndicatorSafeAreaInsets;
+@end
+
+@implementation UIView (TOCropTestSafeArea)
+- (UIEdgeInsets)to_test_homeIndicatorSafeAreaInsets {
+    return (UIEdgeInsets){0, 0, 34, 0};
+}
+@end
+
+static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
+    Method real = class_getInstanceMethod([UIView class], @selector(safeAreaInsets));
+    Method stub = class_getInstanceMethod([UIView class], @selector(to_test_homeIndicatorSafeAreaInsets));
     method_exchangeImplementations(real, stub);
     block();
     method_exchangeImplementations(real, stub);
@@ -181,6 +202,36 @@ static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
         cropView.scrollView.touchesCancelled();
     });
     XCTAssertNil(cropView.resetTimer, @"a pan taking over the touch must not arm the reset timer");
+}
+
+- (void)testRestingCropBoxCentersWhenFullyZoomedOut {
+    // Mimic the squat display side toolbar layout: a trailing inset for the toolbar,
+    // and a bottom inset that is purely the home indicator's safe area
+    TOCropView *(^makeCropView)(CGSize) = ^(CGSize imageSize) {
+        TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:imageSize]];
+        cropView.frame = (CGRect){0, 0, 466, 678};
+        cropView.cropRegionInsets = (UIEdgeInsets){0, 0, 34, 70};
+        [cropView performInitialSetup];
+        return cropView;
+    };
+
+    TOCropRunWhileViewHasBottomSafeArea(^{
+        // Fully zoomed out, the crop box rests perfectly vertically centered
+        TOCropView *cropView = makeCropView((CGSize){40, 20});
+        XCTAssertEqualWithAccuracy(CGRectGetMidY(cropView.cropBoxFrame), 678.0 / 2.0, 1.5,
+                                   @"a fully zoomed out crop box must be vertically centered");
+
+        // Zooming into a subregion of the image offsets it clear of the safe area
+        [cropView setImageCropFrame:(CGRect){10, 5, 20, 10}];
+        XCTAssertEqualWithAccuracy(CGRectGetMidY(cropView.cropBoxFrame), 322.0, 1.5,
+                                   @"a zoomed in crop box must offset clear of the bottom inset");
+    });
+
+    // When the bottom inset is more than the safe area (eg, the bottom toolbar
+    // layout), the box keeps centering within the inset region as always
+    TOCropView *toolbarCropView = makeCropView((CGSize){40, 20});
+    XCTAssertEqualWithAccuracy(CGRectGetMidY(toolbarCropView.cropBoxFrame), 322.0, 1.5,
+                               @"an accessory view's bottom inset must keep offsetting the crop box");
 }
 
 - (void)testSideToolbarHugsTheTrailingEdgeOnSquatDisplays {
