@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) TOCropViewOverlayEdge tappedEdge;   /* The edge region that the user tapped on, to resize the cropping region */
 @property (nonatomic, assign) CGRect cropOriginFrame;             /* When resizing, this is the original frame of the crop box. */
 @property (nonatomic, assign) CGPoint panOriginPoint;             /* The initial touch point of the pan gesture recognizer */
+@property (nonatomic, assign) CGPoint gridPanInitialPoint;        /* Where the crop box pan's touch first landed, captured before the pan recognizes */
 @property (nonatomic, assign, readwrite) CGRect cropBoxFrame;     /* The frame, in relation to to this view where the grid, and crop container view are aligned */
 @property (nonatomic, strong) NSTimer *resetTimer;                /* The timer used to reset the view after the user stops interacting with it */
 @property (nonatomic, assign) BOOL editing;                       /* Used to denote the active state of the user manipulating the content */
@@ -779,7 +780,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         [self startEditing];
-        self.panOriginPoint = point;
+        // Anchor the drag at the point the touch landed on, so the edge it grabbed
+        // resolves correctly and the crop box tracks the full extent of the drag
+        self.panOriginPoint = self.gridPanInitialPoint;
         self.cropOriginFrame = self.cropBoxFrame;
         self.tappedEdge = [self cropEdgeForPoint:self.panOriginPoint];
     }
@@ -805,7 +808,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (gestureRecognizer != self.gridPanGestureRecognizer)
         return YES;
 
-    CGPoint tapPoint = [gestureRecognizer locationInView:self];
+    // Judge the touch by where it first landed: by the time the pan recognizes,
+    // the finger of a brisk drag has already drifted well away from the grid line
+    // it grabbed
+    CGPoint tapPoint = self.gridPanInitialPoint;
 
     CGRect frame = self.gridOverlayView.frame;
     CGRect innerFrame = CGRectInset(frame, 22.0f, 22.0f);
@@ -820,6 +826,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (self.gridPanGestureRecognizer.state == UIGestureRecognizerStateChanged) {
         return NO;
+    }
+    // A pan only recognizes once the finger has travelled some distance, so capture
+    // where the touch actually landed while it is still fresh - by recognition time,
+    // a brisk drag that started on a grid line has long since left it
+    if (gestureRecognizer == self.gridPanGestureRecognizer) {
+        self.gridPanInitialPoint = [touch locationInView:self];
     }
     return YES;
 }

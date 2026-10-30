@@ -15,12 +15,15 @@
 #import "UIImage+CropRotate.h"
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
-// rotation, and drive the scroll view's touch hooks
-@interface TOCropView (UnitTests)
+// rotation, drive the scroll view's touch hooks, and stand in for a touch landing
+// on the crop box
+@interface TOCropView (UnitTests) <UIGestureRecognizerDelegate>
 - (void)startResetTimer;
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;
 @property (nonatomic, strong, readonly) TOCropScrollView *scrollView;
 @property (nonatomic, strong, readonly) NSTimer *resetTimer;
+@property (nonatomic, strong, readonly) UIPanGestureRecognizer *gridPanGestureRecognizer;
+@property (nonatomic, assign) CGPoint gridPanInitialPoint;
 @end
 
 // UIScrollView won't report itself as dragging without a real touch sequence, so
@@ -173,6 +176,31 @@ static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
         cropView.scrollView.touchesCancelled();
     });
     XCTAssertNil(cropView.resetTimer, @"a pan taking over the touch must not arm the reset timer");
+}
+
+- (void)testCropBoxPanJudgesTheTouchDownPointNotTheDriftedOne {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    CGRect gridFrame = cropView.gridOverlayView.frame;
+
+    // A pan only recognises after the finger has already travelled, so the begin
+    // check must judge where the touch first landed, not where the finger is now.
+    // Landing on the box's bottom line grabs it, wherever the finger has moved to
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame)};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch on the grid line must begin the crop box resize");
+
+    // The 44pt grab band is centered on the line: 22pt inside or outside still grabs
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame) - 21.0f};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch just inside the grid line must begin the crop box resize");
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame) + 21.0f};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch just outside the grid line must begin the crop box resize");
+
+    // While a touch in the box's middle pans the image instead
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMidY(gridFrame)};
+    XCTAssertFalse([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                   @"a touch in the middle of the crop box must not resize it");
 }
 
 - (void)testResetTimerIsNotArmedWhenTheCropBoxPanCancelsTheTouch {
