@@ -55,8 +55,6 @@
 		2238CF2A1FC0269C0081B957 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF291FC0269C0081B957 /* Assets.xcassets */; };
 		2238CF2D1FC0269C0081B957 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2238CF2B1FC0269C0081B957 /* LaunchScreen.storyboard */; };
 		2238CF361FC029880081B957 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
-		CAFE0000000000000000B001 /* CropViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0000000000000000A001 /* CropViewControllerTests.swift */; };
-		CAFE0000000000000000B002 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
 		2238CF451FC02AE00081B957 /* TOCropViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2238CF441FC02AE00081B957 /* TOCropViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		223DCEB61FBAA85D00F99209 /* TOCropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB4D831B234CFA008B8466 /* TOCropViewController.m */; };
 		22A105B32BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 22A105B22BC134A200DB3A80 /* PrivacyInfo.xcprivacy */; };
@@ -106,6 +104,10 @@
 		39381CC22DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
 		39381CC32DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h in Headers */ = {isa = PBXBuildFile; fileRef = 39381CBC2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		39381CC42DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */ = {isa = PBXBuildFile; fileRef = 39381CBD2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m */; };
+		5CE2ED0000000000000B0001 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CE2ED0000000000000A0002 /* SceneDelegate.m */; };
+		5CE2ED0000000000000B0002 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE2ED0000000000000A0003 /* SceneDelegate.swift */; };
+		CAFE0000000000000000B001 /* CropViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE0000000000000000A001 /* CropViewControllerTests.swift */; };
+		CAFE0000000000000000B002 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF351FC029880081B957 /* CropViewController.swift */; };
 		FE3E0E3A21098448004DAE93 /* TOCropViewConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 220C8E9F21062DD300A9B25D /* TOCropViewConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -177,8 +179,6 @@
 		2238CF2C1FC0269C0081B957 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2238CF2E1FC0269C0081B957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2238CF351FC029880081B957 /* CropViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropViewController.swift; sourceTree = "<group>"; };
-		CAFE0000000000000000A001 /* CropViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropViewControllerTests.swift; sourceTree = "<group>"; };
-		CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CropViewControllerTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		2238CF3C1FC029A90081B957 /* CropViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CropViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2238CF3E1FC029A90081B957 /* CropViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CropViewController.h; sourceTree = "<group>"; };
 		2238CF3F1FC029A90081B957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -230,6 +230,11 @@
 		88BBE90E22C206340073D22A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782CF214A55F900CAE7EE /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		A93782D3214A81A200CAE7EE /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
+		5CE2ED0000000000000A0001 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		5CE2ED0000000000000A0002 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		5CE2ED0000000000000A0003 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		CAFE0000000000000000A001 /* CropViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropViewControllerTests.swift; sourceTree = "<group>"; };
+		CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CropViewControllerTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		CDC8C5751C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
 		CDC8C5771C667B9100BB86A4 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
 		E4C7D121221D7465003F381A /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/TOCropViewControllerLocalizable.strings; sourceTree = "<group>"; };
@@ -383,6 +388,8 @@
 			children = (
 				223424711ABBC0CD00BBC2B1 /* AppDelegate.h */,
 				223424721ABBC0CD00BBC2B1 /* AppDelegate.m */,
+				5CE2ED0000000000000A0001 /* SceneDelegate.h */,
+				5CE2ED0000000000000A0002 /* SceneDelegate.m */,
 				223424741ABBC0CD00BBC2B1 /* ViewController.h */,
 				223424751ABBC0CD00BBC2B1 /* ViewController.m */,
 				223424771ABBC0CD00BBC2B1 /* Main.storyboard */,
@@ -417,6 +424,7 @@
 			isa = PBXGroup;
 			children = (
 				2238CF221FC0269C0081B957 /* AppDelegate.swift */,
+				5CE2ED0000000000000A0003 /* SceneDelegate.swift */,
 				2238CF241FC0269C0081B957 /* ViewController.swift */,
 				2238CF261FC0269C0081B957 /* Main.storyboard */,
 				2238CF291FC0269C0081B957 /* Assets.xcassets */,
@@ -446,15 +454,6 @@
 				2238CF211FC0269C0081B957 /* CropViewControllerExample */,
 			);
 			path = Swift;
-			sourceTree = "<group>";
-		};
-		CAFE0000000000000000A003 /* CropViewControllerTests */ = {
-			isa = PBXGroup;
-			children = (
-				CAFE0000000000000000A001 /* CropViewControllerTests.swift */,
-				CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */,
-			);
-			path = CropViewControllerTests;
 			sourceTree = "<group>";
 		};
 		2238CF341FC027550081B957 /* CropViewController */ = {
@@ -504,6 +503,15 @@
 				22DB4D951B234D07008B8466 /* TOCropView.m */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		CAFE0000000000000000A003 /* CropViewControllerTests */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE0000000000000000A001 /* CropViewControllerTests.swift */,
+				CAFE0000000000000000A002 /* CropViewControllerTests-Bridging-Header.h */,
+			);
+			path = CropViewControllerTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -674,16 +682,13 @@
 					};
 					220611961B2E6777001A467B = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 6LF3GMKZAB;
 						TestTargetID = 223424691ABBC0CD00BBC2B1;
 					};
 					223424691ABBC0CD00BBC2B1 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 6LF3GMKZAB;
 					};
 					2238CF1F1FC0269C0081B957 = {
 						CreatedOnToolsVersion = 9.1;
-						DevelopmentTeam = 6LF3GMKZAB;
 						ProvisioningStyle = Automatic;
 					};
 					2238CF3B1FC029A90081B957 = {
@@ -693,7 +698,6 @@
 					};
 					2F5062DB1F53E2D900AA9F14 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 6LF3GMKZAB;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -846,6 +850,7 @@
 				39381CBE2DBA510600F42969 /* TOCropViewControllerAspectRatioPreset.m in Sources */,
 				22DB4D9A1B234D07008B8466 /* TOCropToolbar.m in Sources */,
 				223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */,
+				5CE2ED0000000000000B0001 /* SceneDelegate.m in Sources */,
 				223424701ABBC0CD00BBC2B1 /* main.m in Sources */,
 				220C8EAE2106344D00A9B25D /* UIImage+CropRotate.m in Sources */,
 				22DB4D981B234D07008B8466 /* TOCropOverlayView.m in Sources */,
@@ -872,6 +877,7 @@
 				22B68F9D1FFB380700601B1A /* TOCropViewController.m in Sources */,
 				2238CF251FC0269C0081B957 /* ViewController.swift in Sources */,
 				2238CF231FC0269C0081B957 /* AppDelegate.swift in Sources */,
+				5CE2ED0000000000000B0002 /* SceneDelegate.swift in Sources */,
 				2238CF361FC029880081B957 /* CropViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1088,6 +1094,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1116,6 +1123,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "Objective-C/TOCropViewControllerTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1257,6 +1265,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample.entitlements";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
@@ -1267,7 +1276,7 @@
 				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/TOCropViewControllerExample/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1285,6 +1294,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Objective-C/TOCropViewControllerExample/TOCropViewControllerExample.entitlements";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
@@ -1295,7 +1305,7 @@
 				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/TOCropViewControllerExample/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1320,9 +1330,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Swift/CropViewControllerExample/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1347,9 +1358,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Swift/CropViewControllerExample/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1463,6 +1475,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1471,7 +1484,7 @@
 				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/TOCropViewControllerExample-Extension/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1497,11 +1510,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 2D9S2U3NJW;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Objective-C/TOCropViewControllerExample-Extension/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
