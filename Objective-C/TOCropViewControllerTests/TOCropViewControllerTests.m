@@ -43,6 +43,26 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
     method_exchangeImplementations(real, stub);
 }
 
+// Likewise, a gesture recognizer only reports an active state mid-touch, so stand
+// in for the crop box pan having claimed the touch while a block runs
+@interface UIGestureRecognizer (TOCropTestActivePan)
+- (UIGestureRecognizerState)to_test_alwaysChangedState;
+@end
+
+@implementation UIGestureRecognizer (TOCropTestActivePan)
+- (UIGestureRecognizerState)to_test_alwaysChangedState {
+    return UIGestureRecognizerStateChanged;
+}
+@end
+
+static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
+    Method real = class_getInstanceMethod([UIGestureRecognizer class], @selector(state));
+    Method stub = class_getInstanceMethod([UIGestureRecognizer class], @selector(to_test_alwaysChangedState));
+    method_exchangeImplementations(real, stub);
+    block();
+    method_exchangeImplementations(real, stub);
+}
+
 @interface TOCropViewControllerTests : XCTestCase
 
 @end
@@ -153,6 +173,20 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
         cropView.scrollView.touchesCancelled();
     });
     XCTAssertNil(cropView.resetTimer, @"a pan taking over the touch must not arm the reset timer");
+}
+
+- (void)testResetTimerIsNotArmedWhenTheCropBoxPanCancelsTheTouch {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+
+    cropView.scrollView.touchesBegan();
+    XCTAssertNil(cropView.resetTimer, @"editing should have cancelled any pending reset");
+
+    // When the crop box resizing pan recognises, it cancels the touches the scroll
+    // view was receiving, with the user's finger still down on the crop box handle
+    TOCropRunWhileCropBoxPanIsActive(^{
+        cropView.scrollView.touchesCancelled();
+    });
+    XCTAssertNil(cropView.resetTimer, @"the crop box pan taking over must not arm the reset timer");
 }
 
 - (void)testResetTimerIsArmedWhenAnIdleTouchIsInterrupted {

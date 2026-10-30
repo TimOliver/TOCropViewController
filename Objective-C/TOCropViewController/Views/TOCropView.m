@@ -841,13 +841,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 // A cancelled touch doesn't imply the interaction is over: the scroll view cancels the
 // touches it delivered as a normal part of its own pan or pinch recognizer taking over,
-// which happens with the user's finger still down. While one of those is underway the
-// scroll view's delegate arms the timer for us once it finishes, so arming it here as
-// well would trigger a reset mid-gesture. What's left is a touch cancelled while nothing
-// is scrolling - an incoming call or system alert - which would otherwise leave the crop
-// view stuck in its editing appearance.
+// and the crop box resizing pan does the same when it claims a touch near the box's
+// edges, all with the user's finger still down. While one of those is underway, the
+// recognizer that took over arms the timer itself once it finishes, so arming it here
+// as well would trigger a reset mid-gesture. What's left is a touch cancelled while
+// nothing took over - an incoming call or system alert - which would otherwise leave
+// the crop view stuck in its editing appearance.
 - (void)handleScrollViewTouchCancellation {
-    if (self.scrollView.isDragging || self.scrollView.isZooming || self.scrollView.isDecelerating) {
+    BOOL cropBoxPanActive = self.gridPanGestureRecognizer.state == UIGestureRecognizerStateBegan ||
+                            self.gridPanGestureRecognizer.state == UIGestureRecognizerStateChanged;
+    if (cropBoxPanActive || self.scrollView.isDragging || self.scrollView.isZooming || self.scrollView.isDecelerating) {
         return;
     }
 
