@@ -162,6 +162,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     self.toolbar.cancelButtonTapped = ^{ [weakSelf cancelButtonTapped]; };
     self.toolbar.resetButtonTapped = ^{ [weakSelf resetCropViewLayout]; };
     self.toolbar.clampButtonTapped = ^{ [weakSelf showAspectRatioDialog]; };
+    [self updateAspectRatioMenu];
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped = ^{ [weakSelf rotateCropViewClockwise]; };
 }
@@ -723,13 +724,9 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 #pragma mark - Aspect Ratio Handling -
 - (void)showAspectRatioDialog {
     if (self.cropView.aspectRatioLockEnabled) {
-        self.cropView.aspectRatioLockEnabled = NO;
-        self.toolbar.clampButtonGlowing = NO;
+        self.aspectRatioLockEnabled = NO;
         return;
     }
-
-    // Depending on the shape of the image, work out if horizontal, or vertical options are required
-    BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
 
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
@@ -738,25 +735,17 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     NSString *cancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel", @"TOCropViewControllerLocalizable", resourceBundle, nil);
 
     // Prepare the list that will be fed to the alert view/controller
-
-    NSArray<TOCropViewControllerAspectRatioPreset *> *presets;
-
-    if (self.allowedAspectRatios == nil) {
-        presets = verticalCropBox ? [TOCropViewControllerAspectRatioPreset portraitPresets] : [TOCropViewControllerAspectRatioPreset landscapePresets];
-    } else {
-        presets = self.allowedAspectRatios;
-    }
+    NSArray<TOCropViewControllerAspectRatioPreset *> *presets = [self aspectRatioPresets];
 
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController addAction:[UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:nil]];
 
     // Add each item to the alert controller
-    for (NSInteger i = 0; i < presets.count; i++) {
+    for (TOCropViewControllerAspectRatioPreset *preset in presets) {
         id handlerBlock = ^(UIAlertAction *action) {
-            [self setAspectRatioPreset:presets[i].size animated:YES];
-            self.aspectRatioLockEnabled = YES;
+            [self lockToAspectRatioPreset:preset];
         };
-        UIAlertAction *action = [UIAlertAction actionWithTitle:presets[i].title style:UIAlertActionStyleDefault handler:handlerBlock];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:preset.title style:UIAlertActionStyleDefault handler:handlerBlock];
         [alertController addAction:action];
     }
 
@@ -765,6 +754,57 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     presentationController.sourceView = self.toolbar;
     presentationController.sourceRect = self.toolbar.clampButtonFrame;
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (NSArray<TOCropViewControllerAspectRatioPreset *> *)aspectRatioPresets {
+    if (self.allowedAspectRatios != nil) {
+        return self.allowedAspectRatios;
+    }
+
+    // Depending on the shape of the image, work out if horizontal, or vertical options are required
+    BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
+    return verticalCropBox ? [TOCropViewControllerAspectRatioPreset portraitPresets] : [TOCropViewControllerAspectRatioPreset landscapePresets];
+}
+
+- (void)lockToAspectRatioPreset:(TOCropViewControllerAspectRatioPreset *)preset {
+    [self setAspectRatioPreset:preset.size animated:YES];
+    self.aspectRatioLockEnabled = YES;
+}
+
+- (void)updateAspectRatioMenu {
+#ifdef __IPHONE_26_0
+    // On iOS 26, show the presets as a menu that grows out of the toolbar's glass, instead of
+    // an action sheet popover. While a ratio is locked, the button keeps its old behaviour of
+    // unlocking on tap, so the menu is only attached while unlocked.
+    if (@available(iOS 26.0, *)) {
+        UIButton *clampButton = self.toolbar.clampButton;
+        if (!TOCropViewUsesGlassDesign() || self.cropView.aspectRatioLockEnabled) {
+            clampButton.showsMenuAsPrimaryAction = NO;
+            clampButton.menu = nil;
+            return;
+        }
+
+        // Build the items each time the menu opens, since the presets flip between
+        // portrait and landscape with the shape of the crop box
+        __weak typeof(self) weakSelf = self;
+        UIDeferredMenuElement *presetsElement = [UIDeferredMenuElement elementWithUncachedProvider:^(void (^completion)(NSArray<UIMenuElement *> *)) {
+            NSMutableArray<UIMenuElement *> *actions = [NSMutableArray array];
+            for (TOCropViewControllerAspectRatioPreset *preset in [weakSelf aspectRatioPresets]) {
+                [actions addObject:[UIAction actionWithTitle:preset.title image:nil identifier:nil handler:^(UIAction *action) {
+                    // Wait for the menu to finish dismissing, or the button ignores having its menu removed
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf lockToAspectRatioPreset:preset];
+                    });
+                }]];
+            }
+            completion(actions);
+        }];
+
+        clampButton.menu = [UIMenu menuWithChildren:@[presetsElement]];
+        clampButton.preferredMenuElementOrder = UIContextMenuConfigurationElementOrderFixed;
+        clampButton.showsMenuAsPrimaryAction = YES;
+    }
+#endif
 }
 
 - (void)setAspectRatioPreset:(CGSize)aspectRatioPreset animated:(BOOL)animated {
@@ -1246,6 +1286,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 - (void)setAspectRatioLockEnabled:(BOOL)aspectRatioLockEnabled {
     self.toolbar.clampButtonGlowing = aspectRatioLockEnabled;
     self.cropView.aspectRatioLockEnabled = aspectRatioLockEnabled;
+    [self updateAspectRatioMenu];
     if (!self.aspectRatioPickerButtonHidden) {
         self.aspectRatioPickerButtonHidden = (aspectRatioLockEnabled && self.resetAspectRatioEnabled == NO);
     }
