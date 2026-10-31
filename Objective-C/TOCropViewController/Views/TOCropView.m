@@ -300,7 +300,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = CGRectZero;
     frame.size = self.hasAspectRatio ? cropBoxSize : scaledSize;
     frame.origin.x = floorf(bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f));
-    frame.origin.y = floorf([self restingMidYForZoomScale:self.scrollView.minimumZoomScale] - (frame.size.height * 0.5f));
+    frame.origin.y = floorf([self restingOriginYForHeight:frame.size.height zoomScale:self.scrollView.minimumZoomScale]);
     self.cropBoxFrame = frame;
 
     // set the fully zoomed out state initially
@@ -355,7 +355,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     cropFrame.size.width = floorf(cropFrame.size.width * scale);
     cropFrame.size.height = floorf(cropFrame.size.height * scale);
     cropFrame.origin.x = floorf(contentFrame.origin.x + ((contentFrame.size.width - cropFrame.size.width) * 0.5f));
-    cropFrame.origin.y = floorf(contentFrame.origin.y + ((contentFrame.size.height - cropFrame.size.height) * 0.5f));
+    cropFrame.origin.y = floorf([self restingOriginYForHeight:cropFrame.size.height zoomScale:self.scrollView.zoomScale]);
     self.cropBoxFrame = cropFrame;
 
     [self captureStateForImageRotation];
@@ -369,8 +369,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     normalizedCenter.x = contentCenter.x / self.rotationContentSize.width;
     normalizedCenter.y = contentCenter.y / self.rotationContentSize.height;
 
-    // Work out the new content offset by applying the normalized values to the new layout
-    CGPoint newMidPoint = (CGPoint){CGRectGetMidX(self.contentBounds), CGRectGetMidY(self.contentBounds)};
+    // Work out the new content offset by applying the normalized values to the new layout,
+    // centered under wherever the crop box came to rest
+    CGPoint newMidPoint = (CGPoint){CGRectGetMidX(self.cropBoxFrame), CGRectGetMidY(self.cropBoxFrame)};
 
     CGPoint translatedContentOffset = CGPointZero;
     translatedContentOffset.x = self.scrollView.contentSize.width * normalizedCenter.x;
@@ -773,7 +774,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
     cropBoxFrame.origin.x = floorf(CGRectGetMidX(bounds) - (frame.size.width * 0.5f));
-    cropBoxFrame.origin.y = floorf([self restingMidYForZoomScale:self.scrollView.zoomScale] - (frame.size.height * 0.5f));
+    cropBoxFrame.origin.y = floorf([self restingOriginYForHeight:frame.size.height zoomScale:self.scrollView.zoomScale]);
     self.cropBoxFrame = cropBoxFrame;
 
     frame.origin.x = ceilf((scaledOffset.x * scale) - self.scrollView.contentInset.left);
@@ -1327,7 +1328,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     cropFrame.size.width = ceilf(cropFrame.size.width * scale);
     cropFrame.size.height = ceilf(cropFrame.size.height * scale);
     cropFrame.origin.x = contentRect.origin.x + ceilf((contentRect.size.width - cropFrame.size.width) * 0.5f);
-    cropFrame.origin.y = ceilf([self restingMidYForZoomScale:(self.scrollView.zoomScale * scale)] - (cropFrame.size.height * 0.5f));
+    cropFrame.origin.y = ceilf([self restingOriginYForHeight:cropFrame.size.height zoomScale:(self.scrollView.zoomScale * scale)]);
 
     // The content will re-center under wherever the crop box comes to rest
     CGPoint midPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
@@ -1630,7 +1631,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
-    newCropFrame.origin.y = floorf(CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5f));
+    newCropFrame.origin.y = floorf([self restingOriginYForHeight:newCropFrame.size.height zoomScale:self.scrollView.zoomScale]);
 
     // If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = nil;
@@ -1796,12 +1797,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - Convienience Methods -
-// Where the resting crop box's vertical center should sit for a given zoom level.
+// Where the top of a resting crop box of the given height should sit for a given zoom level.
 // While the image is fully zoomed out, the box sits perfectly vertically centered
 // over a bottom inset that is purely the safe area (eg, the home indicator region
 // alongside the side toolbar); once zoomed in, or when an accessory view occupies
-// the bottom inset, it offsets to sit centered within the crop region insets
-- (CGFloat)restingMidYForZoomScale:(CGFloat)zoomScale {
+// the bottom inset, it offsets to sit centered within the crop region insets.
+// Either way, it never extends past the bottom of the content region, since the
+// crop box frame setter would clip its height (eg, an image filling the height).
+- (CGFloat)restingOriginYForHeight:(CGFloat)height zoomScale:(CGFloat)zoomScale {
     CGRect contentRect = self.contentBounds;
     CGFloat bottomInset = self.cropRegionInsets.bottom;
 
@@ -1815,7 +1818,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (fullyZoomedOut && bottomInsetIsSafeArea) {
         midY += bottomInset * 0.5f;
     }
-    return midY;
+
+    // Floor the limit, so callers rounding the result up can't overshoot it
+    return MIN(midY - (height * 0.5f), floorf(CGRectGetMaxY(contentRect) - height));
 }
 
 - (CGRect)contentBounds {

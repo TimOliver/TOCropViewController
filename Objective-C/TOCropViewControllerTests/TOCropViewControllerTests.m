@@ -235,6 +235,38 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
                                @"an accessory view's bottom inset must keep offsetting the crop box");
 }
 
+- (void)testRestingCropBoxFillingTheHeightKeepsTheWholeImage {
+    // An image tall enough to fill the content height has no room to shift down into the
+    // safe area, so it must keep its regular layout rather than being clipped at the bottom
+    void (^checkLayout)(CGSize, CGRect, UIEdgeInsets, NSString *) = ^(CGSize imageSize, CGRect frame, UIEdgeInsets insets, NSString *label) {
+        TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:imageSize]];
+        cropView.frame = frame;
+        cropView.cropRegionInsets = insets;
+        [cropView performInitialSetup];
+
+        XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, imageSize.height, imageSize.height * 0.01,
+                                   @"%@: an untouched crop must cover the whole image", label);
+        XCTAssertFalse(cropView.canBeReset, @"%@: an untouched crop must not be resettable", label);
+
+        // A layout pass re-centers the crop box every time, which must leave it be
+        [cropView moveCroppedContentToCenterAnimated:NO];
+        XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, imageSize.height, imageSize.height * 0.01,
+                                   @"%@: re-centering must not clip the image", label);
+        XCTAssertFalse(cropView.canBeReset, @"%@: re-centering must not make the crop resettable", label);
+
+        // And resetting must land back on the same untouched state
+        [cropView resetLayoutToDefaultAnimated:NO];
+        XCTAssertFalse(cropView.canBeReset, @"%@: resetting must clear the resettable state", label);
+    };
+
+    TOCropRunWhileViewHasBottomSafeArea(^{
+        // A tall image alongside the squat display side toolbar
+        checkLayout((CGSize){1080, 1920}, (CGRect){0, 0, 466, 678}, (UIEdgeInsets){0, 0, 34, 70}, @"squat portrait");
+        // A photo on a regular phone in landscape, beside the leading edge toolbar
+        checkLayout((CGSize){4032, 3024}, (CGRect){0, 0, 874, 402}, (UIEdgeInsets){0, 70, 21, 62}, @"phone landscape");
+    });
+}
+
 - (void)testSideToolbarHugsTheTrailingEdgeOnSquatDisplays {
     TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
 
