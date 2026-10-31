@@ -269,6 +269,29 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     XCTAssertFalse(controller.verticalLayout, @"a compact squat portrait display must keep the side toolbar");
 }
 
+- (void)testUncroppedCropBoxSurvivesRotationRoundTrips {
+    // A large image, so any screen-space rounding drift shows up in image space
+    TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+    cropView.frame = (CGRect){0, 0, 320, 480};
+    [cropView performInitialSetup];
+    CGRect before = cropView.imageCropFrame;
+
+    // Mimic the controller's device rotation dance through two full round trips
+    for (NSInteger i = 0; i < 4; i++) {
+        [cropView prepareforRotation];
+        cropView.frame = (i % 2 == 0) ? (CGRect){0, 0, 480, 320} : (CGRect){0, 0, 320, 480};
+        [cropView performRelayoutForRotation];
+        [cropView moveCroppedContentToCenterAnimated:NO];
+    }
+
+    // An untouched crop must come back bit for bit, not slightly shrunken
+    CGRect after = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(after.origin.x, before.origin.x, 1.0, @"the crop must not drift sideways across rotations");
+    XCTAssertEqualWithAccuracy(after.origin.y, before.origin.y, 1.0, @"the crop must not drift downwards across rotations");
+    XCTAssertEqualWithAccuracy(after.size.width, before.size.width, 1.0, @"the crop must not narrow across rotations");
+    XCTAssertEqualWithAccuracy(after.size.height, before.size.height, 1.0, @"the crop must not shrink across rotations");
+}
+
 - (void)testCropBoxPanJudgesTheTouchDownPointNotTheDriftedOne {
     TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
     CGRect gridFrame = cropView.gridOverlayView.frame;

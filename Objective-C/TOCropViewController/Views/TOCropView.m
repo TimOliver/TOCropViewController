@@ -335,6 +335,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)performRelayoutForRotation {
+    // An untouched crop is laid out from scratch instead of rescaled, so repeated
+    // rotations can never accumulate rounding drift into the cropped region
+    if (!self.canBeReset) {
+        [self layoutInitialImage];
+        return;
+    }
+
     CGRect cropFrame = self.cropBoxFrame;
     CGRect contentFrame = self.contentBounds;
 
