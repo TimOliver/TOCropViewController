@@ -660,10 +660,15 @@
 
 + (UIImage *)resetImage {
     if (@available(iOS 13.0, *)) {
-        return [[UIImage systemImageNamed:@"arrow.counterclockwise"
+        // A revert arrow, rather than a circular one that reads as a third rotate button.
+        // iOS 13 only knows the symbol by its original name.
+        NSString *symbolName = @"arrow.uturn.left";
+        if (@available(iOS 14.0, *)) {
+            symbolName = @"arrow.uturn.backward";
+        }
+        return [[UIImage systemImageNamed:symbolName
                         withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
             imageWithBaselineOffsetFromBottom:0];
-        ;
     }
 
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22, 18}];
