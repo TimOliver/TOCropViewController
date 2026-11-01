@@ -201,9 +201,9 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
 
         let padding: CGFloat = 20.0
 
-        var viewFrame = self.view.bounds
-        viewFrame.size.width -= (padding * 2.0)
-        viewFrame.size.height -= ((padding * 2.0))
+        // Fit within the safe area, so the image stays clear of the navigation bar
+        let safeFrame = self.view.safeAreaLayoutGuide.layoutFrame
+        let viewFrame = safeFrame.insetBy(dx: padding, dy: padding)
 
         var imageFrame = CGRect.zero
         imageFrame.size = imageView.image!.size
@@ -212,12 +212,12 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             let scale = min(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height)
             imageFrame.size.width *= scale
             imageFrame.size.height *= scale
-            imageFrame.origin.x = (self.view.bounds.size.width - imageFrame.size.width) * 0.5
-            imageFrame.origin.y = (self.view.bounds.size.height - imageFrame.size.height) * 0.5
+            imageFrame.origin.x = safeFrame.minX + (safeFrame.size.width - imageFrame.size.width) * 0.5
+            imageFrame.origin.y = safeFrame.minY + (safeFrame.size.height - imageFrame.size.height) * 0.5
             imageView.frame = imageFrame
         } else {
             self.imageView.frame = imageFrame
-            self.imageView.center = CGPoint(x: self.view.bounds.midX, y: self.view.bounds.midY)
+            self.imageView.center = CGPoint(x: safeFrame.midX, y: safeFrame.midY)
         }
     }
 

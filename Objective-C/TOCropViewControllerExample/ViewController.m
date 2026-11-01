@@ -160,9 +160,9 @@
 
     CGFloat padding = 20.0f;
 
-    CGRect viewFrame = self.view.bounds;
-    viewFrame.size.width -= (padding * 2.0f);
-    viewFrame.size.height -= ((padding * 2.0f));
+    // Fit within the safe area, so the image stays clear of the navigation bar
+    CGRect safeFrame = self.view.safeAreaLayoutGuide.layoutFrame;
+    CGRect viewFrame = CGRectInset(safeFrame, padding, padding);
 
     CGRect imageFrame = CGRectZero;
     imageFrame.size = self.imageView.image.size;
@@ -172,12 +172,12 @@
         CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
         imageFrame.size.width *= scale;
         imageFrame.size.height *= scale;
-        imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5f;
-        imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5f;
+        imageFrame.origin.x = CGRectGetMinX(safeFrame) + (CGRectGetWidth(safeFrame) - imageFrame.size.width) * 0.5f;
+        imageFrame.origin.y = CGRectGetMinY(safeFrame) + (CGRectGetHeight(safeFrame) - imageFrame.size.height) * 0.5f;
         self.imageView.frame = imageFrame;
     } else {
         self.imageView.frame = imageFrame;
-        self.imageView.center = (CGPoint){CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds)};
+        self.imageView.center = (CGPoint){CGRectGetMidX(safeFrame), CGRectGetMidY(safeFrame)};
     }
 }
 
