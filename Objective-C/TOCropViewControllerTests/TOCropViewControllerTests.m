@@ -109,6 +109,61 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     }];
 }
 
+// Camera photos are 8-bit Display P3, so stand one in, filled with a red outside sRGB's gamut
+- (UIImage *)displayP3PhotoWithSize:(CGSize)size {
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceDisplayP3);
+    CGContextRef context = CGBitmapContextCreate(NULL, (size_t)size.width, (size_t)size.height, 8, 0, colorSpace,
+                                                 (CGBitmapInfo)kCGImageAlphaNoneSkipLast);
+    const CGFloat red[] = {1.0f, 0.0f, 0.0f, 1.0f};
+    CGColorRef color = CGColorCreate(colorSpace, red);
+    CGContextSetFillColorWithColor(context, color);
+    CGContextFillRect(context, (CGRect){CGPointZero, size});
+    CGImageRef cgImage = CGBitmapContextCreateImage(context);
+    UIImage *image = [UIImage imageWithCGImage:cgImage];
+    CGImageRelease(cgImage);
+    CGColorRelease(color);
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    return image;
+}
+
+// A different colour in each quarter, so a crop landing in the wrong place shows up
+- (UIImage *)quarteredImageWithSize:(CGSize)size scale:(CGFloat)scale orientation:(UIImageOrientation)orientation {
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
+    format.scale = scale;
+    format.preferredRange = UIGraphicsImageRendererFormatRangeStandard;
+    UIImage *image = [[[UIGraphicsImageRenderer alloc] initWithSize:size format:format] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        CGFloat halfWidth = size.width * 0.5f;
+        CGFloat halfHeight = size.height * 0.5f;
+        [UIColor.redColor setFill];
+        [context fillRect:(CGRect){0, 0, halfWidth, halfHeight}];
+        [UIColor.greenColor setFill];
+        [context fillRect:(CGRect){halfWidth, 0, halfWidth, halfHeight}];
+        [UIColor.blueColor setFill];
+        [context fillRect:(CGRect){0, halfHeight, halfWidth, halfHeight}];
+        [UIColor.whiteColor setFill];
+        [context fillRect:(CGRect){halfWidth, halfHeight, halfWidth, halfHeight}];
+    }];
+    return [UIImage imageWithCGImage:image.CGImage scale:scale orientation:orientation];
+}
+
+// The colour of one of an image's pixels as it's displayed (ie, with its orientation applied)
+- (NSArray<NSNumber *> *)rgbaOfPixel:(CGPoint)pixel inImage:(UIImage *)image {
+    uint8_t rgba[4] = {0};
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+    CGContextRef context = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    CGContextSetInterpolationQuality(context, kCGInterpolationNone);
+    CGContextTranslateCTM(context, 0, 1);
+    CGContextScaleCTM(context, 1, -1);
+    CGContextTranslateCTM(context, -pixel.x, -pixel.y);
+    UIGraphicsPushContext(context);
+    [image drawInRect:(CGRect){CGPointZero, {image.size.width * image.scale, image.size.height * image.scale}}];
+    UIGraphicsPopContext();
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    return @[ @(rgba[0]), @(rgba[1]), @(rgba[2]), @(rgba[3]) ];
+}
+
 - (TOCropView *)cropViewWithImageSize:(CGSize)imageSize {
     TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:imageSize]];
     cropView.frame = (CGRect){0, 0, 320, 480};
@@ -946,6 +1001,57 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
     TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:(CGSize){1920, 190} dimensionSwapEnabled:YES viewWidth:375];
     [self rotateCropView:cropView times:1];
     XCTAssertLessThanOrEqual(TOCropPixelsOffAspectRatio(cropView.imageCropFrame, (CGSize){190, 1920}), 1.0);
+}
+
+- (void)testCroppingAPhotoKeepsItsEightBitWideColourFormat {
+    // Rendering the crop at 16 bits per channel doubles the memory a large photo takes,
+    // which is enough to crash a share extension, and converting it to sRGB would clip
+    // the photo's most saturated colours
+    UIImage *image = [self displayP3PhotoWithSize:(CGSize){400, 300}];
+    NSArray *crops = @[ @[ @0, @NO, [NSValue valueWithCGRect:(CGRect){50, 40, 200, 150}] ],
+                        @[ @90, @NO, [NSValue valueWithCGRect:(CGRect){40, 50, 150, 200}] ],
+                        @[ @0, @YES, [NSValue valueWithCGRect:(CGRect){50, 40, 150, 150}] ] ];
+    for (NSArray *crop in crops) {
+        UIImage *cropped = [image croppedImageWithFrame:[crop[2] CGRectValue] angle:[crop[0] integerValue] circularClip:[crop[1] boolValue]];
+        CFStringRef colorSpaceName = CGColorSpaceCopyName(CGImageGetColorSpace(cropped.CGImage));
+        XCTAssertEqual(CGImageGetBitsPerComponent(cropped.CGImage), 8, @"%@", crop);
+        XCTAssertTrue(colorSpaceName != NULL && CFEqual(colorSpaceName, kCGColorSpaceDisplayP3), @"%@ came out in %@", crop, colorSpaceName);
+        if (colorSpaceName) {
+            CFRelease(colorSpaceName);
+        }
+    }
+}
+
+- (void)testUnrotatedCropReusesThePhotosPixels {
+    // A crop that's only cut out of the photo, not rotated or clipped, needs no new bitmap
+    // at all. Sharing the photo's pixel buffer shows up as keeping its row length.
+    UIImage *image = [self displayP3PhotoWithSize:(CGSize){400, 300}];
+    UIImage *cropped = [image croppedImageWithFrame:(CGRect){50, 40, 120, 150} angle:0 circularClip:NO];
+    XCTAssertEqual(CGImageGetBytesPerRow(cropped.CGImage), CGImageGetBytesPerRow(image.CGImage));
+    XCTAssertEqual(cropped.imageOrientation, UIImageOrientationUp);
+}
+
+- (void)testUnrotatedCropsHaveTheRightPixels {
+    // The crop frame is in the image's displayed points, so it has to be mapped through the
+    // image's scale and orientation to find the right pixels
+    CGRect frame = (CGRect){30, 10, 60, 50};
+    for (NSNumber *orientation in @[ @(UIImageOrientationUp), @(UIImageOrientationRight), @(UIImageOrientationLeftMirrored) ]) {
+        for (NSNumber *scale in @[ @1, @2 ]) {
+            UIImage *image = [self quarteredImageWithSize:(CGSize){120, 80} scale:scale.floatValue orientation:orientation.integerValue];
+            UIImage *cropped = [image croppedImageWithFrame:frame angle:0 circularClip:NO];
+            XCTAssertEqualWithAccuracy(cropped.size.width, frame.size.width, FLT_EPSILON);
+            XCTAssertEqualWithAccuracy(cropped.size.height, frame.size.height, FLT_EPSILON);
+            for (NSValue *pointValue in @[ [NSValue valueWithCGPoint:(CGPoint){1, 1}], [NSValue valueWithCGPoint:(CGPoint){58, 1}],
+                                           [NSValue valueWithCGPoint:(CGPoint){1, 48}], [NSValue valueWithCGPoint:(CGPoint){58, 48}] ]) {
+                CGPoint point = pointValue.CGPointValue;
+                CGFloat pixelScale = scale.floatValue;
+                CGPoint croppedPixel = (CGPoint){point.x * pixelScale, point.y * pixelScale};
+                CGPoint sourcePixel = (CGPoint){(frame.origin.x + point.x) * pixelScale, (frame.origin.y + point.y) * pixelScale};
+                XCTAssertEqualObjects([self rgbaOfPixel:croppedPixel inImage:cropped], [self rgbaOfPixel:sourcePixel inImage:image],
+                                      @"Orientation %@, scale %@, point %@", orientation, scale, NSStringFromCGPoint(point));
+            }
+        }
+    }
 }
 
 @end
