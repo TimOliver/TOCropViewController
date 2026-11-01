@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController, CropViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     private let imageView = UIImageView()
+    @IBOutlet private weak var placeholderLabel: UILabel!
 
     private var image: UIImage?
     private var croppingStyle = CropViewCroppingStyle.default
@@ -91,6 +92,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
 
     public func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
         imageView.image = image
+        placeholderLabel.isHidden = true
         layoutImageView()
 
         self.navigationItem.leftBarButtonItem?.isEnabled = true
@@ -108,6 +110,11 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             self.imageView.isHidden = false
             cropViewController.dismiss(animated: true, completion: nil)
         }
+    }
+
+    func cropViewController(_ cropViewController: CropViewController, didFinishCancelled cancelled: Bool) {
+        placeholderLabel.isHidden = !cancelled
+        dismiss(animated: true)
     }
 
     override func viewDidLoad() {

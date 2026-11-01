@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) UIImage *image;          // The image we'll be cropping
 @property (nonatomic, strong) UIImageView *imageView;  // The image view to present the cropped image
+@property (nonatomic, weak) IBOutlet UILabel *placeholderLabel; // The prompt shown until an image is chosen
 
 @property (nonatomic, assign) TOCropViewCroppingStyle croppingStyle;  // The cropping style
 @property (nonatomic, assign) CGRect croppedFrame;
@@ -132,6 +133,7 @@
 
 - (void)updateImageViewWithImage:(UIImage *)image fromCropViewController:(TOCropViewController *)cropViewController {
     self.imageView.image = image;
+    self.placeholderLabel.hidden = (image != nil);
     [self layoutImageView];
 
     self.navigationItem.rightBarButtonItem.enabled = YES;
@@ -151,6 +153,11 @@
         self.imageView.hidden = NO;
         [cropViewController dismissViewControllerAnimated:YES completion:nil];
     }
+}
+
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled {
+    self.placeholderLabel.hidden = !cancelled;
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark - Image Layout -
