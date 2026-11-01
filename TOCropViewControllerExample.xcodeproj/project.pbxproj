@@ -47,7 +47,6 @@
 		223424731ABBC0CD00BBC2B1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424721ABBC0CD00BBC2B1 /* AppDelegate.m */; };
 		223424761ABBC0CD00BBC2B1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223424751ABBC0CD00BBC2B1 /* ViewController.m */; };
 		223424791ABBC0CD00BBC2B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223424771ABBC0CD00BBC2B1 /* Main.storyboard */; };
-		2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2234247A1ABBC0CD00BBC2B1 /* Images.xcassets */; };
 		2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2234247C1ABBC0CD00BBC2B1 /* LaunchScreen.xib */; };
 		2236AB4A1F595960005C5098 /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236AB491F59590E005C5098 /* ShareViewController.m */; };
 		2238CF231FC0269C0081B957 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2238CF221FC0269C0081B957 /* AppDelegate.swift */; };
@@ -166,7 +165,6 @@
 		223424741ABBC0CD00BBC2B1 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		223424751ABBC0CD00BBC2B1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		223424781ABBC0CD00BBC2B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		2234247A1ABBC0CD00BBC2B1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		2234247D1ABBC0CD00BBC2B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		2236AB471F59590E005C5098 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2236AB481F59590E005C5098 /* ShareViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareViewController.h; sourceTree = "<group>"; };
@@ -388,7 +386,6 @@
 				223424741ABBC0CD00BBC2B1 /* ViewController.h */,
 				223424751ABBC0CD00BBC2B1 /* ViewController.m */,
 				223424771ABBC0CD00BBC2B1 /* Main.storyboard */,
-				2234247A1ABBC0CD00BBC2B1 /* Images.xcassets */,
 				2234247C1ABBC0CD00BBC2B1 /* LaunchScreen.xib */,
 				2234246D1ABBC0CD00BBC2B1 /* Supporting Files */,
 			);
@@ -775,7 +772,6 @@
 			files = (
 				223424791ABBC0CD00BBC2B1 /* Main.storyboard in Resources */,
 				2234247E1ABBC0CD00BBC2B1 /* LaunchScreen.xib in Resources */,
-				2234247B1ABBC0CD00BBC2B1 /* Images.xcassets in Resources */,
 				22A105B52BC134A200DB3A80 /* PrivacyInfo.xcprivacy in Resources */,
 				22C3C5471AC8CA0D00E86280 /* TOCropViewControllerLocalizable.strings in Resources */,
 			);
