@@ -294,6 +294,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat fitScale = MIN(boundsSize.width / fullSizeRatio.width, boundsSize.height / fullSizeRatio.height);
         cropBoxSize = (CGSize){fullSizeRatio.width * fitScale, fullSizeRatio.height * fitScale};
 
+        // Floating point error can land the fitted size a hair outside the bounds, which costs
+        // the box a whole point when it's clamped into them, so keep it inside to begin with
+        cropBoxSize = (CGSize){MIN(cropBoxSize.width, boundsSize.width), MIN(cropBoxSize.height, boundsSize.height)};
+
         scale = MAX(cropBoxSize.width / imageSize.width, cropBoxSize.height / imageSize.height);
     }
 
@@ -1145,12 +1149,49 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.size.width = maxX - frame.origin.x;
     frame.size.height = maxY - frame.origin.y;
 
-    // A square crop box must produce a square image, which takes precedence over reaching an edge
-    if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
+    // A box locked to an aspect ratio must produce exactly that ratio, and a square crop box
+    // must produce a square image, both of which take precedence over reaching an edge
+    if (self.aspectRatioLockEnabled && self.hasAspectRatio) {
+        frame = [self imageCropFrame:frame fittedToLockedAspectRatioWithinImageSize:imageSize];
+    } else if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
         frame.size.width = frame.size.height = MIN(frame.size.width, frame.size.height);
     }
 
     return frame;
+}
+
+// Rounding the crop box to whole points can leave its crop several pixels away from the
+// locked aspect ratio, so work the shorter side out from the longer one (whose rounding
+// matters least), keeping the crop centred where it was and inside the image
+- (CGRect)imageCropFrame:(CGRect)frame fittedToLockedAspectRatioWithinImageSize:(CGSize)imageSize {
+    // The box may have swapped between portrait and landscape along with the image
+    CGFloat ratio = self.aspectRatio.width / self.aspectRatio.height;
+    BOOL cropBoxIsPortrait = self.cropBoxFrame.size.width < self.cropBoxFrame.size.height;
+    if ((ratio < 1.0f) != cropBoxIsPortrait) {
+        ratio = 1.0f / ratio;
+    }
+
+    CGSize size = frame.size;
+    if (ratio < 1.0f - FLT_EPSILON) {
+        size.width = roundf(size.height * ratio);
+        if (size.width > imageSize.width) {
+            size.width = imageSize.width;
+            size.height = roundf(size.width / ratio);
+        }
+    } else if (ratio > 1.0f + FLT_EPSILON) {
+        size.height = roundf(size.width / ratio);
+        if (size.height > imageSize.height) {
+            size.height = imageSize.height;
+            size.width = roundf(size.height * ratio);
+        }
+    } else {
+        size.width = size.height = MIN(size.width, size.height);
+    }
+
+    CGRect fittedFrame = (CGRect){{roundf(CGRectGetMidX(frame) - (size.width * 0.5f)), roundf(CGRectGetMidY(frame) - (size.height * 0.5f))}, size};
+    fittedFrame.origin.x = MAX(0.0f, MIN(fittedFrame.origin.x, imageSize.width - size.width));
+    fittedFrame.origin.y = MAX(0.0f, MIN(fittedFrame.origin.y, imageSize.height - size.height));
+    return fittedFrame;
 }
 
 - (void)setImageCropFrame:(CGRect)imageCropFrame {
@@ -1902,10 +1943,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self updateScrollViewMaximumZoomScale];
 
     // Turning all the way back around to the last edit restores it exactly, rather than
-    // re-deriving it through the scroll offset's rounding to whole points
-    if (self.angle == self.lockedRotationAngle && CGRectEqualToRect(cropBoxFrame, self.lockedRotationCropBoxFrame)) {
+    // re-deriving it through the scroll offset's rounding to whole points. Layout passes since
+    // then may have nudged the box along by a point, so move the offset along with it.
+    CGRect editedCropBoxFrame = self.lockedRotationCropBoxFrame;
+    if (self.angle == self.lockedRotationAngle && CGSizeEqualToSize(cropBoxFrame.size, editedCropBoxFrame.size)) {
+        CGPoint offset = self.lockedRotationContentOffset;
+        offset.x += CGRectGetMinX(editedCropBoxFrame) - CGRectGetMinX(cropBoxFrame);
+        offset.y += CGRectGetMinY(editedCropBoxFrame) - CGRectGetMinY(cropBoxFrame);
         self.scrollView.zoomScale = self.lockedRotationZoomScale;
-        self.scrollView.contentOffset = self.lockedRotationContentOffset;
+        self.scrollView.contentOffset = offset;
         [self matchForegroundToBackground];
         return;
     }
