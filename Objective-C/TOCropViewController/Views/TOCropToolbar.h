@@ -93,6 +93,10 @@ NS_ASSUME_NONNULL_BEGIN
 /* For languages like Arabic where they natively present content flipped from English */
 @property (nonatomic, assign) BOOL reverseContentLayout;
 
+/* When YES, the done button anchors to the bottom of the vertical strip layout instead
+ of the top (eg, keeping the primary action in thumb reach of a trailing-edge toolbar) */
+@property (nonatomic, assign) BOOL reverseVerticalContentLayout;
+
 /* Enable the reset button */
 @property (nonatomic, assign) BOOL resetButtonEnabled;
 

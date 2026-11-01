@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) UIImage *image;          // The image we'll be cropping
 @property (nonatomic, strong) UIImageView *imageView;  // The image view to present the cropped image
+@property (nonatomic, weak) IBOutlet UILabel *placeholderLabel; // The prompt shown until an image is chosen
 
 @property (nonatomic, assign) TOCropViewCroppingStyle croppingStyle;  // The cropping style
 @property (nonatomic, assign) CGRect croppedFrame;
@@ -132,6 +133,7 @@
 
 - (void)updateImageViewWithImage:(UIImage *)image fromCropViewController:(TOCropViewController *)cropViewController {
     self.imageView.image = image;
+    self.placeholderLabel.hidden = (image != nil);
     [self layoutImageView];
 
     self.navigationItem.rightBarButtonItem.enabled = YES;
@@ -153,6 +155,11 @@
     }
 }
 
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled {
+    self.placeholderLabel.hidden = !cancelled;
+    [self dismissModalViewControllerAnimated:YES];
+}
+
 #pragma mark - Image Layout -
 - (void)layoutImageView {
     if (self.imageView.image == nil)
@@ -160,9 +167,9 @@
 
     CGFloat padding = 20.0f;
 
-    CGRect viewFrame = self.view.bounds;
-    viewFrame.size.width -= (padding * 2.0f);
-    viewFrame.size.height -= ((padding * 2.0f));
+    // Fit within the safe area, so the image stays clear of the navigation bar
+    CGRect safeFrame = self.view.safeAreaLayoutGuide.layoutFrame;
+    CGRect viewFrame = CGRectInset(safeFrame, padding, padding);
 
     CGRect imageFrame = CGRectZero;
     imageFrame.size = self.imageView.image.size;
@@ -172,12 +179,12 @@
         CGFloat scale = MIN(viewFrame.size.width / imageFrame.size.width, viewFrame.size.height / imageFrame.size.height);
         imageFrame.size.width *= scale;
         imageFrame.size.height *= scale;
-        imageFrame.origin.x = (CGRectGetWidth(self.view.bounds) - imageFrame.size.width) * 0.5f;
-        imageFrame.origin.y = (CGRectGetHeight(self.view.bounds) - imageFrame.size.height) * 0.5f;
+        imageFrame.origin.x = CGRectGetMinX(safeFrame) + (CGRectGetWidth(safeFrame) - imageFrame.size.width) * 0.5f;
+        imageFrame.origin.y = CGRectGetMinY(safeFrame) + (CGRectGetHeight(safeFrame) - imageFrame.size.height) * 0.5f;
         self.imageView.frame = imageFrame;
     } else {
         self.imageView.frame = imageFrame;
-        self.imageView.center = (CGPoint){CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds)};
+        self.imageView.center = (CGPoint){CGRectGetMidX(safeFrame), CGRectGetMidY(safeFrame)};
     }
 }
 
@@ -207,7 +214,7 @@
                                                               profilePicker.allowsEditing = NO;
                                                               profilePicker.delegate = self;
                                                               profilePicker.preferredContentSize = CGSizeMake(512, 512);
-                                                              profilePicker.popoverPresentationController.barButtonItem = self.navigationItem.leftBarButtonItem;
+                                                              profilePicker.popoverPresentationController.sourceItem = self.navigationItem.leftBarButtonItem;
                                                               [self presentViewController:profilePicker animated:YES completion:nil];
                                                           }];
 
@@ -231,7 +238,7 @@
     [alertController setModalPresentationStyle:UIModalPresentationPopover];
 
     UIPopoverPresentationController *popPresenter = [alertController popoverPresentationController];
-    popPresenter.barButtonItem = self.navigationItem.leftBarButtonItem;
+    popPresenter.sourceItem = self.navigationItem.leftBarButtonItem;
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
@@ -241,7 +248,7 @@
 
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[self.imageView.image] applicationActivities:nil];
     activityController.modalPresentationStyle = UIModalPresentationPopover;
-    activityController.popoverPresentationController.barButtonItem = sender;
+    activityController.popoverPresentationController.sourceItem = sender;
     [self presentViewController:activityController animated:YES completion:nil];
 }
 

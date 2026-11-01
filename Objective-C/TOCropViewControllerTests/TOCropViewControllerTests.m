@@ -15,12 +15,22 @@
 #import "UIImage+CropRotate.h"
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
-// rotation, and drive the scroll view's touch hooks
-@interface TOCropView (UnitTests)
+// rotation, drive the scroll view's touch hooks, and stand in for a touch landing
+// on the crop box
+@interface TOCropView (UnitTests) <UIGestureRecognizerDelegate>
 - (void)startResetTimer;
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;
 @property (nonatomic, strong, readonly) TOCropScrollView *scrollView;
 @property (nonatomic, strong, readonly) NSTimer *resetTimer;
+@property (nonatomic, strong, readonly) UIPanGestureRecognizer *gridPanGestureRecognizer;
+@property (nonatomic, assign) CGPoint gridPanInitialPoint;
+@property (nonatomic, readonly) CGRect cropBoxFrame;
+@end
+
+// Expose the controller's layout decisions so tests can drive them with display sizes
+@interface TOCropViewController (UnitTests)
+@property (nonatomic, readonly) BOOL toolbarOnRightEdge;
+@property (nonatomic, readonly) BOOL verticalLayout;
 @end
 
 // UIScrollView won't report itself as dragging without a real touch sequence, so
@@ -38,6 +48,46 @@
 static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
     Method real = class_getInstanceMethod([UIScrollView class], @selector(isDragging));
     Method stub = class_getInstanceMethod([UIScrollView class], @selector(to_test_alwaysDragging));
+    method_exchangeImplementations(real, stub);
+    block();
+    method_exchangeImplementations(real, stub);
+}
+
+// Likewise, a gesture recognizer only reports an active state mid-touch, so stand
+// in for the crop box pan having claimed the touch while a block runs
+@interface UIGestureRecognizer (TOCropTestActivePan)
+- (UIGestureRecognizerState)to_test_alwaysChangedState;
+@end
+
+@implementation UIGestureRecognizer (TOCropTestActivePan)
+- (UIGestureRecognizerState)to_test_alwaysChangedState {
+    return UIGestureRecognizerStateChanged;
+}
+@end
+
+static void TOCropRunWhileCropBoxPanIsActive(void (^block)(void)) {
+    Method real = class_getInstanceMethod([UIGestureRecognizer class], @selector(state));
+    Method stub = class_getInstanceMethod([UIGestureRecognizer class], @selector(to_test_alwaysChangedState));
+    method_exchangeImplementations(real, stub);
+    block();
+    method_exchangeImplementations(real, stub);
+}
+
+// A view only reports safe area insets once it's in a window, so stand in for the
+// home indicator inset of an edge-to-edge layout while a block runs
+@interface UIView (TOCropTestSafeArea)
+- (UIEdgeInsets)to_test_homeIndicatorSafeAreaInsets;
+@end
+
+@implementation UIView (TOCropTestSafeArea)
+- (UIEdgeInsets)to_test_homeIndicatorSafeAreaInsets {
+    return (UIEdgeInsets){0, 0, 34, 0};
+}
+@end
+
+static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
+    Method real = class_getInstanceMethod([UIView class], @selector(safeAreaInsets));
+    Method stub = class_getInstanceMethod([UIView class], @selector(to_test_homeIndicatorSafeAreaInsets));
     method_exchangeImplementations(real, stub);
     block();
     method_exchangeImplementations(real, stub);
@@ -153,6 +203,164 @@ static void TOCropRunWhileScrollViewIsDragging(void (^block)(void)) {
         cropView.scrollView.touchesCancelled();
     });
     XCTAssertNil(cropView.resetTimer, @"a pan taking over the touch must not arm the reset timer");
+}
+
+- (void)testRestingCropBoxCentersWhenFullyZoomedOut {
+    // Mimic the squat display side toolbar layout: a trailing inset for the toolbar,
+    // and a bottom inset that is purely the home indicator's safe area
+    TOCropView *(^makeCropView)(CGSize) = ^(CGSize imageSize) {
+        TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:imageSize]];
+        cropView.frame = (CGRect){0, 0, 466, 678};
+        cropView.cropRegionInsets = (UIEdgeInsets){0, 0, 34, 70};
+        [cropView performInitialSetup];
+        return cropView;
+    };
+
+    TOCropRunWhileViewHasBottomSafeArea(^{
+        // Fully zoomed out, the crop box rests perfectly vertically centered
+        TOCropView *cropView = makeCropView((CGSize){40, 20});
+        XCTAssertEqualWithAccuracy(CGRectGetMidY(cropView.cropBoxFrame), 678.0 / 2.0, 1.5,
+                                   @"a fully zoomed out crop box must be vertically centered");
+
+        // Zooming into a subregion of the image offsets it clear of the safe area
+        [cropView setImageCropFrame:(CGRect){10, 5, 20, 10}];
+        XCTAssertEqualWithAccuracy(CGRectGetMidY(cropView.cropBoxFrame), 322.0, 1.5,
+                                   @"a zoomed in crop box must offset clear of the bottom inset");
+    });
+
+    // When the bottom inset is more than the safe area (eg, the bottom toolbar
+    // layout), the box keeps centering within the inset region as always
+    TOCropView *toolbarCropView = makeCropView((CGSize){40, 20});
+    XCTAssertEqualWithAccuracy(CGRectGetMidY(toolbarCropView.cropBoxFrame), 322.0, 1.5,
+                               @"an accessory view's bottom inset must keep offsetting the crop box");
+}
+
+- (void)testRestingCropBoxFillingTheHeightKeepsTheWholeImage {
+    // An image tall enough to fill the content height has no room to shift down into the
+    // safe area, so it must keep its regular layout rather than being clipped at the bottom
+    void (^checkLayout)(CGSize, CGRect, UIEdgeInsets, NSString *) = ^(CGSize imageSize, CGRect frame, UIEdgeInsets insets, NSString *label) {
+        TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:imageSize]];
+        cropView.frame = frame;
+        cropView.cropRegionInsets = insets;
+        [cropView performInitialSetup];
+
+        XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, imageSize.height, imageSize.height * 0.01,
+                                   @"%@: an untouched crop must cover the whole image", label);
+        XCTAssertFalse(cropView.canBeReset, @"%@: an untouched crop must not be resettable", label);
+
+        // A layout pass re-centers the crop box every time, which must leave it be
+        [cropView moveCroppedContentToCenterAnimated:NO];
+        XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, imageSize.height, imageSize.height * 0.01,
+                                   @"%@: re-centering must not clip the image", label);
+        XCTAssertFalse(cropView.canBeReset, @"%@: re-centering must not make the crop resettable", label);
+
+        // And resetting must land back on the same untouched state
+        [cropView resetLayoutToDefaultAnimated:NO];
+        XCTAssertFalse(cropView.canBeReset, @"%@: resetting must clear the resettable state", label);
+    };
+
+    TOCropRunWhileViewHasBottomSafeArea(^{
+        // A tall image alongside the squat display side toolbar
+        checkLayout((CGSize){1080, 1920}, (CGRect){0, 0, 466, 678}, (UIEdgeInsets){0, 0, 34, 70}, @"squat portrait");
+        // A photo on a regular phone in landscape, beside the leading edge toolbar
+        checkLayout((CGSize){4032, 3024}, (CGRect){0, 0, 874, 402}, (UIEdgeInsets){0, 70, 21, 62}, @"phone landscape");
+    });
+}
+
+- (void)testSideToolbarHugsTheTrailingEdgeOnSquatDisplays {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    // A folding phone's cover display earns the trailing edge toolbar in both orientations
+    controller.view.frame = (CGRect){0, 0, 466, 678};
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat portrait display must use the trailing edge toolbar");
+    controller.view.frame = (CGRect){0, 0, 678, 466};
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat landscape display must use the trailing edge toolbar");
+
+    // While regular phones keep the strip on the leading edge in landscape
+    controller.view.frame = (CGRect){0, 0, 874, 402};
+    XCTAssertFalse(controller.toolbarOnRightEdge, @"a regular landscape phone keeps the leading edge toolbar");
+}
+
+- (void)testRegularWidthPortraitReturnsToTheBottomToolbar {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    // The unfolded inner display in portrait has iPad-like room (regular width),
+    // so the toolbar returns to the bottom like the iPad layout
+    controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassRegular;
+    controller.view.frame = (CGRect){0, 0, 669, 951};
+    XCTAssertTrue(controller.verticalLayout, @"a regular width squat portrait layout must use the bottom toolbar");
+
+    // While its landscape orientation keeps the trailing edge strip
+    controller.view.frame = (CGRect){0, 0, 951, 669};
+    XCTAssertFalse(controller.verticalLayout, @"landscape must keep the side toolbar");
+    XCTAssertTrue(controller.toolbarOnRightEdge, @"a squat landscape display must keep the trailing edge toolbar");
+
+    // And the compact cover display keeps the side toolbar even in portrait
+    controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
+    controller.view.frame = (CGRect){0, 0, 466, 678};
+    XCTAssertFalse(controller.verticalLayout, @"a compact squat portrait display must keep the side toolbar");
+}
+
+- (void)testUncroppedCropBoxSurvivesRotationRoundTrips {
+    // A large image, so any screen-space rounding drift shows up in image space
+    TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+    cropView.frame = (CGRect){0, 0, 320, 480};
+    [cropView performInitialSetup];
+    CGRect before = cropView.imageCropFrame;
+
+    // Mimic the controller's device rotation dance through two full round trips
+    for (NSInteger i = 0; i < 4; i++) {
+        [cropView prepareforRotation];
+        cropView.frame = (i % 2 == 0) ? (CGRect){0, 0, 480, 320} : (CGRect){0, 0, 320, 480};
+        [cropView performRelayoutForRotation];
+        [cropView moveCroppedContentToCenterAnimated:NO];
+    }
+
+    // An untouched crop must come back bit for bit, not slightly shrunken
+    CGRect after = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(after.origin.x, before.origin.x, 1.0, @"the crop must not drift sideways across rotations");
+    XCTAssertEqualWithAccuracy(after.origin.y, before.origin.y, 1.0, @"the crop must not drift downwards across rotations");
+    XCTAssertEqualWithAccuracy(after.size.width, before.size.width, 1.0, @"the crop must not narrow across rotations");
+    XCTAssertEqualWithAccuracy(after.size.height, before.size.height, 1.0, @"the crop must not shrink across rotations");
+}
+
+- (void)testCropBoxPanJudgesTheTouchDownPointNotTheDriftedOne {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+    CGRect gridFrame = cropView.gridOverlayView.frame;
+
+    // A pan only recognises after the finger has already travelled, so the begin
+    // check must judge where the touch first landed, not where the finger is now.
+    // Landing on the box's bottom line grabs it, wherever the finger has moved to
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame)};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch on the grid line must begin the crop box resize");
+
+    // The 44pt grab band is centered on the line: 22pt inside or outside still grabs
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame) - 21.0f};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch just inside the grid line must begin the crop box resize");
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMaxY(gridFrame) + 21.0f};
+    XCTAssertTrue([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                  @"a touch just outside the grid line must begin the crop box resize");
+
+    // While a touch in the box's middle pans the image instead
+    cropView.gridPanInitialPoint = (CGPoint){CGRectGetMidX(gridFrame), CGRectGetMidY(gridFrame)};
+    XCTAssertFalse([cropView gestureRecognizerShouldBegin:cropView.gridPanGestureRecognizer],
+                   @"a touch in the middle of the crop box must not resize it");
+}
+
+- (void)testResetTimerIsNotArmedWhenTheCropBoxPanCancelsTheTouch {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){40, 20}];
+
+    cropView.scrollView.touchesBegan();
+    XCTAssertNil(cropView.resetTimer, @"editing should have cancelled any pending reset");
+
+    // When the crop box resizing pan recognises, it cancels the touches the scroll
+    // view was receiving, with the user's finger still down on the crop box handle
+    TOCropRunWhileCropBoxPanIsActive(^{
+        cropView.scrollView.touchesCancelled();
+    });
+    XCTAssertNil(cropView.resetTimer, @"the crop box pan taking over must not arm the reset timer");
 }
 
 - (void)testResetTimerIsArmedWhenAnIdleTouchIsInterrupted {

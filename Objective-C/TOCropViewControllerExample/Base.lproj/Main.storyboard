@@ -37,6 +37,9 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="sbt-5v-FBk"/>
+                    <connections>
+                        <outlet property="placeholderLabel" destination="SiC-JY-tpF" id="Plh-dL-b1o"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ORJ-Ax-cXt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

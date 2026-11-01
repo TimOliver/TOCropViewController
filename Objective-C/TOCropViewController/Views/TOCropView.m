@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) TOCropViewOverlayEdge tappedEdge;   /* The edge region that the user tapped on, to resize the cropping region */
 @property (nonatomic, assign) CGRect cropOriginFrame;             /* When resizing, this is the original frame of the crop box. */
 @property (nonatomic, assign) CGPoint panOriginPoint;             /* The initial touch point of the pan gesture recognizer */
+@property (nonatomic, assign) CGPoint gridPanInitialPoint;        /* Where the crop box pan's touch first landed, captured before the pan recognizes */
 @property (nonatomic, assign, readwrite) CGRect cropBoxFrame;     /* The frame, in relation to to this view where the grid, and crop container view are aligned */
 @property (nonatomic, strong) NSTimer *resetTimer;                /* The timer used to reset the view after the user stops interacting with it */
 @property (nonatomic, assign) BOOL editing;                       /* Used to denote the active state of the user manipulating the content */
@@ -299,7 +300,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect frame = CGRectZero;
     frame.size = self.hasAspectRatio ? cropBoxSize : scaledSize;
     frame.origin.x = floorf(bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f));
-    frame.origin.y = floorf(bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f));
+    frame.origin.y = floorf([self restingOriginYForHeight:frame.size.height zoomScale:self.scrollView.minimumZoomScale]);
     self.cropBoxFrame = frame;
 
     // set the fully zoomed out state initially
@@ -310,8 +311,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // is in the center of the cropbox
     if (frame.size.width < scaledSize.width - FLT_EPSILON || frame.size.height < scaledSize.height - FLT_EPSILON) {
         CGPoint offset = CGPointZero;
-        offset.x = -floorf(CGRectGetMidX(bounds) - (scaledSize.width * 0.5f));
-        offset.y = -floorf(CGRectGetMidY(bounds) - (scaledSize.height * 0.5f));
+        offset.x = -floorf(CGRectGetMidX(frame) - (scaledSize.width * 0.5f));
+        offset.y = -floorf(CGRectGetMidY(frame) - (scaledSize.height * 0.5f));
         self.scrollView.contentOffset = offset;
     }
 
@@ -334,6 +335,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)performRelayoutForRotation {
+    // An untouched crop is laid out from scratch instead of rescaled, so repeated
+    // rotations can never accumulate rounding drift into the cropped region
+    if (!self.canBeReset) {
+        [self layoutInitialImage];
+        return;
+    }
+
     CGRect cropFrame = self.cropBoxFrame;
     CGRect contentFrame = self.contentBounds;
 
@@ -347,7 +355,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     cropFrame.size.width = floorf(cropFrame.size.width * scale);
     cropFrame.size.height = floorf(cropFrame.size.height * scale);
     cropFrame.origin.x = floorf(contentFrame.origin.x + ((contentFrame.size.width - cropFrame.size.width) * 0.5f));
-    cropFrame.origin.y = floorf(contentFrame.origin.y + ((contentFrame.size.height - cropFrame.size.height) * 0.5f));
+    cropFrame.origin.y = floorf([self restingOriginYForHeight:cropFrame.size.height zoomScale:self.scrollView.zoomScale]);
     self.cropBoxFrame = cropFrame;
 
     [self captureStateForImageRotation];
@@ -361,8 +369,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     normalizedCenter.x = contentCenter.x / self.rotationContentSize.width;
     normalizedCenter.y = contentCenter.y / self.rotationContentSize.height;
 
-    // Work out the new content offset by applying the normalized values to the new layout
-    CGPoint newMidPoint = (CGPoint){CGRectGetMidX(self.contentBounds), CGRectGetMidY(self.contentBounds)};
+    // Work out the new content offset by applying the normalized values to the new layout,
+    // centered under wherever the crop box came to rest
+    CGPoint newMidPoint = (CGPoint){CGRectGetMidX(self.cropBoxFrame), CGRectGetMidY(self.cropBoxFrame)};
 
     CGPoint translatedContentOffset = CGPointZero;
     translatedContentOffset.x = self.scrollView.contentSize.width * normalizedCenter.x;
@@ -765,7 +774,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = CGRectZero;
     cropBoxFrame.size = frame.size;
     cropBoxFrame.origin.x = floorf(CGRectGetMidX(bounds) - (frame.size.width * 0.5f));
-    cropBoxFrame.origin.y = floorf(CGRectGetMidY(bounds) - (frame.size.height * 0.5f));
+    cropBoxFrame.origin.y = floorf([self restingOriginYForHeight:frame.size.height zoomScale:self.scrollView.zoomScale]);
     self.cropBoxFrame = cropBoxFrame;
 
     frame.origin.x = ceilf((scaledOffset.x * scale) - self.scrollView.contentInset.left);
@@ -779,7 +788,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         [self startEditing];
-        self.panOriginPoint = point;
+        // Anchor the drag at the point the touch landed on, so the edge it grabbed
+        // resolves correctly and the crop box tracks the full extent of the drag
+        self.panOriginPoint = self.gridPanInitialPoint;
         self.cropOriginFrame = self.cropBoxFrame;
         self.tappedEdge = [self cropEdgeForPoint:self.panOriginPoint];
     }
@@ -805,7 +816,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (gestureRecognizer != self.gridPanGestureRecognizer)
         return YES;
 
-    CGPoint tapPoint = [gestureRecognizer locationInView:self];
+    // Judge the touch by where it first landed: by the time the pan recognizes,
+    // the finger of a brisk drag has already drifted well away from the grid line
+    // it grabbed
+    CGPoint tapPoint = self.gridPanInitialPoint;
 
     CGRect frame = self.gridOverlayView.frame;
     CGRect innerFrame = CGRectInset(frame, 22.0f, 22.0f);
@@ -820,6 +834,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if (self.gridPanGestureRecognizer.state == UIGestureRecognizerStateChanged) {
         return NO;
+    }
+    // A pan only recognizes once the finger has travelled some distance, so capture
+    // where the touch actually landed while it is still fresh - by recognition time,
+    // a brisk drag that started on a grid line has long since left it
+    if (gestureRecognizer == self.gridPanGestureRecognizer) {
+        self.gridPanInitialPoint = [touch locationInView:self];
     }
     return YES;
 }
@@ -841,13 +861,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 // A cancelled touch doesn't imply the interaction is over: the scroll view cancels the
 // touches it delivered as a normal part of its own pan or pinch recognizer taking over,
-// which happens with the user's finger still down. While one of those is underway the
-// scroll view's delegate arms the timer for us once it finishes, so arming it here as
-// well would trigger a reset mid-gesture. What's left is a touch cancelled while nothing
-// is scrolling - an incoming call or system alert - which would otherwise leave the crop
-// view stuck in its editing appearance.
+// and the crop box resizing pan does the same when it claims a touch near the box's
+// edges, all with the user's finger still down. While one of those is underway, the
+// recognizer that took over arms the timer itself once it finishes, so arming it here
+// as well would trigger a reset mid-gesture. What's left is a touch cancelled while
+// nothing took over - an incoming call or system alert - which would otherwise leave
+// the crop view stuck in its editing appearance.
 - (void)handleScrollViewTouchCancellation {
-    if (self.scrollView.isDragging || self.scrollView.isZooming || self.scrollView.isDecelerating) {
+    BOOL cropBoxPanActive = self.gridPanGestureRecognizer.state == UIGestureRecognizerStateBegan ||
+                            self.gridPanGestureRecognizer.state == UIGestureRecognizerStateChanged;
+    if (cropBoxPanActive || self.scrollView.isDragging || self.scrollView.isZooming || self.scrollView.isDecelerating) {
         return;
     }
 
@@ -1301,12 +1324,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGFloat scale = MIN(CGRectGetWidth(contentRect) / CGRectGetWidth(cropFrame), CGRectGetHeight(contentRect) / CGRectGetHeight(cropFrame));
 
     CGPoint focusPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
-    CGPoint midPoint = (CGPoint){CGRectGetMidX(contentRect), CGRectGetMidY(contentRect)};
 
     cropFrame.size.width = ceilf(cropFrame.size.width * scale);
     cropFrame.size.height = ceilf(cropFrame.size.height * scale);
     cropFrame.origin.x = contentRect.origin.x + ceilf((contentRect.size.width - cropFrame.size.width) * 0.5f);
-    cropFrame.origin.y = contentRect.origin.y + ceilf((contentRect.size.height - cropFrame.size.height) * 0.5f);
+    cropFrame.origin.y = ceilf([self restingOriginYForHeight:cropFrame.size.height zoomScale:(self.scrollView.zoomScale * scale)]);
+
+    // The content will re-center under wherever the crop box comes to rest
+    CGPoint midPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
 
     // Work out the point on the scroll content that the focusPoint is aiming at
     CGPoint contentTargetPoint = CGPointZero;
@@ -1606,7 +1631,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
-    newCropFrame.origin.y = floorf(CGRectGetMidY(contentBounds) - (newCropFrame.size.height * 0.5f));
+    newCropFrame.origin.y = floorf([self restingOriginYForHeight:newCropFrame.size.height zoomScale:self.scrollView.zoomScale]);
 
     // If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = nil;
@@ -1673,7 +1698,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // If we're animated, play an animation of the snapshot view rotating,
     // then fade it out over the live content
     if (animated) {
-        snapshotView.center = (CGPoint){CGRectGetMidX(contentBounds), CGRectGetMidY(contentBounds)};
+        snapshotView.center = (CGPoint){CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
         [self addSubview:snapshotView];
 
         self.backgroundContainerView.hidden = YES;
@@ -1772,6 +1797,32 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 #pragma mark - Convienience Methods -
+// Where the top of a resting crop box of the given height should sit for a given zoom level.
+// While the image is fully zoomed out, the box sits perfectly vertically centered
+// over a bottom inset that is purely the safe area (eg, the home indicator region
+// alongside the side toolbar); once zoomed in, or when an accessory view occupies
+// the bottom inset, it offsets to sit centered within the crop region insets.
+// Either way, it never extends past the bottom of the content region, since the
+// crop box frame setter would clip its height (eg, an image filling the height).
+- (CGFloat)restingOriginYForHeight:(CGFloat)height zoomScale:(CGFloat)zoomScale {
+    CGRect contentRect = self.contentBounds;
+    CGFloat bottomInset = self.cropRegionInsets.bottom;
+
+    // Allow a sliver of tolerance, as the zoom scale accrues rounding noise
+    // whenever the crop box is scaled back up to fill the content region
+    BOOL fullyZoomedOut = zoomScale <= (self.scrollView.minimumZoomScale * 1.01f);
+    BOOL bottomInsetIsSafeArea = (bottomInset > FLT_EPSILON) &&
+                                 (bottomInset <= self.safeAreaInsets.bottom + FLT_EPSILON);
+
+    CGFloat midY = CGRectGetMidY(contentRect);
+    if (fullyZoomedOut && bottomInsetIsSafeArea) {
+        midY += bottomInset * 0.5f;
+    }
+
+    // Floor the limit, so callers rounding the result up can't overshoot it
+    return MIN(midY - (height * 0.5f), floorf(CGRectGetMaxY(contentRect) - height));
+}
+
 - (CGRect)contentBounds {
     CGRect contentRect = CGRectZero;
     contentRect.origin.x = self.cropViewPadding + self.cropRegionInsets.left;

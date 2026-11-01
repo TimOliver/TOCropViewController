@@ -121,7 +121,9 @@
     if (@available(iOS 26.0, *)) {
 #if !TARGET_OS_VISION
         UIButtonConfiguration *configuration = [UIButtonConfiguration prominentGlassButtonConfiguration];
-        configuration.baseForegroundColor = [UIColor labelColor];
+        // The prominent glass capsule takes on the done button's bright accent color,
+        // so keep the icon black for contrast instead of following the label color
+        configuration.baseForegroundColor = [UIColor blackColor];
 #else
         UIButtonConfiguration *configuration = [UIButtonConfiguration filledButtonConfiguration];
 #endif
@@ -289,18 +291,23 @@
         }
         [self layoutToolbarButtons:buttonsInOrderHorizontally withSameButtonSize:buttonSize inContainerRect:containerRect horizontally:YES];
     } else {
+        // The done button normally leads the strip at the top; reversed, it anchors to
+        // the bottom instead so the primary action stays within thumb reach
+        UIButton *topButton = self.reverseVerticalContentLayout ? self.cancelIconButton : self.doneIconButton;
+        UIButton *bottomButton = self.reverseVerticalContentLayout ? self.doneIconButton : self.cancelIconButton;
+
         CGRect frame = CGRectZero;
         frame.size.height = 44.0f;
         frame.size.width = 44.0f;
         frame.origin.y = CGRectGetHeight(self.bounds) - 44.0f;
-        self.cancelIconButton.frame = frame;
+        bottomButton.frame = frame;
 
         frame.origin.y = self.statusBarHeightInset;
         frame.size.width = 44.0f;
         frame.size.height = 44.0f;
-        self.doneIconButton.frame = frame;
+        topButton.frame = frame;
 
-        CGRect containerRect = (CGRect){0, CGRectGetMaxY(self.doneIconButton.frame), 44.0f, CGRectGetMinY(self.cancelIconButton.frame) - CGRectGetMaxY(self.doneIconButton.frame)};
+        CGRect containerRect = (CGRect){0, CGRectGetMaxY(topButton.frame), 44.0f, CGRectGetMinY(bottomButton.frame) - CGRectGetMaxY(topButton.frame)};
 
 #if TOCROPTOOLBAR_DEBUG_SHOWING_BUTTONS_CONTAINER_RECT
         containerView.frame = containerRect;
@@ -653,10 +660,15 @@
 
 + (UIImage *)resetImage {
     if (@available(iOS 13.0, *)) {
-        return [[UIImage systemImageNamed:@"arrow.counterclockwise"
+        // A revert arrow, rather than a circular one that reads as a third rotate button.
+        // iOS 13 only knows the symbol by its original name.
+        NSString *symbolName = @"arrow.uturn.left";
+        if (@available(iOS 14.0, *)) {
+            symbolName = @"arrow.uturn.backward";
+        }
+        return [[UIImage systemImageNamed:symbolName
                         withConfiguration:[UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightSemibold]]
             imageWithBaselineOffsetFromBottom:0];
-        ;
     }
 
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:(CGSize){22, 18}];
@@ -754,6 +766,14 @@
 }
 - (UIButton *)rotateButton {
     return self.rotateCounterclockwiseButton;
+}
+
+- (void)setReverseVerticalContentLayout:(BOOL)reverseVerticalContentLayout {
+    if (_reverseVerticalContentLayout == reverseVerticalContentLayout) {
+        return;
+    }
+    _reverseVerticalContentLayout = reverseVerticalContentLayout;
+    [self setNeedsLayout];
 }
 
 - (void)setStatusBarHeightInset:(CGFloat)statusBarHeightInset {
