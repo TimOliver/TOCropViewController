@@ -203,6 +203,9 @@
  will swap it's dimensions depending on portrait or landscape sized images.
  This value also controls whether the dimensions can swap when the image is rotated.
 
+ When NO, a locked crop box keeps its shape while the image turns underneath it. Set this
+ to YES to have the crop box turn with the image instead, which is what the Photos app does.
+
  Default is NO.
  */
 @property (nonatomic, assign) BOOL aspectRatioLockDimensionSwapEnabled;

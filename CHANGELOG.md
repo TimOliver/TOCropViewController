@@ -6,6 +6,10 @@ Unreleased
 - Dismissing the crop view controller removed the presenting view controller's view when that controller wasn't full screen (such as a sheet, form sheet or popover), or when the crop view controller itself was presented over full screen. ([#486](https://github.com/TimOliver/TOCropViewController/issues/486))
 - Clearing `transitioningDelegate` to opt out of the custom transition had no effect, as it was installed again when the view loaded. ([#503](https://github.com/TimOliver/TOCropViewController/issues/503))
 - Tapping Done without making any changes, or after resetting, returned an image a few pixels smaller than the original (eg, 4032×3019 for a 4032×3024 photo), and each 90° rotation shaved off more. Crops that reach an edge of the image now include it exactly. ([#471](https://github.com/TimOliver/TOCropViewController/issues/471))
+- With a locked aspect ratio, each 90° rotation zoomed further into the image, and rotating without animation (including setting `angle`) left the crop box in the wrong orientation. The crop box now keeps its shape while the image turns underneath it, zooming in only as far as it needs to, and rotating all the way around returns to the original crop. ([#638](https://github.com/TimOliver/TOCropViewController/issues/638))
+- Switching between aspect ratio presets could slide the crop towards the image's left or top edge instead of keeping it centred. ([#354](https://github.com/TimOliver/TOCropViewController/issues/354))
+- Very wide or tall locked aspect ratios (such as 1920:190) were distorted by the minimum crop box size, especially after rotating. ([#309](https://github.com/TimOliver/TOCropViewController/issues/309))
+- With `aspectRatioLockDimensionSwapEnabled` on, rotating after choosing an aspect ratio could jump to a different part of the image. ([#374](https://github.com/TimOliver/TOCropViewController/issues/374))
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================
