@@ -1108,4 +1108,45 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
                                 NSStringFromCGRect(cropController.toolbar.frame), NSStringFromCGRect(cropController.titleLabel.frame));
 }
 
+- (void)testDoneWhileTheImageIsPulledPastTheCropBoxCommitsWhereItComesToRest {
+    // Mid-drag, or while it bounces back after one, the image can be pulled well past the edges of
+    // the crop box, but what gets committed should be the crop it's about to spring back to
+    UIWindow *window = [self presentationTestWindow];
+    TOCropViewController *cropController = [self cropControllerEmbeddedInWindow:window frame:window.bounds configuration:nil];
+    TOCropView *cropView = cropController.cropView;
+    UIScrollView *scrollView = cropView.scrollView;
+
+    __block CGRect committedFrame = CGRectNull;
+    cropController.onDidCropImageToRect = ^(CGRect cropRect, NSInteger angle) {
+        committedFrame = cropRect;
+    };
+
+    for (NSNumber *zoom in @[ @1, @2 ]) {
+        scrollView.zoomScale = scrollView.minimumZoomScale * zoom.floatValue;
+
+        // At rest, the content can go no further than lining its edges up with the crop box's
+        CGRect cropBoxFrame = cropView.cropBoxFrame;
+        CGFloat leftmost = -CGRectGetMinX(cropBoxFrame), rightmost = scrollView.contentSize.width - CGRectGetMaxX(cropBoxFrame);
+        CGFloat topmost = -CGRectGetMinY(cropBoxFrame), bottommost = scrollView.contentSize.height - CGRectGetMaxY(cropBoxFrame);
+        CGFloat middleX = (leftmost + rightmost) * 0.5f, middleY = (topmost + bottommost) * 0.5f;
+
+        NSArray<NSArray<NSValue *> *> *pulls = @[
+            @[ @((CGPoint){leftmost - 150, middleY}), @((CGPoint){leftmost, middleY}) ],
+            @[ @((CGPoint){rightmost + 150, middleY}), @((CGPoint){rightmost, middleY}) ],
+            @[ @((CGPoint){middleX, topmost - 150}), @((CGPoint){middleX, topmost}) ],
+            @[ @((CGPoint){middleX, bottommost + 150}), @((CGPoint){middleX, bottommost}) ],
+            @[ @((CGPoint){rightmost + 1000, bottommost + 1000}), @((CGPoint){rightmost, bottommost}) ],
+        ];
+        for (NSArray<NSValue *> *pull in pulls) {
+            scrollView.contentOffset = pull[1].CGPointValue;
+            CGRect restingFrame = cropView.imageCropFrame;
+
+            scrollView.contentOffset = pull[0].CGPointValue;
+            [cropController commitCurrentCrop];
+            XCTAssertTrue(CGRectEqualToRect(committedFrame, restingFrame), @"At %@x zoom, pulled to %@: committed %@, but it comes to rest on %@", zoom,
+                          NSStringFromCGPoint(pull[0].CGPointValue), NSStringFromCGRect(committedFrame), NSStringFromCGRect(restingFrame));
+        }
+    }
+}
+
 @end
