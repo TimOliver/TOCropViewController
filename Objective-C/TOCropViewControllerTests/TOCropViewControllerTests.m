@@ -162,6 +162,44 @@ static CGFloat TOCropAspectRatioOfRect(CGRect rect) {
     return rect.size.width / rect.size.height;
 }
 
+// How many pixels a crop's shorter side is from what the aspect ratio says it should be,
+// which should never be more than rounding it to a whole pixel
+static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
+    CGFloat ratioValue = ratio.width / ratio.height;
+    if (ratioValue >= 1.0f) {
+        return fabs(rect.size.height - (rect.size.width / ratioValue));
+    }
+    return fabs(rect.size.width - (rect.size.height * ratioValue));
+}
+
+// Sweeps phone-sized views for each image size and ratio, reporting the first crop that's
+// more than a pixel off its ratio
+- (void)assertExactRatioCropsForRatios:(NSArray<NSValue *> *)ratios
+                             imageSizes:(NSArray<NSValue *> *)imageSizes
+                         cropViewMaker:(TOCropView * (^)(UIImage *image, CGSize ratio, CGRect frame))makeCropView {
+    NSInteger failures = 0;
+    NSString *firstFailure = nil;
+    for (NSValue *imageSizeValue in imageSizes) {
+        UIImage *image = [self testImageWithSize:imageSizeValue.CGSizeValue];
+        for (NSValue *ratioValue in ratios) {
+            CGSize ratio = ratioValue.CGSizeValue;
+            for (CGFloat width = 300.0f; width <= 460.0f; width += 2.0f) {
+                CGRect frame = (CGRect){0, 0, width, 874};
+                CGRect cropFrame = makeCropView(image, ratio, frame).imageCropFrame;
+                if (TOCropPixelsOffAspectRatio(cropFrame, ratio) > 1.0f) {
+                    failures++;
+                    if (firstFailure == nil) {
+                        firstFailure = [NSString stringWithFormat:@"%@ for %@ on a %@ image in a %@ view",
+                                        NSStringFromCGSize(cropFrame.size), NSStringFromCGSize(ratio),
+                                        NSStringFromCGSize(image.size), NSStringFromCGSize(frame.size)];
+                    }
+                }
+            }
+        }
+    }
+    XCTAssertEqual(failures, 0, @"Got %@ (and %ld others)", firstFailure, (long)MAX(0, failures - 1));
+}
+
 // The rounding that loses pixels only shows up at some view sizes, so check a
 // spread of phone-sized views and report the first one that goes wrong
 - (void)assertCropFrameAcrossViewWidthsForImageSize:(CGSize)imageSize
@@ -843,6 +881,71 @@ static CGFloat TOCropAspectRatioOfRect(CGRect rect) {
 
     XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.width, squareFrame.size.width, 2.0);
     XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, squareFrame.size.height, 2.0);
+}
+
+- (void)testSquarePresetGivesASquareCropAtEveryViewSize {
+    // Fitting the preset to the view can land a hair over the view's width, which mustn't
+    // cost the box a whole point of width and leave it one point off square
+    UIImage *image = [self testImageWithSize:(CGSize){4032, 3024}];
+    NSInteger failures = 0;
+    NSString *firstFailure = nil;
+    for (CGFloat width = 300.0f; width <= 460.0f; width += 1.0f) {
+        for (CGFloat height = 700.0f; height <= 940.0f; height += 60.0f) {
+            TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:image
+                                                                             frame:(CGRect){0, 0, width, height}
+                                                                     configuration:^(TOCropView *cropView) {
+                                                                         cropView.aspectRatio = (CGSize){1, 1};
+                                                                     }];
+            CGSize boxSize = cropView.cropBoxFrame.size;
+            CGSize cropSize = cropView.imageCropFrame.size;
+            if (boxSize.width != boxSize.height || cropSize.width != cropSize.height) {
+                failures++;
+                if (firstFailure == nil) {
+                    firstFailure = [NSString stringWithFormat:@"box %@ and crop %@ in a %gx%g view",
+                                    NSStringFromCGSize(boxSize), NSStringFromCGSize(cropSize), width, height];
+                }
+            }
+        }
+    }
+    XCTAssertEqual(failures, 0, @"Got %@ (and %ld others)", firstFailure, (long)MAX(0, failures - 1));
+}
+
+- (void)testLockedPresetCropsHaveTheExactRatio {
+    [self assertExactRatioCropsForRatios:@[ @((CGSize){4, 5}), @((CGSize){3, 2}), @((CGSize){16, 9}) ]
+                              imageSizes:@[ @((CGSize){4032, 3024}), @((CGSize){3024, 4032}) ]
+                          cropViewMaker:^TOCropView *(UIImage *image, CGSize ratio, CGRect frame) {
+                              return [self cropViewLaidOutLikeTheControllerWithImage:image frame:frame configuration:^(TOCropView *cropView) {
+                                  cropView.aspectRatioLockEnabled = YES;
+                                  cropView.aspectRatio = ratio;
+                              }];
+                          }];
+}
+
+- (void)testPresetChosenFromThePickerHasTheExactRatio {
+    // The controller applies a picked preset to a crop view that's already laid out, then locks it
+    [self assertExactRatioCropsForRatios:@[ @((CGSize){4, 5}), @((CGSize){3, 2}), @((CGSize){16, 9}) ]
+                              imageSizes:@[ @((CGSize){4032, 3024}) ]
+                          cropViewMaker:^TOCropView *(UIImage *image, CGSize ratio, CGRect frame) {
+                              TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:image frame:frame];
+                              [cropView setAspectRatio:ratio animated:NO];
+                              cropView.aspectRatioLockEnabled = YES;
+                              return cropView;
+                          }];
+}
+
+- (void)testExtremeLockedRatioStaysExactWhenRotated {
+    CGSize ratio = (CGSize){1920, 190};
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:ratio dimensionSwapEnabled:NO viewWidth:375];
+    XCTAssertLessThanOrEqual(TOCropPixelsOffAspectRatio(cropView.imageCropFrame, ratio), 1.0);
+
+    [self rotateCropView:cropView times:1];
+    XCTAssertLessThanOrEqual(TOCropPixelsOffAspectRatio(cropView.imageCropFrame, ratio), 1.0);
+}
+
+- (void)testSwappedExtremeRatioIsExactWhenRotated {
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:(CGSize){1920, 190} dimensionSwapEnabled:YES viewWidth:375];
+    [self rotateCropView:cropView times:1];
+    XCTAssertLessThanOrEqual(TOCropPixelsOffAspectRatio(cropView.imageCropFrame, (CGSize){190, 1920}), 1.0);
 }
 
 @end

@@ -10,6 +10,8 @@ Unreleased
 - Switching between aspect ratio presets could slide the crop towards the image's left or top edge instead of keeping it centred. ([#354](https://github.com/TimOliver/TOCropViewController/issues/354))
 - Very wide or tall locked aspect ratios (such as 1920:190) were distorted by the minimum crop box size, especially after rotating. ([#309](https://github.com/TimOliver/TOCropViewController/issues/309))
 - With `aspectRatioLockDimensionSwapEnabled` on, rotating after choosing an aspect ratio could jump to a different part of the image. ([#374](https://github.com/TimOliver/TOCropViewController/issues/374))
+- At some view sizes, an aspect ratio preset's crop box came out a point narrower than it should, so a square preset didn't produce a square image. ([#637](https://github.com/TimOliver/TOCropViewController/issues/637))
+- Crops locked to an aspect ratio could be up to 20 pixels away from that ratio in the final image. They now match it to the nearest pixel. ([#333](https://github.com/TimOliver/TOCropViewController/issues/333))
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================
