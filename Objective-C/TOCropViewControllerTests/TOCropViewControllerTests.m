@@ -16,7 +16,7 @@
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
 // rotation, drive the scroll view's touch hooks, and stand in for a touch landing
-// on the crop box
+// on the crop box or dragging its corners and edges
 @interface TOCropView (UnitTests) <UIGestureRecognizerDelegate>
 - (void)startResetTimer;
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;
@@ -25,6 +25,12 @@
 @property (nonatomic, strong, readonly) UIPanGestureRecognizer *gridPanGestureRecognizer;
 @property (nonatomic, assign) CGPoint gridPanInitialPoint;
 @property (nonatomic, readonly) CGRect cropBoxFrame;
+@property (nonatomic, readonly) CGRect contentBounds;
+@property (nonatomic, assign) CGPoint panOriginPoint;
+@property (nonatomic, assign) CGRect cropOriginFrame;
+@property (nonatomic, assign) NSInteger tappedEdge;
+- (NSInteger)cropEdgeForPoint:(CGPoint)point;
+- (void)updateCropBoxFrameWithGesturePoint:(CGPoint)point;
 @end
 
 // Expose the controller's layout decisions so tests can drive them with display sizes
@@ -278,6 +284,71 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
     }
     XCTAssertEqual(failures, 0, @"Expected %@ but got %@ (and %ld other view sizes)",
                    NSStringFromCGRect(expectedFrame), firstFailure, (long)MAX(0, failures - 1));
+}
+
+// The crop box's corners and edges, clockwise from the top left, each as the direction it points out of the box
+static const CGPoint kTOCropBoxHandles[8] = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
+static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top right", @"right", @"bottom right", @"bottom", @"bottom left", @"left"};
+
+// Drags one of the crop box's corners or edges out by a distance (or in, when it's negative) a step
+// at a time, the way a touch moves, calling the block after each step
+- (void)dragCropBoxOfCropView:(TOCropView *)cropView handle:(NSInteger)handle by:(CGFloat)distance afterEachStep:(void (^)(void))afterEachStep {
+    CGRect frame = cropView.cropBoxFrame;
+    CGPoint direction = kTOCropBoxHandles[handle];
+    CGPoint touch = (CGPoint){CGRectGetMidX(frame) + (direction.x * CGRectGetWidth(frame) * 0.5f),
+                              CGRectGetMidY(frame) + (direction.y * CGRectGetHeight(frame) * 0.5f)};
+    cropView.panOriginPoint = touch;
+    cropView.cropOriginFrame = frame;
+    cropView.tappedEdge = [cropView cropEdgeForPoint:touch];
+
+    const NSInteger steps = 20;
+    for (NSInteger step = 1; step <= steps; step++) {
+        CGFloat travelled = distance * step / steps;
+        [cropView updateCropBoxFrameWithGesturePoint:(CGPoint){touch.x + (direction.x * travelled), touch.y + (direction.y * travelled)}];
+        if (afterEachStep) {
+            afterEachStep();
+        }
+    }
+}
+
+// Runs each sequence of drags (pairs of a handle and a distance) on a fresh crop box locked to each of a
+// spread of ratios, on landscape and portrait images, reporting the first step of any of them that leaves
+// the box out of its ratio, smaller than its minimum size, or outside the content
+- (void)assertLockedCropBoxKeepsItsShapeThroughDrags:(NSArray<NSArray<NSArray<NSNumber *> *> *> *)sequences {
+    NSArray<NSValue *> *ratios = @[ [NSValue valueWithCGSize:(CGSize){1, 1}], [NSValue valueWithCGSize:(CGSize){16, 9}],
+                                    [NSValue valueWithCGSize:(CGSize){9, 16}], [NSValue valueWithCGSize:(CGSize){4, 3}],
+                                    [NSValue valueWithCGSize:(CGSize){3, 4}] ];
+    NSArray<NSValue *> *imageSizes = @[ [NSValue valueWithCGSize:(CGSize){400, 300}], [NSValue valueWithCGSize:(CGSize){300, 400}] ];
+
+    __block NSInteger failures = 0;
+    __block NSString *firstFailure = nil;
+    for (NSValue *imageSizeValue in imageSizes) {
+        for (NSValue *ratioValue in ratios) {
+            CGSize ratio = ratioValue.CGSizeValue;
+            for (NSArray<NSArray<NSNumber *> *> *sequence in sequences) {
+                TOCropView *cropView = [self cropViewWithImageSize:imageSizeValue.CGSizeValue lockedRatio:ratio dimensionSwapEnabled:NO viewWidth:402];
+                CGRect contentBounds = CGRectInset(cropView.contentBounds, -1.0f, -1.0f);
+                NSMutableArray<NSString *> *drags = [NSMutableArray array];
+                for (NSArray<NSNumber *> *drag in sequence) {
+                    [drags addObject:[NSString stringWithFormat:@"the %@ by %@", kTOCropBoxHandleNames[drag[0].integerValue], drag[1]]];
+                    [self dragCropBoxOfCropView:cropView handle:drag[0].integerValue by:drag[1].floatValue afterEachStep:^{
+                        CGRect frame = cropView.cropBoxFrame;
+                        if (TOCropPixelsOffAspectRatio(frame, ratio) <= 1.0f && MIN(frame.size.width, frame.size.height) >= 41.0f &&
+                            CGRectContainsRect(contentBounds, frame)) {
+                            return;
+                        }
+                        failures++;
+                        if (firstFailure == nil) {
+                            firstFailure = [NSString stringWithFormat:@"%@ dragging %@, at %@ on a %@ image", NSStringFromCGRect(frame),
+                                            [drags componentsJoinedByString:@" then "], NSStringFromCGSize(ratio),
+                                            NSStringFromCGSize(imageSizeValue.CGSizeValue)];
+                        }
+                    }];
+                }
+            }
+        }
+    }
+    XCTAssertEqual(failures, 0, @"The locked crop box went out of shape: %@ (and %ld other steps)", firstFailure, (long)MAX(0, failures - 1));
 }
 
 // The custom transition only runs for animated presentations from a view controller
@@ -1145,6 +1216,58 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
             [cropController commitCurrentCrop];
             XCTAssertTrue(CGRectEqualToRect(committedFrame, restingFrame), @"At %@x zoom, pulled to %@: committed %@, but it comes to rest on %@", zoom,
                           NSStringFromCGPoint(pull[0].CGPointValue), NSStringFromCGRect(committedFrame), NSStringFromCGRect(restingFrame));
+        }
+    }
+}
+
+- (void)testLockedCropBoxKeepsItsShapeWhenDraggedOutAgainstTheEdgeOfTheContent {
+    // Shrinking the box from a corner leaves it up against the content's edges on the far side, so
+    // dragging it out again before it re-centres used to stop one side at an edge while the other kept going
+    NSMutableArray<NSArray<NSArray<NSNumber *> *> *> *sequences = [NSMutableArray array];
+    for (NSInteger corner = 0; corner < 8; corner += 2) {
+        for (NSInteger handle = 0; handle < 8; handle++) {
+            [sequences addObject:@[ @[ @(corner), @-120 ], @[ @(handle), @400 ] ]];
+        }
+    }
+    [self assertLockedCropBoxKeepsItsShapeThroughDrags:sequences];
+}
+
+- (void)testLockedCropBoxKeepsItsShapeWhenShrunkAllTheWay {
+    // The long side used to stop at the minimum size of a short one, while the short side kept shrinking
+    NSMutableArray<NSArray<NSArray<NSNumber *> *> *> *sequences = [NSMutableArray array];
+    for (NSInteger handle = 0; handle < 8; handle++) {
+        [sequences addObject:@[ @[ @(handle), @-1000 ] ]];
+    }
+    [self assertLockedCropBoxKeepsItsShapeThroughDrags:sequences];
+}
+
+- (void)testLockedCropBoxKeepsItsShapeAtEveryStepOfADrag {
+    // Dragging an edge used to size the other side to match where the box was a step earlier, so it
+    // went out of shape while it moved
+    NSMutableArray<NSArray<NSArray<NSNumber *> *> *> *sequences = [NSMutableArray array];
+    for (NSInteger handle = 0; handle < 8; handle++) {
+        [sequences addObject:@[ @[ @(handle), @-150 ] ]];
+    }
+    [self assertLockedCropBoxKeepsItsShapeThroughDrags:sequences];
+}
+
+- (void)testLockedCropBoxDraggedByAnEdgeSlidesAlongTheContentToGrow {
+    // Dragging out the bottom edge of a box that's up against the left or right of the content grows it
+    // as far as there's room for, sliding it away from that side rather than stopping it
+    for (NSValue *ratioValue in @[ [NSValue valueWithCGSize:(CGSize){1, 1}], [NSValue valueWithCGSize:(CGSize){16, 9}], [NSValue valueWithCGSize:(CGSize){3, 4}] ]) {
+        CGSize ratio = ratioValue.CGSizeValue;
+        for (NSNumber *corner in @[ @0, @2 ]) {
+            TOCropView *cropView = [self cropViewWithImageSize:(CGSize){400, 300} lockedRatio:ratio dimensionSwapEnabled:NO viewWidth:402];
+            CGRect contentBounds = cropView.contentBounds;
+            [self dragCropBoxOfCropView:cropView handle:corner.integerValue by:-120 afterEachStep:nil];
+            CGFloat roomBelow = CGRectGetMaxY(contentBounds) - CGRectGetMinY(cropView.cropBoxFrame);
+            CGFloat expectedWidth = MIN(CGRectGetWidth(contentBounds), roomBelow * ratio.width / ratio.height);
+
+            [self dragCropBoxOfCropView:cropView handle:5 by:1000 afterEachStep:nil];
+            XCTAssertEqualWithAccuracy(CGRectGetWidth(cropView.cropBoxFrame), expectedWidth, 1.0f, @"At %@, after shrinking from the %@, it grew to %@",
+                                       NSStringFromCGSize(ratio), kTOCropBoxHandleNames[corner.integerValue], NSStringFromCGRect(cropView.cropBoxFrame));
+            XCTAssertLessThanOrEqual(TOCropPixelsOffAspectRatio(cropView.cropBoxFrame, ratio), 1.0f, @"At %@, after shrinking from the %@, it grew to %@",
+                                     NSStringFromCGSize(ratio), kTOCropBoxHandleNames[corner.integerValue], NSStringFromCGRect(cropView.cropBoxFrame));
         }
     }
 }
