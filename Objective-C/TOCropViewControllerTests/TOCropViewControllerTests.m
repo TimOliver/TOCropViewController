@@ -1272,4 +1272,24 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     }
 }
 
+- (void)testLockedCropBoxGrowsBackOutFromEveryCornerAndEdge {
+    // A locked box shrunk from any corner or edge can be dragged back out from it again, the
+    // same as one that isn't locked, rather than only from its bottom and right
+    for (NSValue *ratioValue in @[ [NSValue valueWithCGSize:(CGSize){1, 1}], [NSValue valueWithCGSize:(CGSize){16, 9}], [NSValue valueWithCGSize:(CGSize){3, 4}] ]) {
+        CGSize ratio = ratioValue.CGSizeValue;
+        for (NSInteger handle = 0; handle < 8; handle++) {
+            TOCropView *cropView = [self cropViewWithImageSize:(CGSize){400, 300} lockedRatio:ratio dimensionSwapEnabled:NO viewWidth:402];
+            CGRect startFrame = cropView.cropBoxFrame;
+            [self dragCropBoxOfCropView:cropView handle:handle by:-120 afterEachStep:nil];
+            [self dragCropBoxOfCropView:cropView handle:handle by:120 afterEachStep:nil];
+
+            CGRect frame = cropView.cropBoxFrame;
+            BOOL grewBack = fabs(CGRectGetMinX(frame) - CGRectGetMinX(startFrame)) <= 1.0f && fabs(CGRectGetMinY(frame) - CGRectGetMinY(startFrame)) <= 1.0f &&
+                            fabs(CGRectGetWidth(frame) - CGRectGetWidth(startFrame)) <= 1.0f && fabs(CGRectGetHeight(frame) - CGRectGetHeight(startFrame)) <= 1.0f;
+            XCTAssertTrue(grewBack, @"At %@, shrinking from the %@ and dragging it back out left %@ instead of %@", NSStringFromCGSize(ratio),
+                          kTOCropBoxHandleNames[handle], NSStringFromCGRect(frame), NSStringFromCGRect(startFrame));
+        }
+    }
+}
+
 @end

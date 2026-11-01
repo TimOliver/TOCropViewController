@@ -612,14 +612,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     // Which point of the box stays put, as a fraction of its width and height, and how much the drag
-    // scales the box by. A corner goes by the average of how far it's dragged each way, and dragging
-    // the top or left of the box can only shrink it
+    // scales the box by. A corner goes by the average of how far it's dragged each way
     CGPoint anchor = (CGPoint){0.5f, 0.5f};
     CGFloat scale = 1.0f;
     switch (self.tappedEdge) {
     case TOCropViewOverlayEdgeLeft:
         anchor = (CGPoint){1.0f, 0.5f};
-        scale = 1.0f - (MAX(delta.x, 0) / width);
+        scale = 1.0f - (delta.x / width);
         break;
     case TOCropViewOverlayEdgeRight:
         anchor = (CGPoint){0.0f, 0.5f};
@@ -627,7 +626,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         break;
     case TOCropViewOverlayEdgeTop:
         anchor = (CGPoint){0.5f, 1.0f};
-        scale = 1.0f - (MAX(delta.y, 0) / height);
+        scale = 1.0f - (delta.y / height);
         break;
     case TOCropViewOverlayEdgeBottom:
         anchor = (CGPoint){0.5f, 0.0f};
@@ -635,11 +634,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         break;
     case TOCropViewOverlayEdgeTopLeft:
         anchor = (CGPoint){1.0f, 1.0f};
-        scale = ((1.0f - (MAX(delta.x, 0) / width)) + (1.0f - (MAX(delta.y, 0) / height))) * 0.5f;
+        scale = ((1.0f - (delta.x / width)) + (1.0f - (delta.y / height))) * 0.5f;
         break;
     case TOCropViewOverlayEdgeTopRight:
         anchor = (CGPoint){0.0f, 1.0f};
-        scale = ((1.0f + (MIN(delta.x, 0) / width)) + (1.0f - (MAX(delta.y, 0) / height))) * 0.5f;
+        scale = ((1.0f + (delta.x / width)) + (1.0f - (delta.y / height))) * 0.5f;
         break;
     case TOCropViewOverlayEdgeBottomLeft:
         anchor = (CGPoint){1.0f, 0.0f};
