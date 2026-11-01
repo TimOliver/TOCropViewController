@@ -1109,10 +1109,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     UIEdgeInsets edgeInsets = self.scrollView.contentInset;
     CGFloat scale = MIN(imageSize.width / contentSize.width, imageSize.height / contentSize.height);
 
+    // Mid-drag, or while it bounces back from one, the content can be pulled past the edges of the
+    // crop box. Work the crop out from where it's about to come to rest, with the content's edges no
+    // further in than the crop box's, so the crop is never squeezed by an edge it has been pulled past.
+    contentOffset.x = MAX(-edgeInsets.left, MIN(contentOffset.x, contentSize.width - CGRectGetWidth(cropBoxFrame) - edgeInsets.left));
+    contentOffset.y = MAX(-edgeInsets.top, MIN(contentOffset.y, contentSize.height - CGRectGetHeight(cropBoxFrame) - edgeInsets.top));
+
     CGRect frame = CGRectZero;
 
     // Calculate the normalized origin, clamped inside the image so the size
-    // subtraction below can never go negative (eg, during rubber-band overscroll)
+    // subtraction below can never go negative
     frame.origin.x = floorf((floorf(contentOffset.x) + edgeInsets.left) * (imageSize.width / contentSize.width));
     frame.origin.x = MAX(0, MIN(frame.origin.x, imageSize.width));
 

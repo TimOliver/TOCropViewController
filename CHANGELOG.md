@@ -16,6 +16,7 @@ Unreleased
 - With the toolbar at the top, it could sit under the status bar whenever the crop view controller couldn't hide it, such as on iPhones without a notch when embedded in another view controller or when view controller-based status bar appearance is turned off. ([#475](https://github.com/TimOliver/TOCropViewController/issues/475))
 - With a title set, a top toolbar was positioned from where the title had been on an earlier layout pass, so it could overlap the title or leave a gap below it. ([#475](https://github.com/TimOliver/TOCropViewController/issues/475))
 - When embedded as a child view controller, the crop view was sized to the parent's view instead of its own, so any part of it below a shorter frame was hidden. ([#367](https://github.com/TimOliver/TOCropViewController/issues/367))
+- Tapping Done while the image was being dragged past the crop box, or while it was still bouncing back, committed a smaller crop than the one shown once it came to rest, or even an empty one. The crop is now the one it comes to rest on. ([#518](https://github.com/TimOliver/TOCropViewController/issues/518))
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================
