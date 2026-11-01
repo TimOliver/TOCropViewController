@@ -116,6 +116,44 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     return cropView;
 }
 
+// The custom transition only runs for animated presentations from a view controller
+// that's on screen, so give each presentation test a window of its own
+- (UIWindow *)presentationTestWindow {
+    UIWindowScene *scene = nil;
+    for (UIScene *candidate in UIApplication.sharedApplication.connectedScenes) {
+        if ([candidate isKindOfClass:[UIWindowScene class]]) {
+            scene = (UIWindowScene *)candidate;
+            break;
+        }
+    }
+
+    UIWindow *window = [[UIWindow alloc] initWithWindowScene:scene];
+    window.rootViewController = [[UIViewController alloc] init];
+    [window makeKeyAndVisible];
+    [self addTeardownBlock:^{
+        window.hidden = YES;
+    }];
+    return window;
+}
+
+- (void)presentViewController:(UIViewController *)viewController
+           fromViewController:(UIViewController *)presentingViewController
+                     animated:(BOOL)animated {
+    XCTestExpectation *presented = [self expectationWithDescription:@"Presented"];
+    [presentingViewController presentViewController:viewController animated:animated completion:^{
+        [presented fulfill];
+    }];
+    [self waitForExpectations:@[presented] timeout:5.0];
+}
+
+- (void)dismissViewController:(UIViewController *)viewController {
+    XCTestExpectation *dismissed = [self expectationWithDescription:@"Dismissed"];
+    [viewController dismissViewControllerAnimated:YES completion:^{
+        [dismissed fulfill];
+    }];
+    [self waitForExpectations:@[dismissed] timeout:5.0];
+}
+
 #pragma mark - Tests -
 
 - (void)testGridOverlayHiddenSetter {
@@ -537,6 +575,59 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
 
     CGFloat gapMidX = (CGRectGetMaxX(cancelFrame) + CGRectGetMinX(doneFrame)) * 0.5f;
     XCTAssertEqualWithAccuracy(CGRectGetMidX(toolsFrame), gapMidX, 1.0f);
+}
+
+- (void)testDismissingLeavesASheetPresenterOnScreen {
+    UIWindow *window = [self presentationTestWindow];
+    UIViewController *sheetController = [[UIViewController alloc] init];
+    sheetController.modalPresentationStyle = UIModalPresentationPageSheet;
+    [self presentViewController:sheetController fromViewController:window.rootViewController animated:NO];
+    CGRect sheetFrame = sheetController.view.frame;
+
+    // A sheet's view is never removed from its window, so the crop controller's
+    // transition mustn't move or resize it on the way out either
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    [self presentViewController:cropController fromViewController:sheetController animated:YES];
+    [self dismissViewController:cropController];
+
+    XCTAssertNotNil(sheetController.view.window);
+    XCTAssertTrue(CGRectEqualToRect(sheetController.view.frame, sheetFrame));
+}
+
+- (void)testDismissingOverFullScreenLeavesThePresenterOnScreen {
+    UIWindow *window = [self presentationTestWindow];
+    UIViewController *presentingController = window.rootViewController;
+
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    cropController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:cropController fromViewController:presentingController animated:YES];
+    [self dismissViewController:cropController];
+
+    XCTAssertNotNil(presentingController.view.window);
+}
+
+- (void)testDismissingFullScreenRestoresThePresenter {
+    UIWindow *window = [self presentationTestWindow];
+    UIViewController *presentingController = window.rootViewController;
+
+    // Full screen presentations take the presenter's view out of the window, so the
+    // transition is responsible for putting it back
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    [self presentViewController:cropController fromViewController:presentingController animated:YES];
+    [self dismissViewController:cropController];
+
+    XCTAssertNotNil(presentingController.view.window);
+    XCTAssertTrue(CGRectEqualToRect(presentingController.view.frame, window.bounds));
+}
+
+- (void)testTransitioningDelegateSetByTheHostIsKept {
+    // Hosts opt out of the custom transition by clearing this before presenting,
+    // so loading the view mustn't quietly install it again
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    cropController.transitioningDelegate = nil;
+    [cropController loadViewIfNeeded];
+
+    XCTAssertNil(cropController.transitioningDelegate);
 }
 
 @end

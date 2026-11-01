@@ -1,3 +1,11 @@
+Unreleased
+=============================================================
+
+## Fixed
+
+- Dismissing the crop view controller removed the presenting view controller's view when that controller wasn't full screen (such as a sheet, form sheet or popover), or when the crop view controller itself was presented over full screen. ([#486](https://github.com/TimOliver/TOCropViewController/issues/486))
+- Clearing `transitioningDelegate` to opt out of the custom transition had no effect, as it was installed again when the view loaded. ([#503](https://github.com/TimOliver/TOCropViewController/issues/503))
+
 3.2.0 Release Notes (2026-07-28)
 =============================================================
 

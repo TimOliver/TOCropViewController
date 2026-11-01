@@ -40,13 +40,19 @@
 
     // Work out which one is the crop view controller
     UIViewController *cropViewController = (self.isDismissing == NO) ? toViewController : fromViewController;
-    UIViewController *previousController = (self.isDismissing == NO) ? fromViewController : toViewController;
+
+    // Full screen presentations take the presenting view out of the window, so on the way
+    // out UIKit hands it back to be restored. Any other presentation (eg, from a sheet, or
+    // over full screen) leaves it where it was, and moving it into the container would see
+    // it torn down along with the container once the transition completes.
+    UIView *previousView = nil;
+    if (self.isDismissing) {
+        previousView = [transitionContext viewForKey:UITransitionContextToViewKey];
+    }
 
     // Just in case, match up the frame sizes
     cropViewController.view.frame = containerView.bounds;
-    if (self.isDismissing) {
-        previousController.view.frame = containerView.bounds;
-    }
+    previousView.frame = containerView.bounds;
 
     // Add the view layers beforehand as this will trigger the initial sets of layouts
     if (self.isDismissing == NO) {
@@ -56,8 +62,8 @@
         [cropViewController.view setNeedsLayout];
         [cropViewController.view layoutIfNeeded];
         [cropViewController viewDidLayoutSubviews];
-    } else {
-        [containerView insertSubview:previousController.view belowSubview:cropViewController.view];
+    } else if (previousView) {
+        [containerView insertSubview:previousView belowSubview:cropViewController.view];
     }
 
     // Perform any last UI updates now so we can potentially factor them into our calculations, but after
