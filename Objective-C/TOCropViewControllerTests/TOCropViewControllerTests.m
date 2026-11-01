@@ -119,13 +119,47 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
 // Lays a crop view out the way the controller does on its first layout pass, with
 // insets for a status bar above and a bottom toolbar below
 - (TOCropView *)cropViewLaidOutLikeTheControllerWithImage:(UIImage *)image frame:(CGRect)frame {
+    return [self cropViewLaidOutLikeTheControllerWithImage:image frame:frame configuration:nil];
+}
+
+// Hosts configure the crop view before it's presented, so apply any configuration
+// before the first layout pass
+- (TOCropView *)cropViewLaidOutLikeTheControllerWithImage:(UIImage *)image
+                                                    frame:(CGRect)frame
+                                            configuration:(void (^)(TOCropView *cropView))configuration {
     TOCropView *cropView = [[TOCropView alloc] initWithImage:image];
     cropView.frame = frame;
     cropView.cropRegionInsets = (UIEdgeInsets){59, 0, 94, 0};
+    if (configuration) {
+        configuration(cropView);
+    }
     [cropView moveCroppedContentToCenterAnimated:NO];
     [cropView performInitialSetup];
     [cropView moveCroppedContentToCenterAnimated:NO];
     return cropView;
+}
+
+- (TOCropView *)cropViewWithImageSize:(CGSize)imageSize
+                          lockedRatio:(CGSize)ratio
+                 dimensionSwapEnabled:(BOOL)dimensionSwapEnabled
+                            viewWidth:(CGFloat)viewWidth {
+    return [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:imageSize]
+                                                     frame:(CGRect){0, 0, viewWidth, 874}
+                                             configuration:^(TOCropView *cropView) {
+                                                 cropView.aspectRatioLockEnabled = YES;
+                                                 cropView.aspectRatioLockDimensionSwapEnabled = dimensionSwapEnabled;
+                                                 cropView.aspectRatio = ratio;
+                                             }];
+}
+
+- (void)rotateCropView:(TOCropView *)cropView times:(NSInteger)times {
+    for (NSInteger i = 0; i < times; i++) {
+        [cropView rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
+    }
+}
+
+static CGFloat TOCropAspectRatioOfRect(CGRect rect) {
+    return rect.size.width / rect.size.height;
 }
 
 // The rounding that loses pixels only shows up at some view sizes, so check a
@@ -705,6 +739,110 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
                                            }
                                        }
                                           expectFrame:(CGRect){CGPointZero, imageSize}];
+}
+
+- (void)testLockedRatioKeepsItsShapeWhenTheImageIsRotated {
+    // A locked crop box keeps its shape while the image turns underneath it, and only
+    // zooms in as far as it takes to keep the box filled by the now landscape image
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){3024, 4032} lockedRatio:(CGSize){3, 4} dimensionSwapEnabled:NO viewWidth:402];
+    [self rotateCropView:cropView times:1];
+
+    CGRect cropFrame = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(TOCropAspectRatioOfRect(cropFrame), 3.0 / 4.0, 0.002);
+    XCTAssertEqual(cropFrame.size.height, 3024);
+}
+
+- (void)testLockedRatioRotationAllTheWayAroundReturnsToTheStart {
+    for (NSValue *value in @[ @((CGSize){3024, 4032}), @((CGSize){4032, 3024}) ]) {
+        TOCropView *cropView = [self cropViewWithImageSize:value.CGSizeValue lockedRatio:(CGSize){3, 4} dimensionSwapEnabled:NO viewWidth:402];
+        CGRect startFrame = cropView.imageCropFrame;
+        [self rotateCropView:cropView times:4];
+        XCTAssertTrue(CGRectEqualToRect(cropView.imageCropFrame, startFrame), @"%@ came back as %@",
+                      NSStringFromCGRect(startFrame), NSStringFromCGRect(cropView.imageCropFrame));
+    }
+}
+
+- (void)testLockedRatioRotationAllTheWayAroundKeepsAnOffCentreCrop {
+    // A zoomed in crop near the image's edge comes back to the same place, rather than
+    // drifting or zooming further in with each turn
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:(CGSize){3, 4} dimensionSwapEnabled:NO viewWidth:402];
+    cropView.imageCropFrame = (CGRect){150, 300, 900, 1200};
+    CGRect startFrame = cropView.imageCropFrame;
+
+    [self rotateCropView:cropView times:4];
+
+    XCTAssertTrue(CGRectEqualToRect(cropView.imageCropFrame, startFrame), @"%@ came back as %@",
+                  NSStringFromCGRect(startFrame), NSStringFromCGRect(cropView.imageCropFrame));
+}
+
+- (void)testAnimatedLockedRatioRotationEndsWhereTheUnanimatedOneDoes {
+    UIWindow *window = [self presentationTestWindow];
+    TOCropView *animatedView = [self cropViewWithImageSize:(CGSize){3024, 4032} lockedRatio:(CGSize){3, 4} dimensionSwapEnabled:NO viewWidth:402];
+    [window.rootViewController.view addSubview:animatedView];
+    TOCropView *unanimatedView = [self cropViewWithImageSize:(CGSize){3024, 4032} lockedRatio:(CGSize){3, 4} dimensionSwapEnabled:NO viewWidth:402];
+
+    for (NSInteger i = 0; i < 2; i++) {
+        XCTestExpectation *rotated = [self expectationWithDescription:@"Rotated"];
+        [animatedView rotateImageNinetyDegreesAnimated:YES clockwise:NO completion:^(BOOL completed) {
+            [rotated fulfill];
+        }];
+        [self waitForExpectations:@[rotated] timeout:5.0];
+    }
+    [self rotateCropView:unanimatedView times:2];
+
+    XCTAssertTrue(CGRectEqualToRect(animatedView.imageCropFrame, unanimatedView.imageCropFrame), @"%@ vs %@",
+                  NSStringFromCGRect(animatedView.imageCropFrame), NSStringFromCGRect(unanimatedView.imageCropFrame));
+}
+
+- (void)testSwitchingBetweenTallPresetsKeepsTheCropCentred {
+    // These presets are too tall to fit a landscape image at its current zoom, so each
+    // one zooms out, which mustn't drag the crop towards the image's left edge
+    CGSize imageSize = (CGSize){4032, 3024};
+    TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:imageSize] frame:(CGRect){0, 0, 402, 874}];
+    for (NSValue *value in @[ @((CGSize){2, 3}), @((CGSize){3, 4}), @((CGSize){9, 16}), @((CGSize){2, 3}) ]) {
+        [cropView setAspectRatio:value.CGSizeValue animated:NO];
+        XCTAssertEqualWithAccuracy(CGRectGetMidX(cropView.imageCropFrame) / imageSize.width, 0.5, 0.01,
+                                   @"Off centre after switching to %@", NSStringFromCGSize(value.CGSizeValue));
+    }
+}
+
+- (void)testExtremeLockedRatioKeepsItsShape {
+    // The minimum crop box size mustn't stretch the short side of a very wide ratio
+    CGSize ratio = (CGSize){1920, 190};
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:ratio dimensionSwapEnabled:NO viewWidth:375];
+    XCTAssertEqualWithAccuracy(TOCropAspectRatioOfRect(cropView.imageCropFrame), ratio.width / ratio.height, 0.2);
+
+    [self rotateCropView:cropView times:1];
+    XCTAssertEqualWithAccuracy(TOCropAspectRatioOfRect(cropView.imageCropFrame), ratio.width / ratio.height, 0.2);
+}
+
+- (void)testExtremeRatioSwapsWithoutLosingItsShape {
+    CGSize ratio = (CGSize){1920, 190};
+    TOCropView *cropView = [self cropViewWithImageSize:(CGSize){4032, 3024} lockedRatio:ratio dimensionSwapEnabled:YES viewWidth:375];
+    [self rotateCropView:cropView times:1];
+
+    // Within the few percent that rounding a 34pt tall crop box to whole points costs
+    XCTAssertEqualWithAccuracy(TOCropAspectRatioOfRect(cropView.imageCropFrame), ratio.height / ratio.width, 0.005);
+}
+
+- (void)testSwappingRotationAfterChoosingARatioKeepsTheSameRegion {
+    // Rotating half way round with dimension swapping on shows the same part of the
+    // image, so the rotation state saved when the ratio was chosen has to match the box
+    CGSize imageSize = (CGSize){4032, 3024};
+    TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:imageSize]
+                                                                     frame:(CGRect){0, 0, 402, 874}
+                                                             configuration:^(TOCropView *cropView) {
+                                                                 cropView.aspectRatioLockDimensionSwapEnabled = YES;
+                                                             }];
+    cropView.imageCropFrame = (CGRect){400, 300, 2400, 1600};
+    [cropView setAspectRatio:(CGSize){1, 1} animated:NO];
+    cropView.aspectRatioLockEnabled = YES;
+    CGRect squareFrame = cropView.imageCropFrame;
+
+    [self rotateCropView:cropView times:2];
+
+    XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.width, squareFrame.size.width, 2.0);
+    XCTAssertEqualWithAccuracy(cropView.imageCropFrame.size.height, squareFrame.size.height, 2.0);
 }
 
 @end

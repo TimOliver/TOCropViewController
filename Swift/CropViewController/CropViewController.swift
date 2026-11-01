@@ -206,7 +206,9 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
 
     /**
      If true, a custom aspect ratio is set, and the aspectRatioLockEnabled is set to true, the crop box will swap it's dimensions depending on portrait or landscape sized images.  This value also controls whether the dimensions can swap when the image is rotated.
-     
+
+     When false, a locked crop box keeps its shape while the image turns underneath it. Set this to true to have the crop box turn with the image instead, which is what the Photos app does.
+
      Default is false.
      */
     public var aspectRatioLockDimensionSwapEnabled: Bool {

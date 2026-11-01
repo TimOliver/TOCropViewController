@@ -96,6 +96,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign) CGFloat baseMaximumZoomScale;          /* The absolute zoom ceiling for the current layout; the scroll view's own maximum is always derived from this */
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;        /* Disallow any input while the rotation animation is playing */
 
+/* 90-degree rotation state for a crop box locked to its aspect ratio, which keeps its shape while the image turns underneath it */
+@property (nonatomic, assign) CGRect lockedRotationImageCropFrame; /* The crop in image space as of the last edit, which every rotation is worked out from */
+@property (nonatomic, assign) NSInteger lockedRotationAngle;       /* The angle the image was at for that edit */
+@property (nonatomic, assign) CGRect lockedRotationCropBoxFrame;   /* The crop box at that edit, and the zoom and offset that framed it, */
+@property (nonatomic, assign) CGFloat lockedRotationZoomScale;     /* restored exactly when the image turns all the way back around */
+@property (nonatomic, assign) CGPoint lockedRotationContentOffset;
+
 /* Reset state data */
 @property (nonatomic, assign) CGSize originalCropBoxSize;    /* Save the original crop box size so we can tell when the content has been edited */
 @property (nonatomic, assign) CGPoint originalContentOffset; /* Save the original content offset so we can tell if it's been scrolled. */
@@ -255,6 +262,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     // Save the current layout state for later
     [self captureStateForImageRotation];
+    [self captureCropForLockedRotation];
 
     // Check if we performed any resetabble modifications
     [self checkForCanReset];
@@ -320,6 +328,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // save the current state for use with 90-degree rotations
     self.cropBoxLastEditedAngle = 0;
     [self captureStateForImageRotation];
+    [self captureCropForLockedRotation];
 
     // save the size for checking if we're in a resettable state
     self.originalCropBoxSize = self.resetAspectRatioEnabled ? scaledImageSize : self.cropBoxFrame.size;
@@ -1023,9 +1032,22 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGFloat maxHeight = (contentFrame.size.height + contentFrame.origin.y) - cropBoxFrame.origin.y;
     cropBoxFrame.size.height = floorf(MIN(cropBoxFrame.size.height, maxHeight));
 
-    // Make sure we can't make the crop box too small
-    cropBoxFrame.size.width = MAX(cropBoxFrame.size.width, kTOCropViewMinimumBoxSize);
-    cropBoxFrame.size.height = MAX(cropBoxFrame.size.height, kTOCropViewMinimumBoxSize);
+    // Make sure we can't make the crop box too small. A box locked to an aspect ratio grows
+    // both sides together so the ratio holds, and where a very wide or tall ratio can't grow
+    // that far within the content bounds, its short side is left under the minimum instead.
+    BOOL keepsAspectRatio = self.aspectRatioLockEnabled && self.hasAspectRatio &&
+                            cropBoxFrame.size.width > FLT_EPSILON && cropBoxFrame.size.height > FLT_EPSILON;
+    if (keepsAspectRatio) {
+        CGFloat growth = MAX(kTOCropViewMinimumBoxSize / cropBoxFrame.size.width, kTOCropViewMinimumBoxSize / cropBoxFrame.size.height);
+        growth = MIN(growth, MIN(maxWidth / cropBoxFrame.size.width, maxHeight / cropBoxFrame.size.height));
+        if (growth > 1.0f) {
+            cropBoxFrame.size.width = floorf(cropBoxFrame.size.width * growth);
+            cropBoxFrame.size.height = floorf(cropBoxFrame.size.height * growth);
+        }
+    } else {
+        cropBoxFrame.size.width = MAX(cropBoxFrame.size.width, kTOCropViewMinimumBoxSize);
+        cropBoxFrame.size.height = MAX(cropBoxFrame.size.height, kTOCropViewMinimumBoxSize);
+    }
 
     _cropBoxFrame = cropBoxFrame;
 
@@ -1138,6 +1160,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
 
     [self updateToImageCropFrame:imageCropFrame];
+    [self captureCropForLockedRotation];
 }
 
 - (void)setCroppingViewsHidden:(BOOL)hidden {
@@ -1306,9 +1329,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self.gridOverlayView setGridHidden:hidden animated:animated];
 
     if (resetCropbox) {
-        [self moveCroppedContentToCenterAnimated:animated];
-        [self captureStateForImageRotation];
-        self.cropBoxLastEditedAngle = self.angle;
+        // Save the edit for 90-degree rotations once the crop box has settled, which
+        // happens a moment later when animated
+        __weak typeof(self) weakSelf = self;
+        [self moveCroppedContentToCenterAnimated:animated
+                                     whenLaidOut:^{
+                                         [weakSelf captureStateForImageRotation];
+                                         [weakSelf captureCropForLockedRotation];
+                                         weakSelf.cropBoxLastEditedAngle = weakSelf.angle;
+                                     }];
     }
 
     if (animated == NO) {
@@ -1333,14 +1362,27 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated {
-    if (self.internalLayoutDisabled)
+    [self moveCroppedContentToCenterAnimated:animated whenLaidOut:nil];
+}
+
+// The block runs as soon as the crop box has its final frame, which when animated is
+// a moment after this returns (but before the animation itself has played out)
+- (void)moveCroppedContentToCenterAnimated:(BOOL)animated whenLaidOut:(void (^)(void))laidOut {
+    if (self.internalLayoutDisabled) {
+        if (laidOut) {
+            laidOut();
+        }
         return;
+    }
 
     CGRect contentRect = self.contentBounds;
     CGRect cropFrame = self.cropBoxFrame;
 
     // Ensure we only proceed after the crop frame has been setup for the first time
     if (cropFrame.size.width < FLT_EPSILON || cropFrame.size.height < FLT_EPSILON) {
+        if (laidOut) {
+            laidOut();
+        }
         return;
     }
 
@@ -1388,7 +1430,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             // On the first run, even though scale is exactly 1.0f, performing this multiplication introduces
             // a floating point noise that zooms the image in by about 5 pixels. This fixes that issue.
             if (scale < 1.0f - FLT_EPSILON || scale > 1.0f + FLT_EPSILON) {
-                strongSelf.scrollView.zoomScale *= scale;
+                // Rounding the crop box up to whole points can leave it needing slightly more zoom
+                // than the scale alone gives. Go that far now, as assigning the crop box below
+                // would otherwise force it after the content was scrolled into place, losing the
+                // scroll position (eg, snapping the crop to the image's left edge).
+                CGSize imageSize = strongSelf.backgroundContainerView.bounds.size;
+                CGFloat minimumZoomScale = MAX(cropFrame.size.width / imageSize.width, cropFrame.size.height / imageSize.height);
+                strongSelf.scrollView.zoomScale = MAX(strongSelf.scrollView.zoomScale * scale, minimumZoomScale);
                 strongSelf.scrollView.zoomScale = MIN(strongSelf.scrollView.maximumZoomScale, strongSelf.scrollView.zoomScale);
             }
 
@@ -1410,6 +1458,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     if (!animated) {
         translateBlock();
+        if (laidOut) {
+            laidOut();
+        }
         return;
     }
 
@@ -1423,6 +1474,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                             options:UIViewAnimationOptionBeginFromCurrentState
                          animations:translateBlock
                          completion:nil];
+
+        // The animation block has already applied the final values
+        if (laidOut) {
+            laidOut();
+        }
     });
 }
 
@@ -1468,7 +1524,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     CGRect boundsFrame = self.contentBounds;
     CGRect cropBoxFrame = self.cropBoxFrame;
-    CGPoint offset = self.scrollView.contentOffset;
+
+    // The point on the image at the middle of the crop, which the new crop is centred on
+    const CGPoint focusPoint = (CGPoint){self.scrollView.contentOffset.x + CGRectGetMidX(cropBoxFrame),
+                                         self.scrollView.contentOffset.y + CGRectGetMidY(cropBoxFrame)};
+    const CGFloat oldZoomScale = self.scrollView.zoomScale;
 
     BOOL cropBoxIsPortrait = NO;
     if ((NSInteger)aspectRatio.width == 1 && (NSInteger)aspectRatio.height == 1)
@@ -1480,7 +1540,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat newWidth = floorf(cropBoxFrame.size.height * (aspectRatio.width / aspectRatio.height));
         CGFloat delta = cropBoxFrame.size.width - newWidth;
         cropBoxFrame.size.width = newWidth;
-        offset.x += (delta * 0.5f);
 
         if (delta < FLT_EPSILON) {
             cropBoxFrame.origin.x = self.contentBounds.origin.x;  // set to 0 to avoid accidental clamping by the crop frame sanitizer
@@ -1494,11 +1553,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
             // Scale the new height
             CGFloat newHeight = cropBoxFrame.size.height * scale;
-            delta = cropBoxFrame.size.height - newHeight;
             cropBoxFrame.size.height = newHeight;
-
-            // Offset the Y position so it stays in the middle
-            offset.y += (delta * 0.5f);
 
             // Clamp the width to the bounds width
             cropBoxFrame.size.width = boundsWidth;
@@ -1508,7 +1563,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat newHeight = floorf(cropBoxFrame.size.width * (aspectRatio.height / aspectRatio.width));
         CGFloat delta = cropBoxFrame.size.height - newHeight;
         cropBoxFrame.size.height = newHeight;
-        offset.y += (delta * 0.5f);
 
         if (delta < FLT_EPSILON) {
             cropBoxFrame.origin.y = self.contentBounds.origin.y;
@@ -1522,11 +1576,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
             // Scale the new width
             CGFloat newWidth = cropBoxFrame.size.width * scale;
-            delta = cropBoxFrame.size.width - newWidth;
             cropBoxFrame.size.width = newWidth;
-
-            // Offset the Y position so it stays in the middle
-            offset.x += (delta * 0.5f);
 
             // Clamp the width to the bounds height
             cropBoxFrame.size.height = boundsHeight;
@@ -1534,19 +1584,33 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         }
     }
 
-    self.cropBoxLastEditedSize = cropBoxFrame.size;
-    self.cropBoxLastEditedAngle = self.angle;
-
     void (^translateBlock)(void) = ^{
-        self.scrollView.contentOffset = offset;
         self.cropBoxFrame = cropBoxFrame;
 
         if (zoomOut) {
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
         }
 
+        // Centre the new crop over the same point on the image as the old one (as far as
+        // the image's edges allow), before the box is scaled up to fill the screen
+        CGRect newCropBoxFrame = self.cropBoxFrame;
+        CGSize contentSize = self.scrollView.contentSize;
+        CGFloat zoomChange = (oldZoomScale > FLT_EPSILON) ? (self.scrollView.zoomScale / oldZoomScale) : 1.0f;
+        CGPoint offset = CGPointZero;
+        offset.x = (focusPoint.x * zoomChange) - CGRectGetMidX(newCropBoxFrame);
+        offset.y = (focusPoint.y * zoomChange) - CGRectGetMidY(newCropBoxFrame);
+        offset.x = MAX(-CGRectGetMinX(newCropBoxFrame), MIN(offset.x, contentSize.width - CGRectGetMaxX(newCropBoxFrame)));
+        offset.y = MAX(-CGRectGetMinY(newCropBoxFrame), MIN(offset.y, contentSize.height - CGRectGetMaxY(newCropBoxFrame)));
+        self.scrollView.contentOffset = offset;
+
         [self moveCroppedContentToCenterAnimated:NO];
         [self checkForCanReset];
+
+        // Save the settled crop for 90-degree rotations, including the zoom that goes with
+        // its size, or rotating back would pair this box with an older zoom level
+        [self captureStateForImageRotation];
+        [self captureCropForLockedRotation];
+        self.cropBoxLastEditedAngle = self.angle;
     };
 
     if (animated == NO) {
@@ -1589,6 +1653,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     // Check before the angle changes, since the image size flips with it
     const BOOL showingWholeImage = CGRectEqualToRect(self.imageCropFrame, (CGRect){CGPointZero, self.imageSize});
+
+    // A box locked to a specific aspect ratio keeps its shape while the image turns underneath
+    // it, unless it's allowed to swap between portrait and landscape along with the image
+    const BOOL keepsLockedCropBox = self.aspectRatioLockEnabled && !self.aspectRatioLockDimensionSwapEnabled && self.hasAspectRatio;
 
     // Work out the new angle, and wrap around once we exceed 360s
     NSInteger newAngle = self.angle;
@@ -1642,7 +1710,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // Work out the dimensions of the crop box when rotated
     const CGFloat oldZoomScale = self.scrollView.zoomScale;
     CGRect newCropFrame = CGRectZero;
-    if (labs(self.angle) == labs(self.cropBoxLastEditedAngle) || (labs(self.angle) * -1) == ((labs(self.cropBoxLastEditedAngle) - 180) % 360)) {
+    if (keepsLockedCropBox) {
+        newCropFrame = cropBoxFrame;
+    } else if (labs(self.angle) == labs(self.cropBoxLastEditedAngle) || (labs(self.angle) * -1) == ((labs(self.cropBoxLastEditedAngle) - 180) % 360)) {
         newCropFrame.size = self.cropBoxLastEditedSize;
 
         // Restore the full zoom state, ceiling first so the saved zoom isn't clamped
@@ -1660,8 +1730,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.scrollView.zoomScale *= scale;
     }
 
-    newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
-    newCropFrame.origin.y = floorf([self restingOriginYForHeight:newCropFrame.size.height zoomScale:self.scrollView.zoomScale]);
+    if (!keepsLockedCropBox) {
+        newCropFrame.origin.x = floorf(CGRectGetMidX(contentBounds) - (newCropFrame.size.width * 0.5f));
+        newCropFrame.origin.y = floorf([self restingOriginYForHeight:newCropFrame.size.height zoomScale:self.scrollView.zoomScale]);
+    }
 
     // If we're animated, generate a snapshot view that we'll animate in place of the real view
     UIView *snapshotView = nil;
@@ -1685,45 +1757,52 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // Flip the content size of the scroll view to match the rotated bounds
     self.scrollView.contentSize = self.backgroundContainerView.frame.size;
 
-    // assign the new crop box frame and re-adjust the content to fill it
-    self.cropBoxFrame = newCropFrame;
-    [self moveCroppedContentToCenterAnimated:NO];
-    newCropFrame = self.cropBoxFrame;
+    if (keepsLockedCropBox) {
+        [self layoutImageUnderLockedCropBoxAfterRotation];
 
-    // work out how to line up out point of interest into the middle of the crop box.
-    // Use the zoom delta that was actually applied (including any adjustment made while
-    // re-centering above), which differs from the geometric scale when a previously
-    // edited crop state was restored
-    const CGFloat appliedScale = (oldZoomScale > FLT_EPSILON) ? (self.scrollView.zoomScale / oldZoomScale) : scale;
-    cropTargetPoint.x *= appliedScale;
-    cropTargetPoint.y *= appliedScale;
-
-    // swap the target dimensions to match a 90 degree rotation (clockwise or counterclockwise)
-    CGFloat swap = cropTargetPoint.x;
-    if (clockwise) {
-        cropTargetPoint.x = self.scrollView.contentSize.width - cropTargetPoint.y;
-        cropTargetPoint.y = swap;
+        // The snapshot only needs to scale by however far the image zoomed
+        scale = (oldZoomScale > FLT_EPSILON) ? (self.scrollView.zoomScale / oldZoomScale) : 1.0f;
     } else {
-        cropTargetPoint.x = cropTargetPoint.y;
-        cropTargetPoint.y = self.scrollView.contentSize.height - swap;
-    }
+        // assign the new crop box frame and re-adjust the content to fill it
+        self.cropBoxFrame = newCropFrame;
+        [self moveCroppedContentToCenterAnimated:NO];
+        newCropFrame = self.cropBoxFrame;
 
-    // reapply the translated scroll offset to the scroll view
-    CGPoint midPoint = {CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
-    CGPoint offset = CGPointZero;
-    offset.x = floorf(-midPoint.x + cropTargetPoint.x);
-    offset.y = floorf(-midPoint.y + cropTargetPoint.y);
-    offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
-    offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
-    offset.x = MIN(self.scrollView.contentSize.width - CGRectGetMaxX(newCropFrame), offset.x);
-    offset.y = MIN(self.scrollView.contentSize.height - CGRectGetMaxY(newCropFrame), offset.y);
+        // work out how to line up out point of interest into the middle of the crop box.
+        // Use the zoom delta that was actually applied (including any adjustment made while
+        // re-centering above), which differs from the geometric scale when a previously
+        // edited crop state was restored
+        const CGFloat appliedScale = (oldZoomScale > FLT_EPSILON) ? (self.scrollView.zoomScale / oldZoomScale) : scale;
+        cropTargetPoint.x *= appliedScale;
+        cropTargetPoint.y *= appliedScale;
 
-    // if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
-    // so we should call the method manually to update the foregroundImageView's frame
-    if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && fabs(appliedScale - 1.0) < FLT_EPSILON) {
-        [self matchForegroundToBackground];
+        // swap the target dimensions to match a 90 degree rotation (clockwise or counterclockwise)
+        CGFloat swap = cropTargetPoint.x;
+        if (clockwise) {
+            cropTargetPoint.x = self.scrollView.contentSize.width - cropTargetPoint.y;
+            cropTargetPoint.y = swap;
+        } else {
+            cropTargetPoint.x = cropTargetPoint.y;
+            cropTargetPoint.y = self.scrollView.contentSize.height - swap;
+        }
+
+        // reapply the translated scroll offset to the scroll view
+        CGPoint midPoint = {CGRectGetMidX(newCropFrame), CGRectGetMidY(newCropFrame)};
+        CGPoint offset = CGPointZero;
+        offset.x = floorf(-midPoint.x + cropTargetPoint.x);
+        offset.y = floorf(-midPoint.y + cropTargetPoint.y);
+        offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
+        offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
+        offset.x = MIN(self.scrollView.contentSize.width - CGRectGetMaxX(newCropFrame), offset.x);
+        offset.y = MIN(self.scrollView.contentSize.height - CGRectGetMaxY(newCropFrame), offset.y);
+
+        // if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
+        // so we should call the method manually to update the foregroundImageView's frame
+        if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && fabs(appliedScale - 1.0) < FLT_EPSILON) {
+            [self matchForegroundToBackground];
+        }
+        self.scrollView.contentOffset = offset;
     }
-    self.scrollView.contentOffset = offset;
 
     // If we're animated, play an animation of the snapshot view rotating,
     // then fade it out over the live content
@@ -1773,7 +1852,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
                         BOOL aspectRatioCanSwapDimensions = !self.aspectRatioLockEnabled ||
                                                             (self.aspectRatioLockEnabled && self.aspectRatioLockDimensionSwapEnabled);
 
-                        if (!aspectRatioCanSwapDimensions) {
+                        if (!aspectRatioCanSwapDimensions && !keepsLockedCropBox) {
                             // This will animate the aspect ratio back to the desired locked ratio after the image is rotated.
                             [self setAspectRatio:self.aspectRatio animated:animated];
                         }
@@ -1799,6 +1878,71 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.cropBoxLastEditedZoomScale = self.scrollView.zoomScale;
     self.cropBoxLastEditedMinZoomScale = self.scrollView.minimumZoomScale;
     self.cropBoxLastEditedMaxZoomScale = self.baseMaximumZoomScale;
+}
+
+// Only called once an edit has settled, unlike the state above, which is also re-scaled
+// while the device rotates. The crop in image space doesn't change with the view's size.
+- (void)captureCropForLockedRotation {
+    self.lockedRotationImageCropFrame = self.imageCropFrame;
+    self.lockedRotationAngle = self.angle;
+    self.lockedRotationCropBoxFrame = self.cropBoxFrame;
+    self.lockedRotationZoomScale = self.scrollView.zoomScale;
+    self.lockedRotationContentOffset = self.scrollView.contentOffset;
+}
+
+// Lays the image out under a crop box locked to its aspect ratio after the image has been
+// rotated to the current angle, keeping the box exactly as it is
+- (void)layoutImageUnderLockedCropBoxAfterRotation {
+    CGRect cropBoxFrame = self.cropBoxFrame;
+    CGSize imageSize = self.imageSize;
+
+    // The box has to stay filled by the rotated image
+    CGFloat minimumZoomScale = MAX(cropBoxFrame.size.width / imageSize.width, cropBoxFrame.size.height / imageSize.height);
+    self.scrollView.minimumZoomScale = minimumZoomScale;
+    [self updateScrollViewMaximumZoomScale];
+
+    // Turning all the way back around to the last edit restores it exactly, rather than
+    // re-deriving it through the scroll offset's rounding to whole points
+    if (self.angle == self.lockedRotationAngle && CGRectEqualToRect(cropBoxFrame, self.lockedRotationCropBoxFrame)) {
+        self.scrollView.zoomScale = self.lockedRotationZoomScale;
+        self.scrollView.contentOffset = self.lockedRotationContentOffset;
+        [self matchForegroundToBackground];
+        return;
+    }
+
+    // Otherwise, turn the crop from the last edit around its middle along with the image
+    CGRect editedFrame = self.lockedRotationImageCropFrame;
+    BOOL editedSideways = (labs(self.lockedRotationAngle) % 180) != 0;
+    CGSize editedImageSize = editedSideways ? (CGSize){self.image.size.height, self.image.size.width} : self.image.size;
+    CGPoint midPoint = (CGPoint){CGRectGetMidX(editedFrame), CGRectGetMidY(editedFrame)};
+    NSInteger clockwiseTurns = ((((self.angle - self.lockedRotationAngle) / 90) % 4) + 4) % 4;
+    for (NSInteger i = 0; i < clockwiseTurns; i++) {
+        midPoint = (CGPoint){editedImageSize.height - midPoint.y, midPoint.x};
+        editedImageSize = (CGSize){editedImageSize.height, editedImageSize.width};
+    }
+
+    // The box doesn't turn, so the crop keeps the same size and shape, only shrinking
+    // (ie, zooming in) if the rotated image is too small to hold it
+    CGSize cropSize = editedFrame.size;
+    CGFloat fitScale = MIN(1.0f, MIN(imageSize.width / cropSize.width, imageSize.height / cropSize.height));
+    cropSize = (CGSize){cropSize.width * fitScale, cropSize.height * fitScale};
+
+    CGRect targetFrame = (CGRect){{midPoint.x - (cropSize.width * 0.5f), midPoint.y - (cropSize.height * 0.5f)}, cropSize};
+    targetFrame.origin.x = MAX(0.0f, MIN(targetFrame.origin.x, imageSize.width - cropSize.width));
+    targetFrame.origin.y = MAX(0.0f, MIN(targetFrame.origin.y, imageSize.height - cropSize.height));
+
+    // Zoom so the crop fills the box, then scroll it into place inside the box
+    CGFloat zoomScale = MAX(cropBoxFrame.size.width / cropSize.width, cropBoxFrame.size.height / cropSize.height);
+    self.scrollView.zoomScale = MIN(MAX(zoomScale, minimumZoomScale), self.scrollView.maximumZoomScale);
+
+    CGSize contentSize = self.scrollView.contentSize;
+    CGPoint offset = CGPointZero;
+    offset.x = (targetFrame.origin.x * (contentSize.width / imageSize.width)) - cropBoxFrame.origin.x;
+    offset.y = (targetFrame.origin.y * (contentSize.height / imageSize.height)) - cropBoxFrame.origin.y;
+    offset.x = MAX(-cropBoxFrame.origin.x, MIN(offset.x, contentSize.width - CGRectGetMaxX(cropBoxFrame)));
+    offset.y = MAX(-cropBoxFrame.origin.y, MIN(offset.y, contentSize.height - CGRectGetMaxY(cropBoxFrame)));
+    self.scrollView.contentOffset = offset;
+    [self matchForegroundToBackground];
 }
 
 // The scroll view's zoom ceiling normally sits at the layout's absolute base value,
