@@ -5,6 +5,7 @@ Unreleased
 
 - Dismissing the crop view controller removed the presenting view controller's view when that controller wasn't full screen (such as a sheet, form sheet or popover), or when the crop view controller itself was presented over full screen. ([#486](https://github.com/TimOliver/TOCropViewController/issues/486))
 - Clearing `transitioningDelegate` to opt out of the custom transition had no effect, as it was installed again when the view loaded. ([#503](https://github.com/TimOliver/TOCropViewController/issues/503))
+- Tapping Done without making any changes, or after resetting, returned an image a few pixels smaller than the original (eg, 4032×3019 for a 4032×3024 photo), and each 90° rotation shaved off more. Crops that reach an edge of the image now include it exactly. ([#471](https://github.com/TimOliver/TOCropViewController/issues/471))
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================

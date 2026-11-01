@@ -116,6 +116,43 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     return cropView;
 }
 
+// Lays a crop view out the way the controller does on its first layout pass, with
+// insets for a status bar above and a bottom toolbar below
+- (TOCropView *)cropViewLaidOutLikeTheControllerWithImage:(UIImage *)image frame:(CGRect)frame {
+    TOCropView *cropView = [[TOCropView alloc] initWithImage:image];
+    cropView.frame = frame;
+    cropView.cropRegionInsets = (UIEdgeInsets){59, 0, 94, 0};
+    [cropView moveCroppedContentToCenterAnimated:NO];
+    [cropView performInitialSetup];
+    [cropView moveCroppedContentToCenterAnimated:NO];
+    return cropView;
+}
+
+// The rounding that loses pixels only shows up at some view sizes, so check a
+// spread of phone-sized views and report the first one that goes wrong
+- (void)assertCropFrameAcrossViewWidthsForImageSize:(CGSize)imageSize
+                                      afterAdjusting:(void (^)(TOCropView *cropView))adjust
+                                        expectFrame:(CGRect)expectedFrame {
+    UIImage *image = [self testImageWithSize:imageSize];
+    NSInteger failures = 0;
+    NSString *firstFailure = nil;
+    for (CGFloat width = 300.0f; width <= 460.0f; width += 1.0f) {
+        CGRect viewFrame = (CGRect){0, 0, width, 880};
+        TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:image frame:viewFrame];
+        if (adjust) {
+            adjust(cropView);
+        }
+        if (!CGRectEqualToRect(cropView.imageCropFrame, expectedFrame)) {
+            failures++;
+            if (firstFailure == nil) {
+                firstFailure = [NSString stringWithFormat:@"%@ in a %@ view", NSStringFromCGRect(cropView.imageCropFrame), NSStringFromCGSize(viewFrame.size)];
+            }
+        }
+    }
+    XCTAssertEqual(failures, 0, @"Expected %@ but got %@ (and %ld other view sizes)",
+                   NSStringFromCGRect(expectedFrame), firstFailure, (long)MAX(0, failures - 1));
+}
+
 // The custom transition only runs for animated presentations from a view controller
 // that's on screen, so give each presentation test a window of its own
 - (UIWindow *)presentationTestWindow {
@@ -628,6 +665,46 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     [cropController loadViewIfNeeded];
 
     XCTAssertNil(cropController.transitioningDelegate);
+}
+
+- (void)testUntouchedCropCoversTheWholeImage {
+    // Pressing Done without touching anything must hand back every pixel
+    for (NSValue *value in @[ @((CGSize){4032, 3024}), @((CGSize){3024, 4032}), @((CGSize){1200, 1600}) ]) {
+        CGSize imageSize = value.CGSizeValue;
+        [self assertCropFrameAcrossViewWidthsForImageSize:imageSize
+                                           afterAdjusting:nil
+                                              expectFrame:(CGRect){CGPointZero, imageSize}];
+    }
+}
+
+- (void)testResetCropCoversTheWholeImage {
+    CGSize imageSize = (CGSize){4032, 3024};
+    [self assertCropFrameAcrossViewWidthsForImageSize:imageSize
+                                       afterAdjusting:^(TOCropView *cropView) {
+                                           cropView.scrollView.zoomScale = cropView.scrollView.minimumZoomScale * 2.0f;
+                                           [cropView resetLayoutToDefaultAnimated:NO];
+                                       }
+                                          expectFrame:(CGRect){CGPointZero, imageSize}];
+}
+
+- (void)testRotatingAnUncroppedImageKeepsTheWholeImage {
+    CGSize imageSize = (CGSize){4032, 3024};
+    [self assertCropFrameAcrossViewWidthsForImageSize:imageSize
+                                       afterAdjusting:^(TOCropView *cropView) {
+                                           [cropView rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
+                                       }
+                                          expectFrame:(CGRect){0, 0, imageSize.height, imageSize.width}];
+}
+
+- (void)testRotatingAnUncroppedImageAllTheWayAroundKeepsTheWholeImage {
+    CGSize imageSize = (CGSize){4032, 3024};
+    [self assertCropFrameAcrossViewWidthsForImageSize:imageSize
+                                       afterAdjusting:^(TOCropView *cropView) {
+                                           for (NSInteger i = 0; i < 4; i++) {
+                                               [cropView rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
+                                           }
+                                       }
+                                          expectFrame:(CGRect){CGPointZero, imageSize}];
 }
 
 @end

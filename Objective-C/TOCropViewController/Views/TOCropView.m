@@ -31,6 +31,7 @@ static const CGFloat kTOCropViewPadding = 14.0f;
 static const NSTimeInterval kTOCropTimerDuration = 0.8f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
 static const CGFloat kTOMaximumZoomScale = 15.0f;
+static const CGFloat kTOCropViewImageEdgeTolerance = 1.0f;  // Points within which a crop box edge counts as on the image's edge
 
 /* When the user taps down to resize the box, this state is used
  to determine where they tapped and how to manipulate the box */
@@ -1097,12 +1098,35 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     frame.size.width = MIN(imageSize.width - frame.origin.x, frame.size.width);
 
     // Calculate normalized height
-    if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
-        frame.size.height = frame.size.width;
-    } else {
-        frame.size.height = ceilf(cropBoxFrame.size.height * scale);
-    }
+    frame.size.height = ceilf(cropBoxFrame.size.height * scale);
     frame.size.height = MIN(imageSize.height - frame.origin.y, frame.size.height);
+
+    // The crop box and content are rounded to whole points while being laid out, which can
+    // leave the box up to a point inside an edge of the image it was meant to reach. Even
+    // fully zoomed out, that's several pixels of a large photo, so treat any edge of the
+    // box within that distance of the image's edge as lying on it.
+    CGRect cropBoxInContent = (CGRect){{contentOffset.x + edgeInsets.left, contentOffset.y + edgeInsets.top}, cropBoxFrame.size};
+    CGFloat maxX = CGRectGetMaxX(frame);
+    CGFloat maxY = CGRectGetMaxY(frame);
+    if (CGRectGetMinX(cropBoxInContent) < kTOCropViewImageEdgeTolerance) {
+        frame.origin.x = 0.0f;
+    }
+    if (CGRectGetMinY(cropBoxInContent) < kTOCropViewImageEdgeTolerance) {
+        frame.origin.y = 0.0f;
+    }
+    if (CGRectGetMaxX(cropBoxInContent) > contentSize.width - kTOCropViewImageEdgeTolerance) {
+        maxX = imageSize.width;
+    }
+    if (CGRectGetMaxY(cropBoxInContent) > contentSize.height - kTOCropViewImageEdgeTolerance) {
+        maxY = imageSize.height;
+    }
+    frame.size.width = maxX - frame.origin.x;
+    frame.size.height = maxY - frame.origin.y;
+
+    // A square crop box must produce a square image, which takes precedence over reaching an edge
+    if (floor(cropBoxFrame.size.width) == floor(cropBoxFrame.size.height)) {
+        frame.size.width = frame.size.height = MIN(frame.size.width, frame.size.height);
+    }
 
     return frame;
 }
@@ -1563,6 +1587,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self captureStateForImageRotation];
     }
 
+    // Check before the angle changes, since the image size flips with it
+    const BOOL showingWholeImage = CGRectEqualToRect(self.imageCropFrame, (CGRect){CGPointZero, self.imageSize});
+
     // Work out the new angle, and wrap around once we exceed 360s
     NSInteger newAngle = self.angle;
     newAngle = clockwise ? newAngle + 90 : newAngle - 90;
@@ -1600,10 +1627,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     // Set up the transformation matrix for the rotation
     CGAffineTransform rotation = CGAffineTransformRotate(CGAffineTransformIdentity, angleInRadians);
 
-    // Work out how much we'll need to scale everything to fit to the new rotation
+    // Work out how much we'll need to scale everything to fit to the new rotation. When the
+    // whole image is in the crop box, fit the image itself rather than the box, which was
+    // rounded down to whole points and would leave the rotated image overhanging it.
     CGRect contentBounds = self.contentBounds;
     CGRect cropBoxFrame = self.cropBoxFrame;
-    CGFloat scale = MIN(contentBounds.size.width / cropBoxFrame.size.height, contentBounds.size.height / cropBoxFrame.size.width);
+    CGSize fittingSize = showingWholeImage ? self.backgroundContainerView.frame.size : cropBoxFrame.size;
+    CGFloat scale = MIN(contentBounds.size.width / fittingSize.height, contentBounds.size.height / fittingSize.width);
 
     // Work out which section of the image we're currently focusing at
     CGPoint cropMidPoint = (CGPoint){CGRectGetMidX(cropBoxFrame), CGRectGetMidY(cropBoxFrame)};
@@ -1621,7 +1651,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self updateScrollViewMaximumZoomScale];
         self.scrollView.zoomScale = self.cropBoxLastEditedZoomScale;
     } else {
-        newCropFrame.size = (CGSize){floorf(self.cropBoxFrame.size.height * scale), floorf(self.cropBoxFrame.size.width * scale)};
+        newCropFrame.size = (CGSize){floorf(fittingSize.height * scale), floorf(fittingSize.width * scale)};
 
         // Re-adjust the scrolling dimensions of the scroll view to match the new size
         self.scrollView.minimumZoomScale *= scale;
