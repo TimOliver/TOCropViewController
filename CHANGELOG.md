@@ -13,6 +13,9 @@ Unreleased
 - At some view sizes, an aspect ratio preset's crop box came out a point narrower than it should, so a square preset didn't produce a square image. ([#637](https://github.com/TimOliver/TOCropViewController/issues/637))
 - Crops locked to an aspect ratio could be up to 20 pixels away from that ratio in the final image. They now match it to the nearest pixel. ([#333](https://github.com/TimOliver/TOCropViewController/issues/333))
 - Cropping a photo from the camera (or any other wide color image) produced a 16-bit-per-channel image, using twice the memory it needed and crashing share extensions with large photos. Crops are now drawn in the photo's own 8-bit color format, and crops that aren't rotated or circular reuse the photo's pixels without copying them. ([#350](https://github.com/TimOliver/TOCropViewController/issues/350))
+- With the toolbar at the top, it could sit under the status bar whenever the crop view controller couldn't hide it, such as on iPhones without a notch when embedded in another view controller or when view controller-based status bar appearance is turned off. ([#475](https://github.com/TimOliver/TOCropViewController/issues/475))
+- With a title set, a top toolbar was positioned from where the title had been on an earlier layout pass, so it could overlap the title or leave a gap below it. ([#475](https://github.com/TimOliver/TOCropViewController/issues/475))
+- When embedded as a child view controller, the crop view was sized to the parent's view instead of its own, so any part of it below a shorter frame was hidden. ([#367](https://github.com/TimOliver/TOCropViewController/issues/367))
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================

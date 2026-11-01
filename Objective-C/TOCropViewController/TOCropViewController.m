@@ -69,6 +69,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 /* Convenience method for managing status bar state */
 @property (nonatomic, readonly) BOOL overrideStatusBar;   // Whether the view controller needs to touch the status bar
 @property (nonatomic, readonly) BOOL statusBarHidden;     // Whether it should be hidden or visible at this point
+@property (nonatomic, readonly) BOOL hidesStatusBarItself; // Whether hiding it is actually up to us
 @property (nonatomic, readonly) CGFloat statusBarHeight;  // The height of the status bar when visible
 
 /* Convenience method for getting the vertical inset for both iPhone X and status bar */
@@ -436,11 +437,10 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 - (CGRect)frameForCropViewWithVerticalLayout:(BOOL)verticalLayout {
     // On an iPad, if being presented in a modal view controller by a UINavigationController,
     // at the time we need it, the size of our view will be incorrect.
-    // If this is the case, derive our view size from our parent view controller instead
-    UIView *view = nil;
-    if (self.parentViewController == nil) {
-        view = self.view;
-    } else {
+    // If this is the case, derive our view size from our parent view controller instead.
+    // Any other parent (eg, one embedding us above its own controls) sizes our view itself.
+    UIView *view = self.view;
+    if ([self.parentViewController isKindOfClass:[UINavigationController class]]) {
         view = self.parentViewController.view;
     }
 
@@ -499,8 +499,8 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         frame.origin.x += x;
     }
 
-    // Work out vertical position
-    frame.origin.y = self.view.safeAreaInsets.top + kTOCropViewControllerTitleTopPadding;
+    // Work out vertical position, clearing the status bar the same way the toolbar does
+    frame.origin.y = self.statusBarHeight + kTOCropViewControllerTitleTopPadding;
 
     return frame;
 }
@@ -591,6 +591,11 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+
+    // A top toolbar is placed underneath the title, so the title has to be in place first
+    if (self.title.length) {
+        self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
+    }
 
     [UIView performWithoutAnimation:^{
         self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
@@ -1475,13 +1480,25 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     hardwareRelatedInset = YES;
 #endif
 
-    // Unless the status bar is visible, or we need to account
-    // for a hardware notch, always treat the status bar height as zero
-    if (self.statusBarHidden && !hardwareRelatedInset) {
+    // While we're appearing or disappearing, a status bar we hide ourselves is still on screen
+    // as it fades, so lay out as though it's already gone rather than jumping once it is. Any
+    // other time, the safe area already reflects whether a status bar is showing, including
+    // one we can't hide (eg, when embedded in another view controller).
+    if (self.inTransition && self.hidesStatusBarItself && !hardwareRelatedInset) {
         statusBarHeight = 0.0f;
     }
 
     return statusBarHeight;
+}
+
+- (BOOL)hidesStatusBarItself {
+    if (!self.overrideStatusBar) {
+        return NO;
+    }
+
+    // Apps can opt out of view controllers deciding whether the status bar is shown
+    NSNumber *viewControllerBasedAppearance = [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"];
+    return viewControllerBasedAppearance == nil || viewControllerBasedAppearance.boolValue;
 }
 
 - (UIEdgeInsets)statusBarSafeInsets {

@@ -310,6 +310,25 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
     [self waitForExpectations:@[presented] timeout:5.0];
 }
 
+// Hosts can embed the controller as a child, eg above their own toolbar, in which case it
+// doesn't control the status bar and has to stay inside the frame it was given
+- (TOCropViewController *)cropControllerEmbeddedInWindow:(UIWindow *)window
+                                                   frame:(CGRect)frame
+                                           configuration:(void (^)(TOCropViewController *cropController))configuration {
+    UIViewController *parentController = window.rootViewController;
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    if (configuration) {
+        configuration(cropController);
+    }
+    [parentController addChildViewController:cropController];
+    cropController.view.frame = frame;
+    [parentController.view addSubview:cropController.view];
+    [cropController didMoveToParentViewController:parentController];
+    [parentController.view layoutIfNeeded];
+    [cropController.view layoutIfNeeded];
+    return cropController;
+}
+
 - (void)dismissViewController:(UIViewController *)viewController {
     XCTestExpectation *dismissed = [self expectationWithDescription:@"Dismissed"];
     [viewController dismissViewControllerAnimated:YES completion:^{
@@ -1052,6 +1071,41 @@ static CGFloat TOCropPixelsOffAspectRatio(CGRect rect, CGSize ratio) {
             }
         }
     }
+}
+
+- (void)testEmbeddedControllerStaysInsideItsOwnFrame {
+    UIWindow *window = [self presentationTestWindow];
+    CGRect frame = (CGRect){0, 0, CGRectGetWidth(window.bounds), CGRectGetHeight(window.bounds) - 150};
+    TOCropViewController *cropController = [self cropControllerEmbeddedInWindow:window frame:frame configuration:nil];
+
+    XCTAssertTrue(CGRectContainsRect(cropController.view.bounds, cropController.cropView.frame), @"%@ overhangs %@",
+                  NSStringFromCGRect(cropController.cropView.frame), NSStringFromCGRect(cropController.view.bounds));
+}
+
+- (void)testTopToolbarClearsAStatusBarItCantHide {
+    // An embedded controller doesn't get a say over the status bar, so it stays on screen
+    UIWindow *window = [self presentationTestWindow];
+    TOCropViewController *cropController = [self cropControllerEmbeddedInWindow:window
+                                                                          frame:window.bounds
+                                                                  configuration:^(TOCropViewController *cropController) {
+                                                                      cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+                                                                  }];
+
+    XCTAssertGreaterThan(cropController.view.safeAreaInsets.top, 0.0f);
+    XCTAssertGreaterThanOrEqual(CGRectGetMinY(cropController.toolbar.frame), cropController.view.safeAreaInsets.top);
+}
+
+- (void)testTopToolbarSitsBelowTheTitle {
+    UIWindow *window = [self presentationTestWindow];
+    TOCropViewController *cropController = [self cropControllerEmbeddedInWindow:window
+                                                                          frame:window.bounds
+                                                                  configuration:^(TOCropViewController *cropController) {
+                                                                      cropController.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+                                                                      cropController.title = @"Crop Your Photo";
+                                                                  }];
+
+    XCTAssertGreaterThanOrEqual(CGRectGetMinY(cropController.toolbar.frame), CGRectGetMaxY(cropController.titleLabel.frame), @"Toolbar %@, title %@",
+                                NSStringFromCGRect(cropController.toolbar.frame), NSStringFromCGRect(cropController.titleLabel.frame));
 }
 
 @end
