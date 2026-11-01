@@ -103,8 +103,10 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         self.modalPresentationStyle = UIModalPresentationFullScreen;
         self.hidesNavigationBar = true;
 
-        // Controller object that handles the transition animation when presenting / dismissing this app
+        // Controller object that handles the transition animation when presenting / dismissing this app.
+        // Install it here rather than when the view loads, so a host can still opt out before presenting.
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
+        self.transitioningDelegate = self;
 
         // Default initial behaviour
         _aspectRatioPreset = CGSizeZero;
@@ -127,7 +129,6 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     [super viewDidLoad];
 
     // Set up view controller properties
-    self.transitioningDelegate = self;
     self.view.backgroundColor = self.cropView.backgroundColor;
 
 #if defined(__IPHONE_26_0)
