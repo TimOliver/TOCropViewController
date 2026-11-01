@@ -58,7 +58,7 @@
 
     UIView *containerView = self;
 #ifdef __IPHONE_26_0
-    if (@available(iOS 26.0, *)) {
+    if (@available(iOS 26.0, visionOS 26.0, *)) {
         UIVisualEffect *effect = nil;
 #if !TARGET_OS_VISION
         // We've been getting reports that some devices have been crashing with the error message
