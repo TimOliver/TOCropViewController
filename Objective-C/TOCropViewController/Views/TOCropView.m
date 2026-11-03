@@ -334,8 +334,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self captureStateForImageRotation];
     [self captureCropForLockedRotation];
 
-    // save the size for checking if we're in a resettable state
-    self.originalCropBoxSize = self.resetAspectRatioEnabled ? scaledImageSize : self.cropBoxFrame.size;
+    // Save the size for checking if we're in a resettable state. Inside fractional content
+    // bounds (eg, a display corner asking for a third-of-a-point inset) the whole-point box
+    // settles a point shy of the image's raw scaled fit, so only an aspect ratio that
+    // resetting will clear away is measured against that fit rather than the box itself
+    BOOL aspectRatioResetsAway = self.resetAspectRatioEnabled && self.hasAspectRatio;
+    self.originalCropBoxSize = aspectRatioResetsAway ? scaledImageSize : self.cropBoxFrame.size;
     self.originalContentOffset = self.scrollView.contentOffset;
 
     [self checkForCanReset];

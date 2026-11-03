@@ -203,6 +203,52 @@ static void TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(void (^block)(void
     method_exchangeImplementations(realSafeArea, stubSafeArea);
 }
 
+// The same cover display upright: the camera gutter column sits on the trailing edge,
+// its bar region places the side bar inside it, and the bare leading edge asks for a
+// fractional corner nudge - the layout regions' insets land on thirds of a point
+@interface UIView (TOCropTestTrailingGutter)
+- (UIEdgeInsets)to_test_trailingGutterSafeAreaInsets;
+- (UIEdgeInsets)to_test_trailingGutterEdgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region;
+@end
+
+@implementation UIView (TOCropTestTrailingGutter)
+- (UIEdgeInsets)to_test_trailingGutterSafeAreaInsets {
+    return (UIEdgeInsets){0, 0, 34, 84};
+}
+- (UIEdgeInsets)to_test_trailingGutterEdgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region {
+    if ([(id)region isKindOfClass:[NSNumber class]]) {
+        switch ((NSUInteger)[(NSNumber *)region unsignedIntegerValue]) {
+            case 100 + UIRectEdgeRight: return (UIEdgeInsets){82, 396, 34, 26};
+            case 100 + UIRectEdgeLeft: return (UIEdgeInsets){17.33, 26, 34, 396};
+            case UIViewLayoutRegionAdaptivityAxisHorizontal: return (UIEdgeInsets){0, 2.33, 34, 84};
+            case UIViewLayoutRegionAdaptivityAxisVertical: return (UIEdgeInsets){17.33, 0, 34, 84};
+            default: return (UIEdgeInsets){0, 0, 34, 84};
+        }
+    }
+    return [self to_test_trailingGutterEdgeInsetsForLayoutRegion:region];
+}
+@end
+
+static void TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(void (^block)(void)) {
+    Method realSafeArea = class_getInstanceMethod([UIView class], @selector(safeAreaInsets));
+    Method stubSafeArea = class_getInstanceMethod([UIView class], @selector(to_test_trailingGutterSafeAreaInsets));
+    Method realBarFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(layoutRegionForBarOnEdge:extent:));
+    Method stubBarFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(to_test_layoutRegionForBarOnEdge:extent:));
+    Method realCornerFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(safeAreaLayoutRegionWithCornerAdaptation:));
+    Method stubCornerFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(to_test_safeAreaLayoutRegionWithCornerAdaptation:));
+    Method realInsets = class_getInstanceMethod([UIView class], @selector(edgeInsetsForLayoutRegion:));
+    Method stubInsets = class_getInstanceMethod([UIView class], @selector(to_test_trailingGutterEdgeInsetsForLayoutRegion:));
+    method_exchangeImplementations(realSafeArea, stubSafeArea);
+    method_exchangeImplementations(realBarFactory, stubBarFactory);
+    method_exchangeImplementations(realCornerFactory, stubCornerFactory);
+    method_exchangeImplementations(realInsets, stubInsets);
+    block();
+    method_exchangeImplementations(realInsets, stubInsets);
+    method_exchangeImplementations(realCornerFactory, stubCornerFactory);
+    method_exchangeImplementations(realBarFactory, stubBarFactory);
+    method_exchangeImplementations(realSafeArea, stubSafeArea);
+}
+
 @interface TOCropViewControllerTests : XCTestCase
 
 @end
@@ -719,6 +765,22 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
                                    @"the crop region must start right past the strip");
         XCTAssertEqualWithAccuracy(insets.right, 17.33, 0.05,
                                    @"the freed trailing edge must owe only its corner inset");
+    });
+}
+
+- (void)testUntouchedCropIsNotResettableWithFractionalContentInsets {
+    // A wide image on the upright gutter display: the corner nudge leaves the content
+    // bounds at a fractional leading origin, so the whole-point crop box laid out inside
+    // them comes up a point shorter than the raw scaled fit it was captured against. An
+    // untouched crop must still read as the resting state, or the reset button lights up
+    // the moment the screen appears (and again on every rotation)
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        XCTAssertFalse(controller.cropView.canBeReset,
+                       @"a crop nobody has touched must not be resettable");
     });
 }
 
