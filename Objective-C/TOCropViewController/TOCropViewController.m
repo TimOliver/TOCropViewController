@@ -65,6 +65,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 /* Whether the side toolbar should hug the right edge (eg, squat displays like
  the outer screen of a folding phone, where a bottom toolbar would crowd the content) */
 @property (nonatomic, readonly) BOOL toolbarOnRightEdge;
+@property (nonatomic, readonly) BOOL sideToolbarOnLeftEdge;
 
 /* Convenience method for managing status bar state */
 @property (nonatomic, readonly) BOOL overrideStatusBar;   // Whether the view controller needs to touch the status bar
@@ -332,13 +333,18 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
             CGFloat bottomInset = minPadding + insets.bottom;
             if (self.toolbarOnRightEdge) {
                 // The system stacks the status bar items down the camera hole punch's column
-                // on squat displays, and its trailing bar region shares that centerline
-                // (and clears the camera region), so adopt the region wholesale
+                // on squat displays, and its bar region for that edge shares the camera's
+                // centerline (and clears the camera region itself), so adopt the region
+                // wholesale. The gutter column rides the trailing edge in portrait, but in
+                // landscape it lands on whichever side the device was turned towards, so
+                // follow it across rather than pinning the strip to the right
+                BOOL onLeftEdge = self.sideToolbarOnLeftEdge;
                 BOOL hasBarRegion = NO;
 #if defined(__IPHONE_27_1)
                 if (@available(iOS 27.1, *)) {
+                    UIRectEdge barEdge = onLeftEdge ? UIRectEdgeLeft : UIRectEdgeRight;
                     UIEdgeInsets barInsets = [self.view edgeInsetsForLayoutRegion:
-                                              [UIViewLayoutRegion layoutRegionForBarOnEdge:UIRectEdgeRight
+                                              [UIViewLayoutRegion layoutRegionForBarOnEdge:barEdge
                                                                                     extent:kTOCropViewControllerToolbarHeight]];
                     frame.origin.x = barInsets.left;
                     frame.origin.y = barInsets.top;
@@ -347,10 +353,15 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
                 }
 #endif
                 if (!hasBarRegion) {
-                    // Center the strip in the trailing safe area gutter, starting below
-                    // the roughly square camera region at the gutter's top
-                    CGFloat gutterWidth = MAX(insets.right, kTOCropViewControllerToolbarHeight + (minPadding * 2.0f));
-                    frame.origin.x = CGRectGetWidth(self.view.bounds) - ((gutterWidth + kTOCropViewControllerToolbarHeight) / 2.0f);
+                    // Center the strip in the safe area gutter, starting below the
+                    // roughly square camera region at the gutter's top
+                    CGFloat gutterWidth = MAX(onLeftEdge ? insets.left : insets.right,
+                                              kTOCropViewControllerToolbarHeight + (minPadding * 2.0f));
+                    if (onLeftEdge) {
+                        frame.origin.x = (gutterWidth - kTOCropViewControllerToolbarHeight) / 2.0f;
+                    } else {
+                        frame.origin.x = CGRectGetWidth(self.view.bounds) - ((gutterWidth + kTOCropViewControllerToolbarHeight) / 2.0f);
+                    }
                     frame.origin.y = MAX(gutterWidth, minPadding + insets.top);
                 }
             } else {
@@ -484,7 +495,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
     // Adjust for landscape layout
     if (!verticalLayout) {
-        if (self.toolbarOnRightEdge) {
+        if (self.toolbarOnRightEdge && !self.sideToolbarOnLeftEdge) {
             viewWidth -= kTOCropViewControllerTitleTopPadding + self.view.safeAreaInsets.right;
         } else {
             x = kTOCropViewControllerTitleTopPadding;
@@ -510,7 +521,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
     if (TOCropViewUsesGlassDesign()) {
         if (!self.verticalLayout) {
-            if (self.toolbarOnRightEdge) {
+            if (self.toolbarOnRightEdge && !self.sideToolbarOnLeftEdge) {
                 insets.right = CGRectGetWidth(self.view.frame) - CGRectGetMinX(self.toolbar.frame);
             } else {
                 insets.left = CGRectGetMaxX(self.toolbar.frame);
@@ -581,7 +592,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
     // Add padding on the toolbar's edge in landscape mode
     if (!self.verticalLayout) {
-        if (self.toolbarOnRightEdge) {
+        if (self.toolbarOnRightEdge && !self.sideToolbarOnLeftEdge) {
             insets.right = self.view.safeAreaInsets.right;
         } else {
             insets.left = self.view.safeAreaInsets.left;
@@ -638,6 +649,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
         [self.cropView moveCroppedContentToCenterAnimated:NO];
     }
+
 }
 
 #pragma mark - Rotation Handling -
@@ -656,7 +668,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     // Set up the toolbar frame to be just off t
     CGRect frame = [self frameForToolbarWithVerticalLayout:UIInterfaceOrientationIsPortrait(toInterfaceOrientation)];
     if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-        frame.origin.x = self.toolbarOnRightEdge ? CGRectGetWidth(self.view.bounds) : -frame.size.width;
+        frame.origin.x = (self.toolbarOnRightEdge && !self.sideToolbarOnLeftEdge) ? CGRectGetWidth(self.view.bounds) : -frame.size.width;
     } else {
         frame.origin.y = self.view.bounds.size.height;
     }
@@ -1454,6 +1466,20 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         size = self.pendingTransitionSize;
     }
     return [self sideToolbarPreferredForSize:size];
+}
+
+- (BOOL)sideToolbarOnLeftEdge {
+    // The camera gutter column shows up as one vertical edge carrying a far larger
+    // safe area inset than the other (eg, 84pt against 0 on a folding phone's cover
+    // display). In portrait it is always the trailing edge, but in landscape it lands
+    // on whichever side the device was turned towards, so the strip crosses over
+    // whenever the leading edge is the one carrying the gutter. Devices whose vertical
+    // edges match (usually both at zero) keep the strip on the right as always
+    if (!self.toolbarOnRightEdge) {
+        return NO;
+    }
+    UIEdgeInsets safeArea = self.view.safeAreaInsets;
+    return safeArea.left > safeArea.right;
 }
 
 - (BOOL)overrideStatusBar {

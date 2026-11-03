@@ -144,6 +144,65 @@ static void TOCropRunWhileDisplayHasRoundedCorners(void (^block)(void)) {
     method_exchangeImplementations(realFactory, stubFactory);
 }
 
+// The cover display of a folding phone, turned to landscape so the camera gutter
+// column lands on the leading edge: the system hands the whole column over as an
+// outsized leading safe area inset, and its bar region for that edge places a side
+// bar inside the column, below the camera itself. The factory swizzles hand each
+// request through as a boxed sentinel (the bar's edge offset by 100, so it can never
+// collide with a corner adaptivity axis) for the edge inset swizzle to recognise
+@interface UIViewLayoutRegion (TOCropTestBarRegions)
++ (UIViewLayoutRegion *)to_test_layoutRegionForBarOnEdge:(UIRectEdge)edge extent:(CGFloat)extent;
+@end
+
+@implementation UIViewLayoutRegion (TOCropTestBarRegions)
++ (UIViewLayoutRegion *)to_test_layoutRegionForBarOnEdge:(UIRectEdge)edge extent:(CGFloat)extent {
+    return (UIViewLayoutRegion *)@(100 + edge);
+}
+@end
+
+@interface UIView (TOCropTestLeadingGutter)
+- (UIEdgeInsets)to_test_leadingGutterSafeAreaInsets;
+- (UIEdgeInsets)to_test_leadingGutterEdgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region;
+@end
+
+@implementation UIView (TOCropTestLeadingGutter)
+- (UIEdgeInsets)to_test_leadingGutterSafeAreaInsets {
+    return (UIEdgeInsets){0, 84, 34, 0};
+}
+- (UIEdgeInsets)to_test_leadingGutterEdgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region {
+    if ([(id)region isKindOfClass:[NSNumber class]]) {
+        switch ((NSUInteger)[(NSNumber *)region unsignedIntegerValue]) {
+            case 100 + UIRectEdgeLeft: return (UIEdgeInsets){82, 26, 34, 608};
+            case 100 + UIRectEdgeRight: return (UIEdgeInsets){17.33, 608, 34, 26};
+            case UIViewLayoutRegionAdaptivityAxisHorizontal: return (UIEdgeInsets){0, 84, 34, 17.33};
+            case UIViewLayoutRegionAdaptivityAxisVertical: return (UIEdgeInsets){17.33, 84, 34, 0};
+            default: return (UIEdgeInsets){0, 84, 34, 0};
+        }
+    }
+    return [self to_test_leadingGutterEdgeInsetsForLayoutRegion:region];
+}
+@end
+
+static void TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(void (^block)(void)) {
+    Method realSafeArea = class_getInstanceMethod([UIView class], @selector(safeAreaInsets));
+    Method stubSafeArea = class_getInstanceMethod([UIView class], @selector(to_test_leadingGutterSafeAreaInsets));
+    Method realBarFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(layoutRegionForBarOnEdge:extent:));
+    Method stubBarFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(to_test_layoutRegionForBarOnEdge:extent:));
+    Method realCornerFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(safeAreaLayoutRegionWithCornerAdaptation:));
+    Method stubCornerFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(to_test_safeAreaLayoutRegionWithCornerAdaptation:));
+    Method realInsets = class_getInstanceMethod([UIView class], @selector(edgeInsetsForLayoutRegion:));
+    Method stubInsets = class_getInstanceMethod([UIView class], @selector(to_test_leadingGutterEdgeInsetsForLayoutRegion:));
+    method_exchangeImplementations(realSafeArea, stubSafeArea);
+    method_exchangeImplementations(realBarFactory, stubBarFactory);
+    method_exchangeImplementations(realCornerFactory, stubCornerFactory);
+    method_exchangeImplementations(realInsets, stubInsets);
+    block();
+    method_exchangeImplementations(realInsets, stubInsets);
+    method_exchangeImplementations(realCornerFactory, stubCornerFactory);
+    method_exchangeImplementations(realBarFactory, stubBarFactory);
+    method_exchangeImplementations(realSafeArea, stubSafeArea);
+}
+
 @interface TOCropViewControllerTests : XCTestCase
 
 @end
@@ -636,6 +695,31 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
     controller.view.frame = (CGRect){0, 0, 466, 678};
     XCTAssertFalse(controller.verticalLayout, @"a compact squat portrait display must keep the side toolbar");
+}
+
+- (void)testLandscapeToolbarFollowsCameraGutterToLeadingEdge {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(^{
+        // A squat cover display turned so the camera column lands on the leading
+        // edge: the button strip must cross over to that edge and flow down the
+        // camera's own column below the punch, freeing the trailing edge so the
+        // crop region only owes its rounded corner there
+        controller.view.frame = (CGRect){0, 0, 678, 466};
+        [controller.view layoutIfNeeded];
+
+        CGRect toolbarFrame = controller.toolbar.frame;
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(toolbarFrame), 26.0, FLT_EPSILON,
+                                   @"the strip must sit inside the leading camera gutter");
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(toolbarFrame), 82.0, FLT_EPSILON,
+                                   @"the strip must start below the camera itself");
+
+        UIEdgeInsets insets = controller.cropView.cropRegionInsets;
+        XCTAssertEqualWithAccuracy(insets.left, CGRectGetMaxX(toolbarFrame), FLT_EPSILON,
+                                   @"the crop region must start right past the strip");
+        XCTAssertEqualWithAccuracy(insets.right, 17.33, 0.05,
+                                   @"the freed trailing edge must owe only its corner inset");
+    });
 }
 
 - (void)testCropRegionClearsTheDisplaysRoundedCorners {
