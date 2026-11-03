@@ -522,6 +522,28 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
                 insets.bottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(self.toolbar.frame);
             }
         }
+
+        // The edge-to-edge layout runs the crop region into the display's rounded
+        // corners wherever the safe area leaves an edge bare (eg, the unfolded inner
+        // display of a folding phone). The corner adapted safe area asks for an inset
+        // concentric with the display's own corner radius on exactly those edges, so
+        // adopt it there, with the crop view's padding riding on top as breathing
+        // room. On every other edge it matches the plain safe area, leaving edges
+        // that already clear the corners - a home indicator, a camera gutter, the
+        // toolbar - laid out just as before
+#if defined(__IPHONE_26_0)
+        if (@available(iOS 26.0, *)) {
+            UIEdgeInsets safeArea = self.view.safeAreaInsets;
+            UIEdgeInsets horizontal = [self.view edgeInsetsForLayoutRegion:
+                                       [UIViewLayoutRegion safeAreaLayoutRegionWithCornerAdaptation:UIViewLayoutRegionAdaptivityAxisHorizontal]];
+            UIEdgeInsets vertical = [self.view edgeInsetsForLayoutRegion:
+                                     [UIViewLayoutRegion safeAreaLayoutRegionWithCornerAdaptation:UIViewLayoutRegionAdaptivityAxisVertical]];
+            if (horizontal.left > safeArea.left) { insets.left = MAX(insets.left, horizontal.left); }
+            if (horizontal.right > safeArea.right) { insets.right = MAX(insets.right, horizontal.right); }
+            if (vertical.top > safeArea.top) { insets.top = MAX(insets.top, vertical.top); }
+            if (vertical.bottom > safeArea.bottom) { insets.bottom = MAX(insets.bottom, vertical.bottom); }
+        }
+#endif
     } else {
         if (!self.verticalLayout) {
             if (self.toolbarOnRightEdge) {

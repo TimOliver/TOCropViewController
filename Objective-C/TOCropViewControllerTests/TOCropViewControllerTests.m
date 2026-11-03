@@ -99,6 +99,51 @@ static void TOCropRunWhileViewHasBottomSafeArea(void (^block)(void)) {
     method_exchangeImplementations(real, stub);
 }
 
+// The corner adapted layout regions only resolve against a real display, so stand in
+// for a folding phone's unfolded inner display - large rounded corners asking for a
+// 16pt concentric inset on every edge the safe area leaves bare - while a block runs.
+// The factory swizzle hands the adaptivity axis through as a boxed sentinel for the
+// edge inset swizzle to recognise, leaving every other layout region untouched
+@interface UIViewLayoutRegion (TOCropTestCornerRegions)
++ (UIViewLayoutRegion *)to_test_safeAreaLayoutRegionWithCornerAdaptation:(UIViewLayoutRegionAdaptivityAxis)axis;
+@end
+
+@implementation UIViewLayoutRegion (TOCropTestCornerRegions)
++ (UIViewLayoutRegion *)to_test_safeAreaLayoutRegionWithCornerAdaptation:(UIViewLayoutRegionAdaptivityAxis)axis {
+    return (UIViewLayoutRegion *)@(axis);
+}
+@end
+
+@interface UIView (TOCropTestCornerRegionInsets)
+- (UIEdgeInsets)to_test_edgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region;
+@end
+
+@implementation UIView (TOCropTestCornerRegionInsets)
+- (UIEdgeInsets)to_test_edgeInsetsForLayoutRegion:(UIViewLayoutRegion *)region {
+    if ([(id)region isKindOfClass:[NSNumber class]]) {
+        switch ((UIViewLayoutRegionAdaptivityAxis)[(NSNumber *)region unsignedIntegerValue]) {
+            case UIViewLayoutRegionAdaptivityAxisHorizontal: return (UIEdgeInsets){0, 16, 34, 16};
+            case UIViewLayoutRegionAdaptivityAxisVertical: return (UIEdgeInsets){16, 0, 34, 0};
+            case UIViewLayoutRegionAdaptivityAxisNone: break;
+        }
+        return (UIEdgeInsets){0, 0, 34, 0};
+    }
+    return [self to_test_edgeInsetsForLayoutRegion:region];
+}
+@end
+
+static void TOCropRunWhileDisplayHasRoundedCorners(void (^block)(void)) {
+    Method realFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(safeAreaLayoutRegionWithCornerAdaptation:));
+    Method stubFactory = class_getClassMethod([UIViewLayoutRegion class], @selector(to_test_safeAreaLayoutRegionWithCornerAdaptation:));
+    Method realInsets = class_getInstanceMethod([UIView class], @selector(edgeInsetsForLayoutRegion:));
+    Method stubInsets = class_getInstanceMethod([UIView class], @selector(to_test_edgeInsetsForLayoutRegion:));
+    method_exchangeImplementations(realFactory, stubFactory);
+    method_exchangeImplementations(realInsets, stubInsets);
+    block();
+    method_exchangeImplementations(realInsets, stubInsets);
+    method_exchangeImplementations(realFactory, stubFactory);
+}
+
 @interface TOCropViewControllerTests : XCTestCase
 
 @end
@@ -591,6 +636,30 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     controller.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
     controller.view.frame = (CGRect){0, 0, 466, 678};
     XCTAssertFalse(controller.verticalLayout, @"a compact squat portrait display must keep the side toolbar");
+}
+
+- (void)testCropRegionClearsTheDisplaysRoundedCorners {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    TOCropRunWhileViewHasBottomSafeArea(^{
+        TOCropRunWhileDisplayHasRoundedCorners(^{
+            // The unfolded inner display in landscape: the toolbar guards the trailing
+            // edge, but the top and leading edges have no safe area at all, leaving the
+            // crop box's sharp corners poking into the display's rounded ones
+            controller.view.frame = (CGRect){0, 0, 951, 669};
+            [controller.view layoutIfNeeded];
+
+            UIEdgeInsets insets = controller.cropView.cropRegionInsets;
+            XCTAssertEqualWithAccuracy(insets.top, 16.0, FLT_EPSILON,
+                                       @"a bare top edge must take the display's concentric corner inset");
+            XCTAssertEqualWithAccuracy(insets.left, 16.0, FLT_EPSILON,
+                                       @"a bare leading edge must take the display's concentric corner inset");
+            XCTAssertEqualWithAccuracy(insets.bottom, 34.0, FLT_EPSILON,
+                                       @"an edge the safe area already clears must keep its own inset");
+            XCTAssertGreaterThan(insets.right, 16.0,
+                                 @"the toolbar's edge must keep its own larger inset");
+        });
+    });
 }
 
 - (void)testUncroppedCropBoxSurvivesRotationRoundTrips {
