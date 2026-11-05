@@ -43,6 +43,25 @@
 @property (nonatomic, readonly) BOOL verticalLayout;
 @end
 
+// Shows the cropped image centred in its safe area, the way a host app's own layout would
+@interface TOCropTestSafeAreaHostViewController : UIViewController
+@property (nonatomic, strong) UIImageView *imageView;
+@end
+
+@implementation TOCropTestSafeAreaHostViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.imageView = [[UIImageView alloc] init];
+    [self.view addSubview:self.imageView];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CGRect safeFrame = self.view.safeAreaLayoutGuide.layoutFrame;
+    self.imageView.frame = (CGRect){{CGRectGetMidX(safeFrame) - 150.0f, CGRectGetMidY(safeFrame) - 100.0f}, {300.0f, 200.0f}};
+}
+@end
+
 // UIScrollView won't report itself as dragging without a real touch sequence, so
 // stand in for one while a block runs
 @interface UIScrollView (TOCropTestDragging)
@@ -547,6 +566,21 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
         }
     }
     XCTAssertEqual(failures, 0, @"The locked crop box went out of shape: %@ (and %ld other steps)", firstFailure, (long)MAX(0, failures - 1));
+}
+
+// The image view showing a given image somewhere in a view's hierarchy, such as the one the
+// transition flies between the crop view controller and the view controller presenting it
+static UIImageView *TOCropImageViewShowingImage(UIView *view, UIImage *image) {
+    if ([view isKindOfClass:[UIImageView class]] && ((UIImageView *)view).image == image) {
+        return (UIImageView *)view;
+    }
+    for (UIView *subview in view.subviews) {
+        UIImageView *imageView = TOCropImageViewShowingImage(subview, image);
+        if (imageView) {
+            return imageView;
+        }
+    }
+    return nil;
 }
 
 // The custom transition only runs for animated presentations from a view controller
@@ -2027,6 +2061,53 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
         XCTAssertTrue(CGRectEqualToRect(controller.cropView.imageCropFrame, (CGRect){CGPointZero, {4032, 3024}}),
                       @"a restored whole image must still commit whole, not %@", NSStringFromCGRect(controller.cropView.imageCropFrame));
     });
+}
+
+- (void)testDismissingLandsTheImageWhereTheHostLaysItOutOnceTheStatusBarIsBack {
+    // On iPhones without a notch, the status bar hidden while cropping comes back as the crop view
+    // controller is dismissed, moving the safe area of the view underneath. The image should land
+    // where a view laid out in that safe area ends up, rather than where that view was a moment
+    // before, which left it to jump once the transition was done. (With a notch, the safe area
+    // stays put either way)
+    UIWindow *window = [self presentationTestWindow];
+    TOCropTestSafeAreaHostViewController *hostController = [[TOCropTestSafeAreaHostViewController alloc] init];
+    window.rootViewController = [[UINavigationController alloc] initWithRootViewController:hostController];
+    [window layoutIfNeeded];
+
+    TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    cropController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:cropController fromViewController:hostController animated:YES];
+
+    // Give the status bar time to fade out once the crop view controller is on screen
+    XCTestExpectation *statusBarHidden = [self expectationWithDescription:@"Status bar hidden"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [statusBarHidden fulfill];
+    });
+    [self waitForExpectations:@[statusBarHidden] timeout:5.0];
+
+    // Partway through the dismissal, see where the cropped image is going to land
+    UIImage *croppedImage = [self testImageWithSize:(CGSize){300, 200}];
+    __block CGRect landingFrame = CGRectNull;
+    XCTestExpectation *dismissed = [self expectationWithDescription:@"Dismissed"];
+    [cropController dismissAnimatedFromParentViewController:hostController
+                                           withCroppedImage:croppedImage
+                                                     toView:hostController.imageView
+                                                    toFrame:CGRectZero
+                                                      setup:^{
+                                                          // Lay the host out for the dismissal, as the sample app does
+                                                          [hostController.view setNeedsLayout];
+                                                          [hostController.view layoutIfNeeded];
+                                                      }
+                                                 completion:^{ [dismissed fulfill]; }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIImageView *flyingImageView = TOCropImageViewShowingImage(window, croppedImage);
+        landingFrame = [flyingImageView.superview convertRect:flyingImageView.frame toView:nil];
+    });
+    [self waitForExpectations:@[dismissed] timeout:5.0];
+
+    CGRect hostFrame = [hostController.imageView convertRect:hostController.imageView.bounds toView:nil];
+    XCTAssertTrue(CGRectEqualToRect(landingFrame, hostFrame), @"The image landed at %@, but the host laid it out at %@",
+                  NSStringFromCGRect(landingFrame), NSStringFromCGRect(hostFrame));
 }
 
 @end

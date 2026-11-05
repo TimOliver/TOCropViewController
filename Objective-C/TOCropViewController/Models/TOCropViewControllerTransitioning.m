@@ -24,6 +24,14 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+@interface TOCropViewControllerTransitioning ()
+
+@property (nonatomic, strong, nullable) UIImageView *imageView;      // The image as it flies to the destination view
+@property (nonatomic, strong, nullable) CADisplayLink *displayLink;  // Keeps an eye on the destination view while it does
+@property (nonatomic, assign) CFTimeInterval landingTime;            // When the image is due to land
+
+@end
+
 @implementation TOCropViewControllerTransitioning
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
@@ -107,6 +115,7 @@
                 imageView.frame = self.toFrame;
             }
             completion:^(BOOL complete) {
+                [self stopFollowingDestinationView];
                 [UIView animateWithDuration:0.25f
                     animations:^{
                         imageView.alpha = 0.0f;
@@ -115,6 +124,13 @@
                         [imageView removeFromSuperview];
                     }];
             }];
+
+        // The destination view can still move while the image is on its way, such as when a status bar
+        // hidden while cropping comes back and moves the safe area it's laid out in (on iPhones without a
+        // notch, the safe area only catches up a moment after the dismissal starts), so follow it there
+        if (self.isDismissing && self.toView) {
+            [self followDestinationViewWithImageView:imageView landingTime:CACurrentMediaTime() + [self transitionDuration:transitionContext]];
+        }
     }
 
     [UIView animateWithDuration:[self transitionDuration:transitionContext]
@@ -127,6 +143,47 @@
         }];
 }
 
+- (void)followDestinationViewWithImageView:(UIImageView *)imageView landingTime:(CFTimeInterval)landingTime {
+    self.imageView = imageView;
+    self.landingTime = landingTime;
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(destinationViewDisplayLinkFired)];
+    [self.displayLink addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
+}
+
+- (void)destinationViewDisplayLinkFired {
+    UIView *containerView = self.imageView.superview;
+    CFTimeInterval timeLeft = self.landingTime - CACurrentMediaTime();
+    if (self.toView.superview == nil || containerView == nil || timeLeft <= 0.0f) {
+        [self stopFollowingDestinationView];
+        return;
+    }
+
+    CGRect toFrame = [self.toView.superview convertRect:self.toView.frame toView:containerView];
+    if (CGRectEqualToRect(toFrame, self.toFrame)) {
+        return;
+    }
+
+    // Steer the image to where the view is now, landing at the same time it was going to. This adds to
+    // the animation already under way rather than replacing it, so the image carries on smoothly
+    self.toFrame = toFrame;
+    UIImageView *imageView = self.imageView;
+    [UIView animateWithDuration:timeLeft
+                          delay:0.0f
+         usingSpringWithDamping:1.0f
+          initialSpringVelocity:0.0f
+                        options:0
+                     animations:^{
+                         imageView.frame = toFrame;
+                     }
+                     completion:nil];
+}
+
+- (void)stopFollowingDestinationView {
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+    self.imageView = nil;
+}
+
 - (void)reset {
     self.image = nil;
     self.toView = nil;
@@ -134,6 +191,7 @@
     self.fromFrame = CGRectZero;
     self.toFrame = CGRectZero;
     self.prepareForTransitionHandler = nil;
+    [self stopFollowingDestinationView];
 }
 
 @end
