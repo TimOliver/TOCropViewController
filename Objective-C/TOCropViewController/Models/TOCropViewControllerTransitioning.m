@@ -64,6 +64,14 @@
         [cropViewController viewDidLayoutSubviews];
     } else if (previousView) {
         [containerView insertSubview:previousView belowSubview:cropViewController.view];
+
+        // Match the presentation: settle this view's layout now that it is back in the
+        // hierarchy. Its safe area insets can have changed while it was detached (on a
+        // display with a camera gutter, turning 180° between the landscapes mirrors them),
+        // and the fresh values only finish propagating in the window's own layout pass, so
+        // run one before any destination frames are measured out of this view
+        [previousView setNeedsLayout];
+        [containerView.window layoutIfNeeded];
     }
 
     // Perform any last UI updates now so we can potentially factor them into our calculations, but after

@@ -12,6 +12,7 @@
 
 #import "TOCropScrollView.h"
 #import "TOCropViewController.h"
+#import "TOCropViewControllerTransitioning.h"
 #import "UIImage+CropRotate.h"
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
@@ -248,6 +249,50 @@ static void TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(void (^block)(void
     method_exchangeImplementations(realBarFactory, stubBarFactory);
     method_exchangeImplementations(realSafeArea, stubSafeArea);
 }
+
+// A stand-in for the presenting view that a full screen presentation detaches: its layout
+// depends on inputs that refresh only once it is back in a window (the way safe areas do
+// after a 180° turn between landscapes), so wherever its subview sat while detached, a
+// real layout pass parks it at the settled spot
+@interface TOCropTestRelayoutingPresenterView : UIView
+@property (nonatomic, strong) UIView *destinationView;
+@property (nonatomic, assign) CGRect settledDestinationFrame;
+@end
+
+@implementation TOCropTestRelayoutingPresenterView
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.destinationView.frame = self.settledDestinationFrame;
+}
+@end
+
+@interface TOCropTestDismissalContext : NSObject <UIViewControllerContextTransitioning>
+@property (nonatomic, strong) UIView *containerView;
+@property (nonatomic, strong) UIViewController *fromViewController;
+@property (nonatomic, strong) UIViewController *toViewController;
+@property (nonatomic, strong) UIView *toView;
+@end
+
+@implementation TOCropTestDismissalContext
+- (UIViewController *)viewControllerForKey:(UITransitionContextViewControllerKey)key {
+    return [key isEqualToString:UITransitionContextFromViewControllerKey] ? self.fromViewController : self.toViewController;
+}
+- (UIView *)viewForKey:(UITransitionContextViewKey)key {
+    return [key isEqualToString:UITransitionContextToViewKey] ? self.toView : nil;
+}
+- (BOOL)isAnimated { return YES; }
+- (BOOL)isInteractive { return NO; }
+- (BOOL)transitionWasCancelled { return NO; }
+- (UIModalPresentationStyle)presentationStyle { return UIModalPresentationFullScreen; }
+- (void)updateInteractiveTransition:(CGFloat)percentComplete {}
+- (void)finishInteractiveTransition {}
+- (void)cancelInteractiveTransition {}
+- (void)pauseInteractiveTransition {}
+- (void)completeTransition:(BOOL)didComplete {}
+- (CGAffineTransform)targetTransform { return CGAffineTransformIdentity; }
+- (CGRect)initialFrameForViewController:(UIViewController *)vc { return self.containerView.bounds; }
+- (CGRect)finalFrameForViewController:(UIViewController *)vc { return self.containerView.bounds; }
+@end
 
 @interface TOCropViewControllerTests : XCTestCase
 
@@ -1550,6 +1595,41 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
                           kTOCropBoxHandleNames[handle], NSStringFromCGRect(frame), NSStringFromCGRect(startFrame));
         }
     }
+}
+
+- (void)testDismissalZoomAimsAtTheSettledDestinationFrame {
+    // A full screen presentation detaches the presenting view, so the layout it carries at
+    // dismissal can be stale (on a display with a camera gutter, turning 180° between the
+    // landscapes mirrors the safe areas underneath it). The zoom-out has to aim at where
+    // the destination view settles once a real layout pass runs, not where the stale
+    // layout left it, or the committed image lands offset and snaps over at the end
+    UIWindow *window = [[UIWindow alloc] initWithFrame:(CGRect){0, 0, 678, 466}];
+    UIView *containerView = [[UIView alloc] initWithFrame:window.bounds];
+    [window addSubview:containerView];
+
+    TOCropTestRelayoutingPresenterView *presenterView = [[TOCropTestRelayoutingPresenterView alloc] initWithFrame:window.bounds];
+    UIView *destinationView = [[UIView alloc] initWithFrame:(CGRect){{96, 102}, {408, 310}}];
+    [presenterView addSubview:destinationView];
+    presenterView.destinationView = destinationView;
+    presenterView.settledDestinationFrame = (CGRect){{180, 102}, {408, 310}};
+
+    UIViewController *presentingViewController = [[UIViewController alloc] init];
+    presentingViewController.view = presenterView;
+
+    TOCropTestDismissalContext *context = [[TOCropTestDismissalContext alloc] init];
+    context.containerView = containerView;
+    context.fromViewController = [[UIViewController alloc] init];
+    context.toViewController = presentingViewController;
+    context.toView = presenterView;
+
+    TOCropViewControllerTransitioning *transitioning = [[TOCropViewControllerTransitioning alloc] init];
+    transitioning.isDismissing = YES;
+    transitioning.toView = destinationView;
+    [transitioning animateTransition:context];
+
+    XCTAssertTrue(CGRectEqualToRect(transitioning.toFrame, presenterView.settledDestinationFrame),
+                  @"The zoom-out was aimed at %@ when the destination view settles at %@",
+                  NSStringFromCGRect(transitioning.toFrame), NSStringFromCGRect(presenterView.settledDestinationFrame));
 }
 
 @end
