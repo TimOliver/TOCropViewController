@@ -309,6 +309,14 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
 
+/**
+ Lay the content out again after a layout pass may have shifted the content bounds
+ (eg, the safe area insets settling once a presentation's status bar change lands).
+ An untouched image is laid out afresh so it stays at rest; a modified crop is
+ re-fitted to the new bounds, carrying the crop across
+ */
+- (void)performRelayoutForBoundsChange;
+
 @end
 
 NS_ASSUME_NONNULL_END

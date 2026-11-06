@@ -677,7 +677,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self adjustCropViewInsets];
-    [self.cropView moveCroppedContentToCenterAnimated:NO];
+    [self.cropView performRelayoutForBoundsChange];
 
     if (self.firstTime == NO) {
         [self.cropView performInitialSetup];
@@ -686,7 +686,7 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 
     if (self.title.length) {
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
-        [self.cropView moveCroppedContentToCenterAnimated:NO];
+        [self.cropView performRelayoutForBoundsChange];
     }
 
 }

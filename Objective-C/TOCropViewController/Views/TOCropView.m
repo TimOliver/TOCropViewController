@@ -744,6 +744,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)updateToImageCropFrame:(CGRect)imageCropframe {
+    // A crop of the whole image is the resting layout itself, so lay it out as such.
+    // Re-deriving it through the content bounds would zoom in by the fractions of a
+    // point the whole-point resting crop box leaves unoccupied, and the restored crop
+    // would read as modified, lighting up the reset button
+    if (CGRectEqualToRect(imageCropframe, (CGRect){CGPointZero, self.imageSize})) {
+        [self layoutInitialImage];
+        return;
+    }
+
     // Convert the image crop frame's size from image space to the screen space
     CGFloat minimumSize = self.scrollView.minimumZoomScale;
     CGPoint scaledOffset = (CGPoint){imageCropframe.origin.x * minimumSize, imageCropframe.origin.y * minimumSize};
@@ -1392,6 +1401,19 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated {
     [self moveCroppedContentToCenterAnimated:animated whenLaidOut:nil];
+}
+
+- (void)performRelayoutForBoundsChange {
+    // An image still at rest has nothing of its own to carry over, so lay it out afresh
+    // for wherever the bounds have landed. Re-fitting the whole-point resting layout
+    // would scale it off its minimum zoom over even a fraction-of-a-point inset change
+    // (eg, the status bar settling a beat after the presentation's first layout), and an
+    // untouched image would then read as a modified, resettable crop
+    if (self.initialSetupPerformed && !self.canBeReset) {
+        [self layoutInitialImage];
+        return;
+    }
+    [self moveCroppedContentToCenterAnimated:NO];
 }
 
 // The block runs as soon as the crop box has its final frame, which when animated is

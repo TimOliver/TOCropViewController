@@ -1597,6 +1597,52 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     }
 }
 
+- (void)testSettlingBoundsKeepAnUntouchedImageAtRest {
+    // The first layout can run against insets that settle a fraction of a point later
+    // (eg, the status bar finishing its hide a beat after presentation). Re-fitting the
+    // whole-point resting layout to the new bounds scales it off its minimum zoom, so an
+    // untouched image suddenly reads as a modified, resettable crop - it must be laid
+    // out afresh instead, and still be at rest
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 678, 466};
+        [controller.view layoutIfNeeded];
+        XCTAssertFalse(controller.cropView.canBeReset, @"an untouched image must start at rest");
+
+        controller.view.frame = (CGRect){0, 0, 678, 466.41666667};
+        [controller.view setNeedsLayout];
+        [controller.view layoutIfNeeded];
+
+        XCTAssertEqual(controller.cropView.scrollView.zoomScale, controller.cropView.scrollView.minimumZoomScale,
+                       @"an untouched image must stay fully zoomed out when the bounds settle");
+        XCTAssertFalse(controller.cropView.canBeReset,
+                       @"an untouched image must still be at rest after the bounds settle");
+    });
+}
+
+- (void)testCommittedWholeImageRestoresAtRest {
+    // Committing an image nobody touched reports the whole image as the crop, and
+    // restoring that crop into a fresh controller must come back to the resting state,
+    // not a crop a hair's breadth smaller that lights up the reset button
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 678, 466};
+        [controller.view layoutIfNeeded];
+
+        CGRect savedRect = controller.cropView.imageCropFrame;
+        XCTAssertTrue(CGRectEqualToRect(savedRect, (CGRect){CGPointZero, {4032, 3024}}),
+                      @"an untouched image must commit as the whole image, not %@", NSStringFromCGRect(savedRect));
+
+        controller.cropView.imageCropFrame = savedRect;
+        XCTAssertEqual(controller.cropView.scrollView.zoomScale, controller.cropView.scrollView.minimumZoomScale,
+                       @"restoring a whole-image crop must land fully zoomed out");
+        XCTAssertFalse(controller.cropView.canBeReset,
+                       @"restoring a whole-image crop must come back to the resting state");
+    });
+}
+
 - (void)testDismissalZoomAimsAtTheSettledDestinationFrame {
     // A full screen presentation detaches the presenting view, so the layout it carries at
     // dismissal can be stale (on a display with a camera gutter, turning 180° between the
