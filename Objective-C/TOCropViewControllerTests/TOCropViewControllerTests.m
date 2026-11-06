@@ -784,6 +784,51 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     });
 }
 
+- (void)testToolbarGlidesToItsSettledFrameAfterPresentation {
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        CGRect settledFrame = controller.toolbar.frame;
+
+        // While a presentation runs, the status bar's glyphs still hold the camera
+        // gutter column, so the strip rides out the animation placed further down the
+        // column. The fade that then dismisses them frees the strip's resting place,
+        // and the strip has to glide up to it with that fade, never teleport
+        controller.toolbar.frame = CGRectOffset(settledFrame, 0, 92);
+        [controller viewDidAppear:YES];
+        XCTAssertTrue(CGRectEqualToRect(controller.toolbar.frame, settledFrame),
+                      @"the fade must put the strip back on its settled frame");
+        XCTAssertTrue(controller.toolbar.layer.animationKeys.count > 0,
+                      @"the strip must animate to its settled frame, not teleport");
+    });
+}
+
+- (void)testStatusBarYieldsTheGutterColumnDuringPresentation {
+    // The status bar's glyphs stack down the same camera gutter column the side toolbar
+    // rests in, so on those displays the bar must hide with the presentation itself.
+    // Deferring its exit until the animation lands parks the strip under the glyphs,
+    // then migrates it into the room they leave behind
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        [controller viewWillAppear:YES];
+        XCTAssertTrue(controller.prefersStatusBarHidden,
+                      @"a side toolbar display must cede the status bar as the presentation starts");
+    });
+
+    // A phone whose status bar lies along the top edge keeps the gentler exit,
+    // fading it out only once the presentation has landed
+    TOCropViewController *classicController = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
+    classicController.view.frame = (CGRect){0, 0, 402, 874};
+    [classicController.view layoutIfNeeded];
+    [classicController viewWillAppear:YES];
+    XCTAssertFalse(classicController.prefersStatusBarHidden,
+                   @"a phone with a top status bar must keep it through the presentation animation");
+}
+
 - (void)testCropRegionClearsTheDisplaysRoundedCorners {
     TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){40, 20}]];
 

@@ -55,6 +55,11 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, assign) BOOL inTransition;
 
+/* The status bar fading in or out can hand the toolbar newly freed room (on some displays,
+ its glyphs occupy the camera gutter column the toolbar rests in), so layout passes inside
+ those fades carry the toolbar to its new frame as an animation instead of a teleport */
+@property (nonatomic, assign) BOOL animateToolbarLayout;
+
 /* If pushed from a navigation controller, the visibility of that controller's bars. */
 @property (nonatomic, assign) BOOL navigationBarHidden;
 @property (nonatomic, assign) BOOL toolbarHidden;
@@ -224,10 +229,17 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         [self setNeedsStatusBarAppearanceUpdate];
 #endif
         self.titleLabel.alpha = 1.0f;
+        // The departing status bar hands back any room its glyphs were holding, so
+        // settle the layout inside this same animation rather than a later pass
+        [self.view setNeedsLayout];
+        [self.view layoutIfNeeded];
     };
 
     if (animated) {
-        [UIView animateWithDuration:0.3f animations:updateContentBlock];
+        self.animateToolbarLayout = YES;
+        [UIView animateWithDuration:0.3f
+                         animations:updateContentBlock
+                         completion:^(BOOL finished) { self.animateToolbarLayout = NO; }];
     } else {
         updateContentBlock();
     }
@@ -249,8 +261,10 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     // Set the transition flag again so we can defer the status bar
     self.inTransition = YES;
 #if TARGET_OS_IOS
+    self.animateToolbarLayout = YES;
     [UIView animateWithDuration:0.5f
-                     animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+                     animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }
+                     completion:^(BOOL finished) { self.animateToolbarLayout = NO; }];
 #endif
 
     // Restore the navigation controller to its state before we were presented
@@ -288,6 +302,14 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
     // Disregard the transition animation if we're not actively overriding it
     if (!self.overrideStatusBar) {
         return self.statusBarHidden;
+    }
+
+    // On displays whose status bar glyphs stack down the camera gutter column, the side
+    // toolbar rests in that same column, so the status bar cedes it as the presentation
+    // starts; deferring its exit would park the toolbar beneath the glyphs, migrating it
+    // into the room they leave behind once the animation lands
+    if (TOCropViewUsesGlassDesign() && self.toolbarOnRightEdge) {
+        return YES;
     }
 
     // Work out whether the status bar needs to be visible
@@ -630,11 +652,28 @@ static const CGFloat kTOCropViewControllerSideToolbarAspectRatio = 0.62f;
         self.titleLabel.frame = [self frameForTitleLabelWithSize:self.titleLabel.frame.size verticalLayout:self.verticalLayout];
     }
 
-    [UIView performWithoutAnimation:^{
-        self.toolbar.frame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
+    CGRect toolbarFrame = [self frameForToolbarWithVerticalLayout:self.verticalLayout];
+    void (^layoutToolbar)(void) = ^{
+        self.toolbar.frame = toolbarFrame;
         [self adjustToolbarInsets];
         [self.toolbar setNeedsLayout];
-    }];
+    };
+
+    // Layout normally moves the toolbar with no animation of its own, but a pass inside
+    // the status bar's appearance fade can hand it newly freed room, so ride that fade
+    // as one smooth glide instead
+    if (self.animateToolbarLayout && !CGRectEqualToRect(self.toolbar.frame, toolbarFrame)) {
+        [UIView animateWithDuration:0.3f
+                              delay:0.0f
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             layoutToolbar();
+                             [self.toolbar layoutIfNeeded];
+                         }
+                         completion:nil];
+    } else {
+        [UIView performWithoutAnimation:layoutToolbar];
+    }
 
     self.cropView.frame = [self frameForCropViewWithVerticalLayout:self.verticalLayout];
     [self adjustCropViewInsets];
