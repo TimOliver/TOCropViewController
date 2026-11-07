@@ -106,6 +106,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 /* Reset state data */
 @property (nonatomic, assign) CGSize originalCropBoxSize;    /* Save the original crop box size so we can tell when the content has been edited */
 @property (nonatomic, assign) CGPoint originalContentOffset; /* Save the original content offset so we can tell if it's been scrolled. */
+@property (nonatomic, assign) CGRect initialCropBoxFrame;    /* The crop box just as the initial layout placed it, which keeps any aspect ratio that resetting would clear away */
+@property (nonatomic, assign) CGSize initialAspectRatio;     /* The aspect ratio the initial layout was laid out for */
 @property (nonatomic, assign, readwrite) BOOL canBeReset;
 
 /* If restoring to a previous crop setting, these properties hang onto the
@@ -298,6 +300,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         // the box a whole point when it's clamped into them, so keep it inside to begin with
         cropBoxSize = (CGSize){MIN(cropBoxSize.width, boundsSize.width), MIN(cropBoxSize.height, boundsSize.height)};
 
+        // The box will be floored to whole points, so centre it at that size, the same as every
+        // later re-centring does, or the first of those (eg, after a tap) nudges it by a point
+        cropBoxSize = (CGSize){floorf(cropBoxSize.width), floorf(cropBoxSize.height)};
+
         scale = MAX(cropBoxSize.width / imageSize.width, cropBoxSize.height / imageSize.height);
     }
 
@@ -341,6 +347,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     BOOL aspectRatioResetsAway = self.resetAspectRatioEnabled && self.hasAspectRatio;
     self.originalCropBoxSize = aspectRatioResetsAway ? scaledImageSize : self.cropBoxFrame.size;
     self.originalContentOffset = self.scrollView.contentOffset;
+    self.initialCropBoxFrame = self.cropBoxFrame;
+    self.initialAspectRatio = self.hasAspectRatio ? self.aspectRatio : CGSizeZero;
 
     [self checkForCanReset];
     [self matchForegroundToBackground];
@@ -353,9 +361,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)performRelayoutForRotation {
-    // An untouched crop is laid out from scratch instead of rescaled, so repeated
-    // rotations can never accumulate rounding drift into the cropped region
-    if (!self.canBeReset) {
+    // A crop still just as the initial layout placed it is laid out from scratch instead of
+    // rescaled, so repeated rotations can never accumulate rounding drift into the cropped region
+    if ([self cropMatchesInitialLayout]) {
         [self layoutInitialImage];
         return;
     }
@@ -744,15 +752,6 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)updateToImageCropFrame:(CGRect)imageCropframe {
-    // A crop of the whole image is the resting layout itself, so lay it out as such.
-    // Re-deriving it through the content bounds would zoom in by the fractions of a
-    // point the whole-point resting crop box leaves unoccupied, and the restored crop
-    // would read as modified, lighting up the reset button
-    if (CGRectEqualToRect(imageCropframe, (CGRect){CGPointZero, self.imageSize})) {
-        [self layoutInitialImage];
-        return;
-    }
-
     // Convert the image crop frame's size from image space to the screen space
     CGFloat minimumSize = self.scrollView.minimumZoomScale;
     CGPoint scaledOffset = (CGPoint){imageCropframe.origin.x * minimumSize, imageCropframe.origin.y * minimumSize};
@@ -1199,6 +1198,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     [self updateToImageCropFrame:imageCropFrame];
     [self captureCropForLockedRotation];
+    [self checkForCanReset];
 }
 
 - (void)setCroppingViewsHidden:(BOOL)hidden {
@@ -1368,13 +1368,16 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     if (resetCropbox) {
         // Save the edit for 90-degree rotations once the crop box has settled, which
-        // happens a moment later when animated
+        // happens a moment later when animated. Settling can also turn a box moved across
+        // the image (but no bigger or smaller) into a scroll of the content, which only
+        // shows up as resettable once the box is back in the middle
         __weak typeof(self) weakSelf = self;
         [self moveCroppedContentToCenterAnimated:animated
                                      whenLaidOut:^{
                                          [weakSelf captureStateForImageRotation];
                                          [weakSelf captureCropForLockedRotation];
                                          weakSelf.cropBoxLastEditedAngle = weakSelf.angle;
+                                         [weakSelf checkForCanReset];
                                      }];
     }
 
@@ -1404,12 +1407,17 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 }
 
 - (void)performRelayoutForBoundsChange {
-    // An image still at rest has nothing of its own to carry over, so lay it out afresh
+    // While the layout is being driven by hand (eg, through a rotation), leave it alone
+    if (self.internalLayoutDisabled) {
+        return;
+    }
+
+    // A crop still at rest has nothing of its own to carry over, so lay it out afresh
     // for wherever the bounds have landed. Re-fitting the whole-point resting layout
     // would scale it off its minimum zoom over even a fraction-of-a-point inset change
     // (eg, the status bar settling a beat after the presentation's first layout), and an
     // untouched image would then read as a modified, resettable crop
-    if (self.initialSetupPerformed && !self.canBeReset) {
+    if (self.initialSetupPerformed && [self cropMatchesInitialLayout]) {
         [self layoutInitialImage];
         return;
     }
@@ -1444,8 +1452,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
     cropFrame.size.width = ceilf(cropFrame.size.width * scale);
     cropFrame.size.height = ceilf(cropFrame.size.height * scale);
-    cropFrame.origin.x = contentRect.origin.x + ceilf((contentRect.size.width - cropFrame.size.width) * 0.5f);
-    cropFrame.origin.y = ceilf([self restingOriginYForHeight:cropFrame.size.height zoomScale:(self.scrollView.zoomScale * scale)]);
+    cropFrame.origin.x = contentRect.origin.x + floorf((contentRect.size.width - cropFrame.size.width) * 0.5f);
+    cropFrame.origin.y = floorf([self restingOriginYForHeight:cropFrame.size.height zoomScale:(self.scrollView.zoomScale * scale)]);
 
     // The content will re-center under wherever the crop box comes to rest
     CGPoint midPoint = (CGPoint){CGRectGetMidX(cropFrame), CGRectGetMidY(cropFrame)};
@@ -2026,6 +2034,38 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.canBeReset = canReset;
 }
 
+// Whether the crop is still just where the initial layout put it (to the point), so laying the
+// image out afresh can't change what's being cropped. Not the same as being unable to reset:
+// resetting can clear an aspect ratio away and show the whole image, while the initial layout
+// lays the ratio's band back out, and a box can be moved across the image without changing size
+- (BOOL)cropMatchesInitialLayout {
+    // With nothing laid out yet (before the initial setup, or for an image too small to lay
+    // out), there's no crop for a fresh layout to lose, nor a crop box that could be rescaled
+    CGRect cropBoxFrame = self.cropBoxFrame;
+    if (!self.initialSetupPerformed || CGRectGetWidth(cropBoxFrame) < FLT_EPSILON || CGRectGetHeight(cropBoxFrame) < FLT_EPSILON) {
+        return YES;
+    }
+
+    if (self.angle != 0 || self.scrollView.zoomScale > self.scrollView.minimumZoomScale + FLT_EPSILON) {
+        return NO;
+    }
+
+    // An aspect ratio chosen since then would lay out a different crop
+    CGSize aspectRatio = self.hasAspectRatio ? self.aspectRatio : CGSizeZero;
+    if (!CGSizeEqualToSize(aspectRatio, self.initialAspectRatio)) {
+        return NO;
+    }
+
+    CGRect initialCropBoxFrame = self.initialCropBoxFrame;
+    CGPoint contentOffset = self.scrollView.contentOffset;
+    return (NSInteger)floorf(CGRectGetMinX(cropBoxFrame)) == (NSInteger)floorf(CGRectGetMinX(initialCropBoxFrame)) &&
+           (NSInteger)floorf(CGRectGetMinY(cropBoxFrame)) == (NSInteger)floorf(CGRectGetMinY(initialCropBoxFrame)) &&
+           (NSInteger)floorf(CGRectGetWidth(cropBoxFrame)) == (NSInteger)floorf(CGRectGetWidth(initialCropBoxFrame)) &&
+           (NSInteger)floorf(CGRectGetHeight(cropBoxFrame)) == (NSInteger)floorf(CGRectGetHeight(initialCropBoxFrame)) &&
+           (NSInteger)floorf(contentOffset.x) == (NSInteger)floorf(self.originalContentOffset.x) &&
+           (NSInteger)floorf(contentOffset.y) == (NSInteger)floorf(self.originalContentOffset.y);
+}
+
 #pragma mark - Convienience Methods -
 // Where the top of a resting crop box of the given height should sit for a given zoom level.
 // While the image is fully zoomed out, the box sits perfectly vertically centered
@@ -2059,7 +2099,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     contentRect.origin.y = self.cropViewPadding + self.cropRegionInsets.top;
     contentRect.size.width = CGRectGetWidth(self.frame) - ((self.cropViewPadding * 2) + self.cropRegionInsets.left + self.cropRegionInsets.right);
     contentRect.size.height = CGRectGetHeight(self.frame) - ((self.cropViewPadding * 2) + self.cropRegionInsets.top + self.cropRegionInsets.bottom);
-    return contentRect;
+
+    // The crop box is laid out in whole points, so round the region inward to whole points
+    // too: fractional edges (eg, a display corner's third-of-a-point inset) make the box's
+    // floored fit and its ceil-clamped origin disagree, shaving a point off the box
+    CGFloat minX = ceil(CGRectGetMinX(contentRect));
+    CGFloat minY = ceil(CGRectGetMinY(contentRect));
+    CGFloat maxX = floor(CGRectGetMaxX(contentRect));
+    CGFloat maxY = floor(CGRectGetMaxY(contentRect));
+    return (CGRect){{minX, minY}, {MAX(0.0f, maxX - minX), MAX(0.0f, maxY - minY)}};
 }
 
 - (CGSize)imageSize {

@@ -16,10 +16,13 @@
 #import "UIImage+CropRotate.h"
 
 // Expose private state so tests can arm the reset timer, simulate an in-flight
-// rotation, drive the scroll view's touch hooks, and stand in for a touch landing
-// on the crop box or dragging its corners and edges
+// rotation, drive the scroll view's touch hooks, stand in for a touch landing
+// on the crop box or dragging its corners and edges, and settle an edit the way
+// the reset timer does
 @interface TOCropView (UnitTests) <UIGestureRecognizerDelegate>
 - (void)startResetTimer;
+- (void)startEditing;
+- (void)setEditing:(BOOL)editing resetCropBox:(BOOL)resetCropbox animated:(BOOL)animated;
 @property (nonatomic, assign) BOOL rotateAnimationInProgress;
 @property (nonatomic, strong, readonly) TOCropScrollView *scrollView;
 @property (nonatomic, strong, readonly) NSTimer *resetTimer;
@@ -1676,6 +1679,345 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
     XCTAssertTrue(CGRectEqualToRect(transitioning.toFrame, presenterView.settledDestinationFrame),
                   @"The zoom-out was aimed at %@ when the destination view settles at %@",
                   NSStringFromCGRect(transitioning.toFrame), NSStringFromCGRect(presenterView.settledDestinationFrame));
+}
+
+- (void)testProgrammaticCropAfterSetupSurvivesALayoutPass {
+    // A crop applied through imageCropFrame once the controller has laid out must stay
+    // applied through a later layout pass rather than snapping back to the whole image
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    controller.view.frame = (CGRect){0, 0, 402, 874};
+    [controller.view layoutIfNeeded];
+    XCTAssertFalse(controller.cropView.canBeReset, @"precondition: an untouched image starts at rest");
+
+    controller.imageCropFrame = (CGRect){{100, 75}, {200, 150}};
+    CGRect applied = controller.imageCropFrame;
+    XCTAssertLessThan(CGRectGetWidth(applied), 300.0, @"precondition: the crop was applied, got %@", NSStringFromCGRect(applied));
+
+    [controller.view setNeedsLayout];
+    [controller.view layoutIfNeeded];
+
+    CGRect afterLayout = controller.imageCropFrame;
+    XCTAssertEqualWithAccuracy(CGRectGetWidth(afterLayout), CGRectGetWidth(applied), 2.0,
+                               @"a layout pass discarded the programmatic crop: %@ became %@",
+                               NSStringFromCGRect(applied), NSStringFromCGRect(afterLayout));
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(afterLayout), CGRectGetMinX(applied), 2.0,
+                               @"a layout pass moved the programmatic crop: %@ became %@",
+                               NSStringFromCGRect(applied), NSStringFromCGRect(afterLayout));
+}
+
+- (void)testProgrammaticCropAfterSetupIsResettable {
+    // A crop applied through imageCropFrame once the controller has laid out is not the
+    // resting state, so Reset must be available for it
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){400, 300}]];
+    controller.view.frame = (CGRect){0, 0, 402, 874};
+    [controller.view layoutIfNeeded];
+
+    controller.imageCropFrame = (CGRect){{100, 75}, {200, 150}};
+    XCTAssertTrue(controller.cropView.canBeReset, @"a programmatically applied crop must be resettable");
+}
+
+- (void)testTapRecentreOnAnUntouchedImageStaysAtRestThroughLayout {
+    // A tap on the image starts the reset timer, whose recentre re-fits even an untouched
+    // image by a fraction of a point inside fractional content bounds; the next layout
+    // pass must still treat the image as untouched rather than lighting Reset
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 678, 466.41666667};
+        [controller.view layoutIfNeeded];
+        XCTAssertFalse(controller.cropView.canBeReset, @"precondition: an untouched image starts at rest");
+
+        CGRect restingBox = controller.cropView.cropBoxFrame;
+        [controller.cropView moveCroppedContentToCenterAnimated:NO];
+        XCTAssertTrue(CGRectEqualToRect(controller.cropView.cropBoxFrame, restingBox),
+                      @"the recentre after a tap must not re-fit an untouched image (%@ became %@)",
+                      NSStringFromCGRect(restingBox), NSStringFromCGRect(controller.cropView.cropBoxFrame));
+
+        [controller.view setNeedsLayout];
+        [controller.view layoutIfNeeded];
+        XCTAssertFalse(controller.cropView.canBeReset, @"a tap must not leave an untouched image resettable after layout");
+    });
+}
+
+- (void)testUntouchedPortraitCommitIsTheWholeImageWithFractionalInsets {
+    // Inside the cover display's fractional content bounds, Done on an untouched photo must
+    // still commit the whole image, not one a few pixels narrower
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        CGRect committed = controller.cropView.imageCropFrame;
+        XCTAssertTrue(CGRectEqualToRect(committed, (CGRect){CGPointZero, {4032, 3024}}),
+                      @"an untouched photo must commit whole, not %@ (box %@)",
+                      NSStringFromCGRect(committed), NSStringFromCGRect(controller.cropView.cropBoxFrame));
+    });
+}
+
+- (void)testNinetyDegreeRoundTripLeavesAnUntouchedImageAtRestWithFractionalInsets {
+    // Turning the image left and then back right changes nothing, so the reset button must
+    // stay dim even inside the cover display's fractional content bounds
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        CGRect restingBox = controller.cropView.cropBoxFrame;
+        [controller.cropView rotateImageNinetyDegreesAnimated:NO clockwise:NO completion:nil];
+        [controller.cropView rotateImageNinetyDegreesAnimated:NO clockwise:YES completion:nil];
+        XCTAssertFalse(controller.cropView.canBeReset,
+                       @"rotating left then right must leave an untouched image at rest (box %@, resting %@)",
+                       NSStringFromCGRect(controller.cropView.cropBoxFrame), NSStringFromCGRect(restingBox));
+    });
+}
+
+- (void)testLockedSquarePresetHoldsSteadyAcrossLayoutPassesWithFractionalInsets {
+    // A locked square crop must come to rest and stay there: repeated layout passes inside
+    // fractional content bounds must not keep growing or distorting it
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        controller.aspectRatioLockEnabled = YES;
+        [controller setAspectRatioPreset:(CGSize){1, 1} animated:NO];
+        [controller.view setNeedsLayout];
+        [controller.view layoutIfNeeded];
+
+        CGRect settled = controller.cropView.cropBoxFrame;
+        for (NSInteger pass = 0; pass < 5; pass++) {
+            [controller.view setNeedsLayout];
+            [controller.view layoutIfNeeded];
+        }
+        CGRect after = controller.cropView.cropBoxFrame;
+        XCTAssertTrue(CGRectEqualToRect(settled, after), @"layout passes moved the square crop box from %@ to %@",
+                      NSStringFromCGRect(settled), NSStringFromCGRect(after));
+        XCTAssertEqual(CGRectGetWidth(after), CGRectGetHeight(after), @"a square preset must stay square, got %@",
+                       NSStringFromCGRect(after));
+    });
+}
+
+// A square crop locked on a landscape photo, in a view wide enough to leave the box room to
+// move sideways over the image, where resetting keeps the ratio
+- (TOCropView *)lockedSquareCropViewWithRoomToMove {
+    return [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:(CGSize){4032, 3024}]
+                                                     frame:(CGRect){0, 0, 874, 402}
+                                             configuration:^(TOCropView *cropView) {
+                                                 cropView.aspectRatioLockEnabled = YES;
+                                                 cropView.resetAspectRatioEnabled = NO;
+                                                 cropView.aspectRatio = (CGSize){1, 1};
+                                             }];
+}
+
+// Drags the crop box's left edge in, then its right edge back out by the same distance, which
+// leaves the box the size it started at, but framing a part of the image further right
+- (void)moveCropBoxOfCropViewRight:(TOCropView *)cropView by:(CGFloat)distance {
+    [cropView startEditing];
+    [self dragCropBoxOfCropView:cropView handle:7 by:-distance afterEachStep:nil];
+    [self dragCropBoxOfCropView:cropView handle:3 by:distance afterEachStep:nil];
+}
+
+- (void)testWholeImageCropUnderAPresetSurvivesALayoutPass {
+    // Under a 16:9 preset, a crop of the whole image is no longer the preset's resting layout,
+    // so a later layout pass must carry the crop across rather than lay the band back out
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+    controller.view.frame = (CGRect){0, 0, 402, 874};
+    [controller.view layoutIfNeeded];
+    [controller setAspectRatioPreset:(CGSize){16, 9} animated:NO];
+    XCTAssertLessThan(CGRectGetHeight(controller.imageCropFrame), 2900.0, @"precondition: the preset cropped to a band, got %@",
+                      NSStringFromCGRect(controller.imageCropFrame));
+
+    controller.imageCropFrame = (CGRect){CGPointZero, {4032, 3024}};
+    XCTAssertEqualWithAccuracy(CGRectGetHeight(controller.imageCropFrame), 3024.0, 16.0, @"precondition: the whole image was applied, got %@",
+                               NSStringFromCGRect(controller.imageCropFrame));
+
+    [controller.view setNeedsLayout];
+    [controller.view layoutIfNeeded];
+    CGRect crop = controller.imageCropFrame;
+    XCTAssertEqualWithAccuracy(CGRectGetWidth(crop), 4032.0, 16.0, @"a layout pass changed the whole-image crop to %@", NSStringFromCGRect(crop));
+    XCTAssertEqualWithAccuracy(CGRectGetHeight(crop), 3024.0, 16.0, @"a layout pass turned the whole-image crop back into the preset's band, %@",
+                               NSStringFromCGRect(crop));
+}
+
+- (void)testWholeImageRestoredWithAPresetSurvivesAppearing {
+    // A host restoring a whole-image crop alongside a 16:9 preset: the preset is applied as the
+    // controller appears, and the layout pass inside its appearance must keep the restored crop
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+    controller.aspectRatioPreset = (CGSize){16, 9};
+    controller.imageCropFrame = (CGRect){CGPointZero, {4032, 3024}};
+
+    TOCropRunWhilePortraitTrailingEdgeHasCameraGutter(^{
+        [controller beginAppearanceTransition:YES animated:NO];
+        controller.view.frame = (CGRect){0, 0, 466, 678};
+        [controller.view layoutIfNeeded];
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(controller.imageCropFrame), 3024.0, 16.0, @"precondition: the whole image was restored, got %@",
+                                   NSStringFromCGRect(controller.imageCropFrame));
+
+        [controller endAppearanceTransition];
+        CGRect crop = controller.imageCropFrame;
+        XCTAssertEqualWithAccuracy(CGRectGetWidth(crop), 4032.0, 16.0, @"appearing changed the restored crop to %@", NSStringFromCGRect(crop));
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(crop), 3024.0, 16.0, @"appearing turned the restored crop back into the preset's band, %@",
+                                   NSStringFromCGRect(crop));
+    });
+}
+
+- (void)testWholeImageCropUnderAPresetSurvivesDeviceRotation {
+    // The same whole-image crop under a 16:9 preset, carried through the device rotation dance
+    TOCropView *cropView = [[TOCropView alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+    cropView.frame = (CGRect){0, 0, 320, 480};
+    [cropView performInitialSetup];
+    [cropView setAspectRatio:(CGSize){16, 9} animated:NO];
+    cropView.imageCropFrame = (CGRect){CGPointZero, {4032, 3024}};
+    XCTAssertEqualWithAccuracy(CGRectGetHeight(cropView.imageCropFrame), 3024.0, 16.0, @"precondition: the whole image was applied, got %@",
+                               NSStringFromCGRect(cropView.imageCropFrame));
+
+    for (NSInteger i = 0; i < 2; i++) {
+        [cropView prepareforRotation];
+        cropView.frame = (i % 2 == 0) ? (CGRect){0, 0, 480, 320} : (CGRect){0, 0, 320, 480};
+        [cropView performRelayoutForRotation];
+
+        CGRect crop = cropView.imageCropFrame;
+        XCTAssertEqualWithAccuracy(CGRectGetWidth(crop), 4032.0, 16.0, @"rotation %ld changed the whole-image crop to %@", (long)i,
+                                   NSStringFromCGRect(crop));
+        XCTAssertEqualWithAccuracy(CGRectGetHeight(crop), 3024.0, 16.0, @"rotation %ld turned the whole-image crop back into the preset's band, %@",
+                                   (long)i, NSStringFromCGRect(crop));
+    }
+}
+
+- (void)testCropMovedAcrossTheImageSurvivesALayoutPass {
+    // Dragging one edge of a locked box in and the opposite one back out moves the crop across the
+    // image without changing the box's size. Once the box re-centres, a later layout pass must
+    // carry that crop across rather than lay the resting layout back out over it
+    TOCropView *cropView = [self lockedSquareCropViewWithRoomToMove];
+    CGRect restingCrop = cropView.imageCropFrame;
+    [self moveCropBoxOfCropViewRight:cropView by:20.0f];
+    [cropView setEditing:NO resetCropBox:YES animated:NO];
+    CGRect movedCrop = cropView.imageCropFrame;
+    XCTAssertGreaterThan(CGRectGetMinX(movedCrop), CGRectGetMinX(restingCrop) + 100.0f, @"precondition: the crop moved right, from %@ to %@",
+                         NSStringFromCGRect(restingCrop), NSStringFromCGRect(movedCrop));
+
+    cropView.frame = (CGRect){0, 0, 874, 410};
+    [cropView performRelayoutForBoundsChange];
+    CGRect crop = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(crop), CGRectGetMinX(movedCrop), 16.0, @"a layout pass moved the crop from %@ to %@",
+                               NSStringFromCGRect(movedCrop), NSStringFromCGRect(crop));
+}
+
+- (void)testCropMovedAcrossTheImageSurvivesALayoutPassBeforeItRecentres {
+    // A layout pass can also land between the drag ending and the box re-centring, while the box
+    // still sits off to the side of where it rests
+    TOCropView *cropView = [self lockedSquareCropViewWithRoomToMove];
+    CGRect restingCrop = cropView.imageCropFrame;
+    [self moveCropBoxOfCropViewRight:cropView by:20.0f];
+    CGRect movedCrop = cropView.imageCropFrame;
+    XCTAssertGreaterThan(CGRectGetMinX(movedCrop), CGRectGetMinX(restingCrop) + 100.0f, @"precondition: the crop moved right, from %@ to %@",
+                         NSStringFromCGRect(restingCrop), NSStringFromCGRect(movedCrop));
+
+    [cropView performRelayoutForBoundsChange];
+    CGRect crop = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(crop), CGRectGetMinX(movedCrop), 16.0, @"a layout pass moved the crop from %@ to %@",
+                               NSStringFromCGRect(movedCrop), NSStringFromCGRect(crop));
+}
+
+- (void)testCropMovedAcrossTheImageSurvivesDeviceRotation {
+    // The same moved crop, carried through the device rotation dance
+    TOCropView *cropView = [self lockedSquareCropViewWithRoomToMove];
+    CGRect restingCrop = cropView.imageCropFrame;
+    [self moveCropBoxOfCropViewRight:cropView by:20.0f];
+    [cropView setEditing:NO resetCropBox:YES animated:NO];
+    CGRect movedCrop = cropView.imageCropFrame;
+    XCTAssertGreaterThan(CGRectGetMinX(movedCrop), CGRectGetMinX(restingCrop) + 100.0f, @"precondition: the crop moved right, from %@ to %@",
+                         NSStringFromCGRect(restingCrop), NSStringFromCGRect(movedCrop));
+
+    [cropView prepareforRotation];
+    cropView.frame = (CGRect){0, 0, 402, 874};
+    [cropView performRelayoutForRotation];
+    CGRect crop = cropView.imageCropFrame;
+    XCTAssertEqualWithAccuracy(CGRectGetMidX(crop), CGRectGetMidX(movedCrop), 16.0, @"rotating moved the crop from %@ to %@",
+                               NSStringFromCGRect(movedCrop), NSStringFromCGRect(crop));
+}
+
+- (void)testCropMovedAcrossTheImageIsResettable {
+    // The moved crop's box is the size it started at, but it frames a different part of the
+    // image, so once the box re-centres there is something for Reset to put back
+    TOCropView *cropView = [self lockedSquareCropViewWithRoomToMove];
+    XCTAssertFalse(cropView.canBeReset, @"precondition: an untouched crop starts at rest");
+    [self moveCropBoxOfCropViewRight:cropView by:20.0f];
+    [cropView setEditing:NO resetCropBox:YES animated:NO];
+    XCTAssertTrue(cropView.canBeReset, @"a crop moved across the image must be resettable, crop %@", NSStringFromCGRect(cropView.imageCropFrame));
+}
+
+- (void)testLayoutPassesLeaveTheCropAloneWhileInternalLayoutIsDisabled {
+    // While the controller lays the crop view out itself (eg, through a device rotation), the
+    // ordinary layout passes in between must leave it alone, untouched image or not
+    TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:(CGSize){4032, 3024}]
+                                                                     frame:(CGRect){0, 0, 402, 874}];
+    XCTAssertFalse(cropView.canBeReset, @"precondition: an untouched image starts at rest");
+    CGRect cropBoxFrame = cropView.cropBoxFrame;
+
+    cropView.internalLayoutDisabled = YES;
+    cropView.frame = (CGRect){0, 0, 874, 402};
+    [cropView performRelayoutForBoundsChange];
+    XCTAssertTrue(CGRectEqualToRect(cropView.cropBoxFrame, cropBoxFrame), @"a layout pass moved the crop box from %@ to %@ while internal layout was disabled",
+                  NSStringFromCGRect(cropBoxFrame), NSStringFromCGRect(cropView.cropBoxFrame));
+}
+
+- (void)testTapOnAnUntouchedLockedBandLeavesItAtRest {
+    // A tap re-centres the crop box once the reset timer fires. On a ratio band nobody has
+    // touched, that must leave it exactly where the initial layout put it, with nothing to
+    // reset, or the band falls off the fresh layout on every later layout pass
+    for (NSValue *ratioValue in @[ [NSValue valueWithCGSize:(CGSize){16, 9}], [NSValue valueWithCGSize:(CGSize){1, 1}],
+                                   [NSValue valueWithCGSize:(CGSize){3, 4}] ]) {
+        for (CGFloat width = 380.0f; width <= 440.0f; width += 3.0f) {
+            TOCropView *cropView = [self cropViewLaidOutLikeTheControllerWithImage:[self testImageWithSize:(CGSize){4032, 3024}]
+                                                                             frame:(CGRect){0, 0, width, 874}
+                                                                     configuration:^(TOCropView *cropView) {
+                                                                         cropView.resetAspectRatioEnabled = NO;
+                                                                         cropView.aspectRatio = ratioValue.CGSizeValue;
+                                                                     }];
+            CGRect restingBox = cropView.cropBoxFrame;
+            [cropView startEditing];
+            [cropView setEditing:NO resetCropBox:YES animated:NO];
+            XCTAssertTrue(CGRectEqualToRect(cropView.cropBoxFrame, restingBox), @"a tap moved the %@ band from %@ to %@ in a %.0fpt wide view",
+                          NSStringFromCGSize(ratioValue.CGSizeValue), NSStringFromCGRect(restingBox), NSStringFromCGRect(cropView.cropBoxFrame), width);
+            XCTAssertFalse(cropView.canBeReset, @"a tap left the untouched %@ band resettable in a %.0fpt wide view",
+                           NSStringFromCGSize(ratioValue.CGSizeValue), width);
+        }
+    }
+}
+
+- (void)testRotatingAZeroSizedCircularImageDoesNotCrash {
+    // A circular crop view starts with a square ratio, but an empty image never gets an initial
+    // layout, so there's no crop box for a rotation to rescale
+    TOCropView *cropView = [[TOCropView alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:[UIImage new]];
+    cropView.frame = (CGRect){0, 0, 320, 480};
+    [cropView performInitialSetup];
+    [cropView prepareforRotation];
+    cropView.frame = (CGRect){0, 0, 480, 320};
+    [cropView performRelayoutForRotation];
+    XCTAssertFalse(isnan(cropView.scrollView.zoomScale) || isinf(cropView.scrollView.minimumZoomScale),
+                   @"rotating an empty image produced zoom %f (minimum %f)", cropView.scrollView.zoomScale, cropView.scrollView.minimumZoomScale);
+}
+
+- (void)testRestoredWholeImageStaysAtRestThroughSettlingBounds {
+    // A whole-image crop restored into the controller is the resting layout itself, so when the
+    // bounds then settle it must still come back fully zoomed out, whole and untouched
+    TOCropViewController *controller = [[TOCropViewController alloc] initWithImage:[self testImageWithSize:(CGSize){4032, 3024}]];
+
+    TOCropRunWhileLandscapeLeadingEdgeHasCameraGutter(^{
+        controller.view.frame = (CGRect){0, 0, 678, 466};
+        [controller.view layoutIfNeeded];
+        controller.cropView.imageCropFrame = (CGRect){CGPointZero, {4032, 3024}};
+
+        controller.view.frame = (CGRect){0, 0, 678, 466.41666667};
+        [controller.view setNeedsLayout];
+        [controller.view layoutIfNeeded];
+        XCTAssertEqual(controller.cropView.scrollView.zoomScale, controller.cropView.scrollView.minimumZoomScale,
+                       @"a restored whole image must stay fully zoomed out when the bounds settle");
+        XCTAssertFalse(controller.cropView.canBeReset, @"a restored whole image must still be at rest after the bounds settle");
+        XCTAssertTrue(CGRectEqualToRect(controller.cropView.imageCropFrame, (CGRect){CGPointZero, {4032, 3024}}),
+                      @"a restored whole image must still commit whole, not %@", NSStringFromCGRect(controller.cropView.imageCropFrame));
+    });
 }
 
 @end

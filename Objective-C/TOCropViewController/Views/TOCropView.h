@@ -312,8 +312,9 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 /**
  Lay the content out again after a layout pass may have shifted the content bounds
  (eg, the safe area insets settling once a presentation's status bar change lands).
- An untouched image is laid out afresh so it stays at rest; a modified crop is
- re-fitted to the new bounds, carrying the crop across
+ A crop still just as the initial layout placed it is laid out afresh so it stays at
+ rest; any other crop is re-fitted to the new bounds, carrying the crop across.
+ Does nothing while `internalLayoutDisabled` is set.
  */
 - (void)performRelayoutForBoundsChange;
 
