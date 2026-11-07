@@ -802,10 +802,19 @@ static NSString *const kTOCropBoxHandleNames[8] = {@"top left", @"top", @"top ri
         controller.view.frame = (CGRect){0, 0, 678, 466};
         [controller.view layoutIfNeeded];
 
+        // From iOS 27.1 the system's bar region places the strip in the column; built against
+        // an earlier SDK, or running on an earlier version, it's centred in the 84pt gutter
+        // ((84 - 44) / 2) and starts a gutter's width down, clear of the camera
+        CGPoint expectedOrigin = (CGPoint){20, 84};
+#if defined(__IPHONE_27_1)
+        if (@available(iOS 27.1, *)) {
+            expectedOrigin = (CGPoint){26, 82};
+        }
+#endif
         CGRect toolbarFrame = controller.toolbar.frame;
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(toolbarFrame), 26.0, FLT_EPSILON,
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(toolbarFrame), expectedOrigin.x, FLT_EPSILON,
                                    @"the strip must sit inside the leading camera gutter");
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(toolbarFrame), 82.0, FLT_EPSILON,
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(toolbarFrame), expectedOrigin.y, FLT_EPSILON,
                                    @"the strip must start below the camera itself");
 
         UIEdgeInsets insets = controller.cropView.cropRegionInsets;
