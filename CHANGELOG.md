@@ -1,12 +1,20 @@
 Unreleased
 =============================================================
 
+3.3.0 Release Notes (2026-11-09)
+=============================================================
+
 ## Added
 
-- Full support for iPhone Duo, in all rotations and screen states. This is still early days, so any feedback on how or if it can be improved would be appreciated!
+- Full support for iPhone Duo, in all rotations and screen states. This is still early days, so any feedback on how or if it can be improved would be appreciated! ([#660](https://github.com/TimOliver/TOCropViewController/pull/660))
+- `TOCropToolbar.reverseVerticalContentLayout`, which anchors the Done button to the bottom of a vertical toolbar instead of the top.
+- `-[TOCropView performRelayoutForBoundsChange]`, which lays the crop out again after its content bounds have shifted, carrying any crop the user has made across.
 
 ## Fixed
 
+- On iOS 26, apps built with Xcode 16 (the iOS 18 SDK) showed no Done or Cancel buttons, as the toolbar laid itself out for the Liquid Glass design that the older SDK had compiled out. The glass design is now only used when both the SDK and the device support it. ([#655](https://github.com/TimOliver/TOCropViewController/issues/655))
+- On iOS 26, the aspect ratio picker could appear away from its button: offset sideways on iPhone, and in the wrong place entirely on iPad. ([#644](https://github.com/TimOliver/TOCropViewController/issues/644), [#657](https://github.com/TimOliver/TOCropViewController/issues/657))
+- On visionOS, the toolbar used `UICornerConfiguration` without checking for visionOS 26, which it requires. ([#658](https://github.com/TimOliver/TOCropViewController/pull/658))
 - Dismissing the crop view controller removed the presenting view controller's view when that controller wasn't full screen (such as a sheet, form sheet or popover), or when the crop view controller itself was presented over full screen. ([#661](https://github.com/TimOliver/TOCropViewController/pull/661))
 - Clearing `transitioningDelegate` to opt out of the custom transition had no effect, as it was installed again when the view loaded. ([#661](https://github.com/TimOliver/TOCropViewController/pull/661))
 - Tapping Done without making any changes, or after resetting, returned an image a few pixels smaller than the original (eg, 4032×3019 for a 4032×3024 photo), and each 90° rotation shaved off more. Crops that reach an edge of the image now include it exactly. ([#662](https://github.com/TimOliver/TOCropViewController/pull/662))
@@ -26,6 +34,13 @@ Unreleased
 - On iOS 26 and later, on displays with large rounded corners and no safe area along some edges (such as iPhone Duo's unfolded display), the corners of the crop box could poke into the display's own. The crop region now keeps clear of the display's corners along those edges.
 - On displays with a camera gutter down one side, such as iPhone Duo's cover display, turning the device 180° between landscape orientations while the crop view controller was presented full screen meant that dismissing to a view (with `dismissAnimatedFromParentViewController:withCroppedImage:toView:...`) aimed the image at where that view had been, then snapped it across to the view once the transition finished. The image now lands on the view where it ends up.
 - Setting `imageCropFrame` once the crop view controller was on screen applied the crop but left the reset button disabled.
+
+## Changed
+
+- On iOS 26, the aspect ratio picker is now a menu that opens out of the toolbar's aspect ratio button, instead of an action sheet.
+- The reset button now shows an undo arrow, rather than a circular arrow that read as a third rotate button.
+- On iOS 26, the Done button's checkmark is now always black, so it stays legible on the yellow button in dark mode.
+- On iOS 26, the display's corner radius (used to fit the toolbar between the rounded corners) is now read through public API, rather than a private `UIScreen` property.
 
 3.2.0 Release Notes (2026-07-28)
 =============================================================
